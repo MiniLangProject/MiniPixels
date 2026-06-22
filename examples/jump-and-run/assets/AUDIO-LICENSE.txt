@@ -1,0 +1,1 @@
+jump.wav, coin.wav, hurt.wav and win.wav are generated for this MiniPixels example and released as CC0.

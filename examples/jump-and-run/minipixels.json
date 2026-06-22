@@ -1,0 +1,27 @@
+{
+  "name": "jump-and-run",
+  "main": "src/main.ml",
+  "window": {
+    "title": "MiniPixels Jump and Run",
+    "width": 320,
+    "height": 180,
+    "scale": 4
+  },
+  "assets": [
+    {
+      "id": "player",
+      "type": "image",
+      "path": "assets/sprites/player_sheet.png"
+    },
+    {
+      "id": "enemy",
+      "type": "image",
+      "path": "assets/sprites/enemy_sheet.png"
+    },
+    {
+      "id": "tiles",
+      "type": "image",
+      "path": "assets/tiles/game_tiles.png"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 # MiniPixels build artifacts
 build/
 examples/*/build/
+.asset-work/
 *.exe
 *.pdb
 *.obj

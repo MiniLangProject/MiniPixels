@@ -122,6 +122,16 @@ python tools\minipixels.py run examples\scrolling-world\minipixels.json --compil
 
 Demonstrates tilemaps, camera scrolling, simple platform collision, world-edge clamping, parallax bands, and jump movement.
 
+### Jump and Run
+
+![Jump and Run](docs/images/jump-and-run.png)
+
+```powershell
+python tools\minipixels.py run examples\jump-and-run\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
+```
+
+Demonstrates a complete small platform game with a main menu, three levels, coins, enemies, stomp combat, exit gates, scrolling camera, sounds, animation, and free CC0/open assets.
+
 ### Pixel Effects
 
 ![Pixel Effects](docs/images/pixel-effects.png)
