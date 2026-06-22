@@ -1,0 +1,32 @@
+{
+  "name": "scrolling-world",
+  "main": "src/main.ml",
+  "window": {
+    "title": "MiniPixels Scrolling World",
+    "width": 320,
+    "height": 180,
+    "scale": 4
+  },
+  "assets": [
+    {
+      "id": "player",
+      "type": "image",
+      "path": "assets/sprites/player.png",
+      "width": 32,
+      "height": 16,
+      "kind": "player",
+      "color": [95, 220, 150, 255],
+      "secondary": [250, 210, 90, 255]
+    },
+    {
+      "id": "world",
+      "type": "image",
+      "path": "assets/tiles/world.png",
+      "width": 64,
+      "height": 16,
+      "kind": "tiles",
+      "color": [70, 150, 90, 255],
+      "secondary": [80, 80, 120, 255]
+    }
+  ]
+}

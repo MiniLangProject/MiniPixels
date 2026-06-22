@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "tileWidth": 16,
+  "tileHeight": 16,
+  "width": 60,
+  "height": 20,
+  "layers": [
+    { "name": "background", "type": "tile", "visible": true, "parallax": { "x": 0.5, "y": 0.5 } },
+    { "name": "collision", "type": "tile", "visible": false, "collision": true },
+    { "name": "foreground", "type": "tile", "visible": true }
+  ]
+}

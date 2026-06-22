@@ -1,0 +1,11 @@
+{
+  "name": "pixel-effects",
+  "main": "src/main.ml",
+  "window": {
+    "title": "MiniPixels Pixel Effects",
+    "width": 320,
+    "height": 180,
+    "scale": 4
+  },
+  "assets": []
+}

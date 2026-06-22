@@ -1,0 +1,17 @@
+# MiniPixels build artifacts
+build/
+examples/*/build/
+*.exe
+*.pdb
+*.obj
+*.ilk
+
+# Python
+__pycache__/
+*.pyc
+
+# Local/editor files
+.vscode/
+.idea/
+*.user
+*.tmp

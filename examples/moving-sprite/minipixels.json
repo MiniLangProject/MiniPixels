@@ -1,0 +1,22 @@
+{
+  "name": "moving-sprite",
+  "main": "src/main.ml",
+  "window": {
+    "title": "MiniPixels Moving Sprite",
+    "width": 320,
+    "height": 180,
+    "scale": 4
+  },
+  "assets": [
+    {
+      "id": "player",
+      "type": "image",
+      "path": "assets/player.png",
+      "width": 16,
+      "height": 16,
+      "kind": "player",
+      "color": [80, 180, 255, 255],
+      "secondary": [255, 120, 80, 255]
+    }
+  ]
+}
