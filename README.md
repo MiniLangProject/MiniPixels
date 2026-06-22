@@ -126,6 +126,12 @@ Demonstrates tilemaps, camera scrolling, simple platform collision, world-edge c
 
 ![Jump and Run](docs/images/jump-and-run.png)
 
+![Jump and Run Gameplay](docs/images/jump-and-run-gameplay.png)
+
+![Jump and Run Levels](docs/images/jump-and-run-levels.png)
+
+![Jump and Run Sprites](docs/images/jump-and-run-sprites.png)
+
 ```powershell
 python tools\minipixels.py run examples\jump-and-run\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```

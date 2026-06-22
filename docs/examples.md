@@ -84,6 +84,12 @@ end while
 
 ![Jump and Run](images/jump-and-run.png)
 
+![Jump and Run Gameplay](images/jump-and-run-gameplay.png)
+
+![Jump and Run Levels](images/jump-and-run-levels.png)
+
+![Jump and Run Sprites](images/jump-and-run-sprites.png)
+
 Run:
 
 ```powershell
