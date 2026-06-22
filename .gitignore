@@ -2,6 +2,7 @@
 build/
 examples/*/build/
 .asset-work/
+examples/jump-and-run/assets/*.zip
 *.exe
 *.pdb
 *.obj

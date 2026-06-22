@@ -2,12 +2,11 @@
 
 Graphics:
 
-- Source: Kenney Pixel Platformer
-- URL: https://kenney.nl/assets/pixel-platformer
-- License: Creative Commons CC0
-- Local license copy: `LICENSE-KENNEY-PIXEL-PLATFORMER.txt`
+- Source: GandalfHardcore FREE Platformer Assets
+- URL: https://gandalfhardcore.itch.io/free-pixel-art-sidescroller-asset-pack-32x32-overworld
+- License: see `LICENSE-GANDALFHARDCORE.txt`
 
-The checked-in PNGs are compact example sprite sheets assembled from the CC0 source pack so MiniPixels can compile them quickly through generated MiniLang assets.
+The checked-in PNGs are compact runtime sprite sheets assembled or adapted for this example so MiniPixels can compile them quickly through generated MiniLang assets. The original ZIP is not meant to be redistributed with the repository.
 
 Audio:
 
@@ -16,4 +15,4 @@ Audio:
 - `audio/hurt.wav`
 - `audio/win.wav`
 
-These WAV files are generated tones created for this MiniPixels example and released as CC0. See `AUDIO-LICENSE.txt`.
+These WAV files are generated sounds created for this MiniPixels example and released as CC0. See `AUDIO-LICENSE.txt`.

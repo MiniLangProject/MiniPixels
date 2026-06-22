@@ -33,11 +33,13 @@ world = void
 tileSheet = void
 playerSheet = void
 enemySheet = void
+bgSprite = void
 coinSprite = void
 exitSprite = void
 cloudSprite = void
 flowerSprite = void
 sparkSprite = void
+campfireSprite = void
 enemies = []
 coins = []
 enemyCount = 0
@@ -46,7 +48,7 @@ coinsTaken = 0
 spawnX = 36
 spawnY = 180
 exitX = 720
-exitY = 126
+exitY = 160
 
 function makeSolidData(w, h, level)
   data = array(w * h, 0)
@@ -59,49 +61,49 @@ function makeSolidData(w, h, level)
   end for
 
   if level == 0 then
-    for x = 7 to 13
-      data[(9 * w) + x] = 1
+    for x = 6 to 11
+      data[(5 * w) + x] = 1
     end for
-    for x = 18 to 24
-      data[(7 * w) + x] = 1
+    for x = 16 to 21
+      data[(4 * w) + x] = 1
     end for
-    for x = 31 to 38
-      data[(8 * w) + x] = 1
+    for x = 29 to 35
+      data[(5 * w) + x] = 1
     end for
   else if level == 1 then
     for x = 5 to 10
-      data[(10 * w) + x] = 1
-    end for
-    for x = 14 to 20
-      data[(8 * w) + x] = 1
-    end for
-    for x = 25 to 28
-      data[(6 * w) + x] = 1
-    end for
-    for x = 34 to 42
-      data[(8 * w) + x] = 1
-    end for
-    for x = 49 to 55
       data[(5 * w) + x] = 1
+    end for
+    for x = 14 to 19
+      data[(4 * w) + x] = 1
+    end for
+    for x = 24 to 28
+      data[(3 * w) + x] = 1
+    end for
+    for x = 33 to 40
+      data[(5 * w) + x] = 1
+    end for
+    for x = 45 to 51
+      data[(4 * w) + x] = 1
     end for
   else
     for x = 4 to 8
-      data[(10 * w) + x] = 1
-    end for
-    for x = 11 to 16
-      data[(8 * w) + x] = 1
-    end for
-    for x = 20 to 25
-      data[(6 * w) + x] = 1
-    end for
-    for x = 29 to 35
-      data[(8 * w) + x] = 1
-    end for
-    for x = 39 to 45
       data[(5 * w) + x] = 1
     end for
-    for x = 50 to 60
-      data[(9 * w) + x] = 1
+    for x = 12 to 17
+      data[(4 * w) + x] = 1
+    end for
+    for x = 22 to 27
+      data[(3 * w) + x] = 1
+    end for
+    for x = 32 to 38
+      data[(5 * w) + x] = 1
+    end for
+    for x = 42 to 48
+      data[(4 * w) + x] = 1
+    end for
+    for x = 53 to 62
+      data[(5 * w) + x] = 1
     end for
   end if
   return data
@@ -124,21 +126,21 @@ end function
 function loadLevel(n)
   global levelIndex, player, camera, world, enemies, coins, enemyCount, coinCount, coinsTaken, spawnX, spawnY, exitX, exitY
   levelIndex = n
-  w = 72 + (n * 10)
-  h = 14
+  w = 46 + (n * 8)
+  h = 9
   data = makeSolidData(w, h, n)
-  world = mp.tilemap(18, 18, w, h, mp.tileset(tileSheet), 2)
+  world = mp.tilemap(32, 32, w, h, mp.tileset(tileSheet), 2)
   world.addLayer(mp.tileLayer("ground", w, h, data, true, false, 1, 1))
   world.addLayer(mp.tileLayer("collision", w, h, data, false, true, 1, 1))
 
-  spawnX = 36
-  spawnY = 180
-  exitX = (w * 18) - 72
-  exitY = 180
+  spawnX = 48
+  spawnY = 192
+  exitX = (w * 32) - 96
+  exitY = 160
   player = Player(spawnX, spawnY, 0, 0, false, 1)
   camera = mp.camera(320, 180)
-  camera.worldWidth = w * 18
-  camera.worldHeight = h * 18
+  camera.worldWidth = w * 32
+  camera.worldHeight = h * 32
 
   enemies = array(6)
   coins = array(10)
@@ -146,18 +148,18 @@ function loadLevel(n)
   coinCount = 5 + n
   coinsTaken = 0
 
-  setEnemy(0, 230, 198, 200, 310)
-  setEnemy(1, 500, 198, 460, 590)
-  if n >= 1 then setEnemy(2, 640, 126, 590, 720) end if
-  if n >= 2 then setEnemy(3, 875, 198, 820, 960) end if
+  setEnemy(0, 360, 192, 330, 490)
+  setEnemy(1, 760, 192, 710, 900)
+  if n >= 1 then setEnemy(2, 1080, 128, 1030, 1210) end if
+  if n >= 2 then setEnemy(3, 1370, 192, 1310, 1510) end if
 
-  setCoin(0, 150, 148)
-  setCoin(1, 225, 112)
-  setCoin(2, 360, 76)
-  setCoin(3, 560, 94)
-  setCoin(4, exitX - 36, 148)
-  if n >= 1 then setCoin(5, 720, 76) end if
-  if n >= 2 then setCoin(6, 910, 58) end if
+  setCoin(0, 230, 124)
+  setCoin(1, 545, 92)
+  setCoin(2, 690, 92)
+  setCoin(3, 980, 124)
+  setCoin(4, exitX - 54, 124)
+  if n >= 1 then setCoin(5, 1160, 92) end if
+  if n >= 2 then setCoin(6, 1480, 124) end if
 end function
 
 function resetLevel()
@@ -165,16 +167,18 @@ function resetLevel()
 end function
 
 function initialize(game)
-  global tileSheet, playerSheet, enemySheet, coinSprite, exitSprite, cloudSprite, flowerSprite, sparkSprite
+  global tileSheet, playerSheet, enemySheet, bgSprite, coinSprite, exitSprite, cloudSprite, flowerSprite, sparkSprite, campfireSprite
   game.assets = gen.registry()
-  tileSheet = mp.spriteSheet(game.assets.getSprite("tiles").image, 18, 18, 0, 0)
-  playerSheet = mp.spriteSheet(game.assets.getSprite("player").image, 24, 24, 0, 0)
-  enemySheet = mp.spriteSheet(game.assets.getSprite("enemy").image, 24, 24, 0, 0)
-  coinSprite = tileSheet.getFrame(3)
-  exitSprite = tileSheet.getFrame(1)
-  cloudSprite = tileSheet.getFrame(7)
-  flowerSprite = tileSheet.getFrame(8)
-  sparkSprite = tileSheet.getFrame(9)
+  bgSprite = game.assets.getSprite("background")
+  tileSheet = mp.spriteSheet(game.assets.getSprite("tiles").image, 32, 32, 0, 0)
+  playerSheet = mp.spriteSheet(game.assets.getSprite("player").image, 24, 32, 0, 0)
+  enemySheet = mp.spriteSheet(game.assets.getSprite("enemy").image, 24, 32, 0, 0)
+  coinSprite = tileSheet.getFrame(1)
+  exitSprite = tileSheet.getFrame(3)
+  cloudSprite = tileSheet.getFrame(5)
+  flowerSprite = tileSheet.getFrame(5)
+  sparkSprite = tileSheet.getFrame(6)
+  campfireSprite = tileSheet.getFrame(6)
   loadLevel(0)
 end function
 
@@ -242,25 +246,25 @@ function updatePlay(game, dt)
   global player, camera, coinsTaken, state, levelIndex
   player.vx = 0
   if game.input.left then
-    player.vx = -105
+    player.vx = -130
     player.facing = -1
   end if
   if game.input.right then
-    player.vx = 105
+    player.vx = 130
     player.facing = 1
   end if
   if (game.input.jump or game.input.up) and player.grounded then
-    player.vy = -245
+    player.vy = -315
     player.grounded = false
     mp.playSound("assets\\audio\\jump.wav")
   end if
-  player.vy = player.vy + (620 * dt)
-  if player.vy > 260 then player.vy = 260 end if
+  player.vy = player.vy + (760 * dt)
+  if player.vy > 360 then player.vy = 360 end if
 
-  rect = mp.recti(player.x + 5, player.y + 5, 14, 18)
+  rect = mp.recti(player.x + 7, player.y + 3, 18, 29)
   res = mp.tileMoveAndCollide(world, rect, player.vx * dt, player.vy * dt)
-  player.x = res.x - 5
-  player.y = res.y - 5
+  player.x = res.x - 7
+  player.y = res.y - 3
   if player.x < 0 then
     player.x = 0
   end if
@@ -283,11 +287,11 @@ function updatePlay(game, dt)
   i = 0
   while i < enemyCount
     e = enemies[i]
-    if e.alive and rectHit(player.x + 5, player.y + 5, 14, 18, e.x + 4, e.y + 7, 16, 14) then
-      if player.vy > 20 and player.y + 18 < e.y + 10 then
+    if e.alive and rectHit(player.x + 7, player.y + 3, 18, 29, e.x + 5, e.y + 8, 23, 20) then
+      if player.vy > 20 and player.y + 28 < e.y + 13 then
         e.alive = false
         enemies[i] = e
-        player.vy = -150
+        player.vy = -210
         mp.playSound("assets\\audio\\coin.wav")
       else
         playerDie()
@@ -299,7 +303,7 @@ function updatePlay(game, dt)
   i = 0
   while i < coinCount
     c = coins[i]
-    if c.got == false and rectHit(player.x + 5, player.y + 5, 14, 18, c.x, c.y, 18, 18) then
+    if c.got == false and rectHit(player.x + 7, player.y + 3, 18, 29, c.x + 6, c.y + 4, 20, 24) then
       c.got = true
       coins[i] = c
       coinsTaken = coinsTaken + 1
@@ -308,7 +312,7 @@ function updatePlay(game, dt)
     i = i + 1
   end while
 
-  if rectHit(player.x + 5, player.y + 5, 14, 18, exitX, exitY, 18, 36) and coinsTaken >= coinCount then
+  if rectHit(player.x + 7, player.y + 3, 18, 29, exitX, exitY, 32, 64) and coinsTaken >= coinCount then
     if levelIndex < 2 then
       loadLevel(levelIndex + 1)
       mp.playSound("assets\\audio\\win.wav")
@@ -351,39 +355,32 @@ function update(game, dt)
 end function
 
 function drawParallax(canvas)
-  canvas.clear(mp.rgb(74, 112, 162))
-  canvas.fillRect(0, 0, 320, 72, mp.rgb(88, 142, 188))
-  canvas.fillRect(0 - (camera.x / 8), 44, 900, 24, mp.rgb(96, 150, 190))
-  canvas.fillRect(70 - (camera.x / 5), 76, 180, 22, mp.rgb(74, 122, 166))
-  canvas.fillRect(330 - (camera.x / 5), 66, 190, 28, mp.rgb(70, 116, 158))
-  canvas.drawSprite(cloudSprite, 36 - (camera.x / 7), 22)
-  canvas.drawSprite(cloudSprite, 154 - (camera.x / 6), 36)
-  canvas.drawSprite(cloudSprite, 278 - (camera.x / 7), 18)
-  canvas.drawSprite(cloudSprite, 442 - (camera.x / 6), 34)
+  canvas.clear(mp.rgb(126, 190, 207))
+  canvas.drawSpriteEx(bgSprite, 0, 0, false, false, 8, mp.rgba(255, 255, 255, 255))
+  canvas.fillRect(0, 100, 320, 80, mp.rgba(62, 91, 74, 120))
 end function
 
 function drawPlay(game, canvas)
-  coinFrame = cycle4(game, 6)
-  enemyFrame = cycle4(game, 8)
-  exitFrame = 1 + pulse2(game, 12)
+  coinFrame = pulse2(game, 7)
+  enemyFrame = pulse2(game, 9)
+  exitFrame = 3 + pulse2(game, 12)
   runFrame = cycle4(game, 5)
   idleFrame = pulse2(game, 28)
   drawParallax(canvas)
   world.draw(canvas, camera)
-  canvas.drawSprite(tileSheet.getFrame(exitFrame), exitX - camera.x, exitY - camera.y)
-  canvas.drawSprite(tileSheet.getFrame(exitFrame), exitX - camera.x, exitY - 18 - camera.y)
-  canvas.drawSprite(sparkSprite, exitX - camera.x, exitY - 37 - camera.y + bob4(coinFrame))
+  canvas.drawSpriteEx(tileSheet.getFrame(exitFrame), exitX - camera.x, exitY - camera.y, false, false, 2, mp.rgba(255, 255, 255, 255))
 
   for d = 0 to 10
-    dx = 112 + (d * 118)
-    canvas.drawSprite(flowerSprite, dx - camera.x, 215 - camera.y)
+    dx = 120 + (d * 146)
+    canvas.drawSprite(tileSheet.getFrame(5), dx - camera.x, 194 - camera.y)
   end for
+  canvas.drawSprite(tileSheet.getFrame(6), 72 - camera.x, 192 - camera.y)
 
   i = 0
   while i < coinCount
     c = coins[i]
     if c.got == false then
-      cspr = tileSheet.getFrame(3 + coinFrame)
+      cspr = tileSheet.getFrame(1 + coinFrame)
       canvas.drawSprite(cspr, c.x - camera.x, c.y - camera.y + bob4((coinFrame + i) % 4))
     end if
     i = i + 1
@@ -408,10 +405,10 @@ function drawPlay(game, canvas)
     pframe = 2 + runFrame
   end if
   if player.grounded == false and player.vy < 0 then
-    pframe = 6
+    pframe = 4
   end if
   if player.grounded == false and player.vy >= 0 then
-    pframe = 7
+    pframe = 5
   end if
   pspr = playerSheet.getFrame(pframe)
   if player.facing < 0 then
@@ -421,9 +418,9 @@ function drawPlay(game, canvas)
   end if
 
   for c = 0 to coinsTaken - 1
-    canvas.fillRect(6 + (c * 8), 6, 5, 5, mp.rgb(255, 216, 64))
+    canvas.drawSprite(tileSheet.getFrame(1), 6 + (c * 13), 6)
   end for
-  canvas.fillRect(6, 16, (levelIndex + 1) * 18, 4, mp.rgb(115, 230, 145))
+  canvas.fillRect(6, 21, (levelIndex + 1) * 22, 4, mp.rgb(116, 184, 90))
 end function
 
 function glyphRows(ch)
@@ -487,10 +484,11 @@ end function
 
 function drawMenuScreen(game, canvas, title, subtitle, color)
   menuFrame = cycle4(game, 8)
+  menuPulse = pulse2(game, 8)
   glow = pulse2(game, 18)
-  canvas.fillRect(0, 80, 320, 100, mp.rgb(40, 66, 100))
-  canvas.fillRect(0, 136, 320, 44, mp.rgb(38, 80, 62))
-  canvas.fillRect(0, 148, 320, 32, mp.rgb(42, 92, 70))
+  canvas.drawSpriteEx(bgSprite, 0, 0, false, false, 8, mp.rgba(255, 255, 255, 255))
+  canvas.fillRect(0, 136, 320, 44, mp.rgb(44, 74, 48))
+  canvas.fillRect(0, 150, 320, 30, mp.rgb(34, 58, 40))
   canvas.fillRect(44, 27, 232, 76, mp.rgba(0, 0, 0, 175))
   canvas.drawRect(44, 27, 232, 76, color)
   if glow == 1 then
@@ -499,13 +497,13 @@ function drawMenuScreen(game, canvas, title, subtitle, color)
   drawCentered(canvas, title, 44, 3, color)
   canvas.fillRect(83, 82, 154, 12, mp.rgb(255, 255, 255))
   drawCentered(canvas, subtitle, 84, 1, mp.rgb(30, 42, 60))
-  canvas.fillRect(42, 134, 42, 10, mp.rgb(84, 178, 104))
-  canvas.fillRect(47, 118, 26, 16, mp.rgb(84, 178, 104))
-  canvas.fillRect(238, 124, 40, 10, mp.rgb(84, 178, 104))
-  canvas.fillRect(250, 104, 18, 20, mp.rgb(84, 178, 104))
-  canvas.drawSprite(playerSheet.getFrame(2 + menuFrame), 92, 110 + bob4(menuFrame))
-  canvas.drawSprite(enemySheet.getFrame(menuFrame), 204, 116 + bob4((menuFrame + 1) % 4))
-  canvas.drawSprite(tileSheet.getFrame(3 + menuFrame), 148, 121 + bob4(menuFrame))
+  canvas.drawSprite(tileSheet.getFrame(0), 32, 120)
+  canvas.drawSprite(tileSheet.getFrame(0), 64, 120)
+  canvas.drawSprite(tileSheet.getFrame(0), 224, 120)
+  canvas.drawSprite(tileSheet.getFrame(0), 256, 120)
+  canvas.drawSprite(playerSheet.getFrame(2 + menuFrame), 96, 104 + bob4(menuFrame))
+  canvas.drawSprite(enemySheet.getFrame(menuPulse), 205, 112 + bob4((menuFrame + 1) % 4))
+  canvas.drawSprite(tileSheet.getFrame(1 + menuPulse), 149, 118 + bob4(menuFrame))
 end function
 
 function render(game, canvas)

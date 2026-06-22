@@ -1,0 +1,8 @@
+Source: GandalfHardcore FREE Platformer Assets
+URL: https://gandalfhardcore.itch.io/free-pixel-art-sidescroller-asset-pack-32x32-overworld
+
+The downloaded pack's README allows use of the assets for commercial and non-commercial video games and projects, and allows modification and display on designated websites.
+
+The README prohibits reselling, repackaging, or redistributing the assets; using them for AI training or NFT/Crypto/Blockchain/Web3 projects; and incorporating them into game development tools or printed materials.
+
+This example uses compact runtime sheets adapted from the pack for the MiniPixels Jump and Run example. Do not redistribute the original ZIP through this repository.

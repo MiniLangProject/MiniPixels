@@ -22,6 +22,11 @@
       "id": "tiles",
       "type": "image",
       "path": "assets/tiles/game_tiles.png"
+    },
+    {
+      "id": "background",
+      "type": "image",
+      "path": "assets/backgrounds/forest_bg.png"
     }
   ]
 }

@@ -21,8 +21,9 @@ Controls:
 
 Asset notes:
 
-- Character, enemy, coin, exit, and ground graphics are derived from Kenney Pixel Platformer, CC0: https://kenney.nl/assets/pixel-platformer
-- `assets/LICENSE-KENNEY-PIXEL-PLATFORMER.txt` contains the original Kenney license text.
-- `assets/audio/*.wav` are generated tones made for this example and released as CC0 in `assets/AUDIO-LICENSE.txt`.
+- World, background, tile, portal, cloud, grass, and campfire graphics are adapted from GandalfHardcore FREE Platformer Assets: https://gandalfhardcore.itch.io/free-pixel-art-sidescroller-asset-pack-32x32-overworld
+- The player, enemy, and coin sheets are compact runtime sprites made for this example to match the 32x32 pack.
+- `assets/LICENSE-GANDALFHARDCORE.txt` summarizes the source license terms from the downloaded pack.
+- `assets/audio/*.wav` are generated sounds made for this example and released as CC0 in `assets/AUDIO-LICENSE.txt`.
 
 The example intentionally uses compact sprite sheets. MiniPixels currently converts PNGs into generated MiniLang source at build time, so small sheets compile much faster than large background images.

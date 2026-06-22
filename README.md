@@ -130,7 +130,7 @@ Demonstrates tilemaps, camera scrolling, simple platform collision, world-edge c
 python tools\minipixels.py run examples\jump-and-run\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```
 
-Demonstrates a complete small platform game with a main menu, three levels, coins, enemies, stomp combat, exit gates, scrolling camera, sounds, animation, and free CC0/open assets.
+Demonstrates a complete small platform game with a main menu, three levels, coins, enemies, stomp combat, exit gates, scrolling camera, sounds, animation, and compact runtime assets adapted from the GandalfHardcore 32x32 sidescroller pack.
 
 ### Pixel Effects
 

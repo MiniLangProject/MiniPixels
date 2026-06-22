@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import shutil
 import struct
 import subprocess
 import sys
@@ -258,6 +259,12 @@ def build(project_file: Path, output: Path | None, compiler: Path, generated_dir
     ]
     print(" ".join(cmd))
     subprocess.check_call(cmd, cwd=str(root))
+    audio_src = root / "assets" / "audio"
+    if audio_src.exists():
+        audio_dst = output.parent / "assets" / "audio"
+        if audio_dst.exists():
+            shutil.rmtree(audio_dst)
+        shutil.copytree(audio_src, audio_dst)
     return output
 
 
