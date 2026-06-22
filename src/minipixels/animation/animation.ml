@@ -40,6 +40,7 @@ end function
 
 function addFrame(a, sprite, duration)
   if a.count >= len(a.frames) then return false end if
+  if duration <= 0 then duration = 0.016 end if
   a.frames[a.count] = sprite
   a.durations[a.count] = duration
   a.count = a.count + 1
@@ -52,6 +53,7 @@ function currentSprite(a)
 end function
 
 function stepForward(a)
+  if a.count <= 1 then return end if
   if a.pingPong then
     a.index = a.index + a.direction
     if a.index >= a.count then

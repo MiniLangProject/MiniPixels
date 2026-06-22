@@ -31,6 +31,7 @@ struct SpriteSheet
   spacing
   margin
   columns
+  frameCount
 
   function getFrame(index)
     return minipixels.graphics.sprite.spriteSheetFrame(this, index)
@@ -99,12 +100,21 @@ function spriteSheet(img, frameWidth, frameHeight, spacing, margin)
     available = available - step
   end while
   if columns < 1 then columns = 1 end if
-  return SpriteSheet(img, frameWidth, frameHeight, spacing, margin, columns)
+  availableY = img.height - (margin * 2) + spacing
+  stepY = frameHeight + spacing
+  rows = 0
+  while availableY >= stepY
+    rows = rows + 1
+    availableY = availableY - stepY
+  end while
+  if rows < 1 then rows = 1 end if
+  return SpriteSheet(img, frameWidth, frameHeight, spacing, margin, columns, columns * rows)
 end function
 
 function spriteSheetFrame(sheet, index)
   if typeof(index) != "int" then index = 0 end if
   if index < 0 then index = 0 end if
+  if index >= sheet.frameCount then index = sheet.frameCount - 1 end if
   col = index % sheet.columns
   row = 0
   scan = index

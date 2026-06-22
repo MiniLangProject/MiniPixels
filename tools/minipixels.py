@@ -178,11 +178,16 @@ def procedural_pixels(asset: dict) -> tuple[int, int, bytes]:
 
 
 def bytes_literal(data: bytes, indent: str = "  ") -> str:
-    lines = [f"{indent}pix = bytes({len(data)}, 0)"]
-    for i in range(0, len(data), 16):
-        chunk = data[i : i + 16]
-        for j, b in enumerate(chunk):
-            lines.append(f"{indent}pix[{i + j}] = {b}")
+    if not data:
+        return f"{indent}pix = bytes(0, 0)"
+    counts = [0] * 256
+    for b in data:
+        counts[b] += 1
+    default = max(range(256), key=lambda b: counts[b])
+    lines = [f"{indent}pix = bytes({len(data)}, {default})"]
+    for i, b in enumerate(data):
+        if b != default:
+            lines.append(f"{indent}pix[{i}] = {b}")
     return "\n".join(lines)
 
 

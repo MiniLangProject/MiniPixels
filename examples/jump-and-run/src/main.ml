@@ -8,6 +8,7 @@ struct Player
   vy
   grounded
   facing
+  coyote
 end struct
 
 struct Enemy
@@ -63,10 +64,10 @@ function makeSolidData(w, h, level)
     for x = 5 to 10
       data[(5 * w) + x] = 1
     end for
-    for x = 13 to 18
+    for x = 13 to 19
       data[(4 * w) + x] = 1
     end for
-    for x = 21 to 27
+    for x = 20 to 27
       data[(5 * w) + x] = 1
     end for
   else if level == 1 then
@@ -136,7 +137,7 @@ function loadLevel(n)
   spawnY = 192
   exitX = (w * 32) - 96
   exitY = 160
-  player = Player(spawnX, spawnY, 0, 0, false, 1)
+  player = Player(spawnX, spawnY, 0, 0, false, 1, 0)
   camera = mp.camera(320, 180)
   camera.worldWidth = w * 32
   camera.worldHeight = h * 32
@@ -251,9 +252,10 @@ function updatePlay(game, dt)
     player.vx = 130
     player.facing = 1
   end if
-  if (game.input.jump or game.input.up) and player.grounded then
+  if (game.input.jump or game.input.up) and (player.grounded or player.coyote > 0) then
     player.vy = -315
     player.grounded = false
+    player.coyote = 0
     mp.playSound("assets\\audio\\jump.wav")
   end if
   player.vy = player.vy + (760 * dt)
@@ -272,8 +274,11 @@ function updatePlay(game, dt)
   if res.hitBottom then
     player.vy = 0
     player.grounded = true
+    player.coyote = 0.09
   else
     player.grounded = false
+    player.coyote = player.coyote - dt
+    if player.coyote < 0 then player.coyote = 0 end if
   end if
   if res.hitTop then player.vy = 0 end if
   if player.y > camera.worldHeight then
@@ -364,7 +369,7 @@ end function
 
 function drawPlay(game, canvas)
   coinFrame = pulse2(game, 7)
-  enemyFrame = pulse2(game, 9)
+  enemyFrame = cycle4(game, 9)
   exitFrame = 3 + pulse2(game, 12)
   runFrame = cycle4(game, 5)
   idleFrame = pulse2(game, 28)
@@ -407,10 +412,10 @@ function drawPlay(game, canvas)
     pframe = 2 + runFrame
   end if
   if player.grounded == false and player.vy < 0 then
-    pframe = 4
+    pframe = 6
   end if
   if player.grounded == false and player.vy >= 0 then
-    pframe = 5
+    pframe = 7
   end if
   pspr = playerSheet.getFrame(pframe)
   if player.facing < 0 then
