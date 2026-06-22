@@ -121,6 +121,6 @@ end if
 
 Assets:
 
-- World, background, tile, portal, cloud, grass, and campfire graphics are adapted from GandalfHardcore FREE Platformer Assets: https://gandalfhardcore.itch.io/free-pixel-art-sidescroller-asset-pack-32x32-overworld
+- World, tile, portal, grass, and sign graphics are adapted from GandalfHardcore FREE Platformer Assets: https://gandalfhardcore.itch.io/free-pixel-art-sidescroller-asset-pack-32x32-overworld
 - The checked-in sheets are compact runtime assets for this example, not a redistribution of the original ZIP.
 - The small example sounds were generated for MiniPixels and are released as CC0 with the example.

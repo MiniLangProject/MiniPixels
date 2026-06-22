@@ -21,7 +21,7 @@ Controls:
 
 Asset notes:
 
-- World, background, tile, portal, cloud, grass, and campfire graphics are adapted from GandalfHardcore FREE Platformer Assets: https://gandalfhardcore.itch.io/free-pixel-art-sidescroller-asset-pack-32x32-overworld
+- World, tile, portal, grass, and sign graphics are adapted from GandalfHardcore FREE Platformer Assets: https://gandalfhardcore.itch.io/free-pixel-art-sidescroller-asset-pack-32x32-overworld
 - The player, enemy, and coin sheets are compact runtime sprites made for this example to match the 32x32 pack.
 - `assets/LICENSE-GANDALFHARDCORE.txt` summarizes the source license terms from the downloaded pack.
 - `assets/audio/*.wav` are generated sounds made for this example and released as CC0 in `assets/AUDIO-LICENSE.txt`.
