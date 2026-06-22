@@ -35,6 +35,9 @@ playerSheet = void
 enemySheet = void
 coinSprite = void
 exitSprite = void
+cloudSprite = void
+flowerSprite = void
+sparkSprite = void
 enemies = []
 coins = []
 enemyCount = 0
@@ -162,13 +165,16 @@ function resetLevel()
 end function
 
 function initialize(game)
-  global tileSheet, playerSheet, enemySheet, coinSprite, exitSprite
+  global tileSheet, playerSheet, enemySheet, coinSprite, exitSprite, cloudSprite, flowerSprite, sparkSprite
   game.assets = gen.registry()
   tileSheet = mp.spriteSheet(game.assets.getSprite("tiles").image, 18, 18, 0, 0)
   playerSheet = mp.spriteSheet(game.assets.getSprite("player").image, 24, 24, 0, 0)
   enemySheet = mp.spriteSheet(game.assets.getSprite("enemy").image, 24, 24, 0, 0)
-  coinSprite = tileSheet.getFrame(2)
+  coinSprite = tileSheet.getFrame(3)
   exitSprite = tileSheet.getFrame(1)
+  cloudSprite = tileSheet.getFrame(7)
+  flowerSprite = tileSheet.getFrame(8)
+  sparkSprite = tileSheet.getFrame(9)
   loadLevel(0)
 end function
 
@@ -205,6 +211,31 @@ function updateEnemies(dt)
     end if
     i = i + 1
   end while
+end function
+
+function animFrame(game, speed)
+  return game.time.frameNumber % speed
+end function
+
+function cycle4(game, speed)
+  t = game.time.frameNumber % (speed * 4)
+  if t < speed then return 0 end if
+  if t < speed * 2 then return 1 end if
+  if t < speed * 3 then return 2 end if
+  return 3
+end function
+
+function pulse2(game, speed)
+  t = game.time.frameNumber % (speed * 2)
+  if t < speed then return 0 end if
+  return 1
+end function
+
+function bob4(frame)
+  if frame == 0 then return 0 end if
+  if frame == 1 then return -1 end if
+  if frame == 2 then return 0 end if
+  return 1
 end function
 
 function updatePlay(game, dt)
@@ -320,24 +351,40 @@ function update(game, dt)
 end function
 
 function drawParallax(canvas)
-  canvas.clear(mp.rgb(55, 85, 128))
-  canvas.fillRect(0 - (camera.x / 6), 38, 900, 22, mp.rgb(82, 126, 168))
-  canvas.fillRect(90 - (camera.x / 4), 76, 160, 20, mp.rgb(72, 112, 150))
-  canvas.fillRect(340 - (camera.x / 4), 68, 180, 24, mp.rgb(72, 112, 150))
+  canvas.clear(mp.rgb(74, 112, 162))
+  canvas.fillRect(0, 0, 320, 72, mp.rgb(88, 142, 188))
+  canvas.fillRect(0 - (camera.x / 8), 44, 900, 24, mp.rgb(96, 150, 190))
+  canvas.fillRect(70 - (camera.x / 5), 76, 180, 22, mp.rgb(74, 122, 166))
+  canvas.fillRect(330 - (camera.x / 5), 66, 190, 28, mp.rgb(70, 116, 158))
+  canvas.drawSprite(cloudSprite, 36 - (camera.x / 7), 22)
+  canvas.drawSprite(cloudSprite, 154 - (camera.x / 6), 36)
+  canvas.drawSprite(cloudSprite, 278 - (camera.x / 7), 18)
+  canvas.drawSprite(cloudSprite, 442 - (camera.x / 6), 34)
 end function
 
 function drawPlay(game, canvas)
-  frame = intDiv(game.time.frameNumber, 10) % 2
+  coinFrame = cycle4(game, 6)
+  enemyFrame = cycle4(game, 8)
+  exitFrame = 1 + pulse2(game, 12)
+  runFrame = cycle4(game, 5)
+  idleFrame = pulse2(game, 28)
   drawParallax(canvas)
   world.draw(canvas, camera)
-  canvas.drawSprite(exitSprite, exitX - camera.x, exitY - camera.y)
-  canvas.drawSprite(exitSprite, exitX - camera.x, exitY - 18 - camera.y)
+  canvas.drawSprite(tileSheet.getFrame(exitFrame), exitX - camera.x, exitY - camera.y)
+  canvas.drawSprite(tileSheet.getFrame(exitFrame), exitX - camera.x, exitY - 18 - camera.y)
+  canvas.drawSprite(sparkSprite, exitX - camera.x, exitY - 37 - camera.y + bob4(coinFrame))
+
+  for d = 0 to 10
+    dx = 112 + (d * 118)
+    canvas.drawSprite(flowerSprite, dx - camera.x, 215 - camera.y)
+  end for
 
   i = 0
   while i < coinCount
     c = coins[i]
     if c.got == false then
-      canvas.drawSprite(coinSprite, c.x - camera.x, c.y - camera.y)
+      cspr = tileSheet.getFrame(3 + coinFrame)
+      canvas.drawSprite(cspr, c.x - camera.x, c.y - camera.y + bob4((coinFrame + i) % 4))
     end if
     i = i + 1
   end while
@@ -346,7 +393,7 @@ function drawPlay(game, canvas)
   while i < enemyCount
     e = enemies[i]
     if e.alive then
-      spr = enemySheet.getFrame(frame)
+      spr = enemySheet.getFrame(enemyFrame)
       if e.dir < 0 then
         canvas.drawSpriteEx(spr, e.x - camera.x, e.y - camera.y, true, false, 1, mp.rgba(255, 255, 255, 255))
       else
@@ -356,8 +403,16 @@ function drawPlay(game, canvas)
     i = i + 1
   end while
 
-  pframe = frame
-  if player.grounded == false then pframe = 0 end if
+  pframe = idleFrame
+  if player.grounded and player.vx != 0 then
+    pframe = 2 + runFrame
+  end if
+  if player.grounded == false and player.vy < 0 then
+    pframe = 6
+  end if
+  if player.grounded == false and player.vy >= 0 then
+    pframe = 7
+  end if
   pspr = playerSheet.getFrame(pframe)
   if player.facing < 0 then
     canvas.drawSpriteEx(pspr, player.x - camera.x, player.y - camera.y, true, false, 1, mp.rgba(255, 255, 255, 255))
@@ -430,12 +485,17 @@ function drawCentered(canvas, text, y, scale, color)
   drawText(canvas, text, (320 - width) / 2, y, scale, color)
 end function
 
-function drawMenuScreen(canvas, title, subtitle, color)
+function drawMenuScreen(game, canvas, title, subtitle, color)
+  menuFrame = cycle4(game, 8)
+  glow = pulse2(game, 18)
   canvas.fillRect(0, 80, 320, 100, mp.rgb(40, 66, 100))
   canvas.fillRect(0, 136, 320, 44, mp.rgb(38, 80, 62))
   canvas.fillRect(0, 148, 320, 32, mp.rgb(42, 92, 70))
   canvas.fillRect(44, 27, 232, 76, mp.rgba(0, 0, 0, 175))
   canvas.drawRect(44, 27, 232, 76, color)
+  if glow == 1 then
+    canvas.drawRect(46, 29, 228, 72, mp.rgba(255, 255, 255, 90))
+  end if
   drawCentered(canvas, title, 44, 3, color)
   canvas.fillRect(83, 82, 154, 12, mp.rgb(255, 255, 255))
   drawCentered(canvas, subtitle, 84, 1, mp.rgb(30, 42, 60))
@@ -443,12 +503,15 @@ function drawMenuScreen(canvas, title, subtitle, color)
   canvas.fillRect(47, 118, 26, 16, mp.rgb(84, 178, 104))
   canvas.fillRect(238, 124, 40, 10, mp.rgb(84, 178, 104))
   canvas.fillRect(250, 104, 18, 20, mp.rgb(84, 178, 104))
+  canvas.drawSprite(playerSheet.getFrame(2 + menuFrame), 92, 110 + bob4(menuFrame))
+  canvas.drawSprite(enemySheet.getFrame(menuFrame), 204, 116 + bob4((menuFrame + 1) % 4))
+  canvas.drawSprite(tileSheet.getFrame(3 + menuFrame), 148, 121 + bob4(menuFrame))
 end function
 
 function render(game, canvas)
   if state == 0 then
     canvas.clear(mp.rgb(18, 24, 42))
-    drawMenuScreen(canvas, "SKYLINE RUN", "SPACE OR UP", mp.rgb(78, 205, 196))
+    drawMenuScreen(game, canvas, "SKYLINE RUN", "SPACE OR UP", mp.rgb(78, 205, 196))
     return
   end if
   if state == 1 then
@@ -457,11 +520,11 @@ function render(game, canvas)
   end if
   if state == 2 then
     canvas.clear(mp.rgb(18, 30, 28))
-    drawMenuScreen(canvas, "YOU WIN", "SPACE OR UP", mp.rgb(255, 220, 80))
+    drawMenuScreen(game, canvas, "YOU WIN", "SPACE OR UP", mp.rgb(255, 220, 80))
     return
   end if
   canvas.clear(mp.rgb(36, 18, 28))
-  drawMenuScreen(canvas, "TRY AGAIN", "SPACE OR UP", mp.rgb(255, 90, 105))
+  drawMenuScreen(game, canvas, "TRY AGAIN", "SPACE OR UP", mp.rgb(255, 90, 105))
 end function
 
 function main(args)

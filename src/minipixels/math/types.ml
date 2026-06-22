@@ -155,6 +155,10 @@ function rectangleIntersects(a, b)
 end function
 
 function rgba(r, g, b, a)
+  if typeof(r) != "int" then r = 0 end if
+  if typeof(g) != "int" then g = 0 end if
+  if typeof(b) != "int" then b = 0 end if
+  if typeof(a) != "int" then a = 0 end if
   r = clamp(r, 0, 255)
   g = clamp(g, 0, 255)
   b = clamp(b, 0, 255)

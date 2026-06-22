@@ -72,7 +72,14 @@ end function
 function imageGetPixel(img, x, y)
   if x < 0 or y < 0 or x >= img.width or y >= img.height then return 0 end if
   i = imageIndex(img, x, y)
-  return mt.rgba(img.pixels[i], img.pixels[i + 1], img.pixels[i + 2], img.pixels[i + 3])
+  if typeof(i) != "int" then return 0 end if
+  if i < 0 or i + 3 >= len(img.pixels) then return 0 end if
+  r = img.pixels[i]
+  g = img.pixels[i + 1]
+  b = img.pixels[i + 2]
+  a = img.pixels[i + 3]
+  if typeof(r) != "int" or typeof(g) != "int" or typeof(b) != "int" or typeof(a) != "int" then return 0 end if
+  return mt.rgba(r, g, b, a)
 end function
 
 function spriteFromImage(img, name)
@@ -84,14 +91,27 @@ function spriteRegion(img, sx, sy, w, h, name)
 end function
 
 function spriteSheet(img, frameWidth, frameHeight, spacing, margin)
-  columns = (img.width - (margin * 2) + spacing) / (frameWidth + spacing)
+  available = img.width - (margin * 2) + spacing
+  step = frameWidth + spacing
+  columns = 0
+  while available >= step
+    columns = columns + 1
+    available = available - step
+  end while
   if columns < 1 then columns = 1 end if
   return SpriteSheet(img, frameWidth, frameHeight, spacing, margin, columns)
 end function
 
 function spriteSheetFrame(sheet, index)
+  if typeof(index) != "int" then index = 0 end if
+  if index < 0 then index = 0 end if
   col = index % sheet.columns
-  row = index / sheet.columns
+  row = 0
+  scan = index
+  while scan >= sheet.columns
+    row = row + 1
+    scan = scan - sheet.columns
+  end while
   sx = sheet.margin + (col * (sheet.frameWidth + sheet.spacing))
   sy = sheet.margin + (row * (sheet.frameHeight + sheet.spacing))
   return Sprite(sheet.image, sx, sy, sheet.frameWidth, sheet.frameHeight, 0, 0, sheet.image.name + "#" + index)
