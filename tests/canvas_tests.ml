@@ -23,6 +23,11 @@ function main(args)
   a.assertEq(canvas.getPixel(1, 6), mp.rgb(11, 22, 33), "fillRect snaps float coordinates")
   canvas.drawSprite(spr, 2.8, 5.9)
   a.assertEq(canvas.getPixel(2, 5), mp.rgb(255, 0, 0), "drawSprite snaps float coordinates")
+  textCanvas = minipixels.graphics.canvas.create(32, 16)
+  textCanvas.clear(mp.rgb(0, 0, 0))
+  mp.drawText(textCanvas, "A1", 1, 1, 1, mp.rgb(200, 210, 220))
+  a.assertEq(mp.textWidth("A1", 1), 11, "textWidth uses 5px glyphs plus spacing")
+  a.assertEq(textCanvas.getPixel(2, 1), mp.rgb(200, 210, 220), "drawText draws glyph pixels")
   print "=== CANVAS TESTS DONE ==="
   return 0
 end function

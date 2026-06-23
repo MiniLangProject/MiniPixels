@@ -430,65 +430,6 @@ function drawPlay(game, canvas)
   canvas.fillRect(6, 21, (levelIndex + 1) * 22, 4, mp.rgb(116, 184, 90))
 end function
 
-function glyphRows(ch)
-  if ch == "A" then return [14, 17, 17, 31, 17, 17, 17] end if
-  if ch == "C" then return [14, 17, 16, 16, 16, 17, 14] end if
-  if ch == "E" then return [31, 16, 16, 30, 16, 16, 31] end if
-  if ch == "G" then return [14, 17, 16, 23, 17, 17, 14] end if
-  if ch == "I" then return [14, 4, 4, 4, 4, 4, 14] end if
-  if ch == "K" then return [17, 18, 20, 24, 20, 18, 17] end if
-  if ch == "L" then return [16, 16, 16, 16, 16, 16, 31] end if
-  if ch == "N" then return [17, 25, 21, 19, 17, 17, 17] end if
-  if ch == "O" then return [14, 17, 17, 17, 17, 17, 14] end if
-  if ch == "P" then return [30, 17, 17, 30, 16, 16, 16] end if
-  if ch == "R" then return [30, 17, 17, 30, 20, 18, 17] end if
-  if ch == "S" then return [15, 16, 16, 14, 1, 1, 30] end if
-  if ch == "T" then return [31, 4, 4, 4, 4, 4, 4] end if
-  if ch == "U" then return [17, 17, 17, 17, 17, 17, 14] end if
-  if ch == "W" then return [17, 17, 17, 21, 21, 27, 17] end if
-  if ch == "Y" then return [17, 17, 10, 4, 4, 4, 4] end if
-  return [31, 17, 21, 17, 21, 17, 31]
-end function
-
-function glyphMask(x)
-  if x == 0 then return 16 end if
-  if x == 1 then return 8 end if
-  if x == 2 then return 4 end if
-  if x == 3 then return 2 end if
-  return 1
-end function
-
-function drawGlyph(canvas, ch, x, y, scale, color)
-  if ch == " " then return end if
-  rows = glyphRows(ch)
-  yy = 0
-  while yy < 7
-    row = rows[yy]
-    xx = 0
-    while xx < 5
-      mask = glyphMask(xx)
-      if (row & mask) != 0 then
-        canvas.fillRect(x + (xx * scale), y + (yy * scale), scale, scale, color)
-      end if
-      xx = xx + 1
-    end while
-    yy = yy + 1
-  end while
-end function
-
-function drawText(canvas, text, x, y, scale, color)
-  xx = x
-  for each ch in text
-    drawGlyph(canvas, ch, xx, y, scale, color)
-    xx = xx + (6 * scale)
-  end for
-end function
-
-function drawCentered(canvas, text, y, scale, color)
-  width = len(text) * 6 * scale
-  drawText(canvas, text, (320 - width) / 2, y, scale, color)
-end function
-
 function drawMenuScreen(game, canvas, title, subtitle, color)
   menuFrame = cycle4(game, 8)
   menuPulse = pulse2(game, 8)
@@ -503,9 +444,9 @@ function drawMenuScreen(game, canvas, title, subtitle, color)
   if glow == 1 then
     canvas.drawRect(46, 29, 228, 72, mp.rgba(255, 255, 255, 90))
   end if
-  drawCentered(canvas, title, 44, 3, color)
+  mp.drawTextCentered(canvas, title, 44, 3, color)
   canvas.fillRect(83, 82, 154, 12, mp.rgb(255, 255, 255))
-  drawCentered(canvas, subtitle, 84, 1, mp.rgb(30, 42, 60))
+  mp.drawTextCentered(canvas, subtitle, 84, 1, mp.rgb(30, 42, 60))
   canvas.drawSprite(tileSheet.getFrame(0), 32, 120)
   canvas.drawSprite(tileSheet.getFrame(0), 64, 120)
   canvas.drawSprite(tileSheet.getFrame(0), 224, 120)

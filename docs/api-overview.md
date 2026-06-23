@@ -40,7 +40,7 @@ Canvas memory stores bytes as `R, G, B, A`. The Win32 renderer converts to BGRA 
 
 ## Assets
 
-The CLI reads PNG assets at build time and generates MiniLang code:
+The CLI reads image assets at build time and generates MiniLang code:
 
 ```ml
 import generated.assets as gen
@@ -51,7 +51,65 @@ function initialize(game)
 end function
 ```
 
-Supported first-version PNGs are 8-bit RGB/RGBA.
+Supported embedded PNGs are 8-bit RGB/RGBA. Assets with `type: "audio"` or `type: "file"` are copied next to the executable instead of being embedded as image code.
+
+```json
+{
+  "id": "jumpSound",
+  "type": "audio",
+  "path": "assets/audio/jump.wav"
+}
+```
+
+## Text
+
+MiniPixels includes a small 5x7 bitmap font for menus, HUDs, and debug labels:
+
+```ml
+mp.drawText(canvas, "COINS 03", 8, 8, 1, mp.rgb(255, 255, 255))
+mp.drawTextCentered(canvas, "SKYLINE RUN", 44, 3, mp.rgb(78, 205, 196))
+width = mp.textWidth("READY", 2)
+```
+
+## Input
+
+The `game.input` state exposes booleans like `left`, `right`, `jump`, and `escape`. The facade also has edge helpers:
+
+```ml
+if mp.inputPressed(game.input, "jump") then
+  mp.playSound("assets\\audio\\jump.wav")
+end if
+if mp.inputReleased(game.input, "fire") then
+  mp.stopSound()
+end if
+```
+
+Input is sampled only when the game window has focus.
+
+## Animation
+
+```ml
+sheet = mp.spriteSheet(playerSprite.image, 32, 32, 0, 0)
+run = mp.animationFromSheet(sheet, 2, 4, 0.08)
+run.setPingPong(false)
+run.play()
+run.update(dt)
+canvas.drawSprite(run.currentSprite(), x, y)
+```
+
+Animations support `play`, `pause`, `stop`, `reset`, looping, ping-pong playback, per-frame durations, and speed scaling.
+
+## Audio
+
+The first audio layer uses the WinMM backend on Windows:
+
+```ml
+mp.playSound("assets\\audio\\coin.wav")
+mp.playSoundSync("assets\\audio\\intro.wav")
+mp.playSoundLoop("assets\\audio\\theme.wav")
+mp.playMusic("assets\\audio\\theme.wav")
+mp.stopSound()
+```
 
 ## Tilemaps
 

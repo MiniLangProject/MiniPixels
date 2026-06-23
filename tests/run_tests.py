@@ -23,6 +23,16 @@ def run_python_tests() -> None:
     assert "pix[2] = 255" in literal, literal
     assert "pix[4] = 255" in literal, literal
     assert "pix[0]" not in literal, literal
+    data = {
+        "assets": [
+            {"id": "hero", "type": "image", "path": "assets/hero.png"},
+            {"id": "music", "type": "audio", "path": "assets/audio/theme.wav"},
+            {"id": "script", "type": "file", "path": "assets/script.txt"},
+            {"id": "legacy", "path": "assets/legacy.png"},
+        ]
+    }
+    ids = [asset["id"] for asset in mod.embedded_assets(data)]
+    assert ids == ["hero", "legacy"], ids
     print("Python tool tests passed")
 
 

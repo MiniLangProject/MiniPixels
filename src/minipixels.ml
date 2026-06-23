@@ -3,6 +3,7 @@ package minipixels
 import minipixels.math.types as mt
 import minipixels.graphics.canvas as cv
 import minipixels.graphics.sprite as sp
+import minipixels.graphics.font as font
 import minipixels.input.input as inp
 import minipixels.core.time as tm
 import minipixels.platform.windows as win
@@ -74,12 +75,23 @@ function solidImage(width, height, color, name) return sp.solidImage(width, heig
 function spriteFromImage(img, name) return sp.spriteFromImage(img, name) end function
 function spriteSheet(img, fw, fh, spacing, margin) return sp.spriteSheet(img, fw, fh, spacing, margin) end function
 function animation(maxFrames) return anim.create(maxFrames) end function
+function animationFromSheet(sheet, start, count, duration) return anim.fromSheet(sheet, start, count, duration) end function
 function camera(width, height) return cam.create(width, height) end function
 function tileset(sheet) return tile.Tileset(sheet) end function
 function tilemap(tileWidth, tileHeight, width, height, tileset, maxLayers) return tile.create(tileWidth, tileHeight, width, height, tileset, maxLayers) end function
 function tileLayer(name, width, height, data, visible, collision, px, py) return tile.layer(name, width, height, data, visible, collision, px, py) end function
 function tileMoveAndCollide(map, rect, vx, vy) return tile.moveAndCollide(map, rect, vx, vy) end function
+function inputDown(input, action) return inp.isDown(input, action) end function
+function inputPressed(input, action) return inp.pressed(input, action) end function
+function inputReleased(input, action) return inp.released(input, action) end function
+function drawText(canvas, text, x, y, scale, color) return font.drawText(canvas, text, x, y, scale, color) end function
+function drawTextCentered(canvas, text, y, scale, color) return font.drawTextCentered(canvas, text, y, scale, color) end function
+function textWidth(text, scale) return font.textWidth(text, scale) end function
 function playSound(path) return aud.playSound(path) end function
+function playSoundSync(path) return aud.playSoundSync(path) end function
+function playSoundLoop(path) return aud.playSoundLoop(path) end function
+function playMusic(path) return aud.playMusic(path) end function
+function stopSound() return aud.stopSound() end function
 function frameHash(canvas) return dbg.captureHash(canvas) end function
 
 function callIfFunction(fn, a)

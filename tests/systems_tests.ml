@@ -1,4 +1,5 @@
 import minipixels as mp
+import minipixels.input.input as inp
 import minipixels.world.tilemap as tile
 import std.assert as a
 
@@ -43,6 +44,29 @@ function main(args)
   anim.play()
   anim.update(1.0)
   a.assertEq(anim.index, 0, "single frame animation stays valid")
+  anim.stop()
+  a.assertFalse(anim.playing, "stop pauses animation")
+  a.assertEq(anim.index, 0, "stop resets animation")
+
+  runAnim = mp.animationFromSheet(sheet2, 0, 2, 0.05)
+  runAnim.play()
+  runAnim.update(0.05)
+  a.assertEq(runAnim.index, 1, "animationFromSheet advances to next frame")
+  runAnim.setPingPong(true)
+  runAnim.update(0.05)
+  a.assertEq(runAnim.index, 0, "ping pong animation reverses at edge")
+
+  input = inp.create()
+  input.beginFrame()
+  inp.setKeyboard(input, true, false, false, false, false, false, false)
+  a.assertTrue(mp.inputPressed(input, "left"), "inputPressed detects new press")
+  a.assertTrue(mp.inputDown(input, "left"), "inputDown reads current key")
+  input.beginFrame()
+  inp.setKeyboard(input, false, false, false, false, false, false, false)
+  a.assertTrue(mp.inputReleased(input, "left"), "inputReleased detects release")
+
+  a.assertFalse(mp.playSound(123), "playSound rejects non-string")
+  a.assertFalse(mp.playSoundLoop(123), "playSoundLoop rejects non-string")
 
   r = mp.recti(3.75, 4.25, 12.9, 15.1)
   a.assertEq(r.x, 3, "recti floors x")

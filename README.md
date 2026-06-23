@@ -2,7 +2,7 @@
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses the existing `MiniLangCompilerPy` compiler and builds native Windows x64 executables.
 
-The first version focuses on a small but working vertical slice: a Win32 window, fixed logical framebuffer, nearest-neighbor scaling, keyboard input, sprites, build-time PNG assets, tilemaps, camera scrolling, simple collision, headless tests, and example projects.
+The first version focuses on a small but working vertical slice: a Win32 window, fixed logical framebuffer, nearest-neighbor scaling, focus-aware keyboard input, sprites, build-time PNG assets, runtime file assets, tilemaps, camera scrolling, simple collision, bitmap text, basic audio, headless tests, and example projects.
 
 ![Moving Sprite](docs/images/moving-sprite.png)
 
@@ -95,6 +95,11 @@ Example project file:
       "id": "player",
       "type": "image",
       "path": "assets/player.png"
+    },
+    {
+      "id": "jumpSound",
+      "type": "audio",
+      "path": "assets/audio/jump.wav"
     }
   ]
 }
@@ -159,12 +164,42 @@ python tools\minipixels.py build examples\moving-sprite\minipixels.json --compil
 python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```
 
-The CLI validates project JSON, reads 8-bit RGB/RGBA PNG files at build time, generates deterministic MiniLang asset modules, optionally packs assets into `.mpak`, and invokes the regular MiniLang compiler.
+The CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, generates deterministic MiniLang asset modules, copies runtime assets such as `type: "audio"` or `type: "file"` next to the executable, optionally packs assets into `.mpak`, and invokes the regular MiniLang compiler.
+
+## Mini Code Examples
+
+Text:
+
+```ml
+mp.drawText(canvas, "LEVEL 1", 8, 8, 1, mp.rgb(255, 255, 255))
+mp.drawTextCentered(canvas, "READY", 72, 2, mp.rgb(255, 220, 80))
+```
+
+Animation:
+
+```ml
+sheet = mp.spriteSheet(playerSprite.image, 32, 32, 0, 0)
+run = mp.animationFromSheet(sheet, 2, 4, 0.08)
+run.play()
+run.update(dt)
+canvas.drawSprite(run.currentSprite(), x, y)
+```
+
+Input and audio:
+
+```ml
+if mp.inputPressed(game.input, "jump") then
+  mp.playSound("assets\\audio\\jump.wav")
+end if
+mp.playMusic("assets\\audio\\theme.wav")
+mp.stopSound()
+```
 
 ## Engine Modules
 
 - `minipixels`: public facade and game loop
 - `minipixels.graphics.canvas`: framebuffer, primitives, sprite drawing
+- `minipixels.graphics.font`: 5x7 bitmap text helpers
 - `minipixels.graphics.sprite`: images, sprites, sprite sheets
 - `minipixels.platform.windows`: Win32 window, input, DIB renderer
 - `minipixels.input.input`: keyboard snapshot and action helpers
@@ -186,7 +221,9 @@ Implemented:
 - FPS in the window title
 - Safe pixel operations and primitive drawing
 - PNG-to-MiniLang build-time asset generation
+- Runtime asset copying for audio/file assets
 - Sprites, sprite sheets, animation
+- Facade helpers for text, input edges, animation-from-sheet, and audio loop/stop
 - Camera, scrolling, parallax bands
 - Tilemap culling and simple collision
 - Headless tests
@@ -195,7 +232,7 @@ Not yet implemented:
 
 - GPU renderer
 - Runtime PNG hot-loading
-- Audio mixer beyond the minimal WinMM hook
+- Cross-platform audio mixer beyond the WinMM hook
 - Full editor tooling
 - Advanced physics or ECS
 

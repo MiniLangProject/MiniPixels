@@ -50,7 +50,7 @@ Game logic, input polling, rendering, and Win32 presentation run on the main thr
 
 ## Implemented now
 
-Canvas, sprites, build-time PNG assets, sprite sheets, animation, camera, tilemaps, parallax, collision helpers, bitmap debug text, input/action snapshots, headless tests, Win32 reference renderer, CLI, and three examples are present.
+Canvas, sprites, build-time PNG assets, runtime audio/file asset copying, sprite sheets, animation helpers, camera, tilemaps, parallax, collision helpers, bitmap text, input/action snapshots, headless tests, Win32 reference renderer, CLI, and examples are present.
 
 ## Not yet in the vertical prototype
 

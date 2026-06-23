@@ -20,8 +20,24 @@ struct Animation
     this.playing = true
   end function
 
+  function stop()
+    return minipixels.animation.animation.stop(this)
+  end function
+
+  function reset()
+    return minipixels.animation.animation.reset(this)
+  end function
+
   function pause()
     this.playing = false
+  end function
+
+  function setLooping(value)
+    this.looping = value
+  end function
+
+  function setPingPong(value)
+    this.pingPong = value
   end function
 
   function update(dt)
@@ -45,6 +61,17 @@ function addFrame(a, sprite, duration)
   a.durations[a.count] = duration
   a.count = a.count + 1
   return true
+end function
+
+function reset(a)
+  a.index = 0
+  a.elapsed = 0
+  a.direction = 1
+end function
+
+function stop(a)
+  a.playing = false
+  reset(a)
 end function
 
 function currentSprite(a)
@@ -86,4 +113,15 @@ function update(a, dt)
     stepForward(a)
     if a.playing == false then break end if
   end while
+end function
+
+function fromSheet(sheet, start, count, duration)
+  a = create(count)
+  if count <= 0 then return a end if
+  i = 0
+  while i < count
+    a.addFrame(sheet.getFrame(start + i), duration)
+    i = i + 1
+  end while
+  return a
 end function

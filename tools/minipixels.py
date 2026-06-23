@@ -177,6 +177,15 @@ def procedural_pixels(asset: dict) -> tuple[int, int, bytes]:
     return w, h, bytes(buf)
 
 
+def is_embedded_asset(asset: dict) -> bool:
+    kind = str(asset.get("type", "image")).lower()
+    return kind in ("image", "procedural")
+
+
+def embedded_assets(data: dict) -> list[dict]:
+    return [asset for asset in data.get("assets", []) if is_embedded_asset(asset)]
+
+
 def bytes_literal(data: bytes, indent: str = "  ") -> str:
     if not data:
         return f"{indent}pix = bytes(0, 0)"
@@ -202,7 +211,7 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         "import minipixels.assets.assets as assets",
         "",
     ]
-    for asset in sorted(data.get("assets", []), key=lambda a: a["id"]):
+    for asset in sorted(embedded_assets(data), key=lambda a: a["id"]):
         aid = asset["id"]
         w, h, pix = procedural_pixels(asset)
         func = f"make_{aid}"
@@ -214,7 +223,7 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         lines.append("")
     lines.append("function registry()")
     lines.append("  reg = assets.create(64)")
-    for asset in sorted(data.get("assets", []), key=lambda a: a["id"]):
+    for asset in sorted(embedded_assets(data), key=lambda a: a["id"]):
         aid = asset["id"]
         lines.append(f'  reg.add("{aid}", make_{aid}())')
     lines.append("  return reg")
@@ -242,6 +251,37 @@ def pack(project_file: Path, output: Path) -> Path:
     return output
 
 
+def copy_runtime_assets(data: dict, root: Path, output: Path) -> None:
+    copied: set[Path] = set()
+
+    def copy_path(src: Path, rel: Path) -> None:
+        src = src.resolve()
+        if src in copied or not src.exists() or not src.is_file():
+            return
+        dst = output.parent / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst)
+        copied.add(src)
+
+    audio_src = root / "assets" / "audio"
+    if audio_src.exists():
+        audio_dst = output.parent / "assets" / "audio"
+        if audio_dst.exists():
+            shutil.rmtree(audio_dst)
+        shutil.copytree(audio_src, audio_dst)
+        for path in audio_src.rglob("*"):
+            if path.is_file():
+                copied.add(path.resolve())
+
+    for asset in data.get("assets", []):
+        if is_embedded_asset(asset):
+            continue
+        raw_path = asset.get("path")
+        if not raw_path:
+            continue
+        copy_path(root / raw_path, Path(raw_path))
+
+
 def build(project_file: Path, output: Path | None, compiler: Path, generated_dir: Path, keep_generated: bool = True) -> Path:
     data = validate(project_file)
     root = project_root(project_file)
@@ -264,12 +304,7 @@ def build(project_file: Path, output: Path | None, compiler: Path, generated_dir
     ]
     print(" ".join(cmd))
     subprocess.check_call(cmd, cwd=str(root))
-    audio_src = root / "assets" / "audio"
-    if audio_src.exists():
-        audio_dst = output.parent / "assets" / "audio"
-        if audio_dst.exists():
-            shutil.rmtree(audio_dst)
-        shutil.copytree(audio_src, audio_dst)
+    copy_runtime_assets(data, root, output)
     return output
 
 
