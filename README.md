@@ -94,7 +94,13 @@ Example project file:
     {
       "id": "player",
       "type": "image",
-      "path": "assets/player.png"
+      "path": "assets/player.png",
+      "sheet": {
+        "frameWidth": 32,
+        "frameHeight": 32,
+        "spacing": 0,
+        "margin": 0
+      }
     },
     {
       "id": "jumpSound",
@@ -164,7 +170,7 @@ python tools\minipixels.py build examples\moving-sprite\minipixels.json --compil
 python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```
 
-The CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, generates deterministic MiniLang asset modules, copies runtime assets such as `type: "audio"` or `type: "file"` next to the executable, optionally packs assets into `.mpak`, and invokes the regular MiniLang compiler.
+The CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, copies runtime assets such as `type: "audio"` or `type: "file"` next to the executable, writes `asset-report.json`, optionally packs assets into `.mpak`, and invokes the regular MiniLang compiler.
 
 ## Mini Code Examples
 
@@ -178,20 +184,28 @@ mp.drawTextCentered(canvas, "READY", 72, 2, mp.rgb(255, 220, 80))
 Animation:
 
 ```ml
-sheet = mp.spriteSheet(playerSprite.image, 32, 32, 0, 0)
+sheet = gen.sheet_player()
 run = mp.animationFromSheet(sheet, 2, 4, 0.08)
 run.play()
 run.update(dt)
 canvas.drawSprite(run.currentSprite(), x, y)
 ```
 
+Camera-space drawing:
+
+```ml
+mp.drawSpriteWorld(canvas, camera, playerSprite, player.x, player.y)
+mp.fillRectWorld(canvas, camera, coin.x, coin.y, 4, 4, mp.rgb(255, 220, 80))
+```
+
 Input and audio:
 
 ```ml
 if mp.inputPressed(game.input, "jump") then
-  mp.playSound("assets\\audio\\jump.wav")
+  mp.playSfx(game.audio, "assets\\audio\\jump.wav")
 end if
-mp.playMusic("assets\\audio\\theme.wav")
+game.audio.setSfxVolume(80)
+mp.playMusicWithState(game.audio, "assets\\audio\\theme.wav")
 mp.stopSound()
 ```
 
@@ -223,7 +237,8 @@ Implemented:
 - PNG-to-MiniLang build-time asset generation
 - Runtime asset copying for audio/file assets
 - Sprites, sprite sheets, animation
-- Facade helpers for text, input edges, animation-from-sheet, and audio loop/stop
+- Facade helpers for world drawing, text, input edges, animation-from-sheet, and audio state/loop/stop
+- Build-time SpriteSheet metadata and `asset-report.json`
 - Camera, scrolling, parallax bands
 - Tilemap culling and simple collision
 - Headless tests

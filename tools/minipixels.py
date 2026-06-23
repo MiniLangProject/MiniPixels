@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import struct
 import subprocess
@@ -17,6 +18,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
+ASSET_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
 
 def die(message: str, code: int = 1) -> None:
@@ -61,6 +63,8 @@ def validate(project_file: Path) -> dict:
         if not aid:
             errors.append(f"{project_file}: asset without id")
             continue
+        if not ASSET_ID_RE.match(str(aid)):
+            errors.append(f"{project_file}: asset id '{aid}' must be a MiniLang identifier")
         if aid in seen:
             errors.append(f"{project_file}: duplicate asset id '{aid}'")
         seen.add(aid)
@@ -69,6 +73,17 @@ def validate(project_file: Path) -> dict:
             errors.append(f"{project_file}: asset '{aid}' path does not exist: {path}")
         if path:
             asset["_absolute_path"] = str((root / path).resolve())
+        sheet = asset.get("sheet")
+        if sheet is not None:
+            if not isinstance(sheet, dict):
+                errors.append(f"{project_file}: asset '{aid}' sheet must be an object")
+            else:
+                fw = int(sheet.get("frameWidth", 0))
+                fh = int(sheet.get("frameHeight", 0))
+                if fw <= 0 or fh <= 0:
+                    errors.append(f"{project_file}: asset '{aid}' sheet.frameWidth and sheet.frameHeight must be greater than zero")
+                if int(sheet.get("spacing", 0)) < 0 or int(sheet.get("margin", 0)) < 0:
+                    errors.append(f"{project_file}: asset '{aid}' sheet.spacing and sheet.margin must not be negative")
 
     if errors:
         die("\n".join(errors))
@@ -186,6 +201,18 @@ def embedded_assets(data: dict) -> list[dict]:
     return [asset for asset in data.get("assets", []) if is_embedded_asset(asset)]
 
 
+def sheet_config(asset: dict) -> dict | None:
+    sheet = asset.get("sheet")
+    if not isinstance(sheet, dict):
+        return None
+    return {
+        "frameWidth": int(sheet.get("frameWidth", 0)),
+        "frameHeight": int(sheet.get("frameHeight", 0)),
+        "spacing": int(sheet.get("spacing", 0)),
+        "margin": int(sheet.get("margin", 0)),
+    }
+
+
 def bytes_literal(data: bytes, indent: str = "  ") -> str:
     if not data:
         return f"{indent}pix = bytes(0, 0)"
@@ -221,6 +248,15 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         lines.append(f'  return mp.spriteFromImage(img, "{aid}")')
         lines.append("end function")
         lines.append("")
+        sheet = sheet_config(asset)
+        if sheet is not None:
+            lines.append(f"function sheet_{aid}()")
+            lines.append(f"  spr = make_{aid}()")
+            lines.append(
+                f'  return mp.spriteSheet(spr.image, {sheet["frameWidth"]}, {sheet["frameHeight"]}, {sheet["spacing"]}, {sheet["margin"]})'
+            )
+            lines.append("end function")
+            lines.append("")
     lines.append("function registry()")
     lines.append("  reg = assets.create(64)")
     for asset in sorted(embedded_assets(data), key=lambda a: a["id"]):
@@ -249,6 +285,37 @@ def pack(project_file: Path, output: Path) -> Path:
     output.write_bytes(b"MPAK1\0" + struct.pack("<II", len(index), len(blob)) + index + blob)
     print(output)
     return output
+
+
+def asset_report(data: dict, root: Path) -> dict:
+    report = {"embedded": [], "runtime": [], "totals": {"embeddedBytes": 0, "runtimeBytes": 0}}
+    for asset in sorted(data.get("assets", []), key=lambda a: a["id"]):
+        raw_path = asset.get("path", "")
+        path = root / raw_path if raw_path else None
+        size = path.stat().st_size if path is not None and path.exists() else 0
+        entry = {
+            "id": asset["id"],
+            "type": str(asset.get("type", "image")),
+            "path": raw_path,
+            "bytes": size,
+        }
+        sheet = sheet_config(asset)
+        if sheet is not None:
+            entry["sheet"] = sheet
+        if is_embedded_asset(asset):
+            report["embedded"].append(entry)
+            report["totals"]["embeddedBytes"] += size
+        else:
+            report["runtime"].append(entry)
+            report["totals"]["runtimeBytes"] += size
+    return report
+
+
+def write_asset_report(data: dict, root: Path, output: Path) -> Path:
+    report_path = output.parent / "asset-report.json"
+    report_path.write_text(json.dumps(asset_report(data, root), indent=2, sort_keys=True), encoding="utf-8")
+    print(report_path)
+    return report_path
 
 
 def copy_runtime_assets(data: dict, root: Path, output: Path) -> None:
@@ -305,6 +372,7 @@ def build(project_file: Path, output: Path | None, compiler: Path, generated_dir
     print(" ".join(cmd))
     subprocess.check_call(cmd, cwd=str(root))
     copy_runtime_assets(data, root, output)
+    write_asset_report(data, root, output)
     return output
 
 

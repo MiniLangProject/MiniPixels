@@ -101,17 +101,17 @@ What it demonstrates:
 - Main menu, win screen, and retry screen
 - Three hand-authored scrolling levels
 - Player movement, jumping, gravity, tile collision, and camera follow
-- Coins, enemies, stomp combat, exits, and level transitions
-- Sprite-sheet animation and simple sound playback
-- Open/free asset workflow with compact generated MiniLang assets
+- Coins, enemies, stomp combat, locked exits, level intros, particle bursts, and level transitions
+- Sprite-sheet animation, stateful SFX playback, HUD text, and camera-space drawing helpers
+- Open/free asset workflow with compact generated MiniLang assets, manifest sheet metadata, and build-time asset reports
 
 MiniLang code excerpt:
 
 ```ml
-rect = mp.recti(player.x + 5, player.y + 5, 14, 18)
+rect = mp.recti(player.x + 6, player.y + 3, 18, 29)
 res = mp.tileMoveAndCollide(world, rect, player.vx * dt, player.vy * dt)
-player.x = res.x - 5
-player.y = res.y - 5
+player.x = res.x - 6
+player.y = res.y - 3
 
 if res.hitBottom then
   player.vy = 0
@@ -120,9 +120,11 @@ else
   player.grounded = false
 end if
 
-if rectHit(player.x + 5, player.y + 5, 14, 18, exitX, exitY, 18, 36) and coinsTaken >= coinCount then
+if rectHit(player.x + 6, player.y + 3, 18, 29, exitX, exitY, 32, 64) and coinsTaken >= coinCount then
   loadLevel(levelIndex + 1)
 end if
+
+mp.drawSpriteWorld(canvas, camera, playerSheet.getFrame(pframe), player.x, player.y)
 ```
 
 Assets:

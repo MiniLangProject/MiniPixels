@@ -23,9 +23,11 @@ canvas.clear(mp.rgb(20, 20, 30))
 canvas.setPixel(10, 10, mp.rgb(255, 0, 0))
 canvas.fillRect(20, 20, 32, 16, mp.rgba(255, 128, 0, 200))
 canvas.drawSprite(sprite, x, y)
+mp.drawSpriteWorld(canvas, camera, sprite, worldX, worldY)
 ```
 
 Coordinates are snapped to integer pixels. Out-of-bounds pixel writes are ignored safely.
+`drawSpriteEx` supports clipping, horizontal/vertical flips, integer scale, tint, and alpha blending. World helpers subtract a camera position without mutating canvas state.
 
 ## Colors
 
@@ -55,11 +57,25 @@ Supported embedded PNGs are 8-bit RGB/RGBA. Assets with `type: "audio"` or `type
 
 ```json
 {
-  "id": "jumpSound",
-  "type": "audio",
-  "path": "assets/audio/jump.wav"
+  "id": "player",
+  "type": "image",
+  "path": "assets/sprites/player_sheet.png",
+  "sheet": {
+    "frameWidth": 28,
+    "frameHeight": 32,
+    "spacing": 0,
+    "margin": 0
+  }
 }
 ```
+
+For sheet metadata the generated module exposes helpers such as:
+
+```ml
+sheet = gen.sheet_player()
+```
+
+Each build also writes `asset-report.json` next to the executable with embedded/runtime asset sizes and sheet metadata.
 
 ## Text
 
@@ -110,6 +126,18 @@ mp.playSoundLoop("assets\\audio\\theme.wav")
 mp.playMusic("assets\\audio\\theme.wav")
 mp.stopSound()
 ```
+
+Games also get `game.audio`, a small state layer for SFX/music volume and mute handling:
+
+```ml
+game.audio.setMasterVolume(90)
+game.audio.setSfxVolume(75)
+mp.playSfx(game.audio, "assets\\audio\\coin.wav")
+mp.playMusicWithState(game.audio, "assets\\audio\\theme.wav")
+game.audio.mute()
+```
+
+The current backend is still WinMM, so this is a control layer rather than a multi-voice mixer. It keeps game code stable for a future mixer backend.
 
 ## Tilemaps
 

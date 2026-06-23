@@ -11,17 +11,35 @@
     {
       "id": "player",
       "type": "image",
-      "path": "assets/sprites/player_sheet.png"
+      "path": "assets/sprites/player_sheet.png",
+      "sheet": {
+        "frameWidth": 28,
+        "frameHeight": 32,
+        "spacing": 0,
+        "margin": 0
+      }
     },
     {
       "id": "enemy",
       "type": "image",
-      "path": "assets/sprites/enemy_sheet.png"
+      "path": "assets/sprites/enemy_sheet.png",
+      "sheet": {
+        "frameWidth": 28,
+        "frameHeight": 32,
+        "spacing": 0,
+        "margin": 0
+      }
     },
     {
       "id": "tiles",
       "type": "image",
-      "path": "assets/tiles/game_tiles.png"
+      "path": "assets/tiles/game_tiles.png",
+      "sheet": {
+        "frameWidth": 32,
+        "frameHeight": 32,
+        "spacing": 0,
+        "margin": 0
+      }
     }
   ]
 }

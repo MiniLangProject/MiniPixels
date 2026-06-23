@@ -25,7 +25,7 @@ def run_python_tests() -> None:
     assert "pix[0]" not in literal, literal
     data = {
         "assets": [
-            {"id": "hero", "type": "image", "path": "assets/hero.png"},
+            {"id": "hero", "type": "image", "path": "assets/hero.png", "sheet": {"frameWidth": 16, "frameHeight": 24}},
             {"id": "music", "type": "audio", "path": "assets/audio/theme.wav"},
             {"id": "script", "type": "file", "path": "assets/script.txt"},
             {"id": "legacy", "path": "assets/legacy.png"},
@@ -33,6 +33,10 @@ def run_python_tests() -> None:
     }
     ids = [asset["id"] for asset in mod.embedded_assets(data)]
     assert ids == ["hero", "legacy"], ids
+    assert mod.sheet_config(data["assets"][0]) == {"frameWidth": 16, "frameHeight": 24, "spacing": 0, "margin": 0}
+    report = mod.asset_report(data, ROOT)
+    assert [entry["id"] for entry in report["embedded"]] == ["hero", "legacy"], report
+    assert [entry["id"] for entry in report["runtime"]] == ["music", "script"], report
     print("Python tool tests passed")
 
 

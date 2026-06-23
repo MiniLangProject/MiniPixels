@@ -61,6 +61,22 @@ struct Canvas
     return minipixels.graphics.canvas.drawSpriteEx(this, sprite, x, y, flipX, flipY, scale, tint)
   end function
 
+  function fillRectWorld(camera, x, y, w, h, color)
+    return minipixels.graphics.canvas.fillRectWorld(this, camera, x, y, w, h, color)
+  end function
+
+  function drawRectWorld(camera, x, y, w, h, color)
+    return minipixels.graphics.canvas.drawRectWorld(this, camera, x, y, w, h, color)
+  end function
+
+  function drawSpriteWorld(camera, sprite, x, y)
+    return minipixels.graphics.canvas.drawSpriteWorld(this, camera, sprite, x, y)
+  end function
+
+  function drawSpriteWorldEx(camera, sprite, x, y, flipX, flipY, scale, tint)
+    return minipixels.graphics.canvas.drawSpriteWorldEx(this, camera, sprite, x, y, flipX, flipY, scale, tint)
+  end function
+
   function beginCamera(camera)
     this.cameraX = camera.x
     this.cameraY = camera.y
@@ -281,6 +297,30 @@ function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
   end while
   c.spriteCount = c.spriteCount + 1
   c.drawCalls = c.drawCalls + 1
+end function
+
+function screenX(camera, x)
+  return x - camera.x
+end function
+
+function screenY(camera, y)
+  return y - camera.y
+end function
+
+function fillRectWorld(c, camera, x, y, w, h, color)
+  return fillRect(c, screenX(camera, x), screenY(camera, y), w, h, color)
+end function
+
+function drawRectWorld(c, camera, x, y, w, h, color)
+  return drawRect(c, screenX(camera, x), screenY(camera, y), w, h, color)
+end function
+
+function drawSpriteWorld(c, camera, spr, x, y)
+  return drawSprite(c, spr, screenX(camera, x), screenY(camera, y))
+end function
+
+function drawSpriteWorldEx(c, camera, spr, x, y, flipX, flipY, scale, tint)
+  return drawSpriteEx(c, spr, screenX(camera, x), screenY(camera, y), flipX, flipY, scale, tint)
 end function
 
 function hash(c)

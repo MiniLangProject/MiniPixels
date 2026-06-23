@@ -33,6 +33,7 @@ struct Game
   input
   time
   assets
+  audio
   scenes
   running
   window
@@ -57,6 +58,7 @@ function createGame(cfg)
     inp.create(),
     tm.create(cfg.updatesPerSecond),
     ast.create(64),
+    aud.create(),
     scn.create(16),
     true,
     void,
@@ -81,6 +83,10 @@ function tileset(sheet) return tile.Tileset(sheet) end function
 function tilemap(tileWidth, tileHeight, width, height, tileset, maxLayers) return tile.create(tileWidth, tileHeight, width, height, tileset, maxLayers) end function
 function tileLayer(name, width, height, data, visible, collision, px, py) return tile.layer(name, width, height, data, visible, collision, px, py) end function
 function tileMoveAndCollide(map, rect, vx, vy) return tile.moveAndCollide(map, rect, vx, vy) end function
+function fillRectWorld(canvas, camera, x, y, w, h, color) return cv.fillRectWorld(canvas, camera, x, y, w, h, color) end function
+function drawRectWorld(canvas, camera, x, y, w, h, color) return cv.drawRectWorld(canvas, camera, x, y, w, h, color) end function
+function drawSpriteWorld(canvas, camera, sprite, x, y) return cv.drawSpriteWorld(canvas, camera, sprite, x, y) end function
+function drawSpriteWorldEx(canvas, camera, sprite, x, y, flipX, flipY, scale, tint) return cv.drawSpriteWorldEx(canvas, camera, sprite, x, y, flipX, flipY, scale, tint) end function
 function inputDown(input, action) return inp.isDown(input, action) end function
 function inputPressed(input, action) return inp.pressed(input, action) end function
 function inputReleased(input, action) return inp.released(input, action) end function
@@ -92,6 +98,9 @@ function playSoundSync(path) return aud.playSoundSync(path) end function
 function playSoundLoop(path) return aud.playSoundLoop(path) end function
 function playMusic(path) return aud.playMusic(path) end function
 function stopSound() return aud.stopSound() end function
+function audioState() return aud.create() end function
+function playSfx(audio, path) return aud.playSfx(audio, path) end function
+function playMusicWithState(audio, path) return aud.playMusicWithState(audio, path) end function
 function frameHash(canvas) return dbg.captureHash(canvas) end function
 
 function callIfFunction(fn, a)
