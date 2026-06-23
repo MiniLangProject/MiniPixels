@@ -1,5 +1,7 @@
 # MiniPixels
 
+Current version: `0.2.0`
+
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses the existing `MiniLangCompilerPy` compiler and builds native Windows x64 executables.
 
 The first version focuses on a small but working vertical slice: a Win32 window, fixed logical framebuffer, nearest-neighbor scaling, focus-aware keyboard input, sprites, build-time PNG assets, runtime file assets, tilemaps, camera scrolling, simple collision, bitmap text, basic audio, headless tests, and example projects.
@@ -38,6 +40,12 @@ Run tests:
 
 ```powershell
 python tests\run_tests.py
+```
+
+Build all examples:
+
+```powershell
+python tools\build_examples.py
 ```
 
 ## Minimal Game
@@ -170,7 +178,7 @@ python tools\minipixels.py build examples\moving-sprite\minipixels.json --compil
 python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```
 
-The CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, copies runtime assets such as `type: "audio"` or `type: "file"` next to the executable, writes `asset-report.json`, optionally packs assets into `.mpak`, and invokes the regular MiniLang compiler.
+The CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, copies runtime assets such as `type: "audio"` or `type: "file"` next to the executable, generates `generated.levels` when `levels.path` is present, writes `asset-report.json`, optionally packs assets into `.mpak`, and invokes the regular MiniLang compiler.
 
 ## Mini Code Examples
 
@@ -201,8 +209,9 @@ mp.fillRectWorld(canvas, camera, coin.x, coin.y, 4, 4, mp.rgb(255, 220, 80))
 Input and audio:
 
 ```ml
+coin = mp.audioClip("assets\\audio\\coin.wav", "coin")
 if mp.inputPressed(game.input, "jump") then
-  mp.playSfx(game.audio, "assets\\audio\\jump.wav")
+  mp.playAudio(game.audio, coin)
 end if
 game.audio.setSfxVolume(80)
 mp.playMusicWithState(game.audio, "assets\\audio\\theme.wav")
@@ -239,9 +248,12 @@ Implemented:
 - Sprites, sprite sheets, animation
 - Facade helpers for world drawing, text, input edges, animation-from-sheet, and audio state/loop/stop
 - Build-time SpriteSheet metadata and `asset-report.json`
+- Build-time level JSON generation through `generated.levels`
 - Camera, scrolling, parallax bands
 - Tilemap culling and simple collision
-- Headless tests
+- Headless and framehash regression tests
+- GitHub Actions CI for tests and example builds
+- Version file, changelog, and first-game guide
 
 Not yet implemented:
 
@@ -251,4 +263,4 @@ Not yet implemented:
 - Full editor tooling
 - Advanced physics or ECS
 
-More detail is in [docs/getting-started.md](docs/getting-started.md), [docs/examples.md](docs/examples.md), and [docs/minipixels-architecture.md](docs/minipixels-architecture.md).
+More detail is in [docs/getting-started.md](docs/getting-started.md), [docs/first-game.md](docs/first-game.md), [docs/examples.md](docs/examples.md), and [docs/minipixels-architecture.md](docs/minipixels-architecture.md). Release notes are in [CHANGELOG.md](CHANGELOG.md).

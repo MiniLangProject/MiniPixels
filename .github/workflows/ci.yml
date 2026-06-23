@@ -1,0 +1,37 @@
+name: MiniPixels CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  windows:
+    name: Windows tests and examples
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout MiniPixels
+        uses: actions/checkout@v5
+        with:
+          path: MiniPixels
+
+      - name: Checkout MiniLangCompilerPy
+        uses: actions/checkout@v5
+        with:
+          repository: MiniLangProject/MiniLangCompilerPy
+          path: MiniLangCompilerPy
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run MiniPixels tests
+        working-directory: MiniPixels
+        run: python tests\run_tests.py
+
+      - name: Build examples
+        working-directory: MiniPixels
+        run: python tools\build_examples.py

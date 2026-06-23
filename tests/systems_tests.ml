@@ -4,6 +4,7 @@ import minipixels.world.tilemap as tile
 import std.assert as a
 
 function main(args)
+  a.assertEq(mp.version(), "0.2.0", "engine version")
   cam = mp.camera(10, 10)
   cam.worldWidth = 100
   cam.worldHeight = 80
@@ -79,6 +80,13 @@ function main(args)
   a.assertFalse(mp.playSfx(audio, "missing.wav"), "muted audio skips sfx")
   audio.unmute()
   a.assertFalse(mp.playSfx(audio, 123), "stateful sfx rejects non-string")
+  a.assertEq(mp.audioBackend(), "winmm", "audio backend name")
+  a.assertFalse(mp.audioSupportsMultipleSfx(), "winmm backend reports no multi-sfx mixer")
+  clip = mp.audioClip("missing.wav", "missing")
+  clip.setVolume(0)
+  a.assertFalse(mp.playAudio(audio, clip), "silent clip skips playback")
+  music = mp.musicClip("missing.wav", "music")
+  a.assertTrue(music.looping, "musicClip loops by default")
 
   r = mp.recti(3.75, 4.25, 12.9, 15.1)
   a.assertEq(r.x, 3, "recti floors x")

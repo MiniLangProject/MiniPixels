@@ -51,6 +51,25 @@ struct AudioState
   end function
 end struct
 
+struct AudioClip
+  path
+  name
+  volume
+  looping
+
+  function setVolume(value)
+    this.volume = minipixels.audio.audio.normalizeVolume(value)
+  end function
+
+  function setLooping(value)
+    this.looping = value
+  end function
+
+  function play(audio)
+    return minipixels.audio.audio.playClip(audio, this)
+  end function
+end struct
+
 function normalizeVolume(value)
   if typeof(value) != "int" then value = 100 end if
   if value < 0 then return 0 end if
@@ -62,9 +81,37 @@ function create()
   return AudioState(100, 100, 100, false, "")
 end function
 
+function clip(path, name)
+  if typeof(path) != "string" then path = "" end if
+  if typeof(name) != "string" then name = path end if
+  return AudioClip(path, name, 100, false)
+end function
+
+function musicClip(path, name)
+  c = clip(path, name)
+  c.looping = true
+  return c
+end function
+
 function effectiveVolume(audio, channelVolume)
   if audio.muted then return 0 end if
   return (normalizeVolume(audio.masterVolume) * normalizeVolume(channelVolume)) / 100
+end function
+
+function effectiveClipVolume(audio, channelVolume, clipVolume)
+  return (effectiveVolume(audio, channelVolume) * normalizeVolume(clipVolume)) / 100
+end function
+
+function backendName()
+  return "winmm"
+end function
+
+function supportsMultipleSfx()
+  return false
+end function
+
+function supportsVolumeControl()
+  return false
 end function
 
 function playSound(path)
@@ -101,4 +148,13 @@ function playMusicWithState(audio, path)
   audio.musicPath = path
   if effectiveVolume(audio, audio.musicVolume) <= 0 then return false end if
   return playSoundLoop(path)
+end function
+
+function playClip(audio, c)
+  if c.looping then
+    if effectiveClipVolume(audio, audio.musicVolume, c.volume) <= 0 then return false end if
+    return playMusicWithState(audio, c.path)
+  end if
+  if effectiveClipVolume(audio, audio.sfxVolume, c.volume) <= 0 then return false end if
+  return playSfx(audio, c.path)
 end function

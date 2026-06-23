@@ -9,10 +9,12 @@ python ..\MiniLangCompilerPy\mlc_win64.py <main.ml> <game.exe> -I src
 The recommended workflow is the CLI:
 
 ```powershell
+python tools\minipixels.py --version
 python tools\minipixels.py validate examples\moving-sprite\minipixels.json
 python tools\minipixels.py generate examples\moving-sprite\minipixels.json
 python tools\minipixels.py build examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
+python tools\build_examples.py
 ```
 
 ## Minimal game
@@ -50,7 +52,7 @@ Game logic, input polling, rendering, and Win32 presentation run on the main thr
 
 ## Implemented now
 
-Canvas, sprites, build-time PNG assets, runtime audio/file asset copying, sprite sheets, animation helpers, camera, tilemaps, parallax, collision helpers, bitmap text, input/action snapshots, headless tests, Win32 reference renderer, CLI, and examples are present.
+Canvas, sprites, build-time PNG assets, runtime audio/file asset copying, sprite sheets, generated level data, animation helpers, camera, tilemaps, parallax, collision helpers, bitmap text, input/action snapshots, headless tests, framehash regression tests, Win32 reference renderer, CLI, CI workflow, and examples are present.
 
 ## Not yet in the vertical prototype
 

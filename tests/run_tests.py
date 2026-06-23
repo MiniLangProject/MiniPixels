@@ -4,12 +4,14 @@ from __future__ import annotations
 import subprocess
 import sys
 import importlib.util
+import json
+import tempfile
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
-TESTS = ["canvas_tests.ml", "systems_tests.ml", "headless_game_tests.ml"]
+TESTS = ["canvas_tests.ml", "systems_tests.ml", "headless_game_tests.ml", "render_regression_tests.ml"]
 
 
 def run_python_tests() -> None:
@@ -18,6 +20,7 @@ def run_python_tests() -> None:
         raise RuntimeError("could not load tools/minipixels.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
+    assert mod.VERSION == "0.2.0", mod.VERSION
     literal = mod.bytes_literal(bytes([0, 0, 255, 0, 255, 0]))
     assert "pix = bytes(6, 0)" in literal, literal
     assert "pix[2] = 255" in literal, literal
@@ -37,6 +40,32 @@ def run_python_tests() -> None:
     report = mod.asset_report(data, ROOT)
     assert [entry["id"] for entry in report["embedded"]] == ["hero", "legacy"], report
     assert [entry["id"] for entry in report["runtime"]] == ["music", "script"], report
+    levels = {
+        "levels": [
+            {
+                "width": 4,
+                "height": 3,
+                "spawn": {"x": 8, "y": 16},
+                "exit": {"x": 96, "y": 32},
+                "platforms": [{"x": 0, "y": 2, "w": 4}],
+                "enemies": [{"x": 12, "y": 24, "minX": 4, "maxX": 40}],
+                "coins": [{"x": 18, "y": 10}],
+            }
+        ]
+    }
+    normalized = mod.validate_levels(levels, "inline")
+    assert normalized[0]["width"] == 4, normalized
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        level_path = tmp_path / "levels.json"
+        level_path.write_text(json.dumps(levels), encoding="utf-8")
+        out_dir = tmp_path / "generated"
+        out_dir.mkdir()
+        mod.generate_levels_module({"levels": {"_absolute_path": str(level_path)}}, out_dir)
+        generated = (out_dir / "levels.ml").read_text(encoding="utf-8")
+        assert "package generated.levels" in generated, generated
+        assert "function enemyMinX" in generated, generated
+        assert "fill(data, w, 0, 2, 4, 1)" in generated, generated
     print("Python tool tests passed")
 
 

@@ -66,6 +66,7 @@ function createGame(cfg)
   )
 end function
 
+function version() return "0.2.0" end function
 function rgb(r, g, b) return mt.rgb(r, g, b) end function
 function rgba(r, g, b, a) return mt.rgba(r, g, b, a) end function
 function vec2(x, y) return mt.vec2(x, y) end function
@@ -101,6 +102,12 @@ function stopSound() return aud.stopSound() end function
 function audioState() return aud.create() end function
 function playSfx(audio, path) return aud.playSfx(audio, path) end function
 function playMusicWithState(audio, path) return aud.playMusicWithState(audio, path) end function
+function audioClip(path, name) return aud.clip(path, name) end function
+function musicClip(path, name) return aud.musicClip(path, name) end function
+function playAudio(audio, clip) return aud.playClip(audio, clip) end function
+function audioBackend() return aud.backendName() end function
+function audioSupportsMultipleSfx() return aud.supportsMultipleSfx() end function
+function audioSupportsVolumeControl() return aud.supportsVolumeControl() end function
 function frameHash(canvas) return dbg.captureHash(canvas) end function
 
 function callIfFunction(fn, a)

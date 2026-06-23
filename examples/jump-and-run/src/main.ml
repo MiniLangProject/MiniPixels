@@ -1,5 +1,6 @@
 import minipixels as mp
 import generated.assets as gen
+import generated.levels as lvl
 
 struct Player
   x
@@ -64,65 +65,6 @@ exitY = 160
 levelIntro = 0
 hitFlash = 0
 
-function makeSolidData(w, h, level)
-  data = array(w * h, 0)
-  for y = 0 to h - 1
-    for x = 0 to w - 1
-      if y >= h - 2 then
-        data[(y * w) + x] = 1
-      end if
-    end for
-  end for
-
-  if level == 0 then
-    for x = 5 to 10
-      data[(5 * w) + x] = 1
-    end for
-    for x = 13 to 19
-      data[(4 * w) + x] = 1
-    end for
-    for x = 20 to 27
-      data[(5 * w) + x] = 1
-    end for
-  else if level == 1 then
-    for x = 5 to 10
-      data[(5 * w) + x] = 1
-    end for
-    for x = 14 to 19
-      data[(4 * w) + x] = 1
-    end for
-    for x = 24 to 28
-      data[(3 * w) + x] = 1
-    end for
-    for x = 33 to 40
-      data[(5 * w) + x] = 1
-    end for
-    for x = 45 to 51
-      data[(4 * w) + x] = 1
-    end for
-  else
-    for x = 4 to 8
-      data[(5 * w) + x] = 1
-    end for
-    for x = 12 to 17
-      data[(4 * w) + x] = 1
-    end for
-    for x = 22 to 27
-      data[(3 * w) + x] = 1
-    end for
-    for x = 32 to 38
-      data[(5 * w) + x] = 1
-    end for
-    for x = 42 to 48
-      data[(4 * w) + x] = 1
-    end for
-    for x = 53 to 62
-      data[(5 * w) + x] = 1
-    end for
-  end if
-  return data
-end function
-
 function intDiv(n, d)
   return (n - (n % d)) / d
 end function
@@ -163,17 +105,17 @@ end function
 function loadLevel(n)
   global levelIndex, player, camera, world, enemies, coins, enemyCount, coinCount, coinsTaken, spawnX, spawnY, exitX, exitY, levelIntro, hitFlash
   levelIndex = n
-  w = 46 + (n * 8)
-  h = 9
-  data = makeSolidData(w, h, n)
+  w = lvl.width(n)
+  h = lvl.height(n)
+  data = lvl.tileData(n)
   world = mp.tilemap(32, 32, w, h, mp.tileset(tileSheet), 2)
   world.addLayer(mp.tileLayer("ground", w, h, data, true, false, 1, 1))
   world.addLayer(mp.tileLayer("collision", w, h, data, false, true, 1, 1))
 
-  spawnX = 48
-  spawnY = 192
-  exitX = (w * 32) - 96
-  exitY = 160
+  spawnX = lvl.spawnX(n)
+  spawnY = lvl.spawnY(n)
+  exitX = lvl.exitX(n)
+  exitY = lvl.exitY(n)
   player = Player(spawnX, spawnY, 0, 0, false, 1, 0)
   camera = mp.camera(320, 180)
   camera.worldWidth = w * 32
@@ -181,25 +123,24 @@ function loadLevel(n)
 
   enemies = array(6)
   coins = array(10)
-  enemyCount = 2 + n
-  coinCount = 5 + n
+  enemyCount = lvl.enemyCount(n)
+  coinCount = lvl.coinCount(n)
   coinsTaken = 0
   levelIntro = 1.1
   hitFlash = 0
   resetParticles()
 
-  setEnemy(0, 360, 192, 330, 490)
-  setEnemy(1, 760, 192, 710, 900)
-  if n >= 1 then setEnemy(2, 1080, 128, 1030, 1210) end if
-  if n >= 2 then setEnemy(3, 1370, 192, 1310, 1510) end if
+  i = 0
+  while i < enemyCount
+    setEnemy(i, lvl.enemyX(n, i), lvl.enemyY(n, i), lvl.enemyMinX(n, i), lvl.enemyMaxX(n, i))
+    i = i + 1
+  end while
 
-  setCoin(0, 210, 124)
-  setCoin(1, 455, 92)
-  setCoin(2, 720, 124)
-  setCoin(3, 910, 124)
-  setCoin(4, exitX - 54, 124)
-  if n >= 1 then setCoin(5, 1160, 92) end if
-  if n >= 2 then setCoin(6, 1480, 124) end if
+  i = 0
+  while i < coinCount
+    setCoin(i, lvl.coinX(n, i), lvl.coinY(n, i))
+    i = i + 1
+  end while
 end function
 
 function resetLevel()
@@ -385,7 +326,7 @@ function updatePlay(game, dt)
   end while
 
   if rectHit(player.x + 6, player.y + 3, 18, 29, exitX, exitY, 32, 64) and coinsTaken >= coinCount then
-    if levelIndex < 2 then
+    if levelIndex < lvl.count() - 1 then
       loadLevel(levelIndex + 1)
       mp.playSfx(game.audio, "assets\\audio\\win.wav")
     else

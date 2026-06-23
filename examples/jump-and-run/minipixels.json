@@ -7,6 +7,9 @@
     "height": 180,
     "scale": 4
   },
+  "levels": {
+    "path": "assets/levels/levels.json"
+  },
   "assets": [
     {
       "id": "player",

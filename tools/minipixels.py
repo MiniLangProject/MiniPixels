@@ -19,6 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 ASSET_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+VERSION = "0.2.0"
 
 
 def die(message: str, code: int = 1) -> None:
@@ -84,6 +85,19 @@ def validate(project_file: Path) -> dict:
                     errors.append(f"{project_file}: asset '{aid}' sheet.frameWidth and sheet.frameHeight must be greater than zero")
                 if int(sheet.get("spacing", 0)) < 0 or int(sheet.get("margin", 0)) < 0:
                     errors.append(f"{project_file}: asset '{aid}' sheet.spacing and sheet.margin must not be negative")
+
+    levels = data.get("levels")
+    if levels is not None:
+        if not isinstance(levels, dict):
+            errors.append(f"{project_file}: levels must be an object")
+        else:
+            path = levels.get("path")
+            if not path:
+                errors.append(f"{project_file}: levels.path is required")
+            elif not (root / path).exists():
+                errors.append(f"{project_file}: levels file does not exist: {path}")
+            else:
+                levels["_absolute_path"] = str((root / path).resolve())
 
     if errors:
         die("\n".join(errors))
@@ -227,6 +241,138 @@ def bytes_literal(data: bytes, indent: str = "  ") -> str:
     return "\n".join(lines)
 
 
+def load_levels(data: dict) -> dict | None:
+    levels = data.get("levels")
+    if not isinstance(levels, dict):
+        return None
+    path = levels.get("_absolute_path")
+    if not path:
+        return None
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        die(f"{path}:{exc.lineno}:{exc.colno}: level JSON syntax error: {exc.msg}")
+    except OSError as exc:
+        die(f"{path}: cannot read levels file: {exc}")
+
+
+def validate_levels(levels: dict, source: str) -> list[dict]:
+    raw_levels = levels.get("levels", [])
+    if not isinstance(raw_levels, list) or not raw_levels:
+        die(f"{source}: levels must contain at least one level")
+    out: list[dict] = []
+    for idx, level in enumerate(raw_levels):
+        width = int(level.get("width", 0))
+        height = int(level.get("height", 0))
+        if width <= 0 or height <= 0:
+            die(f"{source}: level {idx} width and height must be greater than zero")
+        platforms = level.get("platforms", [])
+        enemies = level.get("enemies", [])
+        coins = level.get("coins", [])
+        if not isinstance(platforms, list) or not isinstance(enemies, list) or not isinstance(coins, list):
+            die(f"{source}: level {idx} platforms, enemies, and coins must be arrays")
+        spawn = level.get("spawn", {"x": 48, "y": 192})
+        exit_pos = level.get("exit", {"x": (width * 32) - 96, "y": 160})
+        out.append(
+            {
+                "width": width,
+                "height": height,
+                "spawn": {"x": int(spawn.get("x", 48)), "y": int(spawn.get("y", 192))},
+                "exit": {"x": int(exit_pos.get("x", (width * 32) - 96)), "y": int(exit_pos.get("y", 160))},
+                "platforms": platforms,
+                "enemies": enemies,
+                "coins": coins,
+            }
+        )
+    return out
+
+
+def generate_levels_module(data: dict, out_dir: Path) -> Path | None:
+    levels_data = load_levels(data)
+    if levels_data is None:
+        return None
+    source = data["levels"].get("_absolute_path", "levels")
+    levels = validate_levels(levels_data, source)
+    out = out_dir / "levels.ml"
+    lines = [
+        "package generated.levels",
+        "",
+        "function count()",
+        f"  return {len(levels)}",
+        "end function",
+        "",
+        "function fill(data, width, x, y, w, value)",
+        "  i = 0",
+        "  while i < w",
+        "    data[(y * width) + x + i] = value",
+        "    i = i + 1",
+        "  end while",
+        "end function",
+        "",
+    ]
+
+    for fn_name, key, subkey in [
+        ("width", "width", None),
+        ("height", "height", None),
+        ("spawnX", "spawn", "x"),
+        ("spawnY", "spawn", "y"),
+        ("exitX", "exit", "x"),
+        ("exitY", "exit", "y"),
+    ]:
+        lines.append(f"function {fn_name}(level)")
+        for idx, level in enumerate(levels):
+            value = level[key] if subkey is None else level[key][subkey]
+            lines.append(f"  if level == {idx} then return {value} end if")
+        fallback = levels[-1][key] if subkey is None else levels[-1][key][subkey]
+        lines.append(f"  return {fallback}")
+        lines.append("end function")
+        lines.append("")
+
+    lines.append("function tileData(level)")
+    lines.append("  w = width(level)")
+    lines.append("  h = height(level)")
+    lines.append("  data = array(w * h, 0)")
+    for idx, level in enumerate(levels):
+        lines.append(f"  if level == {idx} then")
+        for platform in level["platforms"]:
+            x = int(platform.get("x", 0))
+            y = int(platform.get("y", 0))
+            w = int(platform.get("w", 1))
+            tile = int(platform.get("tile", 1))
+            lines.append(f"    fill(data, w, {x}, {y}, {w}, {tile})")
+        lines.append("  end if")
+    lines.append("  return data")
+    lines.append("end function")
+    lines.append("")
+
+    for collection, source_key, fields in [
+        ("enemy", "enemies", ["x", "y", "minX", "maxX"]),
+        ("coin", "coins", ["x", "y"]),
+    ]:
+        lines.append(f"function {collection}Count(level)")
+        for idx, level in enumerate(levels):
+            lines.append(f"  if level == {idx} then return {len(level[source_key])} end if")
+        lines.append(f"  return {len(levels[-1][source_key])}")
+        lines.append("end function")
+        lines.append("")
+        for field in fields:
+            lines.append(f"function {collection}{field[0].upper() + field[1:]}(level, index)")
+            for idx, level in enumerate(levels):
+                lines.append(f"  if level == {idx} then")
+                items = level[source_key]
+                for item_idx, item in enumerate(items):
+                    lines.append(f"    if index == {item_idx} then return {int(item.get(field, 0))} end if")
+                lines.append("    return 0")
+                lines.append("  end if")
+            lines.append("  return 0")
+            lines.append("end function")
+            lines.append("")
+
+    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(out)
+    return out
+
+
 def generate(project_file: Path, out_dir: Path) -> Path:
     data = validate(project_file)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -265,6 +411,7 @@ def generate(project_file: Path, out_dir: Path) -> Path:
     lines.append("  return reg")
     lines.append("end function")
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    generate_levels_module(data, out_dir)
     print(out)
     return out
 
@@ -289,6 +436,9 @@ def pack(project_file: Path, output: Path) -> Path:
 
 def asset_report(data: dict, root: Path) -> dict:
     report = {"embedded": [], "runtime": [], "totals": {"embeddedBytes": 0, "runtimeBytes": 0}}
+    levels = load_levels(data)
+    if levels is not None:
+        report["levels"] = {"count": len(validate_levels(levels, data["levels"].get("_absolute_path", "levels")))}
     for asset in sorted(data.get("assets", []), key=lambda a: a["id"]):
         raw_path = asset.get("path", "")
         path = root / raw_path if raw_path else None
@@ -393,6 +543,7 @@ def new_project(name: str) -> None:
 
 def main(argv: list[str]) -> int:
     p = argparse.ArgumentParser(prog="minipixels")
+    p.add_argument("--version", action="version", version=f"MiniPixels {VERSION}")
     sub = p.add_subparsers(dest="cmd", required=True)
     sub.add_parser("new").add_argument("name")
     for name in ["validate", "generate", "pack", "build", "run"]:

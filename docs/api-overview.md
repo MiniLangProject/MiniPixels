@@ -77,6 +77,32 @@ sheet = gen.sheet_player()
 
 Each build also writes `asset-report.json` next to the executable with embedded/runtime asset sizes and sheet metadata.
 
+## Level Data
+
+Project manifests can point at level JSON:
+
+```json
+{
+  "levels": {
+    "path": "assets/levels/levels.json"
+  }
+}
+```
+
+The build generates `generated.levels`:
+
+```ml
+import generated.levels as lvl
+
+w = lvl.width(levelIndex)
+h = lvl.height(levelIndex)
+data = lvl.tileData(levelIndex)
+enemyCount = lvl.enemyCount(levelIndex)
+coinCount = lvl.coinCount(levelIndex)
+```
+
+This keeps example game code small while still producing plain MiniLang for the runtime.
+
 ## Text
 
 MiniPixels includes a small 5x7 bitmap font for menus, HUDs, and debug labels:
@@ -132,12 +158,13 @@ Games also get `game.audio`, a small state layer for SFX/music volume and mute h
 ```ml
 game.audio.setMasterVolume(90)
 game.audio.setSfxVolume(75)
-mp.playSfx(game.audio, "assets\\audio\\coin.wav")
+coin = mp.audioClip("assets\\audio\\coin.wav", "coin")
+mp.playAudio(game.audio, coin)
 mp.playMusicWithState(game.audio, "assets\\audio\\theme.wav")
 game.audio.mute()
 ```
 
-The current backend is still WinMM, so this is a control layer rather than a multi-voice mixer. It keeps game code stable for a future mixer backend.
+The current backend is still WinMM, so this is a control layer rather than a multi-voice mixer. `mp.audioBackend()`, `mp.audioSupportsMultipleSfx()`, and `mp.audioSupportsVolumeControl()` make that explicit and keep game code stable for a future mixer backend.
 
 ## Tilemaps
 
