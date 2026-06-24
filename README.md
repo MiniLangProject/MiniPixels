@@ -184,7 +184,7 @@ python tools\minipixels.py build examples\moving-sprite\minipixels.json --compil
 python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```
 
-The CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, copies runtime assets such as `type: "audio"` or `type: "file"` next to the executable, generates `generated.levels` when `levels.path` is present, writes `asset-report.json`, optionally packs assets into `.mpak`, and invokes the regular MiniLang compiler.
+The CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, copies runtime assets such as `type: "audio"` or `type: "file"` next to the executable, generates `generated.levels` from MiniPixels or Tiled JSON when `levels.path` is present, writes `asset-report.json`, optionally packs assets into `.mpak`, and invokes the regular MiniLang compiler.
 
 ## Mini Code Examples
 
@@ -271,4 +271,4 @@ Not yet implemented:
 - Full editor tooling
 - Advanced physics or ECS
 
-More detail is in [docs/getting-started.md](docs/getting-started.md), [docs/first-game.md](docs/first-game.md), [docs/examples.md](docs/examples.md), and [docs/minipixels-architecture.md](docs/minipixels-architecture.md). Release notes are in [CHANGELOG.md](CHANGELOG.md).
+More detail is in [docs/getting-started.md](docs/getting-started.md), [docs/first-game.md](docs/first-game.md), [docs/manifest-reference.md](docs/manifest-reference.md), [docs/examples.md](docs/examples.md), and [docs/minipixels-architecture.md](docs/minipixels-architecture.md). Release notes are in [CHANGELOG.md](CHANGELOG.md).

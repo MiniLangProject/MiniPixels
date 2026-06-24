@@ -79,7 +79,7 @@ Each build also writes `asset-report.json` next to the executable with embedded/
 
 ## Level Data
 
-Project manifests can point at level JSON:
+Project manifests can point at MiniPixels level JSON or Tiled JSON/TMJ:
 
 ```json
 {
@@ -101,7 +101,7 @@ enemyCount = lvl.enemyCount(levelIndex)
 coinCount = lvl.coinCount(levelIndex)
 ```
 
-This keeps example game code small while still producing plain MiniLang for the runtime.
+This keeps example game code small while still producing plain MiniLang for the runtime. The full manifest and Tiled conventions are documented in `docs/manifest-reference.md`.
 
 ## Text
 

@@ -59,8 +59,62 @@ def run_python_tests() -> None:
             }
         ]
     }
+    tiled = {
+        "width": 4,
+        "height": 3,
+        "tilewidth": 32,
+        "tileheight": 32,
+        "layers": [
+            {
+                "type": "tilelayer",
+                "name": "collision",
+                "width": 4,
+                "height": 3,
+                "data": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    2,
+                    2,
+                    0,
+                    1,
+                    1,
+                    1,
+                    1,
+                ],
+            },
+            {
+                "type": "objectgroup",
+                "name": "objects",
+                "objects": [
+                    {"name": "spawn", "x": 8, "y": 16},
+                    {"type": "exit", "x": 96, "y": 32},
+                    {"type": "coin", "x": 48, "y": 24},
+                    {
+                        "type": "enemy",
+                        "x": 64,
+                        "y": 40,
+                        "width": 96,
+                        "properties": [
+                            {"name": "minX", "value": 32},
+                            {"name": "maxX", "value": 160},
+                        ],
+                    },
+                ],
+            },
+        ],
+    }
     normalized = mod.validate_levels(levels, "inline")
     assert normalized[0]["width"] == 4, normalized
+    tiled_normalized = mod.normalize_level_source(tiled, "inline.tiled")
+    tiled_level = mod.validate_levels(tiled_normalized, "inline.tiled")[0]
+    assert tiled_level["spawn"] == {"x": 8, "y": 16}, tiled_level
+    assert tiled_level["exit"] == {"x": 96, "y": 32}, tiled_level
+    assert tiled_level["coins"][0] == {"x": 48, "y": 24}, tiled_level
+    assert tiled_level["enemies"][0]["minX"] == 32, tiled_level
+    assert {"x": 1, "y": 1, "w": 2, "tile": 2} in tiled_level["platforms"], tiled_level
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         level_path = tmp_path / "levels.json"

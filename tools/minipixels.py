@@ -104,6 +104,126 @@ def validate(project_file: Path) -> dict:
     return data
 
 
+def tiled_properties(obj: dict) -> dict:
+    out = {}
+    for prop in obj.get("properties", []):
+        if isinstance(prop, dict) and "name" in prop:
+            out[str(prop["name"])] = prop.get("value")
+    return out
+
+
+def object_kind(obj: dict) -> str:
+    value = str(obj.get("type") or obj.get("name") or "").lower()
+    if value:
+        return value
+    props = tiled_properties(obj)
+    return str(props.get("kind") or props.get("type") or "").lower()
+
+
+def tiled_object_layers(data: dict) -> list[dict]:
+    return [layer for layer in data.get("layers", []) if layer.get("type") == "objectgroup"]
+
+
+def tiled_tile_layers(data: dict) -> list[dict]:
+    layers = [layer for layer in data.get("layers", []) if layer.get("type") == "tilelayer"]
+    solid = []
+    for layer in layers:
+        name = str(layer.get("name", "")).lower()
+        props = tiled_properties(layer)
+        if name in ("collision", "collisions", "solid", "ground") or props.get("collision") is True or props.get("solid") is True:
+            solid.append(layer)
+    return solid if solid else layers
+
+
+def tiled_int(obj: dict, key: str, default: int = 0) -> int:
+    props = tiled_properties(obj)
+    value = props.get(key, obj.get(key, default))
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def normalize_tiled_map(data: dict, source: str) -> dict:
+    width = int(data.get("width", 0))
+    height = int(data.get("height", 0))
+    tile_width = int(data.get("tilewidth", 32))
+    tile_height = int(data.get("tileheight", 32))
+    if width <= 0 or height <= 0:
+        die(f"{source}: Tiled map width and height must be greater than zero")
+
+    platforms = []
+    for layer in tiled_tile_layers(data):
+        layer_width = int(layer.get("width", width))
+        raw = layer.get("data", [])
+        if not isinstance(raw, list):
+            die(f"{source}: Tiled CSV-encoded layer data is required")
+        for y in range(min(height, int(layer.get("height", height)))):
+            x = 0
+            while x < layer_width:
+                idx = (y * layer_width) + x
+                gid = int(raw[idx]) if idx < len(raw) else 0
+                if gid <= 0:
+                    x += 1
+                    continue
+                start = x
+                while x < layer_width:
+                    scan = (y * layer_width) + x
+                    value = int(raw[scan]) if scan < len(raw) else 0
+                    if value != gid:
+                        break
+                    x += 1
+                platforms.append({"x": start, "y": y, "w": x - start, "tile": gid})
+
+    spawn = {"x": 48, "y": max(0, (height - 3) * tile_height)}
+    exit_pos = {"x": max(0, (width * tile_width) - (3 * tile_width)), "y": max(0, (height - 4) * tile_height)}
+    enemies = []
+    coins = []
+    for layer in tiled_object_layers(data):
+        for obj in layer.get("objects", []):
+            kind = object_kind(obj)
+            x = int(obj.get("x", 0))
+            y = int(obj.get("y", 0))
+            if kind == "spawn" or kind == "player":
+                spawn = {"x": x, "y": y}
+            elif kind == "exit" or kind == "goal":
+                exit_pos = {"x": x, "y": y}
+            elif kind == "coin":
+                coins.append({"x": x, "y": y})
+            elif kind == "enemy":
+                width_px = int(obj.get("width", tile_width * 4))
+                enemies.append(
+                    {
+                        "x": x,
+                        "y": y,
+                        "minX": tiled_int(obj, "minX", x),
+                        "maxX": tiled_int(obj, "maxX", x + width_px),
+                    }
+                )
+
+    return {
+        "levels": [
+            {
+                "width": width,
+                "height": height,
+                "spawn": spawn,
+                "exit": exit_pos,
+                "platforms": platforms,
+                "enemies": enemies,
+                "coins": coins,
+            }
+        ]
+    }
+
+
+def normalize_level_source(data: dict, source: str) -> dict:
+    if "levels" in data:
+        return data
+    if "layers" in data and "tilewidth" in data:
+        return normalize_tiled_map(data, source)
+    die(f"{source}: expected MiniPixels level JSON or Tiled JSON/TMJ map")
+
+
 def color_rgba(color: list[int]) -> tuple[int, int, int, int]:
     vals = list(color) + [255, 255, 255, 255]
     return tuple(max(0, min(255, int(v))) for v in vals[:4])
@@ -249,7 +369,8 @@ def load_levels(data: dict) -> dict | None:
     if not path:
         return None
     try:
-        return json.loads(Path(path).read_text(encoding="utf-8"))
+        raw = json.loads(Path(path).read_text(encoding="utf-8"))
+        return normalize_level_source(raw, path)
     except json.JSONDecodeError as exc:
         die(f"{path}:{exc.lineno}:{exc.colno}: level JSON syntax error: {exc.msg}")
     except OSError as exc:
