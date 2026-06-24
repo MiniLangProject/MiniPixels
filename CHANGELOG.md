@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0
+
+- Added `minipixels.tools.fsutil` for shared native tool filesystem helpers.
+- Added `minipixels.tools.generator` with native generated module stubs.
+- Added native CLI command `generate [project] [outDir]`.
+- Added native generator tests and CI coverage for simple projects and templates.
+- Added explicit manifest validation for asset types `image`, `audio`, and `file`.
+
 ## 0.5.0
 
 - Added a native MiniLang JSON parser at `minipixels.tools.json`.

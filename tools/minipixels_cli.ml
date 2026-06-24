@@ -1,10 +1,10 @@
 import std.fs as fs
 import std.string as str
 import minipixels.tools.manifest as manifest
+import minipixels.tools.generator as generator
+import minipixels.tools.fsutil as fsu
 
-extern function CreateDirectoryW(path as wstr, security as ptr) from "kernel32.dll" returns bool
-
-const VERSION = "0.5.0"
+const VERSION = "0.6.0"
 
 function usage()
   print "MiniPixels native CLI " + VERSION
@@ -13,18 +13,12 @@ function usage()
   print "  minipixels info [project]"
   print "  minipixels doctor"
   print "  minipixels validate [project]"
+  print "  minipixels generate [project] [outDir]"
   print "  minipixels new <name> [basic|platformer|pixel-art]"
   print ""
   print "This MiniLang CLI currently covers project creation and diagnostics."
   print "Build/generate/package are still handled by the legacy Python tool until"
   print "JSON, PNG and compiler process launching are moved into MiniLang."
-end function
-
-function mkdir(path)
-  if fs.exists(path) then
-    return fs.isDir(path)
-  end if
-  return CreateDirectoryW(path, 0)
 end function
 
 function fail(msg)
@@ -33,7 +27,7 @@ function fail(msg)
 end function
 
 function writeText(path, text)
-  r = try(fs.writeAllText(path, text))
+  r = try(fsu.writeText(path, text))
   if typeof(r) == "error" then
     print path + ": " + r.message
     return false
@@ -203,6 +197,16 @@ function commandValidate(args)
   return 1
 end function
 
+function commandGenerate(args)
+  project = projectArg(args, "minipixels.json")
+  outDir = ""
+  if len(args) >= 3 then outDir = args[2] end if
+  r = generator.generate(project, outDir)
+  generator.printResult(r)
+  if r.ok then return 0 end if
+  return 1
+end function
+
 function commandDoctor()
   print "MiniPixels native CLI doctor"
   ok = true
@@ -252,11 +256,11 @@ function commandNew(args)
   if fs.exists(name) then
     return fail("new: target already exists: " + name)
   end if
-  if mkdir(name) == false then return fail("new: could not create directory: " + name) end if
+  if fsu.mkdir(name) == false then return fail("new: could not create directory: " + name) end if
   srcDir = fs.joinPath(name, "src")
   assetsDir = fs.joinPath(name, "assets")
-  if mkdir(srcDir) == false then return fail("new: could not create directory: " + srcDir) end if
-  if mkdir(assetsDir) == false then return fail("new: could not create directory: " + assetsDir) end if
+  if fsu.mkdir(srcDir) == false then return fail("new: could not create directory: " + srcDir) end if
+  if fsu.mkdir(assetsDir) == false then return fail("new: could not create directory: " + assetsDir) end if
 
   title = name
   manifestPath = fs.joinPath(name, "minipixels.json")
@@ -287,6 +291,7 @@ function main(args)
   if cmd == "info" then return commandInfo(args) end if
   if cmd == "doctor" then return commandDoctor() end if
   if cmd == "validate" then return commandValidate(args) end if
+  if cmd == "generate" then return commandGenerate(args) end if
   if cmd == "new" then return commandNew(args) end if
   usage()
   return 1

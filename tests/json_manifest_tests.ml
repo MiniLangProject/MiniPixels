@@ -29,6 +29,10 @@ function main(args)
   a.assertFalse(mani.isValid(invalid), "invalid manifest fails")
   a.assertTrue(len(invalid.errors) > 0, "invalid manifest reports errors")
 
+  invalidAsset = mani.parseText("{\"name\":\"bad-asset\",\"window\":{\"width\":320,\"height\":180},\"assets\":[{\"id\":\"thing\",\"type\":\"shader\"}]}", "inline", ".")
+  a.assertFalse(mani.isValid(invalidAsset), "invalid asset type fails")
+  a.assertTrue(len(invalidAsset.errors) > 0, "invalid asset type reports errors")
+
   print "=== JSON MANIFEST TESTS DONE ==="
   return 0
 end function

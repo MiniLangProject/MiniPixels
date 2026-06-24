@@ -1,6 +1,6 @@
 # MiniPixels
 
-Current version: `0.5.0`
+Current version: `0.6.0`
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses the existing `MiniLangCompilerPy` compiler and builds native Windows x64 executables.
 
@@ -43,10 +43,11 @@ python ..\MiniLangCompilerPy\mlc_win64.py tools\minipixels_cli.ml build\tools\mi
 build\tools\minipixels.exe info
 build\tools\minipixels.exe validate examples\moving-sprite\minipixels.json
 build\tools\minipixels.exe info examples\moving-sprite\minipixels.json
+build\tools\minipixels.exe generate examples\pixel-effects\minipixels.json
 build\tools\minipixels.exe new my-game platformer
 ```
 
-The native CLI currently provides `info`, `doctor`, `validate`, and `new`. The legacy Python tool still owns `build`, `run`, `generate`, and `package` while PNG and compiler process launching are moved into MiniLang.
+The native CLI currently provides `info`, `doctor`, `validate`, `generate`, and `new`. Native `generate` writes the initial generated module structure and supports empty/simple projects; image embedding, rich level import, runtime asset copying, `build`, `run`, and `package` still live in the legacy Python tool while PNG and compiler process launching are moved into MiniLang.
 
 Run tests:
 
