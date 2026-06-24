@@ -41,11 +41,13 @@ jobs:
         run: python tools\build_examples.py
 
       - name: Build native MiniLang CLI
+        shell: pwsh
         working-directory: MiniPixels
         run: |
+          New-Item -ItemType Directory -Force build\tools | Out-Null
           python ..\MiniLangCompilerPy\mlc_win64.py tools\minipixels_cli.ml build\tools\minipixels.exe -I src -I ..\MiniLangCompilerPy
-          build\tools\minipixels.exe info
-          build\tools\minipixels.exe doctor
+          .\build\tools\minipixels.exe info
+          .\build\tools\minipixels.exe doctor
 
       - name: Smoke native MiniLang CLI templates
         shell: pwsh
