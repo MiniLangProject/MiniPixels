@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
-TESTS = ["canvas_tests.ml", "systems_tests.ml", "headless_game_tests.ml", "render_regression_tests.ml"]
+TESTS = ["canvas_tests.ml", "systems_tests.ml", "headless_game_tests.ml", "render_regression_tests.ml", "json_manifest_tests.ml"]
 
 
 def run_python_tests() -> None:
@@ -21,7 +21,7 @@ def run_python_tests() -> None:
         raise RuntimeError("could not load tools/minipixels.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    assert mod.VERSION == "0.4.0", mod.VERSION
+    assert mod.VERSION == "0.5.0", mod.VERSION
     package_spec = importlib.util.spec_from_file_location("package_sdk", ROOT / "tools" / "package_sdk.py")
     if package_spec is None or package_spec.loader is None:
         raise RuntimeError("could not load tools/package_sdk.py")

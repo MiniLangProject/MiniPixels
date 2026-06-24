@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0
+
+- Added a native MiniLang JSON parser at `minipixels.tools.json`.
+- Added native MiniPixels manifest loading and validation at `minipixels.tools.manifest`.
+- Added native CLI commands `validate [project]` and `info <project>`.
+- Extended native CLI and CI checks to validate real example manifests without the Python project processor.
+
 ## 0.4.0
 
 - Added the first native MiniLang CLI at `tools/minipixels_cli.ml`.

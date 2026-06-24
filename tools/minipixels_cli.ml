@@ -1,16 +1,18 @@
 import std.fs as fs
 import std.string as str
+import minipixels.tools.manifest as manifest
 
 extern function CreateDirectoryW(path as wstr, security as ptr) from "kernel32.dll" returns bool
 
-const VERSION = "0.4.0"
+const VERSION = "0.5.0"
 
 function usage()
   print "MiniPixels native CLI " + VERSION
   print ""
   print "Usage:"
-  print "  minipixels info"
+  print "  minipixels info [project]"
   print "  minipixels doctor"
+  print "  minipixels validate [project]"
   print "  minipixels new <name> [basic|platformer|pixel-art]"
   print ""
   print "This MiniLang CLI currently covers project creation and diagnostics."
@@ -176,11 +178,29 @@ function readmeFor(name, tpl)
     "```\n"
 end function
 
-function commandInfo()
+function projectArg(args, defaultPath)
+  if len(args) >= 2 then return args[1] end if
+  return defaultPath
+end function
+
+function commandInfo(args)
+  if len(args) >= 2 then
+    m = manifest.load(projectArg(args, "minipixels.json"))
+    manifest.printReport(m)
+    if manifest.isValid(m) then return 0 end if
+    return 1
+  end if
   print "MiniPixels native CLI " + VERSION
   print "Engine templates: basic, platformer, pixel-art"
   print "Python status: compiler bootstrap only; legacy build pipeline still exists."
   return 0
+end function
+
+function commandValidate(args)
+  m = manifest.load(projectArg(args, "minipixels.json"))
+  manifest.printReport(m)
+  if manifest.isValid(m) then return 0 end if
+  return 1
 end function
 
 function commandDoctor()
@@ -202,6 +222,18 @@ function commandDoctor()
   else
     print "[WARN] bootstrap compiler not found next to this repo"
     ok = false
+  end if
+  if fs.exists("minipixels.json") then
+    m = manifest.load("minipixels.json")
+    if manifest.isValid(m) then
+      print "[OK] local minipixels.json valid"
+    else
+      print "[WARN] local minipixels.json has errors"
+      for i = 0 to len(m.errors) - 1
+        print "  " + m.errors[i]
+      end for
+      ok = false
+    end if
   end if
   if ok then return 0 end if
   return 1
@@ -252,8 +284,9 @@ function main(args)
     usage()
     return 0
   end if
-  if cmd == "info" then return commandInfo() end if
+  if cmd == "info" then return commandInfo(args) end if
   if cmd == "doctor" then return commandDoctor() end if
+  if cmd == "validate" then return commandValidate(args) end if
   if cmd == "new" then return commandNew(args) end if
   usage()
   return 1
