@@ -25,6 +25,9 @@ function main(args)
   a.assertTrue(mani.isValid(j), "jump-and-run manifest valid")
   a.assertEq(j.levelPath, "assets/levels/levels.json", "manifest level path")
 
+  t = mani.load("examples\\tiled-platformer\\minipixels.json")
+  a.assertTrue(mani.isValid(t), "procedural asset manifest valid")
+
   invalid = mani.parseText("{\"name\":\"bad\",\"window\":{\"width\":0,\"height\":180}}", "inline", ".")
   a.assertFalse(mani.isValid(invalid), "invalid manifest fails")
   a.assertTrue(len(invalid.errors) > 0, "invalid manifest reports errors")

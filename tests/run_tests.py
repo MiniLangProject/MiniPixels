@@ -28,7 +28,7 @@ def run_python_tests() -> None:
         raise RuntimeError("could not load tools/minipixels.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    assert mod.VERSION == "0.6.0", mod.VERSION
+    assert mod.VERSION == "0.7.0", mod.VERSION
     package_spec = importlib.util.spec_from_file_location("package_sdk", ROOT / "tools" / "package_sdk.py")
     if package_spec is None or package_spec.loader is None:
         raise RuntimeError("could not load tools/package_sdk.py")
@@ -148,6 +148,100 @@ def run_python_tests() -> None:
     print("Python tool tests passed")
 
 
+def run_generated_smoke() -> None:
+    generated_root = ROOT / "build" / "tests" / "native_generated_levels"
+    generated = generated_root / "generated"
+    if not (generated / "assets.ml").exists() or not (generated / "levels.ml").exists():
+        raise RuntimeError("native generated smoke output is missing")
+    smoke = ROOT / "build" / "tests" / "generated_smoke.ml"
+    smoke.write_text(
+        "\n".join(
+            [
+                "import generated.assets as gen",
+                "import generated.levels as lvl",
+                "import std.assert as a",
+                "",
+                "function main(args)",
+                "  reg = gen.registry()",
+                "  spr = reg.getSprite(\"player\")",
+                "  a.assertEq(spr.width, 28, \"generated sprite width\")",
+                "  sheet = gen.sheet_player()",
+                "  a.assertEq(sheet.frameWidth, 28, \"generated sheet width\")",
+                "  a.assertEq(lvl.count(), 3, \"generated level count\")",
+                "  a.assertEq(lvl.width(0), 46, \"generated level width\")",
+                "  a.assertEq(lvl.enemyMaxX(2, 3), 1510, \"generated enemy max\")",
+                "  a.assertEq(lvl.coinX(2, 6), 1480, \"generated coin x\")",
+                "  print \"=== GENERATED SMOKE DONE ===\"",
+                "  return 0",
+                "end function",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    exe = ROOT / "build" / "tests" / "generated_smoke.exe"
+    cmd = [
+        sys.executable,
+        str(COMPILER),
+        str(smoke),
+        str(exe),
+        "-I",
+        str(ROOT / "src"),
+        "-I",
+        str(ROOT.parent / "MiniLangCompilerPy"),
+        "-I",
+        str(generated_root),
+    ]
+    print("compile:", " ".join(cmd))
+    subprocess.check_call(cmd, cwd=str(ROOT))
+    print("run:", exe)
+    subprocess.check_call([str(exe)], cwd=str(ROOT))
+
+    procedural_root = ROOT / "build" / "tests" / "native_generated_procedural"
+    if not (procedural_root / "generated" / "assets.ml").exists():
+        raise RuntimeError("native procedural generated output is missing")
+    procedural_smoke = ROOT / "build" / "tests" / "generated_procedural_smoke.ml"
+    procedural_smoke.write_text(
+        "\n".join(
+            [
+                "import generated.assets as gen",
+                "import std.assert as a",
+                "",
+                "function main(args)",
+                "  reg = gen.registry()",
+                "  tiles = reg.getSprite(\"tiles\")",
+                "  a.assertEq(tiles.width, 64, \"generated procedural tiles width\")",
+                "  sheet = gen.sheet_tiles()",
+                "  a.assertEq(sheet.frameWidth, 32, \"generated procedural sheet width\")",
+                "  player = reg.getSprite(\"player\")",
+                "  a.assertEq(player.width, 16, \"generated procedural player width\")",
+                "  print \"=== GENERATED PROCEDURAL SMOKE DONE ===\"",
+                "  return 0",
+                "end function",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    procedural_exe = ROOT / "build" / "tests" / "generated_procedural_smoke.exe"
+    cmd = [
+        sys.executable,
+        str(COMPILER),
+        str(procedural_smoke),
+        str(procedural_exe),
+        "-I",
+        str(ROOT / "src"),
+        "-I",
+        str(ROOT.parent / "MiniLangCompilerPy"),
+        "-I",
+        str(procedural_root),
+    ]
+    print("compile:", " ".join(cmd))
+    subprocess.check_call(cmd, cwd=str(ROOT))
+    print("run:", procedural_exe)
+    subprocess.check_call([str(procedural_exe)], cwd=str(ROOT))
+
+
 def main() -> int:
     run_python_tests()
     build = ROOT / "build" / "tests"
@@ -160,6 +254,7 @@ def main() -> int:
         subprocess.check_call(cmd, cwd=str(ROOT))
         print("run:", exe)
         subprocess.check_call([str(exe)], cwd=str(ROOT))
+    run_generated_smoke()
     print("MiniPixels tests passed")
     return 0
 

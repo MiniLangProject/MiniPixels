@@ -1,12 +1,20 @@
 # Changelog
 
+## 0.7.0
+
+- Extended native `minipixels.tools.generator` from stubs to concrete `generated.levels` output for MiniPixels `levels.json`.
+- Added native generated asset code for `procedural` sprites, including sheet helpers.
+- Kept `image` assets buildable in native generated output through placeholder pixels while PNG embedding remains in the legacy Python path.
+- Restored manifest support for `procedural` asset types and added generated-code compile smoke coverage.
+- Added CI coverage for native generation of the Jump and Run example.
+
 ## 0.6.0
 
 - Added `minipixels.tools.fsutil` for shared native tool filesystem helpers.
 - Added `minipixels.tools.generator` with native generated module stubs.
 - Added native CLI command `generate [project] [outDir]`.
 - Added native generator tests and CI coverage for simple projects and templates.
-- Added explicit manifest validation for asset types `image`, `audio`, and `file`.
+- Added explicit manifest validation for asset types `image`, `procedural`, `audio`, and `file`.
 
 ## 0.5.0
 

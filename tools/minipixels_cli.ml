@@ -4,7 +4,7 @@ import minipixels.tools.manifest as manifest
 import minipixels.tools.generator as generator
 import minipixels.tools.fsutil as fsu
 
-const VERSION = "0.6.0"
+const VERSION = "0.7.0"
 
 function usage()
   print "MiniPixels native CLI " + VERSION
@@ -16,9 +16,8 @@ function usage()
   print "  minipixels generate [project] [outDir]"
   print "  minipixels new <name> [basic|platformer|pixel-art]"
   print ""
-  print "This MiniLang CLI currently covers project creation and diagnostics."
-  print "Build/generate/package are still handled by the legacy Python tool until"
-  print "JSON, PNG and compiler process launching are moved into MiniLang."
+  print "This MiniLang CLI covers project creation, diagnostics, validation, and native generate."
+  print "Build/run/package, PNG embedding, and Tiled import still use the legacy Python tool."
 end function
 
 function fail(msg)

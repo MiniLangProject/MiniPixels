@@ -19,7 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 ASSET_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-VERSION = "0.6.0"
+VERSION = "0.7.0"
 
 
 def die(message: str, code: int = 1) -> None:

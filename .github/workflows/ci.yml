@@ -54,6 +54,7 @@ jobs:
           .\build\tools\minipixels.exe validate examples\jump-and-run\minipixels.json
           .\build\tools\minipixels.exe validate examples\tiled-platformer\minipixels.json
           .\build\tools\minipixels.exe generate examples\pixel-effects\minipixels.json build\native-generated\pixel-effects
+          .\build\tools\minipixels.exe generate examples\jump-and-run\minipixels.json build\native-generated\jump-and-run\generated
 
       - name: Smoke native MiniLang CLI templates
         shell: pwsh
