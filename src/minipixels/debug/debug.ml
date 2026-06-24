@@ -35,13 +35,15 @@ end function
 
 function drawStats(game, canvas)
   white = mt.rgb(255, 255, 255)
-  cv.fillRect(canvas, 0, 0, 44, 32, mt.rgba(0, 0, 0, 160))
+  cv.fillRect(canvas, 0, 0, 50, 43, mt.rgba(0, 0, 0, 160))
   cv.fillRect(canvas, 2, 3, 4, 4, mt.rgb(255, 255, 255))
   drawNumber(canvas, game.time.fps, 9, 1, white)
   cv.fillRect(canvas, 2, 14, 4, 4, mt.rgb(255, 220, 80))
   drawNumber(canvas, canvas.spriteCount, 9, 12, mt.rgb(255, 220, 80))
   cv.fillRect(canvas, 2, 25, 4, 4, mt.rgb(100, 220, 255))
   drawNumber(canvas, canvas.tileCount, 9, 23, mt.rgb(100, 220, 255))
+  cv.fillRect(canvas, 2, 36, 4, 4, mt.rgb(255, 128, 180))
+  drawNumber(canvas, game.time.delta * 1000, 9, 34, mt.rgb(255, 128, 180))
 end function
 
 function captureHash(canvas)

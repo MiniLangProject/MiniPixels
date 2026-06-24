@@ -24,9 +24,29 @@ MiniPixels renders into a fixed-size RGBA canvas and then presents that framebuf
 cfg = mp.createConfig("Title", 320, 180, 4)
 mp.useGpuRenderer(cfg)      # force OpenGL/WGL presentation when available
 # mp.useCpuRenderer(cfg)    # force the classic GDI presentation path
+mp.useIntegerScale(cfg)     # pixel-perfect integer scaling with letterboxing
+mp.setSmoothing(cfg, false) # nearest-neighbor pixels by default
 ```
 
 You can also set `cfg.renderer` manually to `"auto"`, `"opengl"`, `"gpu"`, `"gdi"`, or `"cpu"`. The OpenGL path uploads the CPU canvas as a texture each frame and uses the GPU for scaling and swapping the window framebuffer. Canvas drawing, collisions, animation state, and frame hashes stay CPU-side and deterministic.
+
+Presentation scale modes:
+
+- `"stretch"` fills the whole client area, even when the aspect ratio changes.
+- `"fit"` preserves the logical canvas aspect ratio and letterboxes the remaining area.
+- `"integer"` preserves aspect ratio and scales by whole pixels for the sharpest pixel-art output.
+
+Renderer diagnostics:
+
+```ml
+name = mp.activeRenderer(game)
+gpu = mp.isGpuRenderer(game)
+reason = mp.rendererFallbackReason(game)
+```
+
+For quick local checks, `tests/window_renderer_smoke.ml` opens a tiny window and prints the active backend. For rough presentation timing, build and run `benchmarks/renderer_bench.ml`.
+
+OpenGL presentation may be capped by the graphics driver or display swap interval, so benchmark output around 60 FPS can mean the swap path is synchronized rather than slow.
 
 ## Canvas
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1
+
+- Added renderer diagnostics for GPU state and fallback reasons.
+- Added presentation scale modes: stretch, aspect-fit, and integer pixel-perfect scaling.
+- Added optional smoothing for the OpenGL presenter.
+- Added a renderer benchmark and expanded renderer documentation.
+- Added frame time to the debug stats overlay.
+
 ## 0.3.0
 
 - Added optional OpenGL/WGL hardware-accelerated presentation on Windows.

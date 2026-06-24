@@ -26,6 +26,8 @@ struct GameConfig
   debug
   headlessFrames
   renderer
+  scaleMode
+  smoothing
 end struct
 
 struct Game
@@ -49,7 +51,7 @@ function createConfig(title, width, height, scale)
   if width <= 0 then width = 320 end if
   if height <= 0 then height = 180 end if
   if scale <= 0 then scale = 4 end if
-  return GameConfig(title, width, height, scale, 60, 0.25, 5, false, 120, "auto")
+  return GameConfig(title, width, height, scale, 60, 0.25, 5, false, 120, "auto", "stretch", false)
 end function
 
 function createGame(cfg)
@@ -67,17 +69,36 @@ function createGame(cfg)
   )
 end function
 
-function version() return "0.3.0" end function
+function version() return "0.3.1" end function
 function setRenderer(cfg, renderer)
   if cfg is GameConfig then cfg.renderer = renderer end if
   return cfg
 end function
 function useGpuRenderer(cfg) return setRenderer(cfg, "opengl") end function
 function useCpuRenderer(cfg) return setRenderer(cfg, "gdi") end function
+function setScaleMode(cfg, mode)
+  if cfg is GameConfig then cfg.scaleMode = mode end if
+  return cfg
+end function
+function useStretchScale(cfg) return setScaleMode(cfg, "stretch") end function
+function useFitScale(cfg) return setScaleMode(cfg, "fit") end function
+function useIntegerScale(cfg) return setScaleMode(cfg, "integer") end function
+function setSmoothing(cfg, enabled)
+  if cfg is GameConfig then cfg.smoothing = enabled end if
+  return cfg
+end function
 function activeRenderer(game)
   if game is Game and game.window != void then return win.rendererName(game.window) end if
   if game is Game then return game.config.renderer end if
   return "none"
+end function
+function isGpuRenderer(game)
+  if game is Game and game.window != void then return win.isGpuRenderer(game.window) end if
+  return false
+end function
+function rendererFallbackReason(game)
+  if game is Game and game.window != void then return win.rendererFallbackReason(game.window) end if
+  return ""
 end function
 function rgb(r, g, b) return mt.rgb(r, g, b) end function
 function rgba(r, g, b, a) return mt.rgba(r, g, b, a) end function
@@ -157,7 +178,7 @@ end function
 
 function run(cfg, initialize, update, render, shutdown)
   game = createGame(cfg)
-  w = win.open(cfg.title, cfg.width, cfg.height, cfg.scale, cfg.renderer)
+  w = win.open(cfg.title, cfg.width, cfg.height, cfg.scale, cfg.renderer, cfg.scaleMode, cfg.smoothing)
   if typeof(w) == "error" then return w end if
   game.window = w
   callIfFunction(initialize, game)

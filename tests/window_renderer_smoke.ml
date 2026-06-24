@@ -8,7 +8,7 @@ function main(args)
   canvas.fillRect(8, 8, 20, 12, mp.rgb(255, 205, 80))
   canvas.fillRect(34, 10, 18, 18, mp.rgb(78, 205, 196))
 
-  w = win.open("MiniPixels Renderer Smoke", canvas.width, canvas.height, 6, "opengl")
+  w = win.open("MiniPixels Renderer Smoke", canvas.width, canvas.height, 6, "opengl", "integer", false)
   if typeof(w) == "error" then
     print "WINDOW_RENDERER_ERROR"
     return 1
@@ -16,6 +16,8 @@ function main(args)
 
   win.present(w, canvas)
   print "WINDOW_RENDERER " + win.rendererName(w)
+  print "WINDOW_RENDERER_GPU " + win.isGpuRenderer(w)
+  print "WINDOW_RENDERER_FALLBACK " + win.rendererFallbackReason(w)
   win.sleepMs(120)
   win.close(w)
   return 0

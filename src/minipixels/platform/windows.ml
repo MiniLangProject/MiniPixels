@@ -29,6 +29,7 @@ const GL_NEAREST = 0x2600
 const GL_CLAMP = 0x2900
 const GL_UNPACK_ALIGNMENT = 0x0CF5
 const GL_QUADS = 0x0007
+const BLACKNESS = 0x00000042
 
 extern function GetModuleHandleW(name as ptr) from "kernel32.dll" returns ptr
 extern function GetConsoleWindow() from "kernel32.dll" returns ptr
@@ -55,6 +56,7 @@ extern function GetDC(hwnd as ptr) from "user32.dll" returns ptr
 extern function ReleaseDC(hwnd as ptr, dc as ptr) from "user32.dll" returns int
 extern function StretchDIBits(dc as ptr, xDest as int, yDest as int, destW as int, destH as int, xSrc as int, ySrc as int, srcW as int, srcH as int, bits as bytes, bmi as bytes, usage as int, rop as int) from "gdi32.dll" returns int
 extern function SetStretchBltMode(dc as ptr, mode as int) from "gdi32.dll" returns int
+extern function PatBlt(dc as ptr, x as int, y as int, width as int, height as int, rop as int) from "gdi32.dll" returns bool
 extern function ChoosePixelFormat(dc as ptr, pfd as bytes) from "gdi32.dll" returns int
 extern function SetPixelFormat(dc as ptr, pixelFormat as int, pfd as bytes) from "gdi32.dll" returns bool
 extern function SwapBuffers(dc as ptr) from "gdi32.dll" returns bool
@@ -63,6 +65,8 @@ extern function wglMakeCurrent(dc as ptr, rc as ptr) from "opengl32.dll" returns
 extern function wglDeleteContext(rc as ptr) from "opengl32.dll" returns bool
 extern function glViewport(x as int, y as int, width as int, height as int) from "opengl32.dll" returns void
 extern function glEnable(cap as int) from "opengl32.dll" returns void
+extern function glDisable(cap as int) from "opengl32.dll" returns void
+extern function glColor3ub(r as int, g as int, b as int) from "opengl32.dll" returns void
 extern function glPixelStorei(name as int, param as int) from "opengl32.dll" returns void
 extern function glGenTextures(count as int, textures as bytes) from "opengl32.dll" returns void
 extern function glBindTexture(target as int, texture as u32) from "opengl32.dll" returns void
@@ -98,6 +102,10 @@ struct Window
   texHeight
   textureData
   gpuReady
+  scaleMode
+  smoothing
+  fallbackReason
+  viewport
 end struct
 
 function putU32(buf, off, v)
@@ -228,7 +236,14 @@ function normalizeRenderer(renderer)
   return "auto"
 end function
 
-function open(title, width, height, scale, renderer)
+function normalizeScaleMode(scaleMode)
+  if scaleMode == "fit" then return "fit" end if
+  if scaleMode == "integer" then return "integer" end if
+  if scaleMode == "pixel-perfect" then return "integer" end if
+  return "stretch"
+end function
+
+function open(title, width, height, scale, renderer, scaleMode, smoothing)
   global windowRunning
   windowRunning = true
   console = GetConsoleWindow()
@@ -245,12 +260,13 @@ function open(title, width, height, scale, renderer)
   UpdateWindow(hwnd)
   SetForegroundWindow(hwnd)
   mode = normalizeRenderer(renderer)
-  w = Window(hwnd, width, height, scale, sw, sh, bytes(width * height * 4, 0), createBitmapInfo(width, height), bytes(48, 0), bytes(16, 0), titleBuf, className, "gdi", 0, 0, 0, width, height, bytes(4, 0), false)
+  w = Window(hwnd, width, height, scale, sw, sh, bytes(width * height * 4, 0), createBitmapInfo(width, height), bytes(48, 0), bytes(16, 0), titleBuf, className, "gdi", 0, 0, 0, width, height, bytes(4, 0), false, normalizeScaleMode(scaleMode), smoothing, "", bytes(16, 0))
   if mode == "auto" or mode == "opengl" then
     if initOpenGL(w) then
       w.renderer = "opengl"
     else
       w.renderer = "gdi"
+      w.fallbackReason = "opengl-init-failed"
     end if
   end if
   return w
@@ -281,6 +297,16 @@ end function
 function rendererName(w)
   if w is not Window then return "none" end if
   return w.renderer
+end function
+
+function isGpuRenderer(w)
+  if w is not Window then return false end if
+  return w.renderer == "opengl"
+end function
+
+function rendererFallbackReason(w)
+  if w is not Window then return "none" end if
+  return w.fallbackReason
 end function
 
 function setTitle(w, title)
@@ -345,6 +371,59 @@ function clientHeight(w)
   return clientH
 end function
 
+function minInt(a, b)
+  if a < b then return a end if
+  return b
+end function
+
+function maxInt(a, b)
+  if a > b then return a end if
+  return b
+end function
+
+function updateViewport(w)
+  cw = clientWidth(w)
+  ch = clientHeight(w)
+  dx = 0
+  dy = 0
+  dw = cw
+  dh = ch
+  if w.scaleMode == "fit" or w.scaleMode == "integer" then
+    if (cw * w.logicalHeight) <= (ch * w.logicalWidth) then
+      dw = cw
+      dh = (cw * w.logicalHeight) / w.logicalWidth
+    else
+      dh = ch
+      dw = (ch * w.logicalWidth) / w.logicalHeight
+    end if
+    if w.scaleMode == "integer" then
+      s = minInt(cw / w.logicalWidth, ch / w.logicalHeight)
+      s = maxInt(1, s)
+      dw = w.logicalWidth * s
+      dh = w.logicalHeight * s
+    end if
+    dx = (cw - dw) / 2
+    dy = (ch - dh) / 2
+  end if
+  putU32(w.viewport, 0, dx)
+  putU32(w.viewport, 4, dy)
+  putU32(w.viewport, 8, dw)
+  putU32(w.viewport, 12, dh)
+  return w.viewport
+end function
+
+function viewportX(w) return getU32(w.viewport, 0) end function
+function viewportY(w) return getU32(w.viewport, 4) end function
+function viewportW(w) return getU32(w.viewport, 8) end function
+function viewportH(w) return getU32(w.viewport, 12) end function
+
+function applyTextureFilter(w)
+  filter = GL_NEAREST
+  if w.smoothing then filter = 0x2601 end if
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter)
+end function
+
 function initOpenGL(w)
   dc = GetDC(w.hwnd)
   if dc == 0 then return false end if
@@ -387,8 +466,7 @@ function initOpenGL(w)
     return false
   end if
   glBindTexture(GL_TEXTURE_2D, w.texture)
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+  applyTextureFilter(w)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w.texWidth, w.texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, w.textureData)
@@ -401,9 +479,21 @@ function presentOpenGL(w, canvas)
   if wglMakeCurrent(w.dc, w.glrc) == false then return false end if
   cw = clientWidth(w)
   ch = clientHeight(w)
+  updateViewport(w)
   glViewport(0, 0, cw, ch)
+  glDisable(GL_TEXTURE_2D)
+  glColor3ub(0, 0, 0)
+  glBegin(GL_QUADS)
+  glVertex2i(-1, -1)
+  glVertex2i(1, -1)
+  glVertex2i(1, 1)
+  glVertex2i(-1, 1)
+  glEnd()
+  glViewport(viewportX(w), ch - viewportY(w) - viewportH(w), viewportW(w), viewportH(w))
   glEnable(GL_TEXTURE_2D)
+  glColor3ub(255, 255, 255)
   glBindTexture(GL_TEXTURE_2D, w.texture)
+  applyTextureFilter(w)
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, canvas.width, canvas.height, GL_RGBA, GL_UNSIGNED_BYTE, canvas.pixels)
   u = canvas.width / w.texWidth
   v = canvas.height / w.texHeight
@@ -443,8 +533,10 @@ function presentGDI(w, canvas)
   dc = GetDC(w.hwnd)
   clientW = clientWidth(w)
   clientH = clientHeight(w)
+  updateViewport(w)
   SetStretchBltMode(dc, 3)
-  StretchDIBits(dc, 0, 0, clientW, clientH, 0, 0, canvas.width, canvas.height, w.bgra, w.bmi, DIB_RGB_COLORS, SRCCOPY)
+  PatBlt(dc, 0, 0, clientW, clientH, BLACKNESS)
+  StretchDIBits(dc, viewportX(w), viewportY(w), viewportW(w), viewportH(w), 0, 0, canvas.width, canvas.height, w.bgra, w.bmi, DIB_RGB_COLORS, SRCCOPY)
   ReleaseDC(w.hwnd, dc)
 end function
 

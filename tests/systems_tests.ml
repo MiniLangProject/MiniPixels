@@ -4,15 +4,27 @@ import minipixels.world.tilemap as tile
 import std.assert as a
 
 function main(args)
-  a.assertEq(mp.version(), "0.3.0", "engine version")
+  a.assertEq(mp.version(), "0.3.1", "engine version")
   cfg = mp.createConfig("Renderer", 64, 36, 2)
   a.assertEq(cfg.renderer, "auto", "renderer defaults to auto")
+  a.assertEq(cfg.scaleMode, "stretch", "scale mode defaults to stretch")
+  a.assertFalse(cfg.smoothing, "smoothing defaults off")
   mp.useGpuRenderer(cfg)
   a.assertEq(cfg.renderer, "opengl", "gpu renderer helper selects opengl")
   mp.useCpuRenderer(cfg)
   a.assertEq(cfg.renderer, "gdi", "cpu renderer helper selects gdi")
+  mp.useFitScale(cfg)
+  a.assertEq(cfg.scaleMode, "fit", "fit scale helper")
+  mp.useIntegerScale(cfg)
+  a.assertEq(cfg.scaleMode, "integer", "integer scale helper")
+  mp.useStretchScale(cfg)
+  a.assertEq(cfg.scaleMode, "stretch", "stretch scale helper")
+  mp.setSmoothing(cfg, true)
+  a.assertTrue(cfg.smoothing, "smoothing helper")
   cfgGame = mp.createGame(cfg)
   a.assertEq(mp.activeRenderer(cfgGame), "gdi", "active renderer falls back to config without window")
+  a.assertFalse(mp.isGpuRenderer(cfgGame), "headless game has no gpu window")
+  a.assertEq(mp.rendererFallbackReason(cfgGame), "", "headless game has no renderer fallback")
   cam = mp.camera(10, 10)
   cam.worldWidth = 100
   cam.worldHeight = 80

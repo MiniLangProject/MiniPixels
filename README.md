@@ -1,6 +1,6 @@
 # MiniPixels
 
-Current version: `0.3.0`
+Current version: `0.3.1`
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses the existing `MiniLangCompilerPy` compiler and builds native Windows x64 executables.
 
@@ -49,6 +49,13 @@ python ..\MiniLangCompilerPy\mlc_win64.py tests\window_renderer_smoke.ml build\t
 build\tests\window_renderer_smoke.exe
 ```
 
+Optional renderer benchmark:
+
+```powershell
+python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\renderer_bench.ml build\benchmarks\renderer_bench.exe -I src -I ..\MiniLangCompilerPy
+build\benchmarks\renderer_bench.exe
+```
+
 Build all examples:
 
 ```powershell
@@ -90,6 +97,15 @@ end function
 ```
 
 `createConfig` uses `renderer = "auto"` by default. On Windows that tries the OpenGL/WGL presenter first and falls back to the classic GDI presenter if GPU initialization is unavailable. Use `mp.useCpuRenderer(cfg)` when you want the old GDI path explicitly.
+
+Presentation scaling can be selected per game:
+
+```ml
+mp.useStretchScale(cfg)  # fill the whole window
+mp.useFitScale(cfg)      # keep aspect ratio
+mp.useIntegerScale(cfg)  # pixel-perfect integer scaling
+mp.setSmoothing(cfg, false)
+```
 
 ## Project Layout
 
