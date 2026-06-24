@@ -84,4 +84,4 @@ end function
 python tools\minipixels.py run MyGame\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```
 
-The build creates generated MiniLang assets, compiles a native Windows executable, copies runtime assets, and writes an `asset-report.json` next to the executable.
+The Python build creates generated MiniLang assets, compiles a native Windows executable, copies runtime assets, and writes an `asset-report.json` next to the executable. The native MiniLang CLI can already validate the manifest and generate importable modules, but full build/run still uses the Python CLI.

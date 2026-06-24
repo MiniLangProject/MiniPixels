@@ -6,7 +6,7 @@ MiniPixels lives in this folder and uses the existing Python compiler:
 python ..\MiniLangCompilerPy\mlc_win64.py <main.ml> <game.exe> -I src
 ```
 
-The recommended workflow is the CLI:
+The recommended full build/run workflow is the Python CLI:
 
 ```powershell
 python tools\minipixels.py --version
@@ -17,6 +17,17 @@ python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler
 python tools\build_examples.py
 python tools\package_sdk.py
 ```
+
+There is also a native MiniLang CLI for the pieces that have already moved out of Python:
+
+```powershell
+python ..\MiniLangCompilerPy\mlc_win64.py tools\minipixels_cli.ml build\tools\minipixels.exe -I src -I ..\MiniLangCompilerPy
+build\tools\minipixels.exe info
+build\tools\minipixels.exe validate examples\jump-and-run\minipixels.json
+build\tools\minipixels.exe generate examples\jump-and-run\minipixels.json examples\jump-and-run\build\generated\generated
+```
+
+Native `generate` supports procedural sprites, sheet helpers, and MiniPixels `levels.json`. The Python CLI still owns PNG embedding, Tiled/TMJ import, runtime asset copying, build/run, packaging, and compiler launching.
 
 ## Minimal game
 
@@ -53,8 +64,8 @@ Game logic, input polling, rendering, and Win32 presentation run on the main thr
 
 ## Implemented now
 
-Canvas, sprites, build-time PNG assets, runtime audio/file asset copying, sprite sheets, generated level data, animation helpers, camera, tilemaps, parallax, collision helpers, bitmap text, input/action snapshots, AudioMixer API, headless tests, framehash regression tests, Win32 reference renderer, CLI, CI workflow, SDK packaging, and examples are present.
+Canvas, sprites, build-time PNG assets, native procedural asset generation, runtime audio/file asset copying, sprite sheets, generated level data, animation helpers, camera, tilemaps, parallax, collision helpers, bitmap text, input/action snapshots, AudioMixer API, headless tests, framehash regression tests, Win32 GDI and OpenGL/WGL presentation, CLI, CI workflow, SDK packaging, and examples are present.
 
-## Not yet in the vertical prototype
+## Not yet in the engine
 
-Runtime WIC hot-loading, advanced audio mixing, async asset loading, arbitrary rotation, GPU render targets, a complete ECS, and visual golden-image management are documented extension points rather than first-version requirements.
+Native PNG embedding, native Tiled/TMJ import, runtime WIC hot-loading, advanced audio mixing, async asset loading, arbitrary rotation, GPU render targets, a complete ECS, and visual golden-image management are documented extension points rather than current engine features.

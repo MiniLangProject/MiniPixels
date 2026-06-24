@@ -74,7 +74,7 @@ Canvas memory stores bytes as `R, G, B, A`. The OpenGL presenter uploads that la
 
 ## Assets
 
-The CLI reads image assets at build time and generates MiniLang code:
+Generated asset modules are plain MiniLang code:
 
 ```ml
 import generated.assets as gen
@@ -85,7 +85,7 @@ function initialize(game)
 end function
 ```
 
-Supported embedded PNGs are 8-bit RGB/RGBA. Assets with `type: "audio"` or `type: "file"` are copied next to the executable instead of being embedded as image code.
+The Python CLI embeds supported 8-bit RGB/RGBA PNG pixels and copies assets with `type: "audio"` or `type: "file"` next to the executable. The native MiniLang CLI already generates importable modules for `procedural` assets and sheet helpers; for `image` assets it emits placeholder pixels until native PNG decoding is added.
 
 ```json
 {
@@ -111,7 +111,7 @@ Each build also writes `asset-report.json` next to the executable with embedded/
 
 ## Level Data
 
-Project manifests can point at MiniPixels level JSON or Tiled JSON/TMJ:
+Project manifests can point at MiniPixels level JSON:
 
 ```json
 {
@@ -121,7 +121,7 @@ Project manifests can point at MiniPixels level JSON or Tiled JSON/TMJ:
 }
 ```
 
-The build generates `generated.levels`:
+Both CLIs can generate `generated.levels` for MiniPixels `levels.json`:
 
 ```ml
 import generated.levels as lvl
@@ -133,7 +133,7 @@ enemyCount = lvl.enemyCount(levelIndex)
 coinCount = lvl.coinCount(levelIndex)
 ```
 
-This keeps example game code small while still producing plain MiniLang for the runtime. The full manifest and Tiled conventions are documented in `docs/manifest-reference.md`.
+The Python CLI also supports Tiled JSON/TMJ import. The native MiniLang CLI validates Tiled manifests but still writes a stub for them. This keeps example game code small while still producing plain MiniLang for the runtime. The full manifest and Tiled conventions are documented in `docs/manifest-reference.md`.
 
 ## Text
 

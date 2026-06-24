@@ -4,7 +4,7 @@ Current version: `0.7.0`
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses the existing `MiniLangCompilerPy` compiler and builds native Windows x64 executables.
 
-The first version focuses on a small but working vertical slice: a Win32 window, fixed logical framebuffer, optional OpenGL/WGL presentation, nearest-neighbor scaling, focus-aware keyboard input, sprites, build-time PNG assets, runtime file assets, tilemaps, camera scrolling, simple collision, bitmap text, basic audio, headless tests, and example projects.
+MiniPixels focuses on a small but working 2D engine slice: a Win32 window, fixed logical framebuffer, optional OpenGL/WGL presentation, nearest-neighbor scaling, focus-aware keyboard input, sprites, build-time PNG assets, runtime file assets, tilemaps, camera scrolling, simple collision, bitmap text, basic audio, headless tests, and example projects.
 
 ![Moving Sprite](docs/images/moving-sprite.png)
 
@@ -49,6 +49,17 @@ build\tools\minipixels.exe new my-game platformer
 ```
 
 The native CLI currently provides `info`, `doctor`, `validate`, `generate`, and `new`. Native `generate` writes importable `generated.assets` and `generated.levels` modules, supports `procedural` sprites, emits sheet helpers, and imports MiniPixels `levels.json`. PNG pixel embedding, Tiled/TMJ import, runtime asset copying, `build`, `run`, and `package` still live in the legacy Python tool while those pieces are moved into MiniLang.
+
+Tooling split:
+
+| Task | Native MiniLang CLI | Python CLI |
+| --- | --- | --- |
+| Create a project | `new` | `new` |
+| Inspect/validate manifests | `info`, `doctor`, `validate` | `info`, `doctor`, `validate` |
+| Generate `generated.assets` | `procedural` sprites and placeholder `image` sprites | PNG/procedural sprites with real pixels |
+| Generate `generated.levels` | MiniPixels `levels.json` | MiniPixels `levels.json` and Tiled JSON/TMJ |
+| Copy runtime assets | Not yet | `audio` and `file` assets |
+| Build/run/package | Not yet | `build`, `run`, `package`, `pack` |
 
 Run tests:
 
@@ -219,7 +230,7 @@ Demonstrates direct per-pixel framebuffer manipulation from MiniLang.
 python tools\minipixels.py run examples\tiled-platformer\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```
 
-Demonstrates the Tiled JSON/TMJ importer with a solid tile layer and object-layer spawn, exit, coins, and enemy patrol data.
+Demonstrates the Python build pipeline's Tiled JSON/TMJ importer with a solid tile layer and object-layer spawn, exit, coins, and enemy patrol data. The native MiniLang generator currently writes a level stub for Tiled maps until native Tiled import is added.
 
 ## CLI
 
@@ -235,7 +246,7 @@ python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler
 python tools\minipixels.py package
 ```
 
-The CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, copies runtime assets such as `type: "audio"` or `type: "file"` next to the executable, generates `generated.levels` from MiniPixels or Tiled JSON when `levels.path` is present, writes `asset-report.json`, optionally packs assets into `.mpak`, and invokes the regular MiniLang compiler.
+The Python CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, copies runtime assets such as `type: "audio"` or `type: "file"` next to the executable, generates `generated.levels` from MiniPixels or Tiled JSON when `levels.path` is present, writes `asset-report.json`, optionally packs assets into `.mpak`, and invokes the regular MiniLang compiler. The native MiniLang CLI can already validate manifests and generate importable modules for `procedural` sprites and MiniPixels `levels.json`.
 
 ## Mini Code Examples
 
@@ -297,11 +308,12 @@ Implemented:
 - Native Win32 window
 - Fixed logical resolution and resize stretch
 - CPU RGBA8888 framebuffer
-- Nearest-neighbor DIB presentation
+- Nearest-neighbor GDI presentation and optional OpenGL/WGL presentation
 - Keyboard input only while the game window has focus
 - FPS in the window title
 - Safe pixel operations and primitive drawing
-- PNG-to-MiniLang build-time asset generation
+- PNG-to-MiniLang build-time asset generation in the Python pipeline
+- Native MiniLang generation for procedural sprites and MiniPixels `levels.json`
 - Runtime asset copying for audio/file assets
 - Sprites, sprite sheets, animation
 - Facade helpers for world drawing, text, input edges, animation-from-sheet, and audio state/loop/stop
@@ -316,8 +328,8 @@ Implemented:
 
 Not yet implemented:
 
-- GPU renderer
 - Runtime PNG hot-loading
+- Native PNG embedding and native Tiled/TMJ import
 - Cross-platform audio mixer beyond the WinMM hook
 - Full editor tooling
 - Advanced physics or ECS

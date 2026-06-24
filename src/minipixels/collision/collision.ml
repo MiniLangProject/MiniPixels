@@ -36,7 +36,7 @@ end function
 
 function lineRect(x1, y1, x2, y2, r)
   if pointRect(x1, y1, r) or pointRect(x2, y2, r) then return true end if
-  // Conservative fallback for the first version.
+  // Conservative broad-phase fallback until exact segment-vs-rect clipping is needed.
   minX = x1
   if x2 < minX then minX = x2 end if
   minY = y1

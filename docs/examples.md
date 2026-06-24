@@ -118,7 +118,7 @@ What it demonstrates:
 - Player movement, jumping, gravity, tile collision, and camera follow
 - Coins, enemies, stomp combat, locked exits, level intros, particle bursts, and level transitions
 - Sprite-sheet animation, stateful SFX playback, HUD text, and camera-space drawing helpers
-- Open/free asset workflow with compact generated MiniLang assets, manifest sheet metadata, generated level data, and build-time asset reports
+- Open/free asset workflow with compact generated MiniLang assets, manifest sheet metadata, generated level data, and Python build-time asset reports
 
 MiniLang code excerpt:
 
@@ -142,7 +142,7 @@ end if
 mp.drawSpriteWorld(canvas, camera, playerSheet.getFrame(pframe), player.x, player.y)
 ```
 
-Level data lives in `examples/jump-and-run/assets/levels/levels.json` and is compiled into `generated.levels` during the build.
+Level data lives in `examples/jump-and-run/assets/levels/levels.json` and is compiled into `generated.levels` during the build. The native MiniLang CLI can generate this level module too; the Python CLI is still needed for real PNG pixel embedding and the full build/run pipeline.
 
 Assets:
 

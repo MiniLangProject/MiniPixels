@@ -118,6 +118,7 @@ function assetsHeader()
   code = code + line("import minipixels as mp")
   code = code + line("import minipixels.assets.assets as assets")
   code = code + line("")
+  // The generated module keeps procedural drawing local so projects can compile without the Python asset processor.
   code = code + line("function setPixel(pix, width, x, y, r, g, b, a)")
   code = code + line("  i = ((y * width) + x) * 4")
   code = code + line("  pix[i] = r")
@@ -390,6 +391,7 @@ function levelsModule(m, r)
     return levelsStubModule()
   end if
   if json.has(parsed, "levels") == false then
+    // Tiled/TMJ support still belongs to the Python pipeline until the native importer is ported.
     addWarning(r, "native Tiled/TMJ import is not implemented yet; wrote generated.levels stub")
     return levelsStubModule()
   end if

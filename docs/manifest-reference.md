@@ -38,7 +38,16 @@ MiniPixels projects are described by `minipixels.json`.
 }
 ```
 
-`type: "image"` and `type: "procedural"` assets are embedded into generated MiniLang. Other asset types are copied next to the executable.
+Asset types:
+
+| Type | Meaning | Python CLI | Native CLI `generate` |
+| --- | --- | --- | --- |
+| `image` | 8-bit RGB/RGBA PNG image asset | embeds real PNG pixels into `generated.assets` | emits a compileable placeholder sprite until native PNG decoding is added |
+| `procedural` | generated checker/player/tile sprite data from manifest fields | embeds generated pixels | embeds generated pixels |
+| `audio` | runtime audio file, usually WAV | copies next to the executable | validates only |
+| `file` | runtime data file | copies next to the executable | validates only |
+
+Assets with `sheet` metadata also get generated helpers such as `gen.sheet_player()`.
 
 ## MiniPixels Level JSON
 
@@ -68,7 +77,7 @@ Platform `x`, `y`, and `w` are measured in tiles. Spawn, exit, enemies, and coin
 
 ## Tiled JSON/TMJ Import
 
-`levels.path` may also point to a Tiled JSON/TMJ map. MiniPixels imports one Tiled map as one generated level.
+When using the Python build pipeline, `levels.path` may also point to a Tiled JSON/TMJ map. MiniPixels imports one Tiled map as one generated level. The native MiniLang generator validates the manifest but currently writes a level stub for Tiled/TMJ maps; native Tiled import is a follow-up migration step.
 
 Supported conventions:
 
@@ -78,7 +87,7 @@ Supported conventions:
 - Object layers may contain objects named or typed `spawn`, `exit`, `coin`, and `enemy`.
 - Enemy objects may use custom properties `minX` and `maxX`.
 
-The generated MiniLang module is always imported the same way:
+Generated MiniLang modules are imported the same way regardless of which CLI produced them:
 
 ```ml
 import generated.levels as lvl
