@@ -21,7 +21,7 @@ def run_python_tests() -> None:
         raise RuntimeError("could not load tools/minipixels.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    assert mod.VERSION == "0.2.1", mod.VERSION
+    assert mod.VERSION == "0.3.0", mod.VERSION
     package_spec = importlib.util.spec_from_file_location("package_sdk", ROOT / "tools" / "package_sdk.py")
     if package_spec is None or package_spec.loader is None:
         raise RuntimeError("could not load tools/package_sdk.py")

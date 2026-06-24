@@ -1,10 +1,10 @@
 # MiniPixels
 
-Current version: `0.2.1`
+Current version: `0.3.0`
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses the existing `MiniLangCompilerPy` compiler and builds native Windows x64 executables.
 
-The first version focuses on a small but working vertical slice: a Win32 window, fixed logical framebuffer, nearest-neighbor scaling, focus-aware keyboard input, sprites, build-time PNG assets, runtime file assets, tilemaps, camera scrolling, simple collision, bitmap text, basic audio, headless tests, and example projects.
+The first version focuses on a small but working vertical slice: a Win32 window, fixed logical framebuffer, optional OpenGL/WGL presentation, nearest-neighbor scaling, focus-aware keyboard input, sprites, build-time PNG assets, runtime file assets, tilemaps, camera scrolling, simple collision, bitmap text, basic audio, headless tests, and example projects.
 
 ![Moving Sprite](docs/images/moving-sprite.png)
 
@@ -42,6 +42,13 @@ Run tests:
 python tests\run_tests.py
 ```
 
+Optional window renderer smoke test:
+
+```powershell
+python ..\MiniLangCompilerPy\mlc_win64.py tests\window_renderer_smoke.ml build\tests\window_renderer_smoke.exe -I src -I ..\MiniLangCompilerPy
+build\tests\window_renderer_smoke.exe
+```
+
 Build all examples:
 
 ```powershell
@@ -77,9 +84,12 @@ end function
 
 function main(args)
   cfg = mp.createConfig("MiniPixels Game", 320, 180, 4)
+  mp.useGpuRenderer(cfg)
   return mp.run(cfg, void, update, render, void)
 end function
 ```
+
+`createConfig` uses `renderer = "auto"` by default. On Windows that tries the OpenGL/WGL presenter first and falls back to the classic GDI presenter if GPU initialization is unavailable. Use `mp.useCpuRenderer(cfg)` when you want the old GDI path explicitly.
 
 ## Project Layout
 

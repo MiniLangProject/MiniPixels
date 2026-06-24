@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- Added optional OpenGL/WGL hardware-accelerated presentation on Windows.
+- Added renderer selection through `cfg.renderer`, `mp.useGpuRenderer(cfg)`, and `mp.useCpuRenderer(cfg)`.
+- Kept the existing GDI renderer as automatic fallback when GPU initialization is unavailable.
+
 ## 0.2.1
 
 - Added the `examples/tiled-platformer` project demonstrating Tiled JSON/TMJ level import.

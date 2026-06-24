@@ -4,7 +4,15 @@ import minipixels.world.tilemap as tile
 import std.assert as a
 
 function main(args)
-  a.assertEq(mp.version(), "0.2.1", "engine version")
+  a.assertEq(mp.version(), "0.3.0", "engine version")
+  cfg = mp.createConfig("Renderer", 64, 36, 2)
+  a.assertEq(cfg.renderer, "auto", "renderer defaults to auto")
+  mp.useGpuRenderer(cfg)
+  a.assertEq(cfg.renderer, "opengl", "gpu renderer helper selects opengl")
+  mp.useCpuRenderer(cfg)
+  a.assertEq(cfg.renderer, "gdi", "cpu renderer helper selects gdi")
+  cfgGame = mp.createGame(cfg)
+  a.assertEq(mp.activeRenderer(cfgGame), "gdi", "active renderer falls back to config without window")
   cam = mp.camera(10, 10)
   cam.worldWidth = 100
   cam.worldHeight = 80

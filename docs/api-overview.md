@@ -16,6 +16,18 @@ Callbacks:
 
 The game loop runs on the main thread. Input is sampled only when the game window has focus. The window title includes the current FPS.
 
+## Renderer
+
+MiniPixels renders into a fixed-size RGBA canvas and then presents that framebuffer to the native window. On Windows the default renderer mode is `auto`: MiniPixels first tries the OpenGL/WGL presenter and falls back to the GDI presenter if GPU initialization is not available.
+
+```ml
+cfg = mp.createConfig("Title", 320, 180, 4)
+mp.useGpuRenderer(cfg)      # force OpenGL/WGL presentation when available
+# mp.useCpuRenderer(cfg)    # force the classic GDI presentation path
+```
+
+You can also set `cfg.renderer` manually to `"auto"`, `"opengl"`, `"gpu"`, `"gdi"`, or `"cpu"`. The OpenGL path uploads the CPU canvas as a texture each frame and uses the GPU for scaling and swapping the window framebuffer. Canvas drawing, collisions, animation state, and frame hashes stay CPU-side and deterministic.
+
 ## Canvas
 
 ```ml
@@ -38,7 +50,7 @@ red = mp.rgb(255, 0, 0)
 semi = mp.rgba(255, 255, 255, 128)
 ```
 
-Canvas memory stores bytes as `R, G, B, A`. The Win32 renderer converts to BGRA for DIB presentation.
+Canvas memory stores bytes as `R, G, B, A`. The OpenGL presenter uploads that layout directly; the GDI presenter converts it to BGRA for DIB presentation.
 
 ## Assets
 
