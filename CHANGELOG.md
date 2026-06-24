@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+- Added the first native MiniLang CLI at `tools/minipixels_cli.ml`.
+- Added native `info`, `doctor`, and `new <name> [template]` commands.
+- Added project templates: `basic`, `platformer`, and `pixel-art`.
+- Started moving MiniPixels tooling away from Python; Python remains only for compiler bootstrap and the legacy build/generate/package pipeline for now.
+
 ## 0.3.1
 
 - Added renderer diagnostics for GPU state and fallback reasons.

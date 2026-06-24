@@ -69,7 +69,7 @@ function createGame(cfg)
   )
 end function
 
-function version() return "0.3.1" end function
+function version() return "0.4.0" end function
 function setRenderer(cfg, renderer)
   if cfg is GameConfig then cfg.renderer = renderer end if
   return cfg

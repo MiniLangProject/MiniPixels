@@ -4,7 +4,7 @@ import minipixels.world.tilemap as tile
 import std.assert as a
 
 function main(args)
-  a.assertEq(mp.version(), "0.3.1", "engine version")
+  a.assertEq(mp.version(), "0.4.0", "engine version")
   cfg = mp.createConfig("Renderer", 64, 36, 2)
   a.assertEq(cfg.renderer, "auto", "renderer defaults to auto")
   a.assertEq(cfg.scaleMode, "stretch", "scale mode defaults to stretch")

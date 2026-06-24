@@ -40,6 +40,34 @@ jobs:
         working-directory: MiniPixels
         run: python tools\build_examples.py
 
+      - name: Build native MiniLang CLI
+        working-directory: MiniPixels
+        run: |
+          python ..\MiniLangCompilerPy\mlc_win64.py tools\minipixels_cli.ml build\tools\minipixels.exe -I src -I ..\MiniLangCompilerPy
+          build\tools\minipixels.exe info
+          build\tools\minipixels.exe doctor
+
+      - name: Smoke native MiniLang CLI templates
+        shell: pwsh
+        working-directory: MiniPixels
+        run: |
+          $tmp = Join-Path $env:TEMP "minipixels-native-cli-smoke"
+          if (Test-Path $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force }
+          New-Item -ItemType Directory -Force $tmp | Out-Null
+          Copy-Item build\tools\minipixels.exe $tmp\minipixels.exe
+          Push-Location $tmp
+          try {
+            foreach ($tpl in @("basic", "platformer", "pixel-art")) {
+              $name = "demo-$tpl"
+              .\minipixels.exe new $name $tpl
+              if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+              python "$env:GITHUB_WORKSPACE\MiniLangCompilerPy\mlc_win64.py" "$tmp\$name\src\main.ml" "$tmp\$name\$name.exe" -I "$env:GITHUB_WORKSPACE\MiniPixels\src" -I "$env:GITHUB_WORKSPACE\MiniLangCompilerPy"
+              if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            }
+          } finally {
+            Pop-Location
+          }
+
       - name: Package SDK
         working-directory: MiniPixels
         run: python tools\package_sdk.py
