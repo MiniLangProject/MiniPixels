@@ -66,6 +66,21 @@ Run:
 python tools\minipixels.py run examples\pixel-effects\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```
 
+## Tiled Platformer
+
+Run:
+
+```powershell
+python tools\minipixels.py run examples\tiled-platformer\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
+```
+
+What it demonstrates:
+
+- Tiled JSON/TMJ level input through `levels.path`
+- Collision tile layer import
+- Object-layer `spawn`, `exit`, `coin`, and `enemy` records
+- Procedurally generated sprites and tiles
+
 MiniLang code excerpt:
 
 ```ml

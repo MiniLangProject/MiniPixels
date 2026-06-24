@@ -4,7 +4,7 @@ import minipixels.world.tilemap as tile
 import std.assert as a
 
 function main(args)
-  a.assertEq(mp.version(), "0.2.0", "engine version")
+  a.assertEq(mp.version(), "0.2.1", "engine version")
   cam = mp.camera(10, 10)
   cam.worldWidth = 100
   cam.worldHeight = 80

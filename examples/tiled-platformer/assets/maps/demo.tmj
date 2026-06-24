@@ -1,0 +1,71 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "width": 30,
+  "height": 9,
+  "tilewidth": 32,
+  "tileheight": 32,
+  "infinite": false,
+  "nextlayerid": 3,
+  "nextobjectid": 8,
+  "layers": [
+    {
+      "id": 1,
+      "name": "collision",
+      "type": "tilelayer",
+      "x": 0,
+      "y": 0,
+      "width": 30,
+      "height": 9,
+      "opacity": 1,
+      "visible": true,
+      "data": [
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,0,
+        0,0,0,0,0,2,2,2,2,0,0,0,0,2,2,2,2,2,0,0,0,0,2,2,2,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,
+        0,0,0,2,2,2,0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+      ]
+    },
+    {
+      "id": 2,
+      "name": "objects",
+      "type": "objectgroup",
+      "opacity": 1,
+      "visible": true,
+      "objects": [
+        { "id": 1, "name": "spawn", "type": "spawn", "x": 48, "y": 208, "width": 16, "height": 16 },
+        { "id": 2, "name": "exit", "type": "exit", "x": 858, "y": 96, "width": 32, "height": 64 },
+        { "id": 3, "name": "coin", "type": "coin", "x": 190, "y": 168, "width": 16, "height": 16 },
+        { "id": 4, "name": "coin", "type": "coin", "x": 444, "y": 104, "width": 16, "height": 16 },
+        { "id": 5, "name": "coin", "type": "coin", "x": 726, "y": 72, "width": 16, "height": 16 },
+        {
+          "id": 6,
+          "name": "enemy",
+          "type": "enemy",
+          "x": 520,
+          "y": 208,
+          "width": 96,
+          "height": 16,
+          "properties": [
+            { "name": "minX", "type": "int", "value": 480 },
+            { "name": "maxX", "type": "int", "value": 650 }
+          ]
+        }
+      ]
+    }
+  ],
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "source": "procedural-tiles.tsx"
+    }
+  ]
+}

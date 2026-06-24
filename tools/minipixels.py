@@ -19,7 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 ASSET_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-VERSION = "0.2.0"
+VERSION = "0.2.1"
 
 
 def die(message: str, code: int = 1) -> None:
@@ -222,6 +222,54 @@ def normalize_level_source(data: dict, source: str) -> dict:
     if "layers" in data and "tilewidth" in data:
         return normalize_tiled_map(data, source)
     die(f"{source}: expected MiniPixels level JSON or Tiled JSON/TMJ map")
+
+
+def level_warnings(levels: dict, source: str) -> list[str]:
+    warnings: list[str] = []
+    if "layers" in levels and "tilewidth" in levels:
+        known = {"spawn", "player", "exit", "goal", "coin", "enemy"}
+        found = {"spawn": False, "exit": False, "coin": False}
+        for layer in tiled_object_layers(levels):
+            for obj in layer.get("objects", []):
+                kind = object_kind(obj)
+                if kind in ("spawn", "player"):
+                    found["spawn"] = True
+                elif kind in ("exit", "goal"):
+                    found["exit"] = True
+                elif kind == "coin":
+                    found["coin"] = True
+                elif kind and kind not in known:
+                    warnings.append(f"{source}: unknown Tiled object kind '{kind}'")
+        if not tiled_tile_layers(levels):
+            warnings.append(f"{source}: no tile layers found for collision/ground")
+        for key, label in [("spawn", "spawn object"), ("exit", "exit object"), ("coin", "coin objects")]:
+            if not found[key]:
+                warnings.append(f"{source}: no {label} found")
+        return warnings
+
+    normalized = normalize_level_source(levels, source)
+    parsed = validate_levels(normalized, source)
+    for idx, level in enumerate(parsed):
+        if not level["coins"]:
+            warnings.append(f"{source}: level {idx} has no coins")
+        if not level["platforms"]:
+            warnings.append(f"{source}: level {idx} has no platforms")
+    return warnings
+
+
+def project_warnings(data: dict) -> list[str]:
+    warnings: list[str] = []
+    levels = data.get("levels")
+    if isinstance(levels, dict) and levels.get("_absolute_path"):
+        path = levels["_absolute_path"]
+        try:
+            raw = json.loads(Path(path).read_text(encoding="utf-8"))
+            warnings.extend(level_warnings(raw, path))
+        except Exception as exc:
+            warnings.append(f"{path}: could not inspect levels: {exc}")
+    if not data.get("assets"):
+        warnings.append("project has no assets")
+    return warnings
 
 
 def color_rgba(color: list[int]) -> tuple[int, int, int, int]:
@@ -662,11 +710,43 @@ def new_project(name: str) -> None:
     print(root)
 
 
+def print_project_info(project_file: Path) -> None:
+    data = validate(project_file)
+    window = data.get("window", {})
+    print(f"MiniPixels {VERSION}")
+    print(f"project: {data.get('name')}")
+    print(f"main: {data.get('main')}")
+    print(f"window: {window.get('width')}x{window.get('height')} scale {window.get('scale', 1)}")
+    print(f"assets: {len(data.get('assets', []))}")
+    levels = load_levels(data)
+    if levels is not None:
+        print(f"levels: {len(validate_levels(levels, data['levels'].get('_absolute_path', 'levels')))}")
+    else:
+        print("levels: none")
+
+
+def doctor(project_file: Path) -> int:
+    data = validate(project_file)
+    warnings = project_warnings(data)
+    print("MiniPixels doctor")
+    print(f"project: {data.get('name')}")
+    if not warnings:
+        print("OK: no issues found")
+        return 0
+    for warning in warnings:
+        print(f"warning: {warning}")
+    return 0
+
+
 def main(argv: list[str]) -> int:
     p = argparse.ArgumentParser(prog="minipixels")
     p.add_argument("--version", action="version", version=f"MiniPixels {VERSION}")
     sub = p.add_subparsers(dest="cmd", required=True)
     sub.add_parser("new").add_argument("name")
+    sub.add_parser("package").add_argument("--output-dir", default=str(ROOT / "dist"))
+    for name in ["info", "doctor"]:
+        sp = sub.add_parser(name)
+        sp.add_argument("project", nargs="?", default="minipixels.json")
     for name in ["validate", "generate", "pack", "build", "run"]:
         sp = sub.add_parser(name)
         sp.add_argument("project", nargs="?", default="minipixels.json")
@@ -682,21 +762,31 @@ def main(argv: list[str]) -> int:
     if args.cmd == "new":
         new_project(args.name)
         return 0
+    if args.cmd == "package":
+        cmd = [sys.executable, str(ROOT / "tools" / "package_sdk.py"), "--output-dir", str(Path(args.output_dir).resolve())]
+        subprocess.check_call(cmd, cwd=str(ROOT))
+        return 0
 
     project = Path(args.project).resolve()
-    gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"
-    if args.cmd == "validate":
+    if args.cmd == "info":
+        print_project_info(project)
+    elif args.cmd == "doctor":
+        return doctor(project)
+    elif args.cmd == "validate":
         validate(project)
         print("MiniPixels project is valid")
     elif args.cmd == "generate":
+        gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"
         generate(project, gen_dir)
     elif args.cmd == "pack":
         out = Path(args.output).resolve() if args.output else project.parent / "build" / "game.mpak"
         pack(project, out)
     elif args.cmd == "build":
+        gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"
         out = Path(args.output).resolve() if args.output else None
         build(project, out, Path(args.compiler).resolve(), gen_dir)
     elif args.cmd == "run":
+        gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"
         out = Path(args.output).resolve() if args.output else None
         exe = build(project, out, Path(args.compiler).resolve(), gen_dir)
         subprocess.check_call([str(exe)], cwd=str(project.parent))

@@ -21,7 +21,7 @@ def run_python_tests() -> None:
         raise RuntimeError("could not load tools/minipixels.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    assert mod.VERSION == "0.2.0", mod.VERSION
+    assert mod.VERSION == "0.2.1", mod.VERSION
     package_spec = importlib.util.spec_from_file_location("package_sdk", ROOT / "tools" / "package_sdk.py")
     if package_spec is None or package_spec.loader is None:
         raise RuntimeError("could not load tools/package_sdk.py")
@@ -115,6 +115,10 @@ def run_python_tests() -> None:
     assert tiled_level["coins"][0] == {"x": 48, "y": 24}, tiled_level
     assert tiled_level["enemies"][0]["minX"] == 32, tiled_level
     assert {"x": 1, "y": 1, "w": 2, "tile": 2} in tiled_level["platforms"], tiled_level
+    assert mod.level_warnings(tiled, "inline.tiled") == [], mod.level_warnings(tiled, "inline.tiled")
+    noisy = {"width": 1, "height": 1, "tilewidth": 32, "tileheight": 32, "layers": [{"type": "objectgroup", "objects": [{"type": "mystery"}]}]}
+    noisy_warnings = mod.level_warnings(noisy, "noisy.tiled")
+    assert any("unknown Tiled object kind" in warning for warning in noisy_warnings), noisy_warnings
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         level_path = tmp_path / "levels.json"

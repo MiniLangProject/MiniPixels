@@ -1,0 +1,39 @@
+{
+  "name": "tiled-platformer",
+  "main": "src/main.ml",
+  "window": {
+    "title": "MiniPixels Tiled Platformer",
+    "width": 320,
+    "height": 180,
+    "scale": 4
+  },
+  "levels": {
+    "path": "assets/maps/demo.tmj"
+  },
+  "assets": [
+    {
+      "id": "tiles",
+      "type": "procedural",
+      "kind": "tiles",
+      "width": 64,
+      "height": 32,
+      "color": [82, 190, 118, 255],
+      "secondary": [44, 115, 76, 255],
+      "sheet": {
+        "frameWidth": 32,
+        "frameHeight": 32,
+        "spacing": 0,
+        "margin": 0
+      }
+    },
+    {
+      "id": "player",
+      "type": "procedural",
+      "kind": "player",
+      "width": 16,
+      "height": 16,
+      "color": [78, 205, 196, 255],
+      "secondary": [255, 220, 80, 255]
+    }
+  ]
+}

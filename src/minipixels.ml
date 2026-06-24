@@ -66,7 +66,7 @@ function createGame(cfg)
   )
 end function
 
-function version() return "0.2.0" end function
+function version() return "0.2.1" end function
 function rgb(r, g, b) return mt.rgb(r, g, b) end function
 function rgba(r, g, b, a) return mt.rgba(r, g, b, a) end function
 function vec2(x, y) return mt.vec2(x, y) end function

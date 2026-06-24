@@ -13,6 +13,7 @@ EXAMPLES = [
     "examples/scrolling-world/minipixels.json",
     "examples/pixel-effects/minipixels.json",
     "examples/jump-and-run/minipixels.json",
+    "examples/tiled-platformer/minipixels.json",
 ]
 
 

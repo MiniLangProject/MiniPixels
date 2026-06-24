@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1
+
+- Added the `examples/tiled-platformer` project demonstrating Tiled JSON/TMJ level import.
+- Added CLI commands: `info`, `doctor`, and `package`.
+- Added Tiled/level warnings for missing objects and unknown object kinds.
+- Expanded manifest and Tiled import documentation.
+
 ## 0.2.0
 
 - Added Windows CI for tests and example builds.

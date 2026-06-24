@@ -1,6 +1,6 @@
 # MiniPixels
 
-Current version: `0.2.0`
+Current version: `0.2.1`
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses the existing `MiniLangCompilerPy` compiler and builds native Windows x64 executables.
 
@@ -173,15 +173,26 @@ python tools\minipixels.py run examples\pixel-effects\minipixels.json --compiler
 
 Demonstrates direct per-pixel framebuffer manipulation from MiniLang.
 
+### Tiled Platformer
+
+```powershell
+python tools\minipixels.py run examples\tiled-platformer\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
+```
+
+Demonstrates the Tiled JSON/TMJ importer with a solid tile layer and object-layer spawn, exit, coins, and enemy patrol data.
+
 ## CLI
 
 ```powershell
 python tools\minipixels.py new MyGame
+python tools\minipixels.py info examples\moving-sprite\minipixels.json
+python tools\minipixels.py doctor examples\tiled-platformer\minipixels.json
 python tools\minipixels.py validate examples\moving-sprite\minipixels.json
 python tools\minipixels.py generate examples\moving-sprite\minipixels.json
 python tools\minipixels.py pack examples\moving-sprite\minipixels.json
 python tools\minipixels.py build examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
+python tools\minipixels.py package
 ```
 
 The CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, copies runtime assets such as `type: "audio"` or `type: "file"` next to the executable, generates `generated.levels` from MiniPixels or Tiled JSON when `levels.path` is present, writes `asset-report.json`, optionally packs assets into `.mpak`, and invokes the regular MiniLang compiler.
