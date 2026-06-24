@@ -6,6 +6,7 @@ import sys
 import importlib.util
 import json
 import tempfile
+import zipfile
 from pathlib import Path
 
 
@@ -21,6 +22,11 @@ def run_python_tests() -> None:
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     assert mod.VERSION == "0.2.0", mod.VERSION
+    package_spec = importlib.util.spec_from_file_location("package_sdk", ROOT / "tools" / "package_sdk.py")
+    if package_spec is None or package_spec.loader is None:
+        raise RuntimeError("could not load tools/package_sdk.py")
+    package_mod = importlib.util.module_from_spec(package_spec)
+    package_spec.loader.exec_module(package_mod)
     literal = mod.bytes_literal(bytes([0, 0, 255, 0, 255, 0]))
     assert "pix = bytes(6, 0)" in literal, literal
     assert "pix[2] = 255" in literal, literal
@@ -66,6 +72,14 @@ def run_python_tests() -> None:
         assert "package generated.levels" in generated, generated
         assert "function enemyMinX" in generated, generated
         assert "fill(data, w, 0, 2, 4, 1)" in generated, generated
+        sdk_zip = package_mod.package_sdk(tmp_path / "dist")
+        assert sdk_zip.exists(), sdk_zip
+        assert (sdk_zip.parent / f"{sdk_zip.name}.sha256").exists(), sdk_zip
+        with zipfile.ZipFile(sdk_zip) as zf:
+            names = set(zf.namelist())
+            assert any(name.endswith("/README.md") for name in names), names
+            assert any(name.endswith("/src/minipixels.ml") for name in names), names
+            assert any(name.endswith("/sdk-manifest.json") for name in names), names
     print("Python tool tests passed")
 
 

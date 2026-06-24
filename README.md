@@ -48,6 +48,12 @@ Build all examples:
 python tools\build_examples.py
 ```
 
+Create the SDK bundle:
+
+```powershell
+python tools\package_sdk.py
+```
+
 ## Minimal Game
 
 ```ml
@@ -210,12 +216,13 @@ Input and audio:
 
 ```ml
 coin = mp.audioClip("assets\\audio\\coin.wav", "coin")
+mixer = mp.audioMixer(4)
 if mp.inputPressed(game.input, "jump") then
-  mp.playAudio(game.audio, coin)
+  mixer.playSfx(coin)
 end if
-game.audio.setSfxVolume(80)
-mp.playMusicWithState(game.audio, "assets\\audio\\theme.wav")
-mp.stopSound()
+mixer.setSfxVolume(80)
+mixer.playMusic(mp.musicClip("assets\\audio\\theme.wav", "theme"))
+mixer.stopAll()
 ```
 
 ## Engine Modules
@@ -253,6 +260,7 @@ Implemented:
 - Tilemap culling and simple collision
 - Headless and framehash regression tests
 - GitHub Actions CI for tests and example builds
+- SDK ZIP packaging with SHA256 checksum and release upload on `v*` tags
 - Version file, changelog, and first-game guide
 
 Not yet implemented:

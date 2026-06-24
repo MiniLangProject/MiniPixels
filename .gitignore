@@ -1,5 +1,6 @@
 # MiniPixels build artifacts
 build/
+dist/
 examples/*/build/
 .asset-work/
 examples/jump-and-run/assets/*.zip

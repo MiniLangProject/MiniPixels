@@ -3,9 +3,11 @@
 ## 0.2.0
 
 - Added Windows CI for tests and example builds.
+- Added SDK ZIP packaging with SHA256 checksum and workflow artifact upload.
+- Added tag-based GitHub Release publishing for `v*` tags.
 - Added build-time level JSON generation through `generated.levels`.
 - Added framehash render regression tests.
-- Added AudioClip and backend capability helpers as the next audio API layer.
+- Added AudioClip, AudioMixer, and backend capability helpers as the next audio API layer.
 - Added SpriteSheet metadata generation, asset reports, and runtime asset copying.
 - Polished the Jump and Run example with HUD, particles, level intros, and data-driven levels.
 

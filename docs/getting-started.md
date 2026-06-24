@@ -15,6 +15,7 @@ python tools\minipixels.py generate examples\moving-sprite\minipixels.json
 python tools\minipixels.py build examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 python tools\build_examples.py
+python tools\package_sdk.py
 ```
 
 ## Minimal game
@@ -52,7 +53,7 @@ Game logic, input polling, rendering, and Win32 presentation run on the main thr
 
 ## Implemented now
 
-Canvas, sprites, build-time PNG assets, runtime audio/file asset copying, sprite sheets, generated level data, animation helpers, camera, tilemaps, parallax, collision helpers, bitmap text, input/action snapshots, headless tests, framehash regression tests, Win32 reference renderer, CLI, CI workflow, and examples are present.
+Canvas, sprites, build-time PNG assets, runtime audio/file asset copying, sprite sheets, generated level data, animation helpers, camera, tilemaps, parallax, collision helpers, bitmap text, input/action snapshots, AudioMixer API, headless tests, framehash regression tests, Win32 reference renderer, CLI, CI workflow, SDK packaging, and examples are present.
 
 ## Not yet in the vertical prototype
 

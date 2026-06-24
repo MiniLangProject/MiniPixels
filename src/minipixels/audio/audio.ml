@@ -70,6 +70,53 @@ struct AudioClip
   end function
 end struct
 
+struct AudioChannel
+  id
+  clip
+  playing
+  volume
+end struct
+
+struct AudioMixer
+  audio
+  channels
+  channelCount
+  nextChannel
+  music
+
+  function setMasterVolume(value)
+    this.audio.setMasterVolume(value)
+  end function
+
+  function setSfxVolume(value)
+    this.audio.setSfxVolume(value)
+  end function
+
+  function setMusicVolume(value)
+    this.audio.setMusicVolume(value)
+  end function
+
+  function mute()
+    return this.audio.mute()
+  end function
+
+  function unmute()
+    return this.audio.unmute()
+  end function
+
+  function playSfx(clip)
+    return minipixels.audio.audio.mixerPlaySfx(this, clip)
+  end function
+
+  function playMusic(clip)
+    return minipixels.audio.audio.mixerPlayMusic(this, clip)
+  end function
+
+  function stopAll()
+    return minipixels.audio.audio.mixerStopAll(this)
+  end function
+end struct
+
 function normalizeVolume(value)
   if typeof(value) != "int" then value = 100 end if
   if value < 0 then return 0 end if
@@ -91,6 +138,21 @@ function musicClip(path, name)
   c = clip(path, name)
   c.looping = true
   return c
+end function
+
+function channel(id)
+  return AudioChannel(id, void, false, 100)
+end function
+
+function mixer(maxChannels)
+  if typeof(maxChannels) != "int" or maxChannels <= 0 then maxChannels = 4 end if
+  channels = array(maxChannels)
+  i = 0
+  while i < maxChannels
+    channels[i] = channel(i)
+    i = i + 1
+  end while
+  return AudioMixer(create(), channels, maxChannels, 0, void)
 end function
 
 function effectiveVolume(audio, channelVolume)
@@ -157,4 +219,51 @@ function playClip(audio, c)
   end if
   if effectiveClipVolume(audio, audio.sfxVolume, c.volume) <= 0 then return false end if
   return playSfx(audio, c.path)
+end function
+
+function chooseChannel(m)
+  i = 0
+  while i < m.channelCount
+    ch = m.channels[i]
+    if ch.playing == false then return i end if
+    i = i + 1
+  end while
+  idx = m.nextChannel
+  m.nextChannel = (m.nextChannel + 1) % m.channelCount
+  return idx
+end function
+
+function mixerPlaySfx(m, c)
+  if c.looping then c.looping = false end if
+  if effectiveClipVolume(m.audio, m.audio.sfxVolume, c.volume) <= 0 then return false end if
+  ok = playSfx(m.audio, c.path)
+  if ok == false then return false end if
+  idx = chooseChannel(m)
+  ch = m.channels[idx]
+  ch.clip = c
+  ch.playing = true
+  ch.volume = c.volume
+  m.channels[idx] = ch
+  return true
+end function
+
+function mixerPlayMusic(m, c)
+  c.looping = true
+  if effectiveClipVolume(m.audio, m.audio.musicVolume, c.volume) <= 0 then return false end if
+  ok = playMusicWithState(m.audio, c.path)
+  if ok == false then return false end if
+  m.music = c
+  return true
+end function
+
+function mixerStopAll(m)
+  i = 0
+  while i < m.channelCount
+    ch = m.channels[i]
+    ch.playing = false
+    m.channels[i] = ch
+    i = i + 1
+  end while
+  m.music = void
+  return stopSound()
 end function

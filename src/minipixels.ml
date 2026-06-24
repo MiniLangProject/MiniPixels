@@ -105,6 +105,10 @@ function playMusicWithState(audio, path) return aud.playMusicWithState(audio, pa
 function audioClip(path, name) return aud.clip(path, name) end function
 function musicClip(path, name) return aud.musicClip(path, name) end function
 function playAudio(audio, clip) return aud.playClip(audio, clip) end function
+function audioMixer(maxChannels) return aud.mixer(maxChannels) end function
+function mixerPlaySfx(mixer, clip) return aud.mixerPlaySfx(mixer, clip) end function
+function mixerPlayMusic(mixer, clip) return aud.mixerPlayMusic(mixer, clip) end function
+function mixerStopAll(mixer) return aud.mixerStopAll(mixer) end function
 function audioBackend() return aud.backendName() end function
 function audioSupportsMultipleSfx() return aud.supportsMultipleSfx() end function
 function audioSupportsVolumeControl() return aud.supportsVolumeControl() end function

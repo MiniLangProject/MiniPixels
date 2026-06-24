@@ -164,7 +164,26 @@ mp.playMusicWithState(game.audio, "assets\\audio\\theme.wav")
 game.audio.mute()
 ```
 
-The current backend is still WinMM, so this is a control layer rather than a multi-voice mixer. `mp.audioBackend()`, `mp.audioSupportsMultipleSfx()`, and `mp.audioSupportsVolumeControl()` make that explicit and keep game code stable for a future mixer backend.
+For game code that wants a mixer-shaped API, use `AudioMixer`:
+
+```ml
+mixer = mp.audioMixer(4)
+jump = mp.audioClip("assets\\audio\\jump.wav", "jump")
+theme = mp.musicClip("assets\\audio\\theme.wav", "theme")
+mixer.playSfx(jump)
+mixer.playMusic(theme)
+mixer.stopAll()
+```
+
+The current backend is still WinMM, so this is a stable high-level API rather than a true multi-voice software mixer. `mp.audioBackend()`, `mp.audioSupportsMultipleSfx()`, and `mp.audioSupportsVolumeControl()` make backend capability limits explicit.
+
+## Releases
+
+```powershell
+python tools\package_sdk.py
+```
+
+This writes `dist/MiniPixels-<version>-sdk.zip` and a `.sha256` file. GitHub Actions uploads the SDK bundle as a workflow artifact and publishes it as a release asset when a `v*` tag is pushed.
 
 ## Tilemaps
 

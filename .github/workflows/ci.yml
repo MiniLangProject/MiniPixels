@@ -3,8 +3,12 @@ name: MiniPixels CI
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
     branches: [main]
+
+permissions:
+  contents: write
 
 jobs:
   windows:
@@ -35,3 +39,28 @@ jobs:
       - name: Build examples
         working-directory: MiniPixels
         run: python tools\build_examples.py
+
+      - name: Package SDK
+        working-directory: MiniPixels
+        run: python tools\package_sdk.py
+
+      - name: Upload SDK artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: minipixels-sdk
+          path: |
+            MiniPixels/dist/*-sdk.zip
+            MiniPixels/dist/*.sha256
+          compression-level: 0
+
+      - name: Publish GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" `
+            MiniPixels/dist/*-sdk.zip `
+            MiniPixels/dist/*.sha256 `
+            --title "MiniPixels ${{ github.ref_name }}" `
+            --generate-notes
