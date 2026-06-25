@@ -258,17 +258,24 @@ function updatePlay(game, dt)
     player.vx = 130
     player.facing = 1
   end if
-  if (game.input.jump or game.input.up) and (player.grounded or player.coyote > 0) then
+  jumpNow = (game.input.jump or game.input.up) and (player.grounded or player.coyote > 0)
+  if jumpNow then
     player.vy = -315
     player.grounded = false
     player.coyote = 0
     mp.playSfx(game.audio, "assets\\audio\\jump.wav")
+  else
+    if player.grounded then player.vy = 0 end if
   end if
-  player.vy = player.vy + (760 * dt)
+  if player.grounded == false then
+    player.vy = player.vy + (760 * dt)
+  end if
   if player.vy > 360 then player.vy = 360 end if
 
   rect = mp.recti(player.x + 9, player.y + 13, 14, 19)
-  res = mp.tileMoveAndCollide(world, rect, player.vx * dt, player.vy * dt)
+  moveY = player.vy * dt
+  if player.grounded and jumpNow == false then moveY = 1 end if
+  res = mp.tileMoveAndCollide(world, rect, player.vx * dt, moveY)
   player.x = res.x - 9
   player.y = res.y - 13
   if player.x < 0 then
