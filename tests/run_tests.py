@@ -15,11 +15,26 @@ COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 TESTS = [
     "canvas_tests.ml",
     "systems_tests.ml",
+    "asset_pack_tests.ml",
     "headless_game_tests.ml",
     "render_regression_tests.ml",
     "json_manifest_tests.ml",
     "generator_tests.ml",
 ]
+
+
+def create_asset_pack_fixture() -> None:
+    spec = importlib.util.spec_from_file_location("minipixels_cli", ROOT / "tools" / "minipixels.py")
+    if spec is None or spec.loader is None:
+        raise RuntimeError("could not load tools/minipixels.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    fixture_root = ROOT / "build" / "tests" / "asset_pack_fixture"
+    fixture_assets = fixture_root / "assets"
+    fixture_assets.mkdir(parents=True, exist_ok=True)
+    pixels = bytes([255, 0, 0, 255, 0, 0, 255, 255])
+    (fixture_assets / "hero.png").write_bytes(mod.write_png_rgba_store(2, 1, pixels))
+    mod.write_asset_pack({"assets": [{"id": "hero", "type": "image", "path": "assets/hero.png"}]}, fixture_root, ROOT / "build" / "tests" / "assets.mpx")
 
 
 def run_python_tests() -> None:
@@ -47,12 +62,13 @@ def run_python_tests() -> None:
             {"id": "legacy", "path": "assets/legacy.png"},
         ]
     }
-    ids = [asset["id"] for asset in mod.embedded_assets(data)]
+    ids = [asset["id"] for asset in mod.container_image_assets(data)]
     assert ids == ["hero", "legacy"], ids
     assert mod.sheet_config(data["assets"][0]) == {"frameWidth": 16, "frameHeight": 24, "spacing": 0, "margin": 0}
     report = mod.asset_report(data, ROOT)
-    assert [entry["id"] for entry in report["embedded"]] == ["hero", "legacy"], report
-    assert [entry["id"] for entry in report["runtime"]] == ["music", "script"], report
+    assert [entry["id"] for entry in report["embedded"]] == [], report
+    assert [entry["id"] for entry in report["container"]] == ["hero", "legacy", "music", "script"], report
+    assert [entry["id"] for entry in report["runtime"]] == [], report
     levels = {
         "levels": [
             {
@@ -128,6 +144,29 @@ def run_python_tests() -> None:
     assert any("unknown Tiled object kind" in warning for warning in noisy_warnings), noisy_warnings
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
+        asset_dir = tmp_path / "assets"
+        asset_dir.mkdir()
+        hero_png = mod.write_png_rgba_store(
+            2,
+            1,
+            bytes(
+                [
+                    255,
+                    0,
+                    0,
+                    255,
+                    0,
+                    0,
+                    255,
+                    255,
+                ]
+            ),
+        )
+        (asset_dir / "hero.png").write_bytes(hero_png)
+        pack_manifest = {"assets": [{"id": "hero", "type": "image", "path": "assets/hero.png"}]}
+        pack_path = mod.write_asset_pack(pack_manifest, tmp_path, tmp_path / "assets.mpx")
+        assert pack_path.exists(), pack_path
+        assert pack_path.read_bytes().startswith(b"MPX1"), pack_path
         level_path = tmp_path / "levels.json"
         level_path.write_text(json.dumps(levels), encoding="utf-8")
         out_dir = tmp_path / "generated"
@@ -247,6 +286,7 @@ def main() -> int:
     run_python_tests()
     build = ROOT / "build" / "tests"
     build.mkdir(parents=True, exist_ok=True)
+    create_asset_pack_fixture()
     for test in TESTS:
         src = ROOT / "tests" / test
         exe = build / (Path(test).stem + ".exe")

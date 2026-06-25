@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 import re
@@ -339,6 +338,54 @@ def read_png_rgba(path: Path) -> tuple[int, int, bytes]:
     return width, height, bytes(out)
 
 
+def adler32(data: bytes) -> int:
+    a = 1
+    b = 0
+    for value in data:
+        a = (a + value) % 65521
+        b = (b + a) % 65521
+    return ((b << 16) | a) & 0xFFFFFFFF
+
+
+def zlib_store(data: bytes) -> bytes:
+    out = bytearray([0x78, 0x01])
+    pos = 0
+    while pos < len(data) or (pos == 0 and len(data) == 0):
+        chunk = data[pos : pos + 65535]
+        pos += len(chunk)
+        final = 1 if pos >= len(data) else 0
+        out.append(final)
+        out.extend(struct.pack("<H", len(chunk)))
+        out.extend(struct.pack("<H", 0xFFFF ^ len(chunk)))
+        out.extend(chunk)
+        if len(data) == 0:
+            break
+    out.extend(struct.pack(">I", adler32(data)))
+    return bytes(out)
+
+
+def png_chunk(kind: bytes, payload: bytes) -> bytes:
+    return struct.pack(">I", len(payload)) + kind + payload + struct.pack(">I", zlib.crc32(kind + payload) & 0xFFFFFFFF)
+
+
+def write_png_rgba_store(width: int, height: int, rgba: bytes) -> bytes:
+    if len(rgba) != width * height * 4:
+        die("internal error: RGBA buffer size does not match image dimensions")
+    rows = bytearray()
+    stride = width * 4
+    for y in range(height):
+        rows.append(0)
+        start = y * stride
+        rows.extend(rgba[start : start + stride])
+    ihdr = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
+    return (
+        b"\x89PNG\r\n\x1a\n"
+        + png_chunk(b"IHDR", ihdr)
+        + png_chunk(b"IDAT", zlib_store(bytes(rows)))
+        + png_chunk(b"IEND", b"")
+    )
+
+
 def procedural_pixels(asset: dict) -> tuple[int, int, bytes]:
     asset_path = asset.get("_absolute_path")
     if asset_path and Path(asset_path).suffix.lower() == ".png":
@@ -376,11 +423,19 @@ def procedural_pixels(asset: dict) -> tuple[int, int, bytes]:
 
 def is_embedded_asset(asset: dict) -> bool:
     kind = str(asset.get("type", "image")).lower()
-    return kind in ("image", "procedural")
+    return kind == "procedural"
 
 
 def embedded_assets(data: dict) -> list[dict]:
     return [asset for asset in data.get("assets", []) if is_embedded_asset(asset)]
+
+
+def is_container_image_asset(asset: dict) -> bool:
+    return str(asset.get("type", "image")).lower() == "image"
+
+
+def container_image_assets(data: dict) -> list[dict]:
+    return [asset for asset in data.get("assets", []) if is_container_image_asset(asset)]
 
 
 def sheet_config(asset: dict) -> dict | None:
@@ -577,9 +632,61 @@ def generate_levels_module(data: dict, out_dir: Path) -> Path | None:
     return out
 
 
+def write_asset_pack(data: dict, root: Path, output: Path) -> Path:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    entries: list[dict] = []
+    blob = bytearray()
+
+    for asset in sorted(data.get("assets", []), key=lambda a: a["id"]):
+        raw_path = asset.get("path")
+        if not raw_path:
+            continue
+        path = root / raw_path
+        kind = str(asset.get("type", "image")).lower()
+        if kind == "image":
+            width, height, rgba = read_png_rgba(path)
+            payload = write_png_rgba_store(width, height, rgba)
+            type_code = 1
+        elif kind == "audio":
+            payload = path.read_bytes()
+            type_code = 2
+        elif kind == "file":
+            payload = path.read_bytes()
+            type_code = 3
+        else:
+            continue
+        offset = len(blob)
+        blob.extend(payload)
+        entries.append({"id": asset["id"], "type": type_code, "offset": offset, "size": len(payload)})
+
+    index_size = 8
+    for entry in entries:
+        name = entry["id"].encode("utf-8")
+        index_size += 2 + len(name) + 1 + 1 + 4 + 4
+
+    payload_base = index_size
+    index = bytearray(b"MPX1")
+    index.extend(struct.pack("<I", len(entries)))
+    for entry in entries:
+        name = entry["id"].encode("utf-8")
+        index.extend(struct.pack("<H", len(name)))
+        index.extend(name)
+        index.append(entry["type"])
+        index.append(0)
+        index.extend(struct.pack("<I", payload_base + entry["offset"]))
+        index.extend(struct.pack("<I", entry["size"]))
+
+    output.write_bytes(bytes(index) + bytes(blob))
+    print(output)
+    return output
+
+
 def generate(project_file: Path, out_dir: Path) -> Path:
     data = validate(project_file)
     out_dir.mkdir(parents=True, exist_ok=True)
+    root = project_root(project_file)
+    pack_path = out_dir.parent.parent / "assets.mpx"
+    write_asset_pack(data, root, pack_path)
     out = out_dir / "assets.ml"
     lines = [
         "package generated.assets",
@@ -588,6 +695,39 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         "import minipixels.assets.assets as assets",
         "",
     ]
+    image_assets = sorted(container_image_assets(data), key=lambda a: a["id"])
+    if image_assets:
+        lines.extend(
+            [
+                "assetPackCache = void",
+                "",
+                "function assetPack()",
+                "  global assetPackCache",
+                "  if assetPackCache == void then",
+                '    assetPackCache = mp.openAssetPack("assets.mpx")',
+                '    if typeof(assetPackCache) == "error" then assetPackCache = mp.openAssetPack("build\\\\assets.mpx") end if',
+                "  end if",
+                "  return assetPackCache",
+                "end function",
+                "",
+            ]
+        )
+    for asset in image_assets:
+        aid = asset["id"]
+        lines.append(f"function make_{aid}()")
+        lines.append(f'  img = mp.loadPngFromPack(assetPack(), "{aid}")')
+        lines.append(f'  return mp.spriteFromImage(img, "{aid}")')
+        lines.append("end function")
+        lines.append("")
+        sheet = sheet_config(asset)
+        if sheet is not None:
+            lines.append(f"function sheet_{aid}()")
+            lines.append(f"  spr = make_{aid}()")
+            lines.append(
+                f'  return mp.spriteSheet(spr.image, {sheet["frameWidth"]}, {sheet["frameHeight"]}, {sheet["spacing"]}, {sheet["margin"]})'
+            )
+            lines.append("end function")
+            lines.append("")
     for asset in sorted(embedded_assets(data), key=lambda a: a["id"]):
         aid = asset["id"]
         w, h, pix = procedural_pixels(asset)
@@ -609,6 +749,9 @@ def generate(project_file: Path, out_dir: Path) -> Path:
             lines.append("")
     lines.append("function registry()")
     lines.append("  reg = assets.create(64)")
+    for asset in image_assets:
+        aid = asset["id"]
+        lines.append(f'  reg.add("{aid}", make_{aid}())')
     for asset in sorted(embedded_assets(data), key=lambda a: a["id"]):
         aid = asset["id"]
         lines.append(f'  reg.add("{aid}", make_{aid}())')
@@ -623,23 +766,11 @@ def generate(project_file: Path, out_dir: Path) -> Path:
 def pack(project_file: Path, output: Path) -> Path:
     data = validate(project_file)
     root = project_root(project_file)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    entries = []
-    blob = bytearray()
-    for asset in sorted(data.get("assets", []), key=lambda a: a["id"]):
-        path = root / asset.get("path", "")
-        payload = path.read_bytes() if path.exists() else b""
-        offset = len(blob)
-        blob.extend(payload)
-        entries.append((asset["id"], offset, len(payload), hashlib.sha256(payload).hexdigest()))
-    index = json.dumps(entries, ensure_ascii=False, sort_keys=True).encode("utf-8")
-    output.write_bytes(b"MPAK1\0" + struct.pack("<II", len(index), len(blob)) + index + blob)
-    print(output)
-    return output
+    return write_asset_pack(data, root, output)
 
 
 def asset_report(data: dict, root: Path) -> dict:
-    report = {"embedded": [], "runtime": [], "totals": {"embeddedBytes": 0, "runtimeBytes": 0}}
+    report = {"embedded": [], "container": [], "runtime": [], "totals": {"embeddedBytes": 0, "containerBytes": 0, "runtimeBytes": 0}}
     levels = load_levels(data)
     if levels is not None:
         report["levels"] = {"count": len(validate_levels(levels, data["levels"].get("_absolute_path", "levels")))}
@@ -656,9 +787,13 @@ def asset_report(data: dict, root: Path) -> dict:
         sheet = sheet_config(asset)
         if sheet is not None:
             entry["sheet"] = sheet
+        kind = str(asset.get("type", "image")).lower()
         if is_embedded_asset(asset):
             report["embedded"].append(entry)
             report["totals"]["embeddedBytes"] += size
+        elif kind in ("image", "audio", "file"):
+            report["container"].append(entry)
+            report["totals"]["containerBytes"] += size
         else:
             report["runtime"].append(entry)
             report["totals"]["runtimeBytes"] += size
@@ -695,7 +830,8 @@ def copy_runtime_assets(data: dict, root: Path, output: Path) -> None:
                 copied.add(path.resolve())
 
     for asset in data.get("assets", []):
-        if is_embedded_asset(asset):
+        kind = str(asset.get("type", "image")).lower()
+        if is_embedded_asset(asset) or kind == "image":
             continue
         raw_path = asset.get("path")
         if not raw_path:
@@ -814,7 +950,7 @@ def main(argv: list[str]) -> int:
         gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"
         generate(project, gen_dir)
     elif args.cmd == "pack":
-        out = Path(args.output).resolve() if args.output else project.parent / "build" / "game.mpak"
+        out = Path(args.output).resolve() if args.output else project.parent / "build" / "assets.mpx"
         pack(project, out)
     elif args.cmd == "build":
         gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"

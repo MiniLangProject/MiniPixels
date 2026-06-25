@@ -15,7 +15,7 @@ Graphics:
 - URL: https://kenney.nl/assets/pixel-platformer
 - License: Creative Commons Zero, CC0. See `LICENSE-KENNEY-PIXEL-PLATFORMER.txt`
 
-The checked-in PNGs are compact runtime sprite sheets assembled or adapted for this example so MiniPixels can compile them through generated MiniLang assets. `bg_far.png` is a higher-detail compact parallax background, and `decor_sheet.png` contains matching scenery sprites assembled from the same asset pack. The original ZIP is not redistributed with the repository.
+The checked-in PNGs are compact runtime sprite sheets and level background layers assembled or adapted for this example. `bg_base_0.png` through `bg_base_2.png` are the per-level sky/mountain/forest composites, `bg_near_0.png` through `bg_near_2.png` are the nearer parallax forest layers, and `decor_sheet.png` contains the matching scenery sprites that survived visual cleanup. The Python build stores these files in `assets.mpx`; MiniLang runtime code opens the pack and decodes the packed PNG payloads. The original ZIP is not redistributed with the repository.
 
 Audio:
 

@@ -27,7 +27,7 @@ build\tools\minipixels.exe validate examples\jump-and-run\minipixels.json
 build\tools\minipixels.exe generate examples\jump-and-run\minipixels.json examples\jump-and-run\build\generated\generated
 ```
 
-Native `generate` supports procedural sprites, sheet helpers, and MiniPixels `levels.json`. The Python CLI still owns PNG embedding, Tiled/TMJ import, runtime asset copying, build/run, packaging, and compiler launching.
+Native `generate` supports procedural sprites, sheet helpers, and MiniPixels `levels.json`. The Python CLI still owns MiniPixels asset-pack generation for images/audio/files, Tiled/TMJ import, build/run, packaging, and compiler launching.
 
 ## Minimal game
 
@@ -64,8 +64,8 @@ Game logic, input polling, rendering, and Win32 presentation run on the main thr
 
 ## Implemented now
 
-Canvas, sprites, build-time PNG assets, native procedural asset generation, runtime audio/file asset copying, sprite sheets, generated level data, animation helpers, camera, tilemaps, parallax, collision helpers, bitmap text, input/action snapshots, AudioMixer API, headless tests, framehash regression tests, Win32 GDI and OpenGL/WGL presentation, CLI, CI workflow, SDK packaging, and examples are present.
+Canvas, sprites, MiniPixels `.mpx` asset packs, runtime PNG decoding for packed RGBA images, native procedural asset generation, runtime audio/file asset packing, sprite sheets, generated level data, animation helpers, camera, tilemaps, parallax, collision helpers, bitmap text, input/action snapshots, AudioMixer API, headless tests, framehash regression tests, Win32 GDI and OpenGL/WGL presentation, CLI, CI workflow, SDK packaging, and examples are present.
 
 ## Not yet in the engine
 
-Native PNG embedding, native Tiled/TMJ import, runtime WIC hot-loading, advanced audio mixing, async asset loading, arbitrary rotation, GPU render targets, a complete ECS, and visual golden-image management are documented extension points rather than current engine features.
+Native asset-pack generation, native Tiled/TMJ import, general PNG hot-loading outside `.mpx`, advanced audio mixing, async asset loading, arbitrary rotation, GPU render targets, a complete ECS, and visual golden-image management are documented extension points rather than current engine features.

@@ -85,7 +85,7 @@ function initialize(game)
 end function
 ```
 
-The Python CLI embeds supported 8-bit RGB/RGBA PNG pixels and copies assets with `type: "audio"` or `type: "file"` next to the executable. The native MiniLang CLI already generates importable modules for `procedural` assets and sheet helpers; for `image` assets it emits placeholder pixels until native PNG decoding is added.
+The Python CLI writes supported 8-bit RGB/RGBA PNG image assets into `build/assets.mpx` and generates MiniLang loader functions for them. The runtime opens that MiniPixels asset pack and decodes image payloads with MiniPixels' own PNG-profile decoder. Assets with `type: "audio"` or `type: "file"` are stored in the same container. The native MiniLang CLI already generates importable modules for `procedural` assets and sheet helpers; for `image` assets it emits placeholder pixels until native asset-pack generation is added.
 
 ```json
 {
@@ -107,7 +107,15 @@ For sheet metadata the generated module exposes helpers such as:
 sheet = gen.sheet_player()
 ```
 
-Each build also writes `asset-report.json` next to the executable with embedded/runtime asset sizes and sheet metadata.
+Each build also writes `asset-report.json` next to the executable with embedded/container/runtime asset sizes and sheet metadata.
+
+Manual pack access is available when game code wants to load a packed image directly:
+
+```ml
+pack = mp.openAssetPack("assets.mpx")
+image = mp.loadPngFromPack(pack, "player")
+sprite = mp.spriteFromImage(image, "player")
+```
 
 ## Level Data
 

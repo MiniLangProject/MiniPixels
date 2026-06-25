@@ -4,7 +4,7 @@ Current version: `0.7.0`
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses the existing `MiniLangCompilerPy` compiler and builds native Windows x64 executables.
 
-MiniPixels focuses on a small but working 2D engine slice: a Win32 window, fixed logical framebuffer, optional OpenGL/WGL presentation, nearest-neighbor scaling, focus-aware keyboard input, sprites, build-time PNG assets, runtime file assets, tilemaps, camera scrolling, simple collision, bitmap text, basic audio, headless tests, and example projects.
+MiniPixels focuses on a small but working 2D engine slice: a Win32 window, fixed logical framebuffer, optional OpenGL/WGL presentation, nearest-neighbor scaling, focus-aware keyboard input, sprites, MiniPixels asset packs with runtime PNG decoding, runtime file assets, tilemaps, camera scrolling, simple collision, bitmap text, basic audio, headless tests, and example projects.
 
 ![Moving Sprite](docs/images/moving-sprite.png)
 
@@ -48,7 +48,7 @@ build\tools\minipixels.exe generate examples\jump-and-run\minipixels.json exampl
 build\tools\minipixels.exe new my-game platformer
 ```
 
-The native CLI currently provides `info`, `doctor`, `validate`, `generate`, and `new`. Native `generate` writes importable `generated.assets` and `generated.levels` modules, supports `procedural` sprites, emits sheet helpers, and imports MiniPixels `levels.json`. PNG pixel embedding, Tiled/TMJ import, runtime asset copying, `build`, `run`, and `package` still live in the legacy Python tool while those pieces are moved into MiniLang.
+The native CLI currently provides `info`, `doctor`, `validate`, `generate`, and `new`. Native `generate` writes importable `generated.assets` and `generated.levels` modules, supports `procedural` sprites, emits sheet helpers, and imports MiniPixels `levels.json`. The full image asset pack pipeline, Tiled/TMJ import, runtime asset copying, `build`, `run`, and `package` still live in the Python tool while those pieces are moved into MiniLang.
 
 Tooling split:
 
@@ -56,9 +56,9 @@ Tooling split:
 | --- | --- | --- |
 | Create a project | `new` | `new` |
 | Inspect/validate manifests | `info`, `doctor`, `validate` | `info`, `doctor`, `validate` |
-| Generate `generated.assets` | `procedural` sprites and placeholder `image` sprites | PNG/procedural sprites with real pixels |
+| Generate `generated.assets` | `procedural` sprites and placeholder `image` sprites | procedural sprites plus image loaders backed by `assets.mpx` |
 | Generate `generated.levels` | MiniPixels `levels.json` | MiniPixels `levels.json` and Tiled JSON/TMJ |
-| Copy runtime assets | Not yet | `audio` and `file` assets |
+| Create/copy runtime assets | Not yet | `assets.mpx` for images/audio/files |
 | Build/run/package | Not yet | `build`, `run`, `package`, `pack` |
 
 Run tests:
@@ -246,7 +246,7 @@ python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler
 python tools\minipixels.py package
 ```
 
-The Python CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, copies runtime assets such as `type: "audio"` or `type: "file"` next to the executable, generates `generated.levels` from MiniPixels or Tiled JSON when `levels.path` is present, writes `asset-report.json`, optionally packs assets into `.mpak`, and invokes the regular MiniLang compiler. The native MiniLang CLI can already validate manifests and generate importable modules for `procedural` sprites and MiniPixels `levels.json`.
+The Python CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, writes a deterministic MiniPixels asset container (`assets.mpx`), generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, includes runtime assets such as `type: "audio"` or `type: "file"` in the pack, generates `generated.levels` from MiniPixels or Tiled JSON when `levels.path` is present, writes `asset-report.json`, and invokes the regular MiniLang compiler. Image payloads inside `assets.mpx` are PNG-encoded in the MiniPixels runtime profile and decoded by MiniLang code through `mp.loadPngFromPack(...)`. The native MiniLang CLI can already validate manifests and generate importable modules for `procedural` sprites and MiniPixels `levels.json`.
 
 ## Mini Code Examples
 
@@ -293,6 +293,8 @@ mixer.stopAll()
 - `minipixels.graphics.canvas`: framebuffer, primitives, sprite drawing
 - `minipixels.graphics.font`: 5x7 bitmap text helpers
 - `minipixels.graphics.sprite`: images, sprites, sprite sheets
+- `minipixels.assets.pack`: MiniPixels `.mpx` asset container reader
+- `minipixels.assets.png`: MiniPixels PNG-profile decoder for packed RGBA images
 - `minipixels.platform.windows`: Win32 window, input, DIB renderer
 - `minipixels.input.input`: keyboard snapshot and action helpers
 - `minipixels.world.camera`: pixel-snapped 2D camera
@@ -312,9 +314,10 @@ Implemented:
 - Keyboard input only while the game window has focus
 - FPS in the window title
 - Safe pixel operations and primitive drawing
-- PNG-to-MiniLang build-time asset generation in the Python pipeline
+- MiniPixels `.mpx` asset container generation in the Python pipeline
+- Runtime PNG decoding in MiniLang for packed RGBA image assets
 - Native MiniLang generation for procedural sprites and MiniPixels `levels.json`
-- Runtime asset copying for audio/file assets
+- Runtime asset packing for image/audio/file assets
 - Sprites, sprite sheets, animation
 - Facade helpers for world drawing, text, input edges, animation-from-sheet, and audio state/loop/stop
 - Build-time SpriteSheet metadata and `asset-report.json`
@@ -328,8 +331,8 @@ Implemented:
 
 Not yet implemented:
 
-- Runtime PNG hot-loading
-- Native PNG embedding and native Tiled/TMJ import
+- General-purpose PNG hot-loading outside MiniPixels asset packs
+- Native asset-pack generation and native Tiled/TMJ import
 - Cross-platform audio mixer beyond the WinMM hook
 - Full editor tooling
 - Advanced physics or ECS

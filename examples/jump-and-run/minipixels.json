@@ -45,15 +45,34 @@
       }
     },
     {
-      "id": "bg_far",
+      "id": "bg_base_0",
       "type": "image",
-      "path": "assets/tiles/bg_far.png",
-      "sheet": {
-        "frameWidth": 134,
-        "frameHeight": 75,
-        "spacing": 0,
-        "margin": 0
-      }
+      "path": "assets/tiles/bg_base_0.png"
+    },
+    {
+      "id": "bg_near_0",
+      "type": "image",
+      "path": "assets/tiles/bg_near_0.png"
+    },
+    {
+      "id": "bg_base_1",
+      "type": "image",
+      "path": "assets/tiles/bg_base_1.png"
+    },
+    {
+      "id": "bg_near_1",
+      "type": "image",
+      "path": "assets/tiles/bg_near_1.png"
+    },
+    {
+      "id": "bg_base_2",
+      "type": "image",
+      "path": "assets/tiles/bg_base_2.png"
+    },
+    {
+      "id": "bg_near_2",
+      "type": "image",
+      "path": "assets/tiles/bg_near_2.png"
     },
     {
       "id": "decor",

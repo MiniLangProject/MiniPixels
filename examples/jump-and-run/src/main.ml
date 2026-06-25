@@ -44,7 +44,8 @@ player = void
 camera = void
 world = void
 tileSheet = void
-bgFarSheet = void
+bgBaseSprite = void
+bgNearSprite = void
 decorSheet = void
 playerSheet = void
 enemySheet = void
@@ -122,9 +123,26 @@ function coinBurst(x, y)
   end while
 end function
 
+function loadLevelAssets(n)
+  global bgBaseSprite, bgNearSprite
+  if n == 0 then
+    bgBaseSprite = gen.make_bg_base_0()
+    bgNearSprite = gen.make_bg_near_0()
+    return
+  end if
+  if n == 1 then
+    bgBaseSprite = gen.make_bg_base_1()
+    bgNearSprite = gen.make_bg_near_1()
+    return
+  end if
+  bgBaseSprite = gen.make_bg_base_2()
+  bgNearSprite = gen.make_bg_near_2()
+end function
+
 function loadLevel(n)
   global levelIndex, player, camera, world, enemies, coins, enemyCount, coinCount, coinsTaken, spawnX, spawnY, exitX, exitY, levelIntro, hitFlash, invuln
   levelIndex = n
+  loadLevelAssets(n)
   w = lvl.width(n)
   h = lvl.height(n)
   data = lvl.tileData(n)
@@ -169,10 +187,8 @@ function resetLevel()
 end function
 
 function initialize(game)
-  global tileSheet, bgFarSheet, decorSheet, playerSheet, enemySheet, coinSprite, exitSprite, cloudSprite, flowerSprite, sparkSprite, campfireSprite
-  game.assets = gen.registry()
+  global tileSheet, decorSheet, playerSheet, enemySheet, coinSprite, exitSprite, cloudSprite, flowerSprite, sparkSprite, campfireSprite
   tileSheet = gen.sheet_tiles()
-  bgFarSheet = gen.sheet_bg_far()
   decorSheet = gen.sheet_decor()
   playerSheet = gen.sheet_player()
   enemySheet = gen.sheet_enemy()
@@ -422,32 +438,38 @@ function update(game, dt)
   end if
 end function
 
-function drawBgLayer(canvas, sheet, divisor, y)
-  frame = sheet.getFrame(levelIndex)
-  canvas.drawSpriteEx(frame, 0, y, false, false, 3, mp.rgba(255, 255, 255, 255))
+function drawParallaxLayer(canvas, spr, divisor, y)
+  if spr == void then return end if
+  shift = 0
+  if divisor > 0 then shift = (camera.x / divisor) % 400 end if
+  canvas.drawSprite(spr, 0 - shift, y)
+  if shift > 0 then
+    canvas.drawSprite(spr, 400 - shift, y)
+  end if
 end function
 
 function drawParallax(canvas)
-  drawBgLayer(canvas, bgFarSheet, 16, 0)
+  drawParallaxLayer(canvas, bgBaseSprite, 0, 0)
+  drawParallaxLayer(canvas, bgNearSprite, 5, 69)
   canvas.fillRect(0, 202, 400, 23, mp.rgba(39, 57, 39, 165))
 end function
 
 function drawBackDecor(canvas)
   for d = 0 to 5
     x = 430 + (d * 560)
-    mp.drawSpriteWorld(canvas, camera, decorSheet.getFrame(9 + (d % 2)), x, 160)
+    mp.drawSpriteWorld(canvas, camera, decorSheet.getFrame(3 + (d % 2)), x, 192)
   end for
 end function
 
 function drawFrontDecor(canvas)
   for d = 0 to 20
     x = 90 + (d * 150)
-    frame = 6 + (d % 2)
+    frame = d % 2
     mp.drawSpriteWorld(canvas, camera, decorSheet.getFrame(frame), x, 204)
   end for
   for d = 0 to 8
     x = 260 + (d * 360)
-    mp.drawSpriteWorld(canvas, camera, decorSheet.getFrame(11), x, 192)
+    mp.drawSpriteWorld(canvas, camera, decorSheet.getFrame(5), x, 192)
   end for
 end function
 
@@ -554,11 +576,10 @@ end function
 function drawMenuScreen(game, canvas, title, subtitle, color)
   menuPulse = pulse2(game, 18)
   glow = pulse2(game, 18)
-  canvas.drawSpriteEx(bgFarSheet.getFrame(0), 0, 0, false, false, 3, mp.rgba(255, 255, 255, 255))
+  drawParallax(canvas)
   canvas.drawSprite(decorSheet.getFrame(3), 38, 150)
   canvas.drawSprite(decorSheet.getFrame(4), 326, 151)
-  canvas.drawSprite(decorSheet.getFrame(10), 44, 160)
-  canvas.drawSprite(decorSheet.getFrame(9), 326, 160)
+  canvas.drawSprite(decorSheet.getFrame(5), 44, 160)
   canvas.fillRect(0, 160, 400, 65, mp.rgba(24, 42, 30, 120))
   canvas.fillRect(84, 48, 232, 76, mp.rgba(0, 0, 0, 175))
   canvas.drawRect(84, 48, 232, 76, color)

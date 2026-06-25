@@ -8,6 +8,7 @@ import minipixels.input.input as inp
 import minipixels.core.time as tm
 import minipixels.platform.windows as win
 import minipixels.assets.assets as ast
+import minipixels.assets.pack as pack
 import minipixels.scene.scene as scn
 import minipixels.debug.debug as dbg
 import minipixels.animation.animation as anim
@@ -110,6 +111,8 @@ function image(width, height, pixels, name) return sp.newImage(width, height, pi
 function solidImage(width, height, color, name) return sp.solidImage(width, height, color, name) end function
 function spriteFromImage(img, name) return sp.spriteFromImage(img, name) end function
 function spriteSheet(img, fw, fh, spacing, margin) return sp.spriteSheet(img, fw, fh, spacing, margin) end function
+function openAssetPack(path) return pack.open(path) end function
+function loadPngFromPack(assetPack, name) return pack.loadPng(assetPack, name) end function
 function animation(maxFrames) return anim.create(maxFrames) end function
 function animationFromSheet(sheet, start, count, duration) return anim.fromSheet(sheet, start, count, duration) end function
 function camera(width, height) return cam.create(width, height) end function

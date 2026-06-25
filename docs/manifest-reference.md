@@ -42,12 +42,14 @@ Asset types:
 
 | Type | Meaning | Python CLI | Native CLI `generate` |
 | --- | --- | --- | --- |
-| `image` | 8-bit RGB/RGBA PNG image asset | embeds real PNG pixels into `generated.assets` | emits a compileable placeholder sprite until native PNG decoding is added |
+| `image` | 8-bit RGB/RGBA PNG image asset | stores PNG-profile payload in `assets.mpx` and generates loader functions | emits a compileable placeholder sprite until native asset-pack generation is added |
 | `procedural` | generated checker/player/tile sprite data from manifest fields | embeds generated pixels | embeds generated pixels |
-| `audio` | runtime audio file, usually WAV | copies next to the executable | validates only |
-| `file` | runtime data file | copies next to the executable | validates only |
+| `audio` | runtime audio file, usually WAV | stores payload in `assets.mpx` | validates only |
+| `file` | runtime data file | stores payload in `assets.mpx` | validates only |
 
 Assets with `sheet` metadata also get generated helpers such as `gen.sheet_player()`.
+
+The Python build writes `build/assets.mpx` and copies it next to the executable. Image entries are transcoded to the MiniPixels PNG profile so MiniLang runtime code can decode them without embedding large pixel arrays into generated source.
 
 ## MiniPixels Level JSON
 

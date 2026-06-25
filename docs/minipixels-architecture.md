@@ -32,6 +32,8 @@ MiniPixels is a working engine prototype, not the full future engine. It contain
 - `minipixels.world.camera`, `tilemap`, `entity`: camera, parallax, tilemaps, entities.
 - `minipixels.collision.collision`: primitive collisions and simple tile collision.
 - `minipixels.assets.assets`: generated/static asset registry.
+- `minipixels.assets.pack`: deterministic `.mpx` container reader.
+- `minipixels.assets.png`: MiniPixels PNG-profile decoder.
 - `minipixels.audio.audio`: small PlaySoundW wrapper plus headless no-op path.
 - `minipixels.debug.debug`: counters, overlays, and framebuffer hash.
 - `minipixels.scene.scene`: synchronous scene stack.
@@ -46,9 +48,11 @@ The headless path runs deterministic fixed updates and renders exactly the reque
 
 ## Asset strategy
 
-The Python CLI validates `minipixels.json`, reads 8-bit RGB/RGBA PNG assets at build time, generates deterministic MiniLang asset modules, copies runtime assets, imports MiniPixels or Tiled level data, and can pack referenced assets into a deterministic `.mpak` byte stream. Runtime game code does not need a JSON or PNG parser in release builds.
+The Python CLI validates `minipixels.json`, reads source PNG assets at build time, normalizes image payloads into the MiniPixels PNG profile, writes a deterministic `assets.mpx` byte stream, generates deterministic MiniLang asset modules, imports MiniPixels or Tiled level data, and includes referenced audio/file assets in the same container. Runtime game code does not need a JSON parser in release builds; generated image factories open `assets.mpx` and call the MiniLang PNG-profile decoder.
 
-The native MiniLang CLI already validates manifests and generates importable `generated.assets`/`generated.levels` modules for procedural sprites and MiniPixels `levels.json`. Native PNG decoding, runtime asset copying, Tiled/TMJ import, build/run, and packaging remain in the Python pipeline for now.
+The `.mpx` file starts with `MPX1`, followed by a little-endian entry table and contiguous payload bytes. Image entries are PNG files restricted to the runtime-supported profile: 8-bit RGBA, filter type 0, and a simple zlib stream made of stored Deflate blocks. The packer transcodes arbitrary supported RGB/RGBA PNG input into that profile so the MiniLang decoder can stay compact and deterministic.
+
+The native MiniLang CLI already validates manifests and generates importable `generated.assets`/`generated.levels` modules for procedural sprites and MiniPixels `levels.json`. Native asset-pack generation, Tiled/TMJ import, build/run, and packaging remain in the Python pipeline for now.
 
 ## Files created
 
@@ -61,7 +65,7 @@ The native MiniLang CLI already validates manifests and generates importable `ge
 
 ## Risks and next steps
 
-- PNG loading is implemented in the Python build-time processor. Add native PNG embedding or a WIC-backed runtime image loader in `platform/windows` next for image work outside the Python pipeline.
+- The runtime PNG decoder intentionally supports the MiniPixels asset-pack profile, not arbitrary PNG features such as palettes, interlace, or adaptive filters. Broader PNG import should stay in tools or be added as a separate loader.
 - Audio is a minimal WinMM `PlaySoundW` wrapper; streaming music and mixer channels are future work.
 - The window backend has GDI and OpenGL/WGL presentation. D3D11 and GPU render targets would be natural next steps for larger games.
 - `nativeCallback` currently supports WNDPROC only; richer callback APIs should remain backend-internal.

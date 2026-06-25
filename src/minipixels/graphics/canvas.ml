@@ -325,11 +325,55 @@ function fillScaledPixel(c, x, y, scale, color)
   end while
 end function
 
+function drawSpriteFast1x(c, spr, x, y)
+  x0 = mt.clamp(x, 0, c.width)
+  y0 = mt.clamp(y, 0, c.height)
+  x1 = mt.clamp(x + spr.width, 0, c.width)
+  y1 = mt.clamp(y + spr.height, 0, c.height)
+  if x0 >= x1 or y0 >= y1 then return end if
+
+  yy = y0
+  while yy < y1
+    srcY = spr.sy + (yy - y)
+    srcX = spr.sx + (x0 - x)
+    si = ((srcY * spr.image.width) + srcX) * 4
+    di = ((yy * c.width) + x0) * 4
+    xx = x0
+    while xx < x1
+      a = spr.image.pixels[si + 3]
+      if a >= 255 then
+        c.pixels[di] = spr.image.pixels[si]
+        c.pixels[di + 1] = spr.image.pixels[si + 1]
+        c.pixels[di + 2] = spr.image.pixels[si + 2]
+        c.pixels[di + 3] = 255
+      else
+        if a > 0 then
+          inv = 255 - a
+          c.pixels[di] = mt.clamp(mt.floorInt(((spr.image.pixels[si] * a) + (c.pixels[di] * inv)) / 255), 0, 255)
+          c.pixels[di + 1] = mt.clamp(mt.floorInt(((spr.image.pixels[si + 1] * a) + (c.pixels[di + 1] * inv)) / 255), 0, 255)
+          c.pixels[di + 2] = mt.clamp(mt.floorInt(((spr.image.pixels[si + 2] * a) + (c.pixels[di + 2] * inv)) / 255), 0, 255)
+          c.pixels[di + 3] = 255
+        end if
+      end if
+      si = si + 4
+      di = di + 4
+      xx = xx + 1
+    end while
+    yy = yy + 1
+  end while
+  c.spriteCount = c.spriteCount + 1
+  c.drawCalls = c.drawCalls + 1
+end function
+
 function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
   if typeof(scale) != "int" or scale < 1 then scale = 1 end if
   x = mt.floorInt(x - spr.pivotX)
   y = mt.floorInt(y - spr.pivotY)
   if x >= c.width or y >= c.height or x + (spr.width * scale) <= 0 or y + (spr.height * scale) <= 0 then return end if
+  white = mt.rgba(255, 255, 255, 255)
+  if scale == 1 and flipX == false and flipY == false and tint == white then
+    return drawSpriteFast1x(c, spr, x, y)
+  end if
   yy = 0
   while yy < spr.height
     xx = 0
@@ -340,7 +384,7 @@ function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
       if flipY then srcY = spr.height - 1 - yy end if
       color = sp.imageGetPixel(spr.image, spr.sx + srcX, spr.sy + srcY)
       if mt.colorA(color) > 0 then
-        if tint != mt.rgba(255, 255, 255, 255) then
+        if tint != white then
           color = mt.tintColor(color, tint)
         end if
         if scale == 1 then
