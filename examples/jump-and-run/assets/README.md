@@ -2,7 +2,7 @@
 
 Graphics:
 
-- World/tiles/background source: GandalfHardcore FREE Platformer Assets
+- World/tiles/background/decor source: GandalfHardcore FREE Platformer Assets
 - URL: https://gandalfhardcore.itch.io/free-pixel-art-sidescroller-asset-pack-32x32-overworld
 - License: see `LICENSE-GANDALFHARDCORE.txt`
 - Player source: OpenGameArt A platformer in the forest
@@ -15,7 +15,7 @@ Graphics:
 - URL: https://kenney.nl/assets/pixel-platformer
 - License: Creative Commons Zero, CC0. See `LICENSE-KENNEY-PIXEL-PLATFORMER.txt`
 
-The checked-in PNGs are compact runtime sprite sheets assembled or adapted for this example so MiniPixels can compile them quickly through generated MiniLang assets. The original ZIP is not redistributed with the repository.
+The checked-in PNGs are compact runtime sprite sheets assembled or adapted for this example so MiniPixels can compile them through generated MiniLang assets. `bg_far.png` is a higher-detail compact parallax background, and `decor_sheet.png` contains matching scenery sprites assembled from the same asset pack. The original ZIP is not redistributed with the repository.
 
 Audio:
 

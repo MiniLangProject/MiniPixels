@@ -5,7 +5,7 @@
     "title": "MiniPixels Jump and Run",
     "width": 400,
     "height": 225,
-    "scale": 3
+    "scale": 4
   },
   "levels": {
     "path": "assets/levels/levels.json"
@@ -49,8 +49,19 @@
       "type": "image",
       "path": "assets/tiles/bg_far.png",
       "sheet": {
-        "frameWidth": 64,
-        "frameHeight": 36,
+        "frameWidth": 100,
+        "frameHeight": 56,
+        "spacing": 0,
+        "margin": 0
+      }
+    },
+    {
+      "id": "decor",
+      "type": "image",
+      "path": "assets/tiles/decor_sheet.png",
+      "sheet": {
+        "frameWidth": 32,
+        "frameHeight": 32,
         "spacing": 0,
         "margin": 0
       }

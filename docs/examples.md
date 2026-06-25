@@ -146,7 +146,7 @@ Level data lives in `examples/jump-and-run/assets/levels/levels.json` and is com
 
 Assets:
 
-- World, tile, portal, grass, sign, and background graphics are adapted from GandalfHardcore FREE Platformer Assets: https://gandalfhardcore.itch.io/free-pixel-art-sidescroller-asset-pack-32x32-overworld
+- World, tile, portal, grass, sign, background, and decor graphics are adapted from GandalfHardcore FREE Platformer Assets: https://gandalfhardcore.itch.io/free-pixel-art-sidescroller-asset-pack-32x32-overworld
 - Player sprites are adapted from OpenGameArt A platformer in the forest, CC0: https://opengameart.org/content/a-platformer-in-the-forest
 - Enemy sprites are adapted from OpenGameArt Bat (32x32), CC0: https://opengameart.org/content/bat-32x32
 - Additional enemy sprites are adapted from Kenney Pixel Platformer, CC0: https://kenney.nl/assets/pixel-platformer

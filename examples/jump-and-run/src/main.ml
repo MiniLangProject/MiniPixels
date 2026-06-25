@@ -45,6 +45,7 @@ camera = void
 world = void
 tileSheet = void
 bgFarSheet = void
+decorSheet = void
 playerSheet = void
 enemySheet = void
 coinSprite = void
@@ -106,6 +107,21 @@ function burst(x, y, color)
   end while
 end function
 
+function coinBurst(x, y)
+  i = 0
+  while i < 14
+    vx = (((i % 7) - 3) * 24)
+    vy = -38 - ((i % 4) * 16)
+    color = mp.rgb(255, 220, 80)
+    if i % 3 == 1 then color = mp.rgb(255, 170, 55) end if
+    if i % 3 == 2 then color = mp.rgb(255, 245, 160) end if
+    size = 1
+    if i % 4 == 0 then size = 2 end if
+    addParticle(x + (i % 5), y + ((i % 3) * 3), vx, vy, 0.42 + ((i % 4) * 0.04), color, size)
+    i = i + 1
+  end while
+end function
+
 function loadLevel(n)
   global levelIndex, player, camera, world, enemies, coins, enemyCount, coinCount, coinsTaken, spawnX, spawnY, exitX, exitY, levelIntro, hitFlash, invuln
   levelIndex = n
@@ -153,10 +169,11 @@ function resetLevel()
 end function
 
 function initialize(game)
-  global tileSheet, bgFarSheet, playerSheet, enemySheet, coinSprite, exitSprite, cloudSprite, flowerSprite, sparkSprite, campfireSprite
+  global tileSheet, bgFarSheet, decorSheet, playerSheet, enemySheet, coinSprite, exitSprite, cloudSprite, flowerSprite, sparkSprite, campfireSprite
   game.assets = gen.registry()
   tileSheet = gen.sheet_tiles()
   bgFarSheet = gen.sheet_bg_far()
+  decorSheet = gen.sheet_decor()
   playerSheet = gen.sheet_player()
   enemySheet = gen.sheet_enemy()
   coinSprite = tileSheet.getFrame(1)
@@ -337,7 +354,7 @@ function updatePlay(game, dt)
         e.alive = false
         enemies[i] = e
         player.vy = -210
-        burst(e.x + 16, e.y + 16, mp.rgb(255, 220, 80))
+        coinBurst(e.x + 16, e.y + 16)
         hitFlash = 0.08
         mp.playSfx(game.audio, "assets\\audio\\coin.wav")
       else
@@ -354,8 +371,7 @@ function updatePlay(game, dt)
       c.got = true
       coins[i] = c
       coinsTaken = coinsTaken + 1
-      burst(c.x + 16, c.y + 16, mp.rgb(255, 220, 80))
-      hitFlash = 0.05
+      coinBurst(c.x + 16, c.y + 16)
       mp.playSfx(game.audio, "assets\\audio\\coin.wav")
     end if
     i = i + 1
@@ -408,11 +424,19 @@ end function
 
 function drawBgLayer(canvas, sheet, divisor, y)
   frame = sheet.getFrame(levelIndex)
-  shift = (camera.x / divisor) % 256
+  canvas.drawSpriteEx(frame, 0, y, false, false, 4, mp.rgba(255, 255, 255, 255))
+end function
+
+function drawParallaxDecor(canvas, frame, baseY, step, divisor)
+  spr = decorSheet.getFrame(frame)
+  shift = (camera.x / divisor) % step
   x = 0 - shift
-  while x < 400
-    canvas.drawSpriteEx(frame, x, y, false, false, 4, mp.rgba(255, 255, 255, 255))
-    x = x + 256
+  i = 0
+  while x < 430
+    y = baseY + ((i % 3) * 4)
+    canvas.drawSprite(spr, x, y)
+    x = x + step
+    i = i + 1
   end while
 end function
 
@@ -431,11 +455,39 @@ function drawTreeBand(canvas, divisor, baseY, color, trunkColor, step, maxHeight
 end function
 
 function drawParallax(canvas)
-  canvas.clear(mp.rgb(140, 211, 218))
   drawBgLayer(canvas, bgFarSheet, 16, 0)
+  drawParallaxDecor(canvas, 0, 26, 168, 18)
+  drawParallaxDecor(canvas, 1, 44, 190, 15)
+  drawParallaxDecor(canvas, 2, 35, 230, 13)
   drawTreeBand(canvas, 10, 175, mp.rgba(67, 91, 58, 190), mp.rgba(43, 58, 40, 210), 30, 18)
   drawTreeBand(canvas, 5, 198, mp.rgba(42, 67, 45, 210), mp.rgba(30, 45, 32, 230), 26, 26)
   canvas.fillRect(0, 202, 400, 23, mp.rgba(39, 57, 39, 165))
+end function
+
+function drawBackDecor(canvas)
+  for d = 0 to 11
+    x = 160 + (d * 294)
+    frame = 3 + (d % 3)
+    y = 192
+    if d % 2 == 1 then y = 160 end if
+    mp.drawSpriteWorld(canvas, camera, decorSheet.getFrame(frame), x, y)
+  end for
+  for d = 0 to 5
+    x = 430 + (d * 560)
+    mp.drawSpriteWorld(canvas, camera, decorSheet.getFrame(9 + (d % 2)), x, 192)
+  end for
+end function
+
+function drawFrontDecor(canvas)
+  for d = 0 to 20
+    x = 90 + (d * 150)
+    frame = 6 + (d % 2)
+    mp.drawSpriteWorld(canvas, camera, decorSheet.getFrame(frame), x, 204)
+  end for
+  for d = 0 to 8
+    x = 260 + (d * 360)
+    mp.drawSpriteWorld(canvas, camera, decorSheet.getFrame(11), x, 192)
+  end for
 end function
 
 function drawParticles(canvas)
@@ -471,7 +523,9 @@ function drawPlay(game, canvas)
   exitFrame = 3 + pulse2(game, 12)
   runFrame = cycle4(game, 7)
   drawParallax(canvas)
+  drawBackDecor(canvas)
   world.draw(canvas, camera)
+  drawFrontDecor(canvas)
   mp.drawSpriteWorldEx(canvas, camera, tileSheet.getFrame(exitFrame), exitX, exitY, false, false, 2, mp.rgba(255, 255, 255, 255))
   if coinsTaken < coinCount then
     sx = exitX - camera.x
@@ -534,19 +588,21 @@ function drawPlay(game, canvas)
   drawParticles(canvas)
   drawHud(canvas)
   drawLevelIntro(canvas)
-  if hitFlash > 0 then
-    canvas.fillRect(0, 0, 400, 225, mp.rgba(255, 255, 255, 35))
-  end if
 end function
 
 function drawMenuScreen(game, canvas, title, subtitle, color)
   menuPulse = pulse2(game, 18)
   glow = pulse2(game, 18)
-  canvas.clear(mp.rgb(140, 211, 218))
   canvas.drawSpriteEx(bgFarSheet.getFrame(0), 0, 0, false, false, 4, mp.rgba(255, 255, 255, 255))
-  canvas.drawSpriteEx(bgFarSheet.getFrame(0), 256, 0, false, false, 4, mp.rgba(255, 255, 255, 255))
+  drawParallaxDecor(canvas, 0, 26, 168, 18)
+  drawParallaxDecor(canvas, 1, 44, 190, 15)
+  drawParallaxDecor(canvas, 2, 35, 230, 13)
   drawTreeBand(canvas, 10, 175, mp.rgba(67, 91, 58, 190), mp.rgba(43, 58, 40, 210), 30, 18)
   drawTreeBand(canvas, 5, 198, mp.rgba(42, 67, 45, 210), mp.rgba(30, 45, 32, 230), 26, 26)
+  canvas.drawSprite(decorSheet.getFrame(3), 38, 150)
+  canvas.drawSprite(decorSheet.getFrame(4), 326, 151)
+  canvas.drawSprite(decorSheet.getFrame(10), 44, 160)
+  canvas.drawSprite(decorSheet.getFrame(9), 326, 160)
   canvas.fillRect(0, 160, 400, 65, mp.rgba(24, 42, 30, 120))
   canvas.fillRect(84, 48, 232, 76, mp.rgba(0, 0, 0, 175))
   canvas.drawRect(84, 48, 232, 76, color)
@@ -585,7 +641,7 @@ function render(game, canvas)
 end function
 
 function main(args)
-  cfg = mp.createConfig("MiniPixels Skyline Run", 400, 225, 3)
+  cfg = mp.createConfig("MiniPixels Skyline Run", 400, 225, 4)
   cfg = mp.useGpuRenderer(cfg)
   return mp.run(cfg, initialize, update, render, void)
 end function
