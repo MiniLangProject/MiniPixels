@@ -173,7 +173,7 @@ end function
 function playerDie(game)
   global state, hitFlash
   mp.playSfx(game.audio, "assets\\audio\\hurt.wav")
-  burst(player.x + 14, player.y + 16, mp.rgb(255, 90, 105))
+  burst(player.x + 20, player.y + 16, mp.rgb(255, 90, 105))
   hitFlash = 0.18
   state = 3
 end function
@@ -267,15 +267,15 @@ function updatePlay(game, dt)
   player.vy = player.vy + (760 * dt)
   if player.vy > 360 then player.vy = 360 end if
 
-  rect = mp.recti(player.x + 6, player.y + 3, 18, 29)
+  rect = mp.recti(player.x + 12, player.y + 6, 16, 26)
   res = mp.tileMoveAndCollide(world, rect, player.vx * dt, player.vy * dt)
-  player.x = res.x - 6
-  player.y = res.y - 3
+  player.x = res.x - 12
+  player.y = res.y - 6
   if player.x < 0 then
     player.x = 0
   end if
-  if player.x > camera.worldWidth - 28 then
-    player.x = camera.worldWidth - 28
+  if player.x > camera.worldWidth - 40 then
+    player.x = camera.worldWidth - 40
   end if
   if res.hitBottom then
     player.vy = 0
@@ -296,12 +296,12 @@ function updatePlay(game, dt)
   i = 0
   while i < enemyCount
     e = enemies[i]
-    if e.alive and rectHit(player.x + 6, player.y + 3, 18, 29, e.x + 4, e.y + 8, 24, 20) then
-      if player.vy > 20 and player.y + 28 < e.y + 13 then
+    if e.alive and rectHit(player.x + 12, player.y + 6, 16, 26, e.x + 4, e.y + 4, 24, 22) then
+      if player.vy > 20 and player.y + 31 < e.y + 14 then
         e.alive = false
         enemies[i] = e
         player.vy = -210
-        burst(e.x + 14, e.y + 16, mp.rgb(255, 220, 80))
+        burst(e.x + 16, e.y + 16, mp.rgb(255, 220, 80))
         hitFlash = 0.08
         mp.playSfx(game.audio, "assets\\audio\\coin.wav")
       else
@@ -314,7 +314,7 @@ function updatePlay(game, dt)
   i = 0
   while i < coinCount
     c = coins[i]
-    if c.got == false and rectHit(player.x + 6, player.y + 3, 18, 29, c.x + 6, c.y + 4, 20, 24) then
+    if c.got == false and rectHit(player.x + 12, player.y + 6, 16, 26, c.x + 6, c.y + 4, 20, 24) then
       c.got = true
       coins[i] = c
       coinsTaken = coinsTaken + 1
@@ -325,7 +325,7 @@ function updatePlay(game, dt)
     i = i + 1
   end while
 
-  if rectHit(player.x + 6, player.y + 3, 18, 29, exitX, exitY, 32, 64) and coinsTaken >= coinCount then
+  if rectHit(player.x + 12, player.y + 6, 16, 26, exitX, exitY, 32, 64) and coinsTaken >= coinCount then
     if levelIndex < lvl.count() - 1 then
       loadLevel(levelIndex + 1)
       mp.playSfx(game.audio, "assets\\audio\\win.wav")
@@ -407,7 +407,7 @@ function drawPlay(game, canvas)
   coinFrame = pulse2(game, 7)
   enemyFrame = cycle4(game, 9)
   exitFrame = 3 + pulse2(game, 12)
-  runFrame = cycle4(game, 5)
+  runFrame = cycle4(game, 11)
   idleFrame = pulse2(game, 28)
   drawParallax(canvas)
   world.draw(canvas, camera)
@@ -475,7 +475,7 @@ function drawPlay(game, canvas)
 end function
 
 function drawMenuScreen(game, canvas, title, subtitle, color)
-  menuFrame = cycle4(game, 8)
+  menuFrame = cycle4(game, 11)
   menuPulse = pulse2(game, 8)
   glow = pulse2(game, 18)
   canvas.clear(mp.rgb(125, 184, 198))

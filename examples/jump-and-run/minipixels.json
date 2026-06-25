@@ -16,7 +16,7 @@
       "type": "image",
       "path": "assets/sprites/player_sheet.png",
       "sheet": {
-        "frameWidth": 28,
+        "frameWidth": 40,
         "frameHeight": 32,
         "spacing": 0,
         "margin": 0
@@ -27,7 +27,7 @@
       "type": "image",
       "path": "assets/sprites/enemy_sheet.png",
       "sheet": {
-        "frameWidth": 28,
+        "frameWidth": 32,
         "frameHeight": 32,
         "spacing": 0,
         "margin": 0

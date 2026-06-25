@@ -147,5 +147,7 @@ Level data lives in `examples/jump-and-run/assets/levels/levels.json` and is com
 Assets:
 
 - World, tile, portal, grass, and sign graphics are adapted from GandalfHardcore FREE Platformer Assets: https://gandalfhardcore.itch.io/free-pixel-art-sidescroller-asset-pack-32x32-overworld
+- Player sprites are adapted from OpenGameArt Ninja [Animated], CC0: https://opengameart.org/content/ninja-animated
+- Enemy sprites are adapted from OpenGameArt Bat (32x32), CC0: https://opengameart.org/content/bat-32x32
 - The checked-in sheets are compact runtime assets for this example, not a redistribution of the original ZIP.
 - The small example sounds were generated for MiniPixels and are released as CC0 with the example.
