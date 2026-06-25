@@ -3,9 +3,9 @@
   "main": "src/main.ml",
   "window": {
     "title": "MiniPixels Jump and Run",
-    "width": 320,
-    "height": 180,
-    "scale": 4
+    "width": 480,
+    "height": 270,
+    "scale": 3
   },
   "levels": {
     "path": "assets/levels/levels.json"
@@ -45,12 +45,12 @@
       }
     },
     {
-      "id": "backgrounds",
+      "id": "bg_far",
       "type": "image",
-      "path": "assets/tiles/backgrounds.png",
+      "path": "assets/tiles/bg_far.png",
       "sheet": {
-        "frameWidth": 40,
-        "frameHeight": 23,
+        "frameWidth": 64,
+        "frameHeight": 36,
         "spacing": 0,
         "margin": 0
       }
