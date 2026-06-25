@@ -197,7 +197,9 @@ function run(cfg, initialize, update, render, shutdown)
     if game.input.escape then game.running = false end if
 
     tm.beginFrame(game.time, dt)
-    win.setTitle(w, cfg.title + " FPS " + mt.floorInt(game.time.fps) + " " + win.rendererName(w))
+    if game.time.frameNumber % 15 == 1 then
+      win.setTitle(w, cfg.title + " FPS " + mt.floorInt(game.time.fps) + " " + win.rendererName(w))
+    end if
     accumulator = accumulator + dt
     updates = 0
     while accumulator >= game.time.fixedDelta and updates < cfg.maxCatchUpUpdates
@@ -212,7 +214,7 @@ function run(cfg, initialize, update, render, shutdown)
     callRender(render, game, game.canvas)
     if game.debug then dbg.drawStats(game, game.canvas) end if
     win.present(w, game.canvas)
-    win.sleepMs(1)
+    win.sleepMs(0)
   end while
 
   callIfFunction(shutdown, game)

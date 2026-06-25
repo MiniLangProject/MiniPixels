@@ -121,7 +121,7 @@ function loadLevel(n)
   exitX = lvl.exitX(n)
   exitY = lvl.exitY(n)
   player = Player(spawnX, spawnY, 0, 0, false, 1, 0)
-  camera = mp.camera(480, 270)
+  camera = mp.camera(400, 225)
   camera.worldWidth = w * 32
   camera.worldHeight = h * 32
 
@@ -408,11 +408,11 @@ end function
 
 function drawBgLayer(canvas, sheet, divisor, y)
   frame = sheet.getFrame(levelIndex)
-  shift = (camera.x / divisor) % 512
+  shift = (camera.x / divisor) % 256
   x = 0 - shift
-  while x < 480
-    canvas.drawSpriteEx(frame, x, y, false, false, 8, mp.rgba(255, 255, 255, 255))
-    x = x + 512
+  while x < 400
+    canvas.drawSpriteEx(frame, x, y, false, false, 4, mp.rgba(255, 255, 255, 255))
+    x = x + 256
   end while
 end function
 
@@ -420,7 +420,7 @@ function drawTreeBand(canvas, divisor, baseY, color, trunkColor, step, maxHeight
   shift = (camera.x / divisor) % (step * 8)
   x = 0 - shift
   i = 0
-  while x < 500
+  while x < 420
     h = 18 + ((i % 5) * (maxHeight / 5))
     canvas.fillRect(x + 3, baseY - h, 4, h, trunkColor)
     canvas.fillRect(x, baseY - h - 8, 16, h + 10, color)
@@ -433,9 +433,9 @@ end function
 function drawParallax(canvas)
   canvas.clear(mp.rgb(140, 211, 218))
   drawBgLayer(canvas, bgFarSheet, 16, 0)
-  drawTreeBand(canvas, 10, 214, mp.rgba(67, 91, 58, 190), mp.rgba(43, 58, 40, 210), 26, 20)
-  drawTreeBand(canvas, 5, 238, mp.rgba(42, 67, 45, 210), mp.rgba(30, 45, 32, 230), 22, 32)
-  canvas.fillRect(0, 242, 480, 28, mp.rgba(39, 57, 39, 165))
+  drawTreeBand(canvas, 10, 175, mp.rgba(67, 91, 58, 190), mp.rgba(43, 58, 40, 210), 30, 18)
+  drawTreeBand(canvas, 5, 198, mp.rgba(42, 67, 45, 210), mp.rgba(30, 45, 32, 230), 26, 26)
+  canvas.fillRect(0, 202, 400, 23, mp.rgba(39, 57, 39, 165))
 end function
 
 function drawParticles(canvas)
@@ -450,19 +450,19 @@ function drawParticles(canvas)
 end function
 
 function drawHud(canvas)
-  canvas.fillRect(0, 0, 480, 18, mp.rgba(20, 28, 34, 170))
+  canvas.fillRect(0, 0, 400, 18, mp.rgba(20, 28, 34, 170))
   mp.drawText(canvas, "LEVEL " + (levelIndex + 1), 7, 6, 1, mp.rgb(255, 255, 255))
-  mp.drawText(canvas, "COINS " + coinsTaken + "/" + coinCount, 150, 6, 1, mp.rgb(255, 220, 80))
-  mp.drawText(canvas, "HP " + lives, 306, 6, 1, mp.rgb(255, 110, 120))
-  canvas.fillRect(390, 6, 78, 5, mp.rgb(38, 62, 44))
-  canvas.fillRect(390, 6, (coinsTaken * 78) / coinCount, 5, mp.rgb(116, 220, 98))
+  mp.drawText(canvas, "COINS " + coinsTaken + "/" + coinCount, 122, 6, 1, mp.rgb(255, 220, 80))
+  mp.drawText(canvas, "HP " + lives, 258, 6, 1, mp.rgb(255, 110, 120))
+  canvas.fillRect(326, 6, 62, 5, mp.rgb(38, 62, 44))
+  canvas.fillRect(326, 6, (coinsTaken * 62) / coinCount, 5, mp.rgb(116, 220, 98))
 end function
 
 function drawLevelIntro(canvas)
   if levelIntro <= 0 then return end if
-  canvas.fillRect(0, 96, 480, 48, mp.rgba(0, 0, 0, 150))
-  mp.drawTextCentered(canvas, "LEVEL " + (levelIndex + 1), 105, 2, mp.rgb(255, 255, 255))
-  mp.drawTextCentered(canvas, "COLLECT ALL COINS", 129, 1, mp.rgb(255, 220, 80))
+  canvas.fillRect(0, 78, 400, 48, mp.rgba(0, 0, 0, 150))
+  mp.drawTextCentered(canvas, "LEVEL " + (levelIndex + 1), 87, 2, mp.rgb(255, 255, 255))
+  mp.drawTextCentered(canvas, "COLLECT ALL COINS", 111, 1, mp.rgb(255, 220, 80))
 end function
 
 function drawPlay(game, canvas)
@@ -475,12 +475,12 @@ function drawPlay(game, canvas)
   mp.drawSpriteWorldEx(canvas, camera, tileSheet.getFrame(exitFrame), exitX, exitY, false, false, 2, mp.rgba(255, 255, 255, 255))
   if coinsTaken < coinCount then
     sx = exitX - camera.x
-    if sx > -48 and sx < 480 then
+    if sx > -48 and sx < 400 then
       mp.drawText(canvas, "LOCKED", sx - 4, exitY - camera.y - 10, 1, mp.rgb(255, 220, 80))
     end if
   end if
 
-  for d = 0 to 18
+  for d = 0 to 15
     dx = 120 + (d * 146)
     mp.drawSpriteWorld(canvas, camera, tileSheet.getFrame(5), dx, 194)
   end for
@@ -535,7 +535,7 @@ function drawPlay(game, canvas)
   drawHud(canvas)
   drawLevelIntro(canvas)
   if hitFlash > 0 then
-    canvas.fillRect(0, 0, 480, 270, mp.rgba(255, 255, 255, 35))
+    canvas.fillRect(0, 0, 400, 225, mp.rgba(255, 255, 255, 35))
   end if
 end function
 
@@ -543,25 +543,26 @@ function drawMenuScreen(game, canvas, title, subtitle, color)
   menuPulse = pulse2(game, 18)
   glow = pulse2(game, 18)
   canvas.clear(mp.rgb(140, 211, 218))
-  canvas.drawSpriteEx(bgFarSheet.getFrame(0), 0, 0, false, false, 8, mp.rgba(255, 255, 255, 255))
-  drawTreeBand(canvas, 10, 214, mp.rgba(67, 91, 58, 190), mp.rgba(43, 58, 40, 210), 26, 20)
-  drawTreeBand(canvas, 5, 238, mp.rgba(42, 67, 45, 210), mp.rgba(30, 45, 32, 230), 22, 32)
-  canvas.fillRect(0, 196, 480, 74, mp.rgba(24, 42, 30, 120))
-  canvas.fillRect(124, 56, 232, 76, mp.rgba(0, 0, 0, 175))
-  canvas.drawRect(124, 56, 232, 76, color)
+  canvas.drawSpriteEx(bgFarSheet.getFrame(0), 0, 0, false, false, 4, mp.rgba(255, 255, 255, 255))
+  canvas.drawSpriteEx(bgFarSheet.getFrame(0), 256, 0, false, false, 4, mp.rgba(255, 255, 255, 255))
+  drawTreeBand(canvas, 10, 175, mp.rgba(67, 91, 58, 190), mp.rgba(43, 58, 40, 210), 30, 18)
+  drawTreeBand(canvas, 5, 198, mp.rgba(42, 67, 45, 210), mp.rgba(30, 45, 32, 230), 26, 26)
+  canvas.fillRect(0, 160, 400, 65, mp.rgba(24, 42, 30, 120))
+  canvas.fillRect(84, 48, 232, 76, mp.rgba(0, 0, 0, 175))
+  canvas.drawRect(84, 48, 232, 76, color)
   if glow == 1 then
-    canvas.drawRect(126, 58, 228, 72, mp.rgba(255, 255, 255, 90))
+    canvas.drawRect(86, 50, 228, 72, mp.rgba(255, 255, 255, 90))
   end if
-  mp.drawTextCentered(canvas, title, 73, 3, color)
-  canvas.fillRect(163, 111, 154, 12, mp.rgb(255, 255, 255))
-  mp.drawTextCentered(canvas, subtitle, 113, 1, mp.rgb(30, 42, 60))
-  canvas.drawSprite(tileSheet.getFrame(0), 152, 196)
-  canvas.drawSprite(tileSheet.getFrame(0), 184, 196)
-  canvas.drawSprite(tileSheet.getFrame(0), 296, 196)
-  canvas.drawSprite(tileSheet.getFrame(0), 328, 196)
-  canvas.drawSprite(playerSheet.getFrame(0), 216, 180)
-  canvas.drawSprite(enemySheet.getFrame(menuPulse), 285, 188)
-  canvas.drawSprite(tileSheet.getFrame(1 + menuPulse), 237, 194)
+  mp.drawTextCentered(canvas, title, 65, 3, color)
+  canvas.fillRect(123, 103, 154, 12, mp.rgb(255, 255, 255))
+  mp.drawTextCentered(canvas, subtitle, 105, 1, mp.rgb(30, 42, 60))
+  canvas.drawSprite(tileSheet.getFrame(0), 112, 162)
+  canvas.drawSprite(tileSheet.getFrame(0), 144, 162)
+  canvas.drawSprite(tileSheet.getFrame(0), 256, 162)
+  canvas.drawSprite(tileSheet.getFrame(0), 288, 162)
+  canvas.drawSprite(playerSheet.getFrame(0), 176, 146)
+  canvas.drawSprite(enemySheet.getFrame(menuPulse), 245, 154)
+  canvas.drawSprite(tileSheet.getFrame(1 + menuPulse), 197, 160)
 end function
 
 function render(game, canvas)
@@ -584,6 +585,7 @@ function render(game, canvas)
 end function
 
 function main(args)
-  cfg = mp.createConfig("MiniPixels Skyline Run", 480, 270, 3)
+  cfg = mp.createConfig("MiniPixels Skyline Run", 400, 225, 3)
+  cfg = mp.useGpuRenderer(cfg)
   return mp.run(cfg, initialize, update, render, void)
 end function

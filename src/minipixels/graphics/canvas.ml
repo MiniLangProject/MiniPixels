@@ -159,6 +159,21 @@ function blendPixel(c, x, y, color)
   return setPixel(c, x, y, mt.alphaBlend(dst, color))
 end function
 
+function drawPixelFast(c, x, y, color)
+  if x < 0 or y < 0 or x >= c.width or y >= c.height then return false end if
+  a = mt.colorA(color)
+  if a <= 0 then return false end if
+  if a >= 255 then
+    i = index(c, x, y)
+    c.pixels[i] = mt.colorR(color)
+    c.pixels[i + 1] = mt.colorG(color)
+    c.pixels[i + 2] = mt.colorB(color)
+    c.pixels[i + 3] = a
+    return true
+  end if
+  return blendPixel(c, x, y, color)
+end function
+
 function fillRect(c, x, y, w, h, color)
   if w <= 0 or h <= 0 then return end if
   x = mt.floorInt(x - c.cameraX)
@@ -169,11 +184,23 @@ function fillRect(c, x, y, w, h, color)
   y0 = mt.clamp(y, 0, c.height)
   x1 = mt.clamp(x + w, 0, c.width)
   y1 = mt.clamp(y + h, 0, c.height)
+  a = mt.colorA(color)
+  r = mt.colorR(color)
+  g = mt.colorG(color)
+  b = mt.colorB(color)
   yy = y0
   while yy < y1
     xx = x0
     while xx < x1
-      setPixelRaw(c, xx, yy, color)
+      if a >= 255 then
+        i = index(c, xx, yy)
+        c.pixels[i] = r
+        c.pixels[i + 1] = g
+        c.pixels[i + 2] = b
+        c.pixels[i + 3] = a
+      else
+        setPixelRaw(c, xx, yy, color)
+      end if
       xx = xx + 1
     end while
     yy = yy + 1
@@ -268,10 +295,41 @@ function drawSprite(c, spr, x, y)
   return drawSpriteEx(c, spr, x, y, false, false, 1, mt.rgba(255, 255, 255, 255))
 end function
 
+function fillScaledPixel(c, x, y, scale, color)
+  a = mt.colorA(color)
+  if a <= 0 then return end if
+  x0 = mt.clamp(x, 0, c.width)
+  y0 = mt.clamp(y, 0, c.height)
+  x1 = mt.clamp(x + scale, 0, c.width)
+  y1 = mt.clamp(y + scale, 0, c.height)
+  if x0 >= x1 or y0 >= y1 then return end if
+  r = mt.colorR(color)
+  g = mt.colorG(color)
+  b = mt.colorB(color)
+  yy = y0
+  while yy < y1
+    xx = x0
+    while xx < x1
+      if a >= 255 then
+        i = index(c, xx, yy)
+        c.pixels[i] = r
+        c.pixels[i + 1] = g
+        c.pixels[i + 2] = b
+        c.pixels[i + 3] = a
+      else
+        blendPixel(c, xx, yy, color)
+      end if
+      xx = xx + 1
+    end while
+    yy = yy + 1
+  end while
+end function
+
 function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
   if typeof(scale) != "int" or scale < 1 then scale = 1 end if
   x = mt.floorInt(x - spr.pivotX)
   y = mt.floorInt(y - spr.pivotY)
+  if x >= c.width or y >= c.height or x + (spr.width * scale) <= 0 or y + (spr.height * scale) <= 0 then return end if
   yy = 0
   while yy < spr.height
     xx = 0
@@ -286,9 +344,9 @@ function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
           color = mt.tintColor(color, tint)
         end if
         if scale == 1 then
-          blendPixel(c, x + xx, y + yy, color)
+          drawPixelFast(c, x + xx, y + yy, color)
         else
-          fillRect(c, x + (xx * scale), y + (yy * scale), scale, scale, color)
+          fillScaledPixel(c, x + (xx * scale), y + (yy * scale), scale, color)
         end if
       end if
       xx = xx + 1

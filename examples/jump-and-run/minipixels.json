@@ -3,8 +3,8 @@
   "main": "src/main.ml",
   "window": {
     "title": "MiniPixels Jump and Run",
-    "width": 480,
-    "height": 270,
+    "width": 400,
+    "height": 225,
     "scale": 3
   },
   "levels": {

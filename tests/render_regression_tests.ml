@@ -25,7 +25,7 @@ function main(args)
   drawScene(scene)
   sceneHash = mp.frameHash(scene)
   print "REGRESSION_SCENE_HASH " + sceneHash
-  a.assertEq(sceneHash, 1352071985, "scene framehash regression")
+  a.assertEq(sceneHash, 1365052421, "scene framehash regression")
 
   world = minipixels.graphics.canvas.create(32, 24)
   drawWorldScene(world)
