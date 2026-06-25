@@ -1,0 +1,6 @@
+A platformer in the forest
+Author: Buch
+Source: https://opengameart.org/content/a-platformer-in-the-forest
+License: Creative Commons Zero (CC0)
+OpenGameArt lists this asset as CC0.
+Used file: characters.png / characters_7.png; green character row; documented RUN frames 15-18.

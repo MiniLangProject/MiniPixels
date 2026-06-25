@@ -408,7 +408,6 @@ function drawPlay(game, canvas)
   enemyFrame = cycle4(game, 9)
   exitFrame = 3 + pulse2(game, 12)
   runFrame = cycle4(game, 11)
-  idleFrame = pulse2(game, 28)
   drawParallax(canvas)
   world.draw(canvas, camera)
   mp.drawSpriteWorldEx(canvas, camera, tileSheet.getFrame(exitFrame), exitX, exitY, false, false, 2, mp.rgba(255, 255, 255, 255))
@@ -449,7 +448,7 @@ function drawPlay(game, canvas)
     i = i + 1
   end while
 
-  pframe = idleFrame
+  pframe = 0
   if player.grounded and player.vx != 0 then
     pframe = 2 + runFrame
   end if
