@@ -474,7 +474,6 @@ function drawPlay(game, canvas)
 end function
 
 function drawMenuScreen(game, canvas, title, subtitle, color)
-  menuBob = pulse2(game, 36)
   menuPulse = pulse2(game, 18)
   glow = pulse2(game, 18)
   canvas.clear(mp.rgb(125, 184, 198))
@@ -494,9 +493,9 @@ function drawMenuScreen(game, canvas, title, subtitle, color)
   canvas.drawSprite(tileSheet.getFrame(0), 64, 120)
   canvas.drawSprite(tileSheet.getFrame(0), 224, 120)
   canvas.drawSprite(tileSheet.getFrame(0), 256, 120)
-  canvas.drawSprite(playerSheet.getFrame(0), 96, 104 + bob4(menuBob))
-  canvas.drawSprite(enemySheet.getFrame(menuPulse), 205, 112 + bob4((menuBob + 1) % 4))
-  canvas.drawSprite(tileSheet.getFrame(1 + menuPulse), 149, 118 + bob4(menuBob))
+  canvas.drawSprite(playerSheet.getFrame(0), 96, 104)
+  canvas.drawSprite(enemySheet.getFrame(menuPulse), 205, 112)
+  canvas.drawSprite(tileSheet.getFrame(1 + menuPulse), 149, 118)
 end function
 
 function render(game, canvas)
