@@ -16,7 +16,7 @@
       "type": "image",
       "path": "assets/sprites/player_sheet.png",
       "sheet": {
-        "frameWidth": 40,
+        "frameWidth": 32,
         "frameHeight": 32,
         "spacing": 0,
         "margin": 0

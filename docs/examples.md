@@ -123,10 +123,10 @@ What it demonstrates:
 MiniLang code excerpt:
 
 ```ml
-rect = mp.recti(player.x + 6, player.y + 3, 18, 29)
+rect = mp.recti(player.x + 9, player.y + 13, 14, 19)
 res = mp.tileMoveAndCollide(world, rect, player.vx * dt, player.vy * dt)
-player.x = res.x - 6
-player.y = res.y - 3
+player.x = res.x - 9
+player.y = res.y - 13
 
 if res.hitBottom then
   player.vy = 0
@@ -135,7 +135,7 @@ else
   player.grounded = false
 end if
 
-if rectHit(player.x + 6, player.y + 3, 18, 29, exitX, exitY, 32, 64) and coinsTaken >= coinCount then
+if rectHit(player.x + 9, player.y + 13, 14, 19, exitX, exitY, 32, 64) and coinsTaken >= coinCount then
   loadLevel(levelIndex + 1)
 end if
 
@@ -147,7 +147,7 @@ Level data lives in `examples/jump-and-run/assets/levels/levels.json` and is com
 Assets:
 
 - World, tile, portal, grass, and sign graphics are adapted from GandalfHardcore FREE Platformer Assets: https://gandalfhardcore.itch.io/free-pixel-art-sidescroller-asset-pack-32x32-overworld
-- Player sprites are adapted from OpenGameArt Ninja [Animated], CC0: https://opengameart.org/content/ninja-animated
+- Player sprites are adapted from OpenGameArt Forest Boy - Platformer Animated Character 24x24, CC0: https://opengameart.org/content/forest-boy-platformer-animated-character-24x24
 - Enemy sprites are adapted from OpenGameArt Bat (32x32), CC0: https://opengameart.org/content/bat-32x32
 - The checked-in sheets are compact runtime assets for this example, not a redistribution of the original ZIP.
 - The small example sounds were generated for MiniPixels and are released as CC0 with the example.
