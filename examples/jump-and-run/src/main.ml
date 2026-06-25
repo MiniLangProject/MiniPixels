@@ -427,7 +427,7 @@ function drawBgLayer(canvas, sheet, divisor, y)
   canvas.drawSpriteEx(frame, 0, y, false, false, 4, mp.rgba(255, 255, 255, 255))
 end function
 
-function drawParallaxDecor(canvas, frame, baseY, step, divisor)
+function drawSkyBirds(canvas, frame, baseY, step, divisor)
   spr = decorSheet.getFrame(frame)
   shift = (camera.x / divisor) % step
   x = 0 - shift
@@ -456,9 +456,8 @@ end function
 
 function drawParallax(canvas)
   drawBgLayer(canvas, bgFarSheet, 16, 0)
-  drawParallaxDecor(canvas, 0, 26, 168, 18)
-  drawParallaxDecor(canvas, 1, 44, 190, 15)
-  drawParallaxDecor(canvas, 2, 35, 230, 13)
+  drawSkyBirds(canvas, 0, 29, 220, 20)
+  drawSkyBirds(canvas, 1, 49, 276, 16)
   drawTreeBand(canvas, 10, 175, mp.rgba(67, 91, 58, 190), mp.rgba(43, 58, 40, 210), 30, 18)
   drawTreeBand(canvas, 5, 198, mp.rgba(42, 67, 45, 210), mp.rgba(30, 45, 32, 230), 26, 26)
   canvas.fillRect(0, 202, 400, 23, mp.rgba(39, 57, 39, 165))
@@ -594,9 +593,8 @@ function drawMenuScreen(game, canvas, title, subtitle, color)
   menuPulse = pulse2(game, 18)
   glow = pulse2(game, 18)
   canvas.drawSpriteEx(bgFarSheet.getFrame(0), 0, 0, false, false, 4, mp.rgba(255, 255, 255, 255))
-  drawParallaxDecor(canvas, 0, 26, 168, 18)
-  drawParallaxDecor(canvas, 1, 44, 190, 15)
-  drawParallaxDecor(canvas, 2, 35, 230, 13)
+  drawSkyBirds(canvas, 0, 29, 220, 20)
+  drawSkyBirds(canvas, 1, 49, 276, 16)
   drawTreeBand(canvas, 10, 175, mp.rgba(67, 91, 58, 190), mp.rgba(43, 58, 40, 210), 30, 18)
   drawTreeBand(canvas, 5, 198, mp.rgba(42, 67, 45, 210), mp.rgba(30, 45, 32, 230), 26, 26)
   canvas.drawSprite(decorSheet.getFrame(3), 38, 150)
