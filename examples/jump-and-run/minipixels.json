@@ -49,8 +49,8 @@
       "type": "image",
       "path": "assets/tiles/bg_far.png",
       "sheet": {
-        "frameWidth": 100,
-        "frameHeight": 56,
+        "frameWidth": 134,
+        "frameHeight": 75,
         "spacing": 0,
         "margin": 0
       }

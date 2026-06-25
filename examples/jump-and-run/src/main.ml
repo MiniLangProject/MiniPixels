@@ -424,56 +424,18 @@ end function
 
 function drawBgLayer(canvas, sheet, divisor, y)
   frame = sheet.getFrame(levelIndex)
-  canvas.drawSpriteEx(frame, 0, y, false, false, 4, mp.rgba(255, 255, 255, 255))
-end function
-
-function drawSkyBirds(canvas, frame, baseY, step, divisor)
-  spr = decorSheet.getFrame(frame)
-  shift = (camera.x / divisor) % step
-  x = 0 - shift
-  i = 0
-  while x < 430
-    y = baseY + ((i % 3) * 4)
-    canvas.drawSprite(spr, x, y)
-    x = x + step
-    i = i + 1
-  end while
-end function
-
-function drawTreeBand(canvas, divisor, baseY, color, trunkColor, step, maxHeight)
-  shift = (camera.x / divisor) % (step * 8)
-  x = 0 - shift
-  i = 0
-  while x < 420
-    h = 18 + ((i % 5) * (maxHeight / 5))
-    canvas.fillRect(x + 3, baseY - h, 4, h, trunkColor)
-    canvas.fillRect(x, baseY - h - 8, 16, h + 10, color)
-    canvas.fillRect(x + 5, baseY - h - 15, 6, 10, color)
-    x = x + step
-    i = i + 1
-  end while
+  canvas.drawSpriteEx(frame, 0, y, false, false, 3, mp.rgba(255, 255, 255, 255))
 end function
 
 function drawParallax(canvas)
   drawBgLayer(canvas, bgFarSheet, 16, 0)
-  drawSkyBirds(canvas, 0, 29, 220, 20)
-  drawSkyBirds(canvas, 1, 49, 276, 16)
-  drawTreeBand(canvas, 10, 175, mp.rgba(67, 91, 58, 190), mp.rgba(43, 58, 40, 210), 30, 18)
-  drawTreeBand(canvas, 5, 198, mp.rgba(42, 67, 45, 210), mp.rgba(30, 45, 32, 230), 26, 26)
   canvas.fillRect(0, 202, 400, 23, mp.rgba(39, 57, 39, 165))
 end function
 
 function drawBackDecor(canvas)
-  for d = 0 to 11
-    x = 160 + (d * 294)
-    frame = 3 + (d % 3)
-    y = 192
-    if d % 2 == 1 then y = 160 end if
-    mp.drawSpriteWorld(canvas, camera, decorSheet.getFrame(frame), x, y)
-  end for
   for d = 0 to 5
     x = 430 + (d * 560)
-    mp.drawSpriteWorld(canvas, camera, decorSheet.getFrame(9 + (d % 2)), x, 192)
+    mp.drawSpriteWorld(canvas, camera, decorSheet.getFrame(9 + (d % 2)), x, 160)
   end for
 end function
 
@@ -592,11 +554,7 @@ end function
 function drawMenuScreen(game, canvas, title, subtitle, color)
   menuPulse = pulse2(game, 18)
   glow = pulse2(game, 18)
-  canvas.drawSpriteEx(bgFarSheet.getFrame(0), 0, 0, false, false, 4, mp.rgba(255, 255, 255, 255))
-  drawSkyBirds(canvas, 0, 29, 220, 20)
-  drawSkyBirds(canvas, 1, 49, 276, 16)
-  drawTreeBand(canvas, 10, 175, mp.rgba(67, 91, 58, 190), mp.rgba(43, 58, 40, 210), 30, 18)
-  drawTreeBand(canvas, 5, 198, mp.rgba(42, 67, 45, 210), mp.rgba(30, 45, 32, 230), 26, 26)
+  canvas.drawSpriteEx(bgFarSheet.getFrame(0), 0, 0, false, false, 3, mp.rgba(255, 255, 255, 255))
   canvas.drawSprite(decorSheet.getFrame(3), 38, 150)
   canvas.drawSprite(decorSheet.getFrame(4), 326, 151)
   canvas.drawSprite(decorSheet.getFrame(10), 44, 160)
