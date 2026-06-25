@@ -19,6 +19,7 @@ struct Enemy
   maxX
   dir
   alive
+  kind
 end struct
 
 struct Coin
@@ -43,6 +44,7 @@ player = void
 camera = void
 world = void
 tileSheet = void
+bgSheet = void
 playerSheet = void
 enemySheet = void
 coinSprite = void
@@ -64,6 +66,8 @@ exitX = 720
 exitY = 160
 levelIntro = 0
 hitFlash = 0
+lives = 3
+invuln = 0
 
 function intDiv(n, d)
   return (n - (n % d)) / d
@@ -74,9 +78,9 @@ function setCoin(i, x, y)
   coins[i] = Coin(x, y, false)
 end function
 
-function setEnemy(i, x, y, minX, maxX)
+function setEnemy(i, x, y, minX, maxX, kind)
   global enemies
-  enemies[i] = Enemy(x, y, minX, maxX, 1, true)
+  enemies[i] = Enemy(x, y, minX, maxX, 1, true, kind)
 end function
 
 function resetParticles()
@@ -103,7 +107,7 @@ function burst(x, y, color)
 end function
 
 function loadLevel(n)
-  global levelIndex, player, camera, world, enemies, coins, enemyCount, coinCount, coinsTaken, spawnX, spawnY, exitX, exitY, levelIntro, hitFlash
+  global levelIndex, player, camera, world, enemies, coins, enemyCount, coinCount, coinsTaken, spawnX, spawnY, exitX, exitY, levelIntro, hitFlash, invuln
   levelIndex = n
   w = lvl.width(n)
   h = lvl.height(n)
@@ -121,18 +125,19 @@ function loadLevel(n)
   camera.worldWidth = w * 32
   camera.worldHeight = h * 32
 
-  enemies = array(6)
-  coins = array(10)
+  enemies = array(16)
+  coins = array(32)
   enemyCount = lvl.enemyCount(n)
   coinCount = lvl.coinCount(n)
   coinsTaken = 0
   levelIntro = 1.1
   hitFlash = 0
+  invuln = 0
   resetParticles()
 
   i = 0
   while i < enemyCount
-    setEnemy(i, lvl.enemyX(n, i), lvl.enemyY(n, i), lvl.enemyMinX(n, i), lvl.enemyMaxX(n, i))
+    setEnemy(i, lvl.enemyX(n, i), lvl.enemyY(n, i), lvl.enemyMinX(n, i), lvl.enemyMaxX(n, i), lvl.enemyKind(n, i))
     i = i + 1
   end while
 
@@ -148,9 +153,10 @@ function resetLevel()
 end function
 
 function initialize(game)
-  global tileSheet, playerSheet, enemySheet, coinSprite, exitSprite, cloudSprite, flowerSprite, sparkSprite, campfireSprite
+  global tileSheet, bgSheet, playerSheet, enemySheet, coinSprite, exitSprite, cloudSprite, flowerSprite, sparkSprite, campfireSprite
   game.assets = gen.registry()
   tileSheet = gen.sheet_tiles()
+  bgSheet = gen.sheet_backgrounds()
   playerSheet = gen.sheet_player()
   enemySheet = gen.sheet_enemy()
   coinSprite = tileSheet.getFrame(1)
@@ -171,11 +177,28 @@ function rectHit(ax, ay, aw, ah, bx, by, bw, bh)
 end function
 
 function playerDie(game)
-  global state, hitFlash
+  global state, hitFlash, lives
   mp.playSfx(game.audio, "assets\\audio\\hurt.wav")
   burst(player.x + 16, player.y + 18, mp.rgb(255, 90, 105))
   hitFlash = 0.18
+  lives = 0
   state = 3
+end function
+
+function playerHurt(game)
+  global lives, invuln, hitFlash, player, state
+  if invuln > 0 then return end if
+  lives = lives - 1
+  mp.playSfx(game.audio, "assets\\audio\\hurt.wav")
+  burst(player.x + 16, player.y + 18, mp.rgb(255, 90, 105))
+  hitFlash = 0.18
+  if lives <= 0 then
+    state = 3
+    return
+  end if
+  invuln = 2.5
+  player.vy = -145
+  player.grounded = false
 end function
 
 function updateEnemies(dt)
@@ -184,7 +207,9 @@ function updateEnemies(dt)
   while i < enemyCount
     e = enemies[i]
     if e.alive then
-      e.x = e.x + (e.dir * 48 * dt)
+      speed = 48
+      if e.kind == 1 then speed = 34 end if
+      e.x = e.x + (e.dir * speed * dt)
       if e.x < e.minX then
         e.x = e.minX
         e.dir = 1
@@ -241,9 +266,13 @@ function bob4(frame)
 end function
 
 function updatePlay(game, dt)
-  global player, camera, coinsTaken, state, levelIndex, levelIntro, hitFlash
+  global player, camera, coinsTaken, state, levelIndex, levelIntro, hitFlash, invuln
   updateParticles(dt)
   if hitFlash > 0 then hitFlash = hitFlash - dt end if
+  if invuln > 0 then
+    invuln = invuln - dt
+    if invuln < 0 then invuln = 0 end if
+  end if
   if levelIntro > 0 then
     levelIntro = levelIntro - dt
     camera.follow(player.x, player.y)
@@ -312,7 +341,7 @@ function updatePlay(game, dt)
         hitFlash = 0.08
         mp.playSfx(game.audio, "assets\\audio\\coin.wav")
       else
-        playerDie(game)
+        playerHurt(game)
       end if
     end if
     i = i + 1
@@ -346,10 +375,11 @@ function updatePlay(game, dt)
 end function
 
 function update(game, dt)
-  global state
+  global state, lives
   if state == 0 then
     if mp.inputPressed(game.input, "jump") or mp.inputPressed(game.input, "up") then
       state = 1
+      lives = 3
       loadLevel(0)
       mp.playSfx(game.audio, "assets\\audio\\coin.wav")
     end if
@@ -362,6 +392,7 @@ function update(game, dt)
   if state == 2 then
     if mp.inputPressed(game.input, "jump") or mp.inputPressed(game.input, "up") then
       state = 1
+      lives = 3
       loadLevel(0)
     end if
     return
@@ -369,19 +400,14 @@ function update(game, dt)
   if state == 3 then
     if mp.inputPressed(game.input, "jump") or mp.inputPressed(game.input, "up") then
       state = 1
-      resetLevel()
+      lives = 3
+      loadLevel(0)
     end if
   end if
 end function
 
 function drawParallax(canvas)
-  canvas.clear(mp.rgb(125, 184, 198))
-  canvas.fillRect(0, 82, 320, 98, mp.rgb(74, 105, 78))
-  canvas.fillRect(0, 108, 320, 72, mp.rgb(54, 78, 58))
-  canvas.fillRect(0 - (camera.x / 10), 62, 420, 24, mp.rgb(92, 123, 80))
-  canvas.fillRect(40 - (camera.x / 7), 42, 76, 18, mp.rgb(106, 134, 88))
-  canvas.fillRect(164 - (camera.x / 7), 34, 90, 22, mp.rgb(106, 134, 88))
-  canvas.fillRect(286 - (camera.x / 7), 50, 88, 18, mp.rgb(106, 134, 88))
+  canvas.drawSpriteEx(bgSheet.getFrame(levelIndex), 0, 0, false, false, 8, mp.rgba(255, 255, 255, 255))
 end function
 
 function drawParticles(canvas)
@@ -398,7 +424,8 @@ end function
 function drawHud(canvas)
   canvas.fillRect(0, 0, 320, 18, mp.rgba(20, 28, 34, 170))
   mp.drawText(canvas, "LEVEL " + (levelIndex + 1), 7, 6, 1, mp.rgb(255, 255, 255))
-  mp.drawText(canvas, "COINS " + coinsTaken + "/" + coinCount, 104, 6, 1, mp.rgb(255, 220, 80))
+  mp.drawText(canvas, "COINS " + coinsTaken + "/" + coinCount, 91, 6, 1, mp.rgb(255, 220, 80))
+  mp.drawText(canvas, "HP " + lives, 188, 6, 1, mp.rgb(255, 110, 120))
   canvas.fillRect(244, 6, 66, 5, mp.rgb(38, 62, 44))
   canvas.fillRect(244, 6, (coinsTaken * 66) / coinCount, 5, mp.rgb(116, 220, 98))
 end function
@@ -414,7 +441,7 @@ function drawPlay(game, canvas)
   coinFrame = pulse2(game, 7)
   enemyFrame = cycle4(game, 9)
   exitFrame = 3 + pulse2(game, 12)
-  runFrame = cycle4(game, 11)
+  runFrame = cycle4(game, 7)
   drawParallax(canvas)
   world.draw(canvas, camera)
   mp.drawSpriteWorldEx(canvas, camera, tileSheet.getFrame(exitFrame), exitX, exitY, false, false, 2, mp.rgba(255, 255, 255, 255))
@@ -445,7 +472,7 @@ function drawPlay(game, canvas)
   while i < enemyCount
     e = enemies[i]
     if e.alive then
-      spr = enemySheet.getFrame(enemyFrame)
+      spr = enemySheet.getFrame((e.kind * 4) + enemyFrame)
       if e.dir < 0 then
         mp.drawSpriteWorldEx(canvas, camera, spr, e.x, e.y, true, false, 1, mp.rgba(255, 255, 255, 255))
       else
@@ -466,10 +493,14 @@ function drawPlay(game, canvas)
     pframe = 7
   end if
   pspr = playerSheet.getFrame(pframe)
-  if player.facing < 0 then
-    mp.drawSpriteWorldEx(canvas, camera, pspr, player.x, player.y, true, false, 1, mp.rgba(255, 255, 255, 255))
-  else
-    mp.drawSpriteWorld(canvas, camera, pspr, player.x, player.y)
+  drawPlayer = true
+  if invuln > 0 and pulse2(game, 4) == 1 then drawPlayer = false end if
+  if drawPlayer then
+    if player.facing < 0 then
+      mp.drawSpriteWorldEx(canvas, camera, pspr, player.x, player.y, true, false, 1, mp.rgba(255, 255, 255, 255))
+    else
+      mp.drawSpriteWorld(canvas, camera, pspr, player.x, player.y)
+    end if
   end if
 
   drawParticles(canvas)
@@ -483,11 +514,8 @@ end function
 function drawMenuScreen(game, canvas, title, subtitle, color)
   menuPulse = pulse2(game, 18)
   glow = pulse2(game, 18)
-  canvas.clear(mp.rgb(125, 184, 198))
-  canvas.fillRect(0, 82, 320, 98, mp.rgb(74, 105, 78))
-  canvas.fillRect(0, 108, 320, 72, mp.rgb(54, 78, 58))
-  canvas.fillRect(0, 136, 320, 44, mp.rgb(44, 74, 48))
-  canvas.fillRect(0, 150, 320, 30, mp.rgb(34, 58, 40))
+  canvas.drawSpriteEx(bgSheet.getFrame(0), 0, 0, false, false, 8, mp.rgba(255, 255, 255, 255))
+  canvas.fillRect(0, 122, 320, 58, mp.rgba(24, 42, 30, 120))
   canvas.fillRect(44, 27, 232, 76, mp.rgba(0, 0, 0, 175))
   canvas.drawRect(44, 27, 232, 76, color)
   if glow == 1 then

@@ -262,6 +262,7 @@ function levelsStubModule()
     "function enemyY(level, index) return 0 end function\n" +
     "function enemyMinX(level, index) return 0 end function\n" +
     "function enemyMaxX(level, index) return 0 end function\n" +
+    "function enemyKind(level, index) return 0 end function\n" +
     "function coinCount(level) return 0 end function\n" +
     "function coinX(level, index) return 0 end function\n" +
     "function coinY(level, index) return 0 end function\n"
@@ -315,7 +316,15 @@ function emitTileData(levels)
         y = numberField(p, "y", 0)
         w = numberField(p, "w", 1)
         tile = numberField(p, "tile", 1)
-        code = code + line("    fill(data, w, " + x + ", " + y + ", " + w + ", " + tile + ")")
+        if json.has(p, "left") or json.has(p, "middle") or json.has(p, "alt") or json.has(p, "right") then
+          left = numberField(p, "left", tile)
+          middle = numberField(p, "middle", tile)
+          alt = numberField(p, "alt", middle)
+          right = numberField(p, "right", tile)
+          code = code + line("    fillPlatform(data, w, " + x + ", " + y + ", " + w + ", " + left + ", " + middle + ", " + alt + ", " + right + ")")
+        else
+          code = code + line("    fill(data, w, " + x + ", " + y + ", " + w + ", " + tile + ")")
+        end if
       end for
     end if
     code = code + line("  end if")
@@ -412,6 +421,23 @@ function levelsModule(m, r)
   code = code + line("  end while")
   code = code + line("end function")
   code = code + line("")
+  code = code + line("function fillPlatform(data, width, x, y, w, left, middle, alt, right)")
+  code = code + line("  if w <= 0 then return end if")
+  code = code + line("  if w == 1 then")
+  code = code + line("    data[(y * width) + x] = middle")
+  code = code + line("    return")
+  code = code + line("  end if")
+  code = code + line("  data[(y * width) + x] = left")
+  code = code + line("  i = 1")
+  code = code + line("  while i < w - 1")
+  code = code + line("    value = middle")
+  code = code + line("    if alt > 0 and i % 3 == 0 then value = alt end if")
+  code = code + line("    data[(y * width) + x + i] = value")
+  code = code + line("    i = i + 1")
+  code = code + line("  end while")
+  code = code + line("  data[(y * width) + x + w - 1] = right")
+  code = code + line("end function")
+  code = code + line("")
   code = code + emitLevelScalar(levels, "width", "width", "")
   code = code + emitLevelScalar(levels, "height", "height", "")
   code = code + emitLevelScalar(levels, "spawnX", "spawn", "x")
@@ -424,6 +450,7 @@ function levelsModule(m, r)
   code = code + emitCollectionField(levels, "enemy", "enemies", "y", "Y")
   code = code + emitCollectionField(levels, "enemy", "enemies", "minX", "MinX")
   code = code + emitCollectionField(levels, "enemy", "enemies", "maxX", "MaxX")
+  code = code + emitCollectionField(levels, "enemy", "enemies", "kind", "Kind")
   code = code + emitCollectionCount(levels, "coin", "coins")
   code = code + emitCollectionField(levels, "coin", "coins", "x", "X")
   code = code + emitCollectionField(levels, "coin", "coins", "y", "Y")

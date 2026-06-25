@@ -43,6 +43,17 @@
         "spacing": 0,
         "margin": 0
       }
+    },
+    {
+      "id": "backgrounds",
+      "type": "image",
+      "path": "assets/tiles/backgrounds.png",
+      "sheet": {
+        "frameWidth": 40,
+        "frameHeight": 23,
+        "spacing": 0,
+        "margin": 0
+      }
     }
   ]
 }

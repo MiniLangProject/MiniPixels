@@ -478,6 +478,23 @@ def generate_levels_module(data: dict, out_dir: Path) -> Path | None:
         "  end while",
         "end function",
         "",
+        "function fillPlatform(data, width, x, y, w, left, middle, alt, right)",
+        "  if w <= 0 then return end if",
+        "  if w == 1 then",
+        "    data[(y * width) + x] = middle",
+        "    return",
+        "  end if",
+        "  data[(y * width) + x] = left",
+        "  i = 1",
+        "  while i < w - 1",
+        "    value = middle",
+        "    if alt > 0 and i % 3 == 0 then value = alt end if",
+        "    data[(y * width) + x + i] = value",
+        "    i = i + 1",
+        "  end while",
+        "  data[(y * width) + x + w - 1] = right",
+        "end function",
+        "",
     ]
 
     for fn_name, key, subkey in [
@@ -508,7 +525,14 @@ def generate_levels_module(data: dict, out_dir: Path) -> Path | None:
             y = int(platform.get("y", 0))
             w = int(platform.get("w", 1))
             tile = int(platform.get("tile", 1))
-            lines.append(f"    fill(data, w, {x}, {y}, {w}, {tile})")
+            if any(key in platform for key in ("left", "middle", "alt", "right")):
+                left = int(platform.get("left", tile))
+                middle = int(platform.get("middle", tile))
+                alt = int(platform.get("alt", middle))
+                right = int(platform.get("right", tile))
+                lines.append(f"    fillPlatform(data, w, {x}, {y}, {w}, {left}, {middle}, {alt}, {right})")
+            else:
+                lines.append(f"    fill(data, w, {x}, {y}, {w}, {tile})")
         lines.append("  end if")
     lines.append("  return data")
     lines.append("end function")
@@ -536,6 +560,17 @@ def generate_levels_module(data: dict, out_dir: Path) -> Path | None:
             lines.append("  return 0")
             lines.append("end function")
             lines.append("")
+
+    lines.append("function enemyKind(level, index)")
+    for idx, level in enumerate(levels):
+        lines.append(f"  if level == {idx} then")
+        for item_idx, item in enumerate(level["enemies"]):
+            lines.append(f"    if index == {item_idx} then return {int(item.get('kind', 0))} end if")
+        lines.append("    return 0")
+        lines.append("  end if")
+    lines.append("  return 0")
+    lines.append("end function")
+    lines.append("")
 
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(out)
