@@ -55,6 +55,10 @@ cloudSprite = void
 flowerSprite = void
 sparkSprite = void
 campfireSprite = void
+jumpSfx = void
+coinSfx = void
+hurtSfx = void
+winSfx = void
 enemies = []
 coins = []
 particles = []
@@ -187,11 +191,15 @@ function resetLevel()
 end function
 
 function initialize(game)
-  global tileSheet, decorSheet, playerSheet, enemySheet, coinSprite, exitSprite, cloudSprite, flowerSprite, sparkSprite, campfireSprite
+  global tileSheet, decorSheet, playerSheet, enemySheet, coinSprite, exitSprite, cloudSprite, flowerSprite, sparkSprite, campfireSprite, jumpSfx, coinSfx, hurtSfx, winSfx
   tileSheet = gen.sheet_tiles()
   decorSheet = gen.sheet_decor()
   playerSheet = gen.sheet_player()
   enemySheet = gen.sheet_enemy()
+  jumpSfx = gen.audio_jump_sfx()
+  coinSfx = gen.audio_coin_sfx()
+  hurtSfx = gen.audio_hurt_sfx()
+  winSfx = gen.audio_win_sfx()
   coinSprite = tileSheet.getFrame(1)
   exitSprite = tileSheet.getFrame(3)
   cloudSprite = tileSheet.getFrame(5)
@@ -211,7 +219,7 @@ end function
 
 function playerDie(game)
   global state, hitFlash, lives
-  mp.playSfx(game.audio, "assets\\audio\\hurt.wav")
+  mp.playAudio(game.audio, hurtSfx)
   burst(player.x + 16, player.y + 18, mp.rgb(255, 90, 105))
   hitFlash = 0.18
   lives = 0
@@ -222,7 +230,7 @@ function playerHurt(game)
   global lives, invuln, hitFlash, player, state
   if invuln > 0 then return end if
   lives = lives - 1
-  mp.playSfx(game.audio, "assets\\audio\\hurt.wav")
+  mp.playAudio(game.audio, hurtSfx)
   burst(player.x + 16, player.y + 18, mp.rgb(255, 90, 105))
   hitFlash = 0.18
   if lives <= 0 then
@@ -325,7 +333,7 @@ function updatePlay(game, dt)
     player.vy = -315
     player.grounded = false
     player.coyote = 0
-    mp.playSfx(game.audio, "assets\\audio\\jump.wav")
+    mp.playAudio(game.audio, jumpSfx)
   else
     if player.grounded then player.vy = 0 end if
   end if
@@ -372,7 +380,7 @@ function updatePlay(game, dt)
         player.vy = -210
         coinBurst(e.x + 16, e.y + 16)
         hitFlash = 0.08
-        mp.playSfx(game.audio, "assets\\audio\\coin.wav")
+        mp.playAudio(game.audio, coinSfx)
       else
         playerHurt(game)
       end if
@@ -388,7 +396,7 @@ function updatePlay(game, dt)
       coins[i] = c
       coinsTaken = coinsTaken + 1
       coinBurst(c.x + 16, c.y + 16)
-      mp.playSfx(game.audio, "assets\\audio\\coin.wav")
+      mp.playAudio(game.audio, coinSfx)
     end if
     i = i + 1
   end while
@@ -396,10 +404,10 @@ function updatePlay(game, dt)
   if rectHit(player.x + 9, player.y + 13, 14, 19, exitX, exitY, 32, 64) and coinsTaken >= coinCount then
     if levelIndex < lvl.count() - 1 then
       loadLevel(levelIndex + 1)
-      mp.playSfx(game.audio, "assets\\audio\\win.wav")
+      mp.playAudio(game.audio, winSfx)
     else
       state = 2
-      mp.playSfx(game.audio, "assets\\audio\\win.wav")
+      mp.playAudio(game.audio, winSfx)
     end if
   end if
 
@@ -413,7 +421,7 @@ function update(game, dt)
       state = 1
       lives = 3
       loadLevel(0)
-      mp.playSfx(game.audio, "assets\\audio\\coin.wav")
+      mp.playAudio(game.audio, coinSfx)
     end if
     return
   end if

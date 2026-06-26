@@ -85,7 +85,7 @@ function initialize(game)
 end function
 ```
 
-The Python CLI writes supported 8-bit RGB/RGBA PNG image assets into `build/assets.mpx` and generates MiniLang loader functions for them. The runtime opens that MiniPixels asset pack and decodes image payloads with MiniPixels' own PNG-profile decoder. Assets with `type: "audio"` or `type: "file"` are stored in the same container. The native MiniLang CLI already generates importable modules for `procedural` assets and sheet helpers; for `image` assets it emits placeholder pixels until native asset-pack generation is added.
+The Python CLI writes supported 8-bit RGB/RGBA PNG image assets into `build/assets.mpx` and generates MiniLang loader functions for them. The runtime opens that MiniPixels asset pack and decodes image payloads with MiniPixels' own PNG-profile decoder. Assets with `type: "audio"` or `type: "file"` are stored in the same container. Audio helpers load WAV bytes from the pack and create memory-backed clips. The native MiniLang CLI already generates importable modules for `procedural` assets and sheet helpers; for `image` assets it emits placeholder pixels until native asset-pack generation is added.
 
 ```json
 {
@@ -204,6 +204,13 @@ mp.playMusicWithState(game.audio, "assets\\audio\\theme.wav")
 game.audio.mute()
 ```
 
+Generated packed-audio helpers return memory-backed clips, so WAV files can stay inside `assets.mpx`:
+
+```ml
+coin = gen.audio_coin_sfx()
+mp.playAudio(game.audio, coin)
+```
+
 For game code that wants a mixer-shaped API, use `AudioMixer`:
 
 ```ml
@@ -215,7 +222,7 @@ mixer.playMusic(theme)
 mixer.stopAll()
 ```
 
-The current backend is still WinMM, so this is a stable high-level API rather than a true multi-voice software mixer. `mp.audioBackend()`, `mp.audioSupportsMultipleSfx()`, and `mp.audioSupportsVolumeControl()` make backend capability limits explicit.
+The current backend is still WinMM, so this is a stable high-level API rather than a true multi-voice software mixer. SFX clips can be path-backed or memory-backed; looping music remains path-backed for now. `mp.audioBackend()`, `mp.audioSupportsMultipleSfx()`, and `mp.audioSupportsVolumeControl()` make backend capability limits explicit.
 
 ## Releases
 

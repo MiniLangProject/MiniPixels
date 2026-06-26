@@ -34,7 +34,17 @@ def create_asset_pack_fixture() -> None:
     fixture_assets.mkdir(parents=True, exist_ok=True)
     pixels = bytes([255, 0, 0, 255, 0, 0, 255, 255])
     (fixture_assets / "hero.png").write_bytes(mod.write_png_rgba_store(2, 1, pixels))
-    mod.write_asset_pack({"assets": [{"id": "hero", "type": "image", "path": "assets/hero.png"}]}, fixture_root, ROOT / "build" / "tests" / "assets.mpx")
+    (fixture_assets / "tone.wav").write_bytes(bytes([82, 73, 73, 70, 1, 2, 3, 4]))
+    mod.write_asset_pack(
+        {
+            "assets": [
+                {"id": "hero", "type": "image", "path": "assets/hero.png"},
+                {"id": "tone", "type": "audio", "path": "assets/tone.wav"},
+            ]
+        },
+        fixture_root,
+        ROOT / "build" / "tests" / "assets.mpx",
+    )
 
 
 def run_python_tests() -> None:
@@ -64,6 +74,8 @@ def run_python_tests() -> None:
     }
     ids = [asset["id"] for asset in mod.container_image_assets(data)]
     assert ids == ["hero", "legacy"], ids
+    audio_ids = [asset["id"] for asset in mod.container_audio_assets(data)]
+    assert audio_ids == ["music"], audio_ids
     assert mod.sheet_config(data["assets"][0]) == {"frameWidth": 16, "frameHeight": 24, "spacing": 0, "margin": 0}
     report = mod.asset_report(data, ROOT)
     assert [entry["id"] for entry in report["embedded"]] == [], report

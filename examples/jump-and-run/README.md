@@ -26,4 +26,4 @@ Asset notes:
 - `assets/LICENSE-GANDALFHARDCORE.txt` summarizes the source license terms from the downloaded pack.
 - `assets/audio/*.wav` are generated sounds made for this example and released as CC0 in `assets/AUDIO-LICENSE.txt`.
 
-The Python build writes image/audio/file assets into `build/assets.mpx`. The game loads the needed level background layer pair at the start of each level, then decodes those packed PNG images through MiniPixels runtime code.
+The Python build writes image/audio/file assets into `build/assets.mpx`. The game loads the needed level background layer pair at the start of each level, decodes those packed PNG images through MiniPixels runtime code, and plays SFX from WAV bytes kept inside the pack.

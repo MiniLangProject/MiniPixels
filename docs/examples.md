@@ -142,7 +142,7 @@ end if
 mp.drawSpriteWorld(canvas, camera, playerSheet.getFrame(pframe), player.x, player.y)
 ```
 
-Level data lives in `examples/jump-and-run/assets/levels/levels.json` and is compiled into `generated.levels` during the build. Image/audio/file assets are written to `build/assets.mpx`; generated MiniLang image factories load from that pack through the MiniPixels PNG decoder. The native MiniLang CLI can generate the level module too; the Python CLI is still needed for asset-pack creation and the full build/run pipeline.
+Level data lives in `examples/jump-and-run/assets/levels/levels.json` and is compiled into `generated.levels` during the build. Image/audio/file assets are written to `build/assets.mpx`; generated MiniLang image factories load from that pack through the MiniPixels PNG decoder, and generated audio factories load WAV bytes as memory-backed clips. The native MiniLang CLI can generate the level module too; the Python CLI is still needed for asset-pack creation and the full build/run pipeline.
 
 Assets:
 

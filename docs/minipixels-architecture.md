@@ -14,7 +14,7 @@ MiniPixels is a working engine prototype, not the full future engine. It contain
 - Headless game loop for deterministic tests.
 - Win32 window backend using `RegisterClassExW`, a MiniLang WNDPROC callback, `PeekMessageW`, `GetAsyncKeyState`, `StretchDIBits`, and optional OpenGL/WGL presentation.
 - Keyboard input snapshots for common keys.
-- Camera, parallax helpers, tilemap rendering with viewport culling, AABB/tile collisions, bitmap-font style debug text, and a WinMM-backed audio layer.
+- Camera, parallax helpers, tilemap rendering with viewport culling, AABB/tile collisions, bitmap-font style debug text, and a WinMM-backed audio layer with path and in-memory SFX clips.
 - Python CLI `tools/minipixels.py` for `new`, `validate`, `generate`, `pack`, `build`, `run`, and `package`, delegating compilation to `MiniLangCompilerPy`.
 - Native MiniLang CLI `tools/minipixels_cli.ml` for `info`, `doctor`, `validate`, `generate`, and `new`.
 - Example projects covering sprites, scrolling worlds, pixel effects, Tiled import, and a jump-and-run game.
@@ -48,7 +48,7 @@ The headless path runs deterministic fixed updates and renders exactly the reque
 
 ## Asset strategy
 
-The Python CLI validates `minipixels.json`, reads source PNG assets at build time, normalizes image payloads into the MiniPixels PNG profile, writes a deterministic `assets.mpx` byte stream, generates deterministic MiniLang asset modules, imports MiniPixels or Tiled level data, and includes referenced audio/file assets in the same container. Runtime game code does not need a JSON parser in release builds; generated image factories open `assets.mpx` and call the MiniLang PNG-profile decoder.
+The Python CLI validates `minipixels.json`, reads source PNG assets at build time, normalizes image payloads into the MiniPixels PNG profile, writes a deterministic `assets.mpx` byte stream, generates deterministic MiniLang asset modules, imports MiniPixels or Tiled level data, and includes referenced audio/file assets in the same container. Runtime game code does not need a JSON parser in release builds; generated image factories open `assets.mpx` and call the MiniLang PNG-profile decoder. Generated audio factories load WAV bytes from the same pack and create memory-backed WinMM clips.
 
 The `.mpx` file starts with `MPX1`, followed by a little-endian entry table and contiguous payload bytes. Image entries are PNG files restricted to the runtime-supported profile: 8-bit RGBA, filter type 0, and a simple zlib stream made of stored Deflate blocks. The packer transcodes arbitrary supported RGB/RGBA PNG input into that profile so the MiniLang decoder can stay compact and deterministic.
 
@@ -66,6 +66,6 @@ The native MiniLang CLI already validates manifests and generates importable `ge
 ## Risks and next steps
 
 - The runtime PNG decoder intentionally supports the MiniPixels asset-pack profile, not arbitrary PNG features such as palettes, interlace, or adaptive filters. Broader PNG import should stay in tools or be added as a separate loader.
-- Audio is a minimal WinMM `PlaySoundW` wrapper; streaming music and mixer channels are future work.
+- Audio is a minimal WinMM `PlaySoundW` wrapper. Packed WAV SFX use `SND_MEMORY`; streaming music, in-memory looping, and real mixer channels are future work.
 - The window backend has GDI and OpenGL/WGL presentation. D3D11 and GPU render targets would be natural next steps for larger games.
 - `nativeCallback` currently supports WNDPROC only; richer callback APIs should remain backend-internal.

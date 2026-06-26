@@ -438,6 +438,18 @@ def container_image_assets(data: dict) -> list[dict]:
     return [asset for asset in data.get("assets", []) if is_container_image_asset(asset)]
 
 
+def container_assets(data: dict) -> list[dict]:
+    return [
+        asset
+        for asset in data.get("assets", [])
+        if str(asset.get("type", "image")).lower() in ("image", "audio", "file")
+    ]
+
+
+def container_audio_assets(data: dict) -> list[dict]:
+    return [asset for asset in data.get("assets", []) if str(asset.get("type", "image")).lower() == "audio"]
+
+
 def sheet_config(asset: dict) -> dict | None:
     sheet = asset.get("sheet")
     if not isinstance(sheet, dict):
@@ -695,8 +707,10 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         "import minipixels.assets.assets as assets",
         "",
     ]
+    pack_assets = sorted(container_assets(data), key=lambda a: a["id"])
     image_assets = sorted(container_image_assets(data), key=lambda a: a["id"])
-    if image_assets:
+    audio_assets = sorted(container_audio_assets(data), key=lambda a: a["id"])
+    if pack_assets:
         lines.extend(
             [
                 "assetPackCache = void",
@@ -728,6 +742,18 @@ def generate(project_file: Path, out_dir: Path) -> Path:
             )
             lines.append("end function")
             lines.append("")
+    for asset in audio_assets:
+        aid = asset["id"]
+        lines.append(f"audio_{aid}_cache = void")
+        lines.append("")
+        lines.append(f"function audio_{aid}()")
+        lines.append(f"  global audio_{aid}_cache")
+        lines.append(f"  if audio_{aid}_cache == void then")
+        lines.append(f'    audio_{aid}_cache = mp.audioClipFromBytes(mp.loadBytesFromPack(assetPack(), "{aid}"), "{aid}")')
+        lines.append("  end if")
+        lines.append(f"  return audio_{aid}_cache")
+        lines.append("end function")
+        lines.append("")
     for asset in sorted(embedded_assets(data), key=lambda a: a["id"]):
         aid = asset["id"]
         w, h, pix = procedural_pixels(asset)
@@ -809,6 +835,9 @@ def write_asset_report(data: dict, root: Path, output: Path) -> Path:
 
 def copy_runtime_assets(data: dict, root: Path, output: Path) -> None:
     copied: set[Path] = set()
+    stale_audio = output.parent / "assets" / "audio"
+    if stale_audio.exists():
+        shutil.rmtree(stale_audio)
 
     def copy_path(src: Path, rel: Path) -> None:
         src = src.resolve()
@@ -819,19 +848,9 @@ def copy_runtime_assets(data: dict, root: Path, output: Path) -> None:
         shutil.copy2(src, dst)
         copied.add(src)
 
-    audio_src = root / "assets" / "audio"
-    if audio_src.exists():
-        audio_dst = output.parent / "assets" / "audio"
-        if audio_dst.exists():
-            shutil.rmtree(audio_dst)
-        shutil.copytree(audio_src, audio_dst)
-        for path in audio_src.rglob("*"):
-            if path.is_file():
-                copied.add(path.resolve())
-
     for asset in data.get("assets", []):
         kind = str(asset.get("type", "image")).lower()
-        if is_embedded_asset(asset) or kind == "image":
+        if is_embedded_asset(asset) or kind in ("image", "audio"):
             continue
         raw_path = asset.get("path")
         if not raw_path:

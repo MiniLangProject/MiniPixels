@@ -1,12 +1,14 @@
 package minipixels.audio.audio
 
 extern function PlaySoundW(path as wstr, module as ptr, flags as int) from "winmm.dll" symbol "PlaySoundW" returns bool
+extern function PlaySoundMemory(data as ptr, module as ptr, flags as int) from "winmm.dll" symbol "PlaySoundW" returns bool
 
 const SND_SYNC = 0x0000
 const SND_ASYNC = 0x0001
 const SND_NODEFAULT = 0x0002
 const SND_LOOP = 0x0008
 const SND_PURGE = 0x0040
+const SND_MEMORY = 0x0004
 const SND_FILENAME = 0x00020000
 
 struct AudioState
@@ -56,6 +58,7 @@ struct AudioClip
   name
   volume
   looping
+  data
 
   function setVolume(value)
     this.volume = minipixels.audio.audio.normalizeVolume(value)
@@ -131,7 +134,14 @@ end function
 function clip(path, name)
   if typeof(path) != "string" then path = "" end if
   if typeof(name) != "string" then name = path end if
-  return AudioClip(path, name, 100, false)
+  return AudioClip(path, name, 100, false, void)
+end function
+
+function clipFromBytes(data, name)
+  if typeof(name) != "string" then name = "memory" end if
+  c = AudioClip("", name, 100, false, data)
+  if typeof(data) != "bytes" then c.data = void end if
+  return c
 end function
 
 function musicClip(path, name)
@@ -191,6 +201,18 @@ function playSoundLoop(path)
   return PlaySoundW(path, 0, SND_ASYNC | SND_LOOP | SND_FILENAME | SND_NODEFAULT)
 end function
 
+function playSoundBytes(data)
+  if typeof(data) != "bytes" then return false end if
+  if len(data) <= 0 then return false end if
+  return PlaySoundMemory(nativeBytesPtr(data), 0, SND_ASYNC | SND_MEMORY | SND_NODEFAULT)
+end function
+
+function playSoundBytesSync(data)
+  if typeof(data) != "bytes" then return false end if
+  if len(data) <= 0 then return false end if
+  return PlaySoundMemory(nativeBytesPtr(data), 0, SND_SYNC | SND_MEMORY | SND_NODEFAULT)
+end function
+
 function stopSound()
   return PlaySoundW("", 0, SND_PURGE)
 end function
@@ -213,11 +235,14 @@ function playMusicWithState(audio, path)
 end function
 
 function playClip(audio, c)
+  hasData = (typeof(c.data) == "bytes")
   if c.looping then
     if effectiveClipVolume(audio, audio.musicVolume, c.volume) <= 0 then return false end if
+    if hasData then return false end if
     return playMusicWithState(audio, c.path)
   end if
   if effectiveClipVolume(audio, audio.sfxVolume, c.volume) <= 0 then return false end if
+  if hasData then return playSoundBytes(c.data) end if
   return playSfx(audio, c.path)
 end function
 
@@ -236,7 +261,12 @@ end function
 function mixerPlaySfx(m, c)
   if c.looping then c.looping = false end if
   if effectiveClipVolume(m.audio, m.audio.sfxVolume, c.volume) <= 0 then return false end if
-  ok = playSfx(m.audio, c.path)
+  ok = false
+  if typeof(c.data) == "bytes" then
+    ok = playSoundBytes(c.data)
+  else
+    ok = playSfx(m.audio, c.path)
+  end if
   if ok == false then return false end if
   idx = chooseChannel(m)
   ch = m.channels[idx]
@@ -250,6 +280,7 @@ end function
 function mixerPlayMusic(m, c)
   c.looping = true
   if effectiveClipVolume(m.audio, m.audio.musicVolume, c.volume) <= 0 then return false end if
+  if typeof(c.data) == "bytes" then return false end if
   ok = playMusicWithState(m.audio, c.path)
   if ok == false then return false end if
   m.music = c

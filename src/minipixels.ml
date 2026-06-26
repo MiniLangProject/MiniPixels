@@ -112,6 +112,8 @@ function solidImage(width, height, color, name) return sp.solidImage(width, heig
 function spriteFromImage(img, name) return sp.spriteFromImage(img, name) end function
 function spriteSheet(img, fw, fh, spacing, margin) return sp.spriteSheet(img, fw, fh, spacing, margin) end function
 function openAssetPack(path) return pack.open(path) end function
+function loadBytesFromPack(assetPack, name) return pack.getBytes(assetPack, name) end function
+function assetKindFromPack(assetPack, name) return pack.getKind(assetPack, name) end function
 function loadPngFromPack(assetPack, name) return pack.loadPng(assetPack, name) end function
 function animation(maxFrames) return anim.create(maxFrames) end function
 function animationFromSheet(sheet, start, count, duration) return anim.fromSheet(sheet, start, count, duration) end function
@@ -139,6 +141,7 @@ function audioState() return aud.create() end function
 function playSfx(audio, path) return aud.playSfx(audio, path) end function
 function playMusicWithState(audio, path) return aud.playMusicWithState(audio, path) end function
 function audioClip(path, name) return aud.clip(path, name) end function
+function audioClipFromBytes(data, name) return aud.clipFromBytes(data, name) end function
 function musicClip(path, name) return aud.musicClip(path, name) end function
 function playAudio(audio, clip) return aud.playClip(audio, clip) end function
 function audioMixer(maxChannels) return aud.mixer(maxChannels) end function

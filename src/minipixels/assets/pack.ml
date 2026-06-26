@@ -81,6 +81,12 @@ function getBytes(pack, name)
   return slice(pack.data, pack.offsets[index], pack.sizes[index])
 end function
 
+function getKind(pack, name)
+  index = find(pack, name)
+  if index < 0 then return -1 end if
+  return pack.kinds[index]
+end function
+
 function loadPng(pack, name)
   payload = getBytes(pack, name)
   if typeof(payload) == "error" then return payload end if

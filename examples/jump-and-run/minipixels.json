@@ -84,6 +84,26 @@
         "spacing": 0,
         "margin": 0
       }
+    },
+    {
+      "id": "coin_sfx",
+      "type": "audio",
+      "path": "assets/audio/coin.wav"
+    },
+    {
+      "id": "hurt_sfx",
+      "type": "audio",
+      "path": "assets/audio/hurt.wav"
+    },
+    {
+      "id": "jump_sfx",
+      "type": "audio",
+      "path": "assets/audio/jump.wav"
+    },
+    {
+      "id": "win_sfx",
+      "type": "audio",
+      "path": "assets/audio/win.wav"
     }
   ]
 }
