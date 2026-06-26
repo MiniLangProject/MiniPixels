@@ -248,6 +248,51 @@ python tools\minipixels.py package
 
 The Python CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, writes a deterministic MiniPixels asset container (`assets.mpx`), generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, includes runtime assets such as `type: "audio"` or `type: "file"` in the pack, generates `generated.levels` from MiniPixels or Tiled JSON when `levels.path` is present, writes `asset-report.json`, and invokes the regular MiniLang compiler. Image payloads inside `assets.mpx` are PNG-encoded in the MiniPixels runtime profile and decoded by MiniLang code through `mp.loadPngFromPack(...)`. Audio payloads can be loaded as bytes and played directly from memory through WinMM `SND_MEMORY` clips, so example builds no longer need loose WAV files next to the executable. The native MiniLang CLI can already validate manifests and generate importable modules for `procedural` sprites and MiniPixels `levels.json`.
 
+## MPX Asset Pack Format
+
+`assets.mpx` is MiniPixels' deterministic runtime asset container. It is intentionally simple: a fixed header, a compact entry table, and contiguous payload bytes.
+
+All multi-byte integers are unsigned little-endian values.
+
+```text
+offset  size      field
+0       4         magic bytes: "MPX1"
+4       4         entry count: u32
+8       variable  entry table
+...     variable  payload bytes
+```
+
+Each entry table record is:
+
+```text
+size      field
+2         asset id byte length: u16
+N         asset id as UTF-8 bytes, no terminator
+1         kind: u8
+1         flags: u8, currently 0
+4         payload offset from start of file: u32
+4         payload size in bytes: u32
+```
+
+Current `kind` values:
+
+| Kind | Asset type | Payload |
+| --- | --- | --- |
+| `1` | `image` | MiniPixels PNG-profile bytes |
+| `2` | `audio` | Original audio file bytes, usually WAV |
+| `3` | `file` | Original file bytes |
+
+Image assets are transcoded by the Python CLI into the MiniPixels PNG profile before they are written to the pack. That profile is deliberately narrow so the MiniLang runtime decoder stays small: 8-bit RGBA, PNG filter type `0`, non-interlaced, and a zlib stream made of stored Deflate blocks. Audio and file assets are stored byte-for-byte.
+
+Runtime APIs:
+
+```ml
+pack = mp.openAssetPack("assets.mpx")
+img = mp.loadPngFromPack(pack, "player")
+raw = mp.loadBytesFromPack(pack, "coin_sfx")
+kind = mp.assetKindFromPack(pack, "coin_sfx")
+```
+
 ## Mini Code Examples
 
 Text:
