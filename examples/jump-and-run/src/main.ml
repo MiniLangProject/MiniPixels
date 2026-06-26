@@ -441,10 +441,11 @@ end function
 function drawParallaxLayer(canvas, spr, divisor, y)
   if spr == void then return end if
   shift = 0
-  if divisor > 0 then shift = (camera.x / divisor) % 400 end if
+  layerWidth = spr.width
+  if divisor > 0 then shift = intDiv(camera.x, divisor) % layerWidth end if
   canvas.drawSprite(spr, 0 - shift, y)
   if shift > 0 then
-    canvas.drawSprite(spr, 400 - shift, y)
+    canvas.drawSprite(spr, layerWidth - shift, y)
   end if
 end function
 
