@@ -248,6 +248,8 @@ python tools\minipixels.py package
 
 The Python CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, writes a deterministic MiniPixels asset container (`assets.mpx`), generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, includes runtime assets such as `type: "audio"` or `type: "file"` in the pack, generates `generated.levels` from MiniPixels or Tiled JSON when `levels.path` is present, writes `asset-report.json`, and invokes the regular MiniLang compiler. Image payloads inside `assets.mpx` are PNG-encoded in the MiniPixels runtime profile and decoded by MiniLang code through `mp.loadPngFromPack(...)`. Audio payloads can be loaded as bytes and played directly from memory through WinMM `SND_MEMORY` clips, so example builds no longer need loose WAV files next to the executable. The native MiniLang CLI can already validate manifests and generate importable modules for `procedural` sprites and MiniPixels `levels.json`.
 
+Windowed games built through `tools\minipixels.py build` or `run` use the Windows GUI PE subsystem by default, so double-clicking the executable opens only the game window and no companion console. Use `--headless` for console-subsystem builds that are meant to print test or tool output.
+
 ## MPX Asset Pack Format
 
 `assets.mpx` is MiniPixels' deterministic runtime asset container. It is intentionally simple: a fixed header, a compact entry table, and contiguous payload bytes.

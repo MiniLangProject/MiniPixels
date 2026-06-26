@@ -858,7 +858,14 @@ def copy_runtime_assets(data: dict, root: Path, output: Path) -> None:
         copy_path(root / raw_path, Path(raw_path))
 
 
-def build(project_file: Path, output: Path | None, compiler: Path, generated_dir: Path, keep_generated: bool = True) -> Path:
+def build(
+    project_file: Path,
+    output: Path | None,
+    compiler: Path,
+    generated_dir: Path,
+    keep_generated: bool = True,
+    subsystem: str = "windows",
+) -> Path:
     data = validate(project_file)
     root = project_root(project_file)
     generate(project_file, generated_dir)
@@ -877,6 +884,8 @@ def build(project_file: Path, output: Path | None, compiler: Path, generated_dir
         str(ROOT.parent / "MiniLangCompilerPy"),
         "-I",
         str(generated_dir.parent),
+        "--subsystem",
+        subsystem,
     ]
     print(" ".join(cmd))
     subprocess.check_call(cmd, cwd=str(root))
@@ -974,7 +983,8 @@ def main(argv: list[str]) -> int:
     elif args.cmd == "build":
         gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"
         out = Path(args.output).resolve() if args.output else None
-        build(project, out, Path(args.compiler).resolve(), gen_dir)
+        subsystem = "console" if args.headless else "windows"
+        build(project, out, Path(args.compiler).resolve(), gen_dir, subsystem=subsystem)
     elif args.cmd == "run":
         gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"
         out = Path(args.output).resolve() if args.output else None
