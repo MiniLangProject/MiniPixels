@@ -65,6 +65,7 @@ particles = []
 enemyCount = 0
 coinCount = 0
 particleCount = 0
+particleCursor = 0
 coinsTaken = 0
 spawnX = 36
 spawnY = 180
@@ -90,14 +91,28 @@ function setEnemy(i, x, y, minX, maxX, kind)
 end function
 
 function resetParticles()
-  global particles, particleCount
+  global particles, particleCount, particleCursor
   particles = array(64)
   particleCount = 0
+  particleCursor = 0
 end function
 
 function addParticle(x, y, vx, vy, life, color, size)
-  global particles, particleCount
-  if particleCount >= 64 then return end if
+  global particles, particleCount, particleCursor
+  i = 0
+  while i < particleCount
+    p = particles[i]
+    if p == void or p.life <= 0 then
+      particles[i] = Particle(x, y, vx, vy, life, color, size)
+      return
+    end if
+    i = i + 1
+  end while
+  if particleCount >= 64 then
+    particles[particleCursor] = Particle(x, y, vx, vy, life, color, size)
+    particleCursor = (particleCursor + 1) % 64
+    return
+  end if
   particles[particleCount] = Particle(x, y, vx, vy, life, color, size)
   particleCount = particleCount + 1
 end function
@@ -270,7 +285,7 @@ function updateParticles(dt)
   i = 0
   while i < particleCount
     p = particles[i]
-    if p.life > 0 then
+    if p != void and p.life > 0 then
       p.x = p.x + (p.vx * dt)
       p.y = p.y + (p.vy * dt)
       p.vy = p.vy + (180 * dt)
@@ -486,7 +501,7 @@ function drawParticles(canvas)
   i = 0
   while i < particleCount
     p = particles[i]
-    if p.life > 0 then
+    if p != void and p.life > 0 then
       mp.fillRectWorld(canvas, camera, p.x, p.y, p.size, p.size, p.color)
     end if
     i = i + 1
