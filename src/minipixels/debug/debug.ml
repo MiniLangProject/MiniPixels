@@ -3,13 +3,15 @@ package minipixels.debug.debug
 import minipixels.math.types as mt
 import minipixels.graphics.canvas as cv
 
+digitPatterns = [
+  0x7B, 0x48, 0x3D, 0x6D, 0x4E,
+  0x67, 0x77, 0x49, 0x7F, 0x6F
+]
+
 function drawDigit(canvas, n, x, y, color)
-  patterns = [
-    0x7B, 0x48, 0x3D, 0x6D, 0x4E,
-    0x67, 0x77, 0x49, 0x7F, 0x6F
-  ]
+  global digitPatterns
   if n < 0 or n > 9 then return end if
-  p = patterns[n]
+  p = digitPatterns[n]
   if (p & 0x01) != 0 then cv.drawLine(canvas, x + 1, y, x + 3, y, color) end if
   if (p & 0x02) != 0 then cv.drawLine(canvas, x, y + 1, x, y + 3, color) end if
   if (p & 0x04) != 0 then cv.drawLine(canvas, x + 4, y + 1, x + 4, y + 3, color) end if

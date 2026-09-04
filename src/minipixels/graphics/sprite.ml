@@ -3,10 +3,11 @@ package minipixels.graphics.sprite
 import minipixels.math.types as mt
 
 struct Image
-  width
-  height
-  pixels
+  width as int
+  height as int
+  pixels as bytes
   name
+  opaque as bool
 
   function getPixel(x, y)
     return minipixels.graphics.sprite.imageGetPixel(this, x, y)
@@ -15,10 +16,10 @@ end struct
 
 struct Sprite
   image
-  sx
-  sy
-  width
-  height
+  sx as int
+  sy as int
+  width as int
+  height as int
   pivotX
   pivotY
   name
@@ -26,12 +27,12 @@ end struct
 
 struct SpriteSheet
   image
-  frameWidth
-  frameHeight
-  spacing
-  margin
-  columns
-  frameCount
+  frameWidth as int
+  frameHeight as int
+  spacing as int
+  margin as int
+  columns as int
+  frameCount as int
 
   function getFrame(index)
     return minipixels.graphics.sprite.spriteSheetFrame(this, index)
@@ -42,12 +43,23 @@ function newImage(width, height, pixels, name)
   if typeof(pixels) != "bytes" then
     pixels = bytes(width * height * 4, 0)
   end if
-  return Image(width, height, pixels, name)
+  return Image(width, height, pixels, name, pixelsAreOpaque(pixels, width * height))
+end function
+
+function pixelsAreOpaque(pixels as bytes, pixelCount as int) returns bool
+  if len(pixels) < pixelCount * 4 then return false end if
+  i = 3
+  limit = pixelCount * 4
+  while i < limit
+    if pixels[i] != 255 then return false end if
+    i = i + 4
+  end while
+  return true
 end function
 
 function solidImage(width, height, color, name)
   pix = bytes(width * height * 4, 0)
-  img = Image(width, height, pix, name)
+  img = Image(width, height, pix, name, mt.colorA(color) >= 255)
   for y = 0 to height - 1
     for x = 0 to width - 1
       imageSetPixel(img, x, y, color)
@@ -56,7 +68,7 @@ function solidImage(width, height, color, name)
   return img
 end function
 
-function imageIndex(img, x, y)
+function inline imageIndex(img, x, y)
   return ((y * img.width) + x) * 4
 end function
 
@@ -67,6 +79,7 @@ function imageSetPixel(img, x, y, color)
   img.pixels[i + 1] = mt.colorG(color)
   img.pixels[i + 2] = mt.colorB(color)
   img.pixels[i + 3] = mt.colorA(color)
+  if img.pixels[i + 3] < 255 then img.opaque = false end if
   return true
 end function
 

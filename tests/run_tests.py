@@ -23,6 +23,18 @@ TESTS = [
 ]
 
 
+def run_test_executable(exe: Path) -> None:
+    result = subprocess.run([str(exe)], cwd=str(ROOT), text=True, capture_output=True)
+    if result.stdout:
+        print(result.stdout, end="")
+    if result.stderr:
+        print(result.stderr, end="", file=sys.stderr)
+    if result.returncode != 0:
+        raise subprocess.CalledProcessError(result.returncode, [str(exe)])
+    if "[FAIL]" in result.stdout:
+        raise RuntimeError(f"MiniLang assertions failed in {exe.name}")
+
+
 def create_asset_pack_fixture() -> None:
     spec = importlib.util.spec_from_file_location("minipixels_cli", ROOT / "tools" / "minipixels.py")
     if spec is None or spec.loader is None:
@@ -34,11 +46,15 @@ def create_asset_pack_fixture() -> None:
     fixture_assets.mkdir(parents=True, exist_ok=True)
     pixels = bytes([255, 0, 0, 255, 0, 0, 255, 255])
     (fixture_assets / "hero.png").write_bytes(mod.write_png_rgba_store(2, 1, pixels))
+    large_pixels = bytes([17, 34, 51, 255]) * (129 * 128)
+    (fixture_assets / "large.png").write_bytes(mod.write_png_rgba_store(129, 128, large_pixels))
     (fixture_assets / "tone.wav").write_bytes(bytes([82, 73, 73, 70, 1, 2, 3, 4]))
     mod.write_asset_pack(
         {
             "assets": [
                 {"id": "hero", "type": "image", "path": "assets/hero.png"},
+                {"id": "large", "type": "image", "path": "assets/large.png"},
+                {"id": "generated", "type": "procedural", "kind": "checker", "width": 4, "height": 2},
                 {"id": "tone", "type": "audio", "path": "assets/tone.wav"},
             ]
         },
@@ -59,27 +75,23 @@ def run_python_tests() -> None:
         raise RuntimeError("could not load tools/package_sdk.py")
     package_mod = importlib.util.module_from_spec(package_spec)
     package_spec.loader.exec_module(package_mod)
-    literal = mod.bytes_literal(bytes([0, 0, 255, 0, 255, 0]))
-    assert "pix = bytes(6, 0)" in literal, literal
-    assert "pix[2] = 255" in literal, literal
-    assert "pix[4] = 255" in literal, literal
-    assert "pix[0]" not in literal, literal
     data = {
         "assets": [
             {"id": "hero", "type": "image", "path": "assets/hero.png", "sheet": {"frameWidth": 16, "frameHeight": 24}},
             {"id": "music", "type": "audio", "path": "assets/audio/theme.wav"},
             {"id": "script", "type": "file", "path": "assets/script.txt"},
             {"id": "legacy", "path": "assets/legacy.png"},
+            {"id": "generated", "type": "procedural", "kind": "checker", "width": 4, "height": 2},
         ]
     }
     ids = [asset["id"] for asset in mod.container_image_assets(data)]
-    assert ids == ["hero", "legacy"], ids
+    assert ids == ["hero", "legacy", "generated"], ids
     audio_ids = [asset["id"] for asset in mod.container_audio_assets(data)]
     assert audio_ids == ["music"], audio_ids
     assert mod.sheet_config(data["assets"][0]) == {"frameWidth": 16, "frameHeight": 24, "spacing": 0, "margin": 0}
     report = mod.asset_report(data, ROOT)
     assert [entry["id"] for entry in report["embedded"]] == [], report
-    assert [entry["id"] for entry in report["container"]] == ["hero", "legacy", "music", "script"], report
+    assert [entry["id"] for entry in report["container"]] == ["generated", "hero", "legacy", "music", "script"], report
     assert [entry["id"] for entry in report["runtime"]] == [], report
     levels = {
         "levels": [
@@ -179,6 +191,14 @@ def run_python_tests() -> None:
         pack_path = mod.write_asset_pack(pack_manifest, tmp_path, tmp_path / "assets.mpx")
         assert pack_path.exists(), pack_path
         assert pack_path.read_bytes().startswith(b"MPX1"), pack_path
+        procedural_pack = mod.write_asset_pack(
+            {"assets": [{"id": "generated", "type": "procedural", "kind": "checker", "width": 4, "height": 2}]},
+            tmp_path,
+            tmp_path / "procedural.mpx",
+        )
+        procedural_data = procedural_pack.read_bytes()
+        assert b"generated" in procedural_data, procedural_data
+        assert procedural_data.count(b"\x89PNG\r\n\x1a\n") == 1, procedural_data
         level_path = tmp_path / "levels.json"
         level_path.write_text(json.dumps(levels), encoding="utf-8")
         out_dir = tmp_path / "generated"
@@ -247,7 +267,7 @@ def run_generated_smoke() -> None:
     print("compile:", " ".join(cmd))
     subprocess.check_call(cmd, cwd=str(ROOT))
     print("run:", exe)
-    subprocess.check_call([str(exe)], cwd=str(ROOT))
+    run_test_executable(exe)
 
     procedural_root = ROOT / "build" / "tests" / "native_generated_procedural"
     if not (procedural_root / "generated" / "assets.ml").exists():
@@ -291,7 +311,7 @@ def run_generated_smoke() -> None:
     print("compile:", " ".join(cmd))
     subprocess.check_call(cmd, cwd=str(ROOT))
     print("run:", procedural_exe)
-    subprocess.check_call([str(procedural_exe)], cwd=str(ROOT))
+    run_test_executable(procedural_exe)
 
 
 def main() -> int:
@@ -306,7 +326,7 @@ def main() -> int:
         print("compile:", " ".join(cmd))
         subprocess.check_call(cmd, cwd=str(ROOT))
         print("run:", exe)
-        subprocess.check_call([str(exe)], cwd=str(ROOT))
+        run_test_executable(exe)
     run_generated_smoke()
     print("MiniPixels tests passed")
     return 0

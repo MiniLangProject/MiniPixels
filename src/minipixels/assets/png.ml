@@ -18,20 +18,10 @@ function isPng(data)
   return data[0] == 137 and data[1] == 80 and data[2] == 78 and data[3] == 71 and data[4] == 13 and data[5] == 10 and data[6] == 26 and data[7] == 10
 end function
 
-function copyBytes(dst, dstOff, src, srcOff, count)
-  if not hasRange(dst, dstOff, count) or not hasRange(src, srcOff, count) then return false end if
-  i = 0
-  while i < count
-    dst[dstOff + i] = src[srcOff + i]
-    i = i + 1
-  end while
-  return true
-end function
-
 function inflateStored(z)
   if not hasRange(z, 0, 6) then return pngError("png zlib stream too small") end if
   pos = 2
-  result = bytes(0, 0)
+  total = 0
   done = false
   while done == false
     if not hasRange(z, pos, 5) then return pngError("png stored block truncated") end if
@@ -45,7 +35,22 @@ function inflateStored(z)
     pos = pos + 4
     if (size ^ nsize) != 0xFFFF then return pngError("png stored block length check failed") end if
     if not hasRange(z, pos, size) then return pngError("png stored block payload truncated") end if
-    result = result + slice(z, pos, size)
+    total = total + size
+    pos = pos + size
+  end while
+
+  result = bytes(total, 0)
+  pos = 2
+  output = 0
+  done = false
+  while done == false
+    hdr = z[pos]
+    pos = pos + 1
+    done = (hdr & 1) != 0
+    size = by.readU16LE(z, pos)
+    pos = pos + 4
+    copyBytes(result, output, z, pos, size)
+    output = output + size
     pos = pos + size
   end while
   return result
@@ -58,7 +63,7 @@ function decode(data, name)
   height = 0
   bitDepth = 0
   colorType = 0
-  idat = bytes(0, 0)
+  idatSize = 0
   while pos + 8 <= len(data)
     length = by.readU32BE(data, pos)
     if typeof(length) != "int" or length < 0 then return pngError("invalid png chunk length") end if
@@ -76,7 +81,7 @@ function decode(data, name)
       colorType = data[payload + 9]
     end if
     if t0 == 73 and t1 == 68 and t2 == 65 and t3 == 84 then
-      idat = idat + slice(data, payload, length)
+      idatSize = idatSize + length
     end if
     if t0 == 73 and t1 == 69 and t2 == 78 and t3 == 68 then
       break
@@ -85,6 +90,24 @@ function decode(data, name)
   end while
   if width <= 0 or height <= 0 then return pngError("png missing IHDR") end if
   if bitDepth != 8 or colorType != 6 then return pngError("png must be 8-bit RGBA") end if
+
+  idat = bytes(idatSize, 0)
+  idatOffset = 0
+  pos = 8
+  while pos + 8 <= len(data)
+    length = by.readU32BE(data, pos)
+    payload = pos + 8
+    t0 = data[pos + 4]
+    t1 = data[pos + 5]
+    t2 = data[pos + 6]
+    t3 = data[pos + 7]
+    if t0 == 73 and t1 == 68 and t2 == 65 and t3 == 84 then
+      copyBytes(idat, idatOffset, data, payload, length)
+      idatOffset = idatOffset + length
+    end if
+    if t0 == 73 and t1 == 69 and t2 == 78 and t3 == 68 then break end if
+    pos = pos + 12 + length
+  end while
   raw = inflateStored(idat)
   if typeof(raw) == "error" then return raw end if
   stride = width * 4

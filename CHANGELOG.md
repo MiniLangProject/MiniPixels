@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+- Optimized framebuffer clears, opaque rectangle fills, and opaque sprite blits with MiniLang 1.2.3 native byte-copy operations.
+- Removed the GDI frame-by-frame RGBA-to-BGRA conversion by describing the RGBA framebuffer with explicit DIB color masks.
+- Fixed alpha blending for translucent rectangles and generic color blending.
+- Added typed primitive engine fields and selective inline helpers for MiniLang 1.2.3 local type flow.
+- Moved Python-generated procedural images into `assets.mpx` instead of emitting thousands of MiniLang byte assignments.
+- Reworked PNG stored-block and IDAT assembly to allocate once and use native byte copies.
+- Added compiler-project manifests and exact-hit incremental build caching to the Python CLI.
+- Made `--debug`, `--release`, `--verbose`, and `run --headless` behavior explicit and functional.
+- Reduced temporary allocations in bitmap-font drawing, debug digits, native JSON parsing, and native code generation.
+- Fixed initial Win32 window titles to use the compiler's UTF-16 `wstr` marshaling.
+- Made the test runner fail when MiniLang assertions print `[FAIL]`.
+
 ## 0.7.0
 
 - Extended native `minipixels.tools.generator` from stubs to concrete `generated.levels` output for MiniPixels `levels.json`.

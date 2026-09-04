@@ -85,7 +85,7 @@ function initialize(game)
 end function
 ```
 
-The Python CLI writes supported 8-bit RGB/RGBA PNG image assets into `build/assets.mpx` and generates MiniLang loader functions for them. The runtime opens that MiniPixels asset pack and decodes image payloads with MiniPixels' own PNG-profile decoder. Assets with `type: "audio"` or `type: "file"` are stored in the same container. Audio helpers load WAV bytes from the pack and create memory-backed clips. The native MiniLang CLI already generates importable modules for `procedural` assets and sheet helpers; for `image` assets it emits placeholder pixels until native asset-pack generation is added.
+The Python CLI writes supported 8-bit RGB/RGBA PNG images and rendered `procedural` assets into `build/assets.mpx` and generates MiniLang loader functions for them. The runtime opens that MiniPixels asset pack and decodes image payloads with MiniPixels' own PNG-profile decoder. Assets with `type: "audio"` or `type: "file"` are stored in the same container. Audio helpers load WAV bytes from the pack and create memory-backed clips. The native MiniLang CLI already generates importable modules for `procedural` assets and sheet helpers; for `image` assets it emits placeholder pixels until native asset-pack generation is added.
 
 ```json
 {

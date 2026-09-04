@@ -12,6 +12,7 @@ const CW_USEDEFAULT = 0x80000000
 const IDC_ARROW = 32512
 const SW_HIDE = 0
 const DIB_RGB_COLORS = 0
+const BI_BITFIELDS = 3
 const SRCCOPY = 0x00CC0020
 const PFD_DOUBLEBUFFER = 0x00000001
 const PFD_DRAW_TO_WINDOW = 0x00000004
@@ -37,7 +38,7 @@ extern function GetTickCount64() from "kernel32.dll" returns u64
 extern function Sleep(ms as int) from "kernel32.dll" returns void
 
 extern function RegisterClassExW(wndClass as bytes) from "user32.dll" returns u32
-extern function CreateWindowExW(exStyle as int, className as ptr, windowName as ptr, style as int, x as int, y as int, w as int, h as int, parent as ptr, menu as ptr, instance as ptr, param as ptr) from "user32.dll" returns ptr
+extern function CreateWindowExW(exStyle as int, className as ptr, windowName as wstr, style as int, x as int, y as int, w as int, h as int, parent as ptr, menu as ptr, instance as ptr, param as ptr) from "user32.dll" returns ptr
 extern function DefWindowProcW(hwnd as ptr, msg as u32, wParam as ptr, lParam as ptr) from "user32.dll" returns ptr
 extern function DestroyWindow(hwnd as ptr) from "user32.dll" returns bool
 extern function PostQuitMessage(exitCode as int) from "user32.dll" returns void
@@ -88,7 +89,6 @@ struct Window
   scale
   scaledWidth
   scaledHeight
-  bgra
   bmi
   msg
   rect
@@ -130,38 +130,6 @@ function getU32(buf, off)
   return buf[off] + (buf[off + 1] << 8) + (buf[off + 2] << 16) + (buf[off + 3] << 24)
 end function
 
-function utf16z(s)
-  n = len(s)
-  b = bytes((n + 1) * 2, 0)
-  i = 0
-  while i < n
-    ch = s[i]
-    code = 0
-    if ch == "A" then code = 65 else if ch == "B" then code = 66 else if ch == "C" then code = 67 else if ch == "D" then code = 68
-    else if ch == "E" then code = 69 else if ch == "F" then code = 70 else if ch == "G" then code = 71 else if ch == "H" then code = 72
-    else if ch == "I" then code = 73 else if ch == "J" then code = 74 else if ch == "K" then code = 75 else if ch == "L" then code = 76
-    else if ch == "M" then code = 77 else if ch == "N" then code = 78 else if ch == "O" then code = 79 else if ch == "P" then code = 80
-    else if ch == "Q" then code = 81 else if ch == "R" then code = 82 else if ch == "S" then code = 83 else if ch == "T" then code = 84
-    else if ch == "U" then code = 85 else if ch == "V" then code = 86 else if ch == "W" then code = 87 else if ch == "X" then code = 88
-    else if ch == "Y" then code = 89 else if ch == "Z" then code = 90
-    else if ch == "a" then code = 97 else if ch == "b" then code = 98 else if ch == "c" then code = 99 else if ch == "d" then code = 100
-    else if ch == "e" then code = 101 else if ch == "f" then code = 102 else if ch == "g" then code = 103 else if ch == "h" then code = 104
-    else if ch == "i" then code = 105 else if ch == "j" then code = 106 else if ch == "k" then code = 107 else if ch == "l" then code = 108
-    else if ch == "m" then code = 109 else if ch == "n" then code = 110 else if ch == "o" then code = 111 else if ch == "p" then code = 112
-    else if ch == "q" then code = 113 else if ch == "r" then code = 114 else if ch == "s" then code = 115 else if ch == "t" then code = 116
-    else if ch == "u" then code = 117 else if ch == "v" then code = 118 else if ch == "w" then code = 119 else if ch == "x" then code = 120
-    else if ch == "y" then code = 121 else if ch == "z" then code = 122
-    else if ch == "0" then code = 48 else if ch == "1" then code = 49 else if ch == "2" then code = 50 else if ch == "3" then code = 51
-    else if ch == "4" then code = 52 else if ch == "5" then code = 53 else if ch == "6" then code = 54 else if ch == "7" then code = 55
-    else if ch == "8" then code = 56 else if ch == "9" then code = 57 else if ch == " " then code = 32 else if ch == "-" then code = 45 else if ch == "_" then code = 95
-    else code = 63 end if
-    b[i * 2] = code & 255
-    b[(i * 2) + 1] = (code >> 8) & 255
-    i = i + 1
-  end while
-  return b
-end function
-
 function wndProc(hwnd, msg, wParam, lParam)
   global windowRunning
   if msg == WM_CLOSE then
@@ -181,7 +149,7 @@ function registerWindowClass()
   global registeredClassName
   if typeof(registeredClassName) == "bytes" then return registeredClassName end if
   instance = GetModuleHandleW(0)
-  className = utf16z("MiniPixelsWindow")
+  className = fromHex("4D 00 69 00 6E 00 69 00 50 00 69 00 78 00 65 00 6C 00 73 00 57 00 69 00 6E 00 64 00 6F 00 77 00 00 00")
   wc = bytes(80, 0)
   putU32(wc, 0, 80)
   putU32(wc, 4, CS_OWNDC)
@@ -195,14 +163,17 @@ function registerWindowClass()
 end function
 
 function createBitmapInfo(width, height)
-  bmi = bytes(40, 0)
+  bmi = bytes(52, 0)
   putU32(bmi, 0, 40)
   putI32(bmi, 4, width)
   putI32(bmi, 8, 0 - height)
   bmi[12] = 1
   bmi[14] = 32
-  putU32(bmi, 16, 0)
+  putU32(bmi, 16, BI_BITFIELDS)
   putU32(bmi, 20, width * height * 4)
+  putU32(bmi, 40, 0x000000FF)
+  putU32(bmi, 44, 0x0000FF00)
+  putU32(bmi, 48, 0x00FF0000)
   return bmi
 end function
 
@@ -249,10 +220,9 @@ function open(title, width, height, scale, renderer, scaleMode, smoothing)
   console = GetConsoleWindow()
   if console != 0 then ShowWindow(console, SW_HIDE) end if
   className = registerWindowClass()
-  titleBuf = utf16z(title)
   sw = width * scale
   sh = height * scale
-  hwnd = CreateWindowExW(0, nativeBytesPtr(className), nativeBytesPtr(titleBuf), WS_OVERLAPPEDWINDOW | WS_VISIBLE, 100, 100, sw + 16, sh + 39, 0, 0, GetModuleHandleW(0), 0)
+  hwnd = CreateWindowExW(0, nativeBytesPtr(className), title, WS_OVERLAPPEDWINDOW | WS_VISIBLE, 100, 100, sw + 16, sh + 39, 0, 0, GetModuleHandleW(0), 0)
   if hwnd == 0 then
     return error(7001, "MiniPixels could not create the Win32 window.")
   end if
@@ -260,7 +230,7 @@ function open(title, width, height, scale, renderer, scaleMode, smoothing)
   UpdateWindow(hwnd)
   SetForegroundWindow(hwnd)
   mode = normalizeRenderer(renderer)
-  w = Window(hwnd, width, height, scale, sw, sh, bytes(width * height * 4, 0), createBitmapInfo(width, height), bytes(48, 0), bytes(16, 0), titleBuf, className, "gdi", 0, 0, 0, width, height, bytes(4, 0), false, normalizeScaleMode(scaleMode), smoothing, "", bytes(16, 0))
+  w = Window(hwnd, width, height, scale, sw, sh, createBitmapInfo(width, height), bytes(48, 0), bytes(16, 0), title, className, "gdi", 0, 0, 0, width, height, bytes(4, 0), false, normalizeScaleMode(scaleMode), smoothing, "", bytes(16, 0))
   if mode == "auto" or mode == "opengl" then
     if initOpenGL(w) then
       w.renderer = "opengl"
@@ -511,32 +481,13 @@ function presentOpenGL(w, canvas)
 end function
 
 function presentGDI(w, canvas)
-  dst = w.bgra
-  y = 0
-  while y < canvas.height
-    x = 0
-    while x < canvas.width
-      src = ((y * canvas.width) + x) * 4
-      r = canvas.pixels[src]
-      g = canvas.pixels[src + 1]
-      b = canvas.pixels[src + 2]
-      a = canvas.pixels[src + 3]
-      di = ((y * canvas.width) + x) * 4
-      dst[di] = b
-      dst[di + 1] = g
-      dst[di + 2] = r
-      dst[di + 3] = a
-      x = x + 1
-    end while
-    y = y + 1
-  end while
   dc = GetDC(w.hwnd)
   clientW = clientWidth(w)
   clientH = clientHeight(w)
   updateViewport(w)
   SetStretchBltMode(dc, 3)
   PatBlt(dc, 0, 0, clientW, clientH, BLACKNESS)
-  StretchDIBits(dc, viewportX(w), viewportY(w), viewportW(w), viewportH(w), 0, 0, canvas.width, canvas.height, w.bgra, w.bmi, DIB_RGB_COLORS, SRCCOPY)
+  StretchDIBits(dc, viewportX(w), viewportY(w), viewportW(w), viewportH(w), 0, 0, canvas.width, canvas.height, canvas.pixels, w.bmi, DIB_RGB_COLORS, SRCCOPY)
   ReleaseDC(w.hwnd, dc)
 end function
 

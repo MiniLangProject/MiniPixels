@@ -421,17 +421,8 @@ def procedural_pixels(asset: dict) -> tuple[int, int, bytes]:
     return w, h, bytes(buf)
 
 
-def is_embedded_asset(asset: dict) -> bool:
-    kind = str(asset.get("type", "image")).lower()
-    return kind == "procedural"
-
-
-def embedded_assets(data: dict) -> list[dict]:
-    return [asset for asset in data.get("assets", []) if is_embedded_asset(asset)]
-
-
 def is_container_image_asset(asset: dict) -> bool:
-    return str(asset.get("type", "image")).lower() == "image"
+    return str(asset.get("type", "image")).lower() in ("image", "procedural")
 
 
 def container_image_assets(data: dict) -> list[dict]:
@@ -442,7 +433,7 @@ def container_assets(data: dict) -> list[dict]:
     return [
         asset
         for asset in data.get("assets", [])
-        if str(asset.get("type", "image")).lower() in ("image", "audio", "file")
+        if str(asset.get("type", "image")).lower() in ("image", "procedural", "audio", "file")
     ]
 
 
@@ -460,20 +451,6 @@ def sheet_config(asset: dict) -> dict | None:
         "spacing": int(sheet.get("spacing", 0)),
         "margin": int(sheet.get("margin", 0)),
     }
-
-
-def bytes_literal(data: bytes, indent: str = "  ") -> str:
-    if not data:
-        return f"{indent}pix = bytes(0, 0)"
-    counts = [0] * 256
-    for b in data:
-        counts[b] += 1
-    default = max(range(256), key=lambda b: counts[b])
-    lines = [f"{indent}pix = bytes({len(data)}, {default})"]
-    for i, b in enumerate(data):
-        if b != default:
-            lines.append(f"{indent}pix[{i}] = {b}")
-    return "\n".join(lines)
 
 
 def load_levels(data: dict) -> dict | None:
@@ -650,19 +627,31 @@ def write_asset_pack(data: dict, root: Path, output: Path) -> Path:
     blob = bytearray()
 
     for asset in sorted(data.get("assets", []), key=lambda a: a["id"]):
-        raw_path = asset.get("path")
-        if not raw_path:
-            continue
-        path = root / raw_path
         kind = str(asset.get("type", "image")).lower()
-        if kind == "image":
+        if kind == "procedural":
+            width, height, rgba = procedural_pixels(asset)
+            payload = write_png_rgba_store(width, height, rgba)
+            type_code = 1
+        elif kind == "image":
+            raw_path = asset.get("path")
+            if not raw_path:
+                continue
+            path = root / raw_path
             width, height, rgba = read_png_rgba(path)
             payload = write_png_rgba_store(width, height, rgba)
             type_code = 1
         elif kind == "audio":
+            raw_path = asset.get("path")
+            if not raw_path:
+                continue
+            path = root / raw_path
             payload = path.read_bytes()
             type_code = 2
         elif kind == "file":
+            raw_path = asset.get("path")
+            if not raw_path:
+                continue
+            path = root / raw_path
             payload = path.read_bytes()
             type_code = 3
         else:
@@ -754,31 +743,9 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         lines.append(f"  return audio_{aid}_cache")
         lines.append("end function")
         lines.append("")
-    for asset in sorted(embedded_assets(data), key=lambda a: a["id"]):
-        aid = asset["id"]
-        w, h, pix = procedural_pixels(asset)
-        func = f"make_{aid}"
-        lines.append(f"function {func}()")
-        lines.append(bytes_literal(pix))
-        lines.append(f'  img = mp.image({w}, {h}, pix, "{aid}")')
-        lines.append(f'  return mp.spriteFromImage(img, "{aid}")')
-        lines.append("end function")
-        lines.append("")
-        sheet = sheet_config(asset)
-        if sheet is not None:
-            lines.append(f"function sheet_{aid}()")
-            lines.append(f"  spr = make_{aid}()")
-            lines.append(
-                f'  return mp.spriteSheet(spr.image, {sheet["frameWidth"]}, {sheet["frameHeight"]}, {sheet["spacing"]}, {sheet["margin"]})'
-            )
-            lines.append("end function")
-            lines.append("")
     lines.append("function registry()")
     lines.append("  reg = assets.create(64)")
     for asset in image_assets:
-        aid = asset["id"]
-        lines.append(f'  reg.add("{aid}", make_{aid}())')
-    for asset in sorted(embedded_assets(data), key=lambda a: a["id"]):
         aid = asset["id"]
         lines.append(f'  reg.add("{aid}", make_{aid}())')
     lines.append("  return reg")
@@ -814,10 +781,11 @@ def asset_report(data: dict, root: Path) -> dict:
         if sheet is not None:
             entry["sheet"] = sheet
         kind = str(asset.get("type", "image")).lower()
-        if is_embedded_asset(asset):
-            report["embedded"].append(entry)
-            report["totals"]["embeddedBytes"] += size
-        elif kind in ("image", "audio", "file"):
+        if kind == "procedural":
+            width, height, rgba = procedural_pixels(asset)
+            size = len(write_png_rgba_store(width, height, rgba))
+            entry["bytes"] = size
+        if kind in ("image", "procedural", "audio", "file"):
             report["container"].append(entry)
             report["totals"]["containerBytes"] += size
         else:
@@ -850,7 +818,7 @@ def copy_runtime_assets(data: dict, root: Path, output: Path) -> None:
 
     for asset in data.get("assets", []):
         kind = str(asset.get("type", "image")).lower()
-        if is_embedded_asset(asset) or kind in ("image", "audio"):
+        if kind in ("image", "procedural", "audio"):
             continue
         raw_path = asset.get("path")
         if not raw_path:
@@ -863,8 +831,10 @@ def build(
     output: Path | None,
     compiler: Path,
     generated_dir: Path,
-    keep_generated: bool = True,
     subsystem: str = "windows",
+    debug: bool = False,
+    incremental: bool = True,
+    verbose: bool = False,
 ) -> Path:
     data = validate(project_file)
     root = project_root(project_file)
@@ -873,21 +843,29 @@ def build(
     if output is None:
         output = root / "build" / f"{data.get('name', 'game')}.exe"
     output.parent.mkdir(parents=True, exist_ok=True)
-    cmd = [
-        sys.executable,
-        str(compiler),
-        str(main),
-        str(output),
-        "-I",
-        str(ROOT / "src"),
-        "-I",
-        str(ROOT.parent / "MiniLangCompilerPy"),
-        "-I",
-        str(generated_dir.parent),
-        "--subsystem",
-        subsystem,
+    manifest_path = output.parent / "minilang.toml"
+    compiler_root = compiler.parent
+    if not (compiler_root / "std").is_dir() and (compiler_root.parent / "std").is_dir():
+        compiler_root = compiler_root.parent
+    include_paths = [ROOT / "src", compiler_root, generated_dir.parent]
+    compiler_args = ["--profile-calls"] if debug else []
+    manifest_lines = [
+        "[project]",
+        f"entry = {json.dumps(str(main))}",
+        f"output = {json.dumps(str(output))}",
+        "include = [" + ", ".join(json.dumps(str(path)) for path in include_paths) + "]",
+        'target = "windows-x64"',
+        f"subsystem = {json.dumps(subsystem)}",
+        f"incremental = {'true' if incremental else 'false'}",
+        f"cache_dir = {json.dumps(str(output.parent / '.minilang-cache'))}",
+        "compiler_args = [" + ", ".join(json.dumps(arg) for arg in compiler_args) + "]",
+        "",
     ]
-    print(" ".join(cmd))
+    manifest_path.write_text("\n".join(manifest_lines), encoding="utf-8")
+    compiler_command = [sys.executable, str(compiler)] if compiler.suffix.lower() == ".py" else [str(compiler)]
+    cmd = compiler_command + ["--project", str(manifest_path)]
+    if verbose:
+        print("compiler:", " ".join(cmd))
     subprocess.check_call(cmd, cwd=str(root))
     copy_runtime_assets(data, root, output)
     write_asset_report(data, root, output)
@@ -946,16 +924,26 @@ def main(argv: list[str]) -> int:
     for name in ["info", "doctor"]:
         sp = sub.add_parser(name)
         sp.add_argument("project", nargs="?", default="minipixels.json")
-    for name in ["validate", "generate", "pack", "build", "run"]:
+    validate_parser = sub.add_parser("validate")
+    validate_parser.add_argument("project", nargs="?", default="minipixels.json")
+    generate_parser = sub.add_parser("generate")
+    generate_parser.add_argument("project", nargs="?", default="minipixels.json")
+    generate_parser.add_argument("--generated-dir")
+    pack_parser = sub.add_parser("pack")
+    pack_parser.add_argument("project", nargs="?", default="minipixels.json")
+    pack_parser.add_argument("--output")
+    for name in ["build", "run"]:
         sp = sub.add_parser(name)
         sp.add_argument("project", nargs="?", default="minipixels.json")
         sp.add_argument("--compiler", default=str(DEFAULT_COMPILER))
         sp.add_argument("--output")
         sp.add_argument("--generated-dir")
-        sp.add_argument("--debug", action="store_true")
-        sp.add_argument("--release", action="store_true")
-        sp.add_argument("--headless", action="store_true")
-        sp.add_argument("--verbose", action="store_true")
+        mode = sp.add_mutually_exclusive_group()
+        mode.add_argument("--debug", action="store_true", help="instrument MiniLang function calls")
+        mode.add_argument("--release", action="store_true", help="build without debug instrumentation (default)")
+        sp.add_argument("--headless", action="store_true", help="build with the console subsystem")
+        sp.add_argument("--no-incremental", action="store_true", help="bypass the compiler artifact cache")
+        sp.add_argument("--verbose", action="store_true", help="print the compiler invocation")
 
     args = p.parse_args(argv)
     if args.cmd == "new":
@@ -984,11 +972,30 @@ def main(argv: list[str]) -> int:
         gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"
         out = Path(args.output).resolve() if args.output else None
         subsystem = "console" if args.headless else "windows"
-        build(project, out, Path(args.compiler).resolve(), gen_dir, subsystem=subsystem)
+        build(
+            project,
+            out,
+            Path(args.compiler).resolve(),
+            gen_dir,
+            subsystem=subsystem,
+            debug=args.debug,
+            incremental=not args.no_incremental,
+            verbose=args.verbose,
+        )
     elif args.cmd == "run":
         gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"
         out = Path(args.output).resolve() if args.output else None
-        exe = build(project, out, Path(args.compiler).resolve(), gen_dir)
+        subsystem = "console" if args.headless else "windows"
+        exe = build(
+            project,
+            out,
+            Path(args.compiler).resolve(),
+            gen_dir,
+            subsystem=subsystem,
+            debug=args.debug,
+            incremental=not args.no_incremental,
+            verbose=args.verbose,
+        )
         subprocess.check_call([str(exe)], cwd=str(project.parent))
     return 0
 

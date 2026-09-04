@@ -1,7 +1,8 @@
 package minipixels.tools.json
 
-import std.array as arr
+import std.ds.list as list
 import std.string as str
+import std.string_builder as sb
 
 struct JsonValue
   kind
@@ -108,11 +109,11 @@ end function
 
 function parseStringValue(p)
   if expect(p, "\"", "expected string") == false then return end if
-  result = ""
+  result = sb.StringBuilder.withCapacity(32)
   while atEnd(p) == false
     ch = advance(p)
     if ch == "\"" then
-      return string(result)
+      return string(result.toString())
     end if
     if ch == "\\" then
       if atEnd(p) then
@@ -120,14 +121,14 @@ function parseStringValue(p)
         return
       end if
       esc = advance(p)
-      if esc == "\"" then result = result + "\""
-      else if esc == "\\" then result = result + "\\"
-      else if esc == "/" then result = result + "/"
-      else if esc == "b" then result = result + "?"
-      else if esc == "f" then result = result + "?"
-      else if esc == "n" then result = result + "\n"
-      else if esc == "r" then result = result + "\r"
-      else if esc == "t" then result = result + "\t"
+      if esc == "\"" then result.appendString("\"")
+      else if esc == "\\" then result.appendString("\\")
+      else if esc == "/" then result.appendString("/")
+      else if esc == "b" then result.appendString("?")
+      else if esc == "f" then result.appendString("?")
+      else if esc == "n" then result.appendString("\n")
+      else if esc == "r" then result.appendString("\r")
+      else if esc == "t" then result.appendString("\t")
       else if esc == "u" then
         for i = 0 to 3
           if atEnd(p) or isHex(peek(p)) == false then
@@ -136,13 +137,13 @@ function parseStringValue(p)
           end if
           p.pos = p.pos + 1
         end for
-        result = result + "?"
+        result.appendString("?")
       else
         setError(p, "invalid escape sequence")
         return
       end if
     else
-      result = result + ch
+      result.appendString(ch)
     end if
   end while
   setError(p, "unterminated string")
@@ -207,21 +208,21 @@ end function
 
 function parseArrayValue(p)
   expect(p, "[", "expected array")
-  items = []
+  items = list.List.new()
   skipWhitespace(p)
   if peek(p) == "]" then
     p.pos = p.pos + 1
-    return array(items)
+    return array(items.toArray())
   end if
   while p.failed == false
     item = parseValue(p)
     if p.failed then return end if
-    items = arr.append(items, item)
+    items.add(item)
     skipWhitespace(p)
     ch = peek(p)
     if ch == "]" then
       p.pos = p.pos + 1
-      return array(items)
+      return array(items.toArray())
     end if
     if ch != "," then
       setError(p, "expected ',' or ']'")
@@ -235,12 +236,12 @@ end function
 
 function parseObjectValue(p)
   expect(p, "{", "expected object")
-  keys = []
-  vals = []
+  keys = list.List.new()
+  vals = list.List.new()
   skipWhitespace(p)
   if peek(p) == "}" then
     p.pos = p.pos + 1
-    return object(keys, vals)
+    return object(keys.toArray(), vals.toArray())
   end if
   while p.failed == false
     key = parseStringValue(p)
@@ -250,13 +251,13 @@ function parseObjectValue(p)
     skipWhitespace(p)
     val = parseValue(p)
     if p.failed then return end if
-    keys = arr.append(keys, key.stringValue)
-    vals = arr.append(vals, val)
+    keys.add(key.stringValue)
+    vals.add(val)
     skipWhitespace(p)
     ch = peek(p)
     if ch == "}" then
       p.pos = p.pos + 1
-      return object(keys, vals)
+      return object(keys.toArray(), vals.toArray())
     end if
     if ch != "," then
       setError(p, "expected ',' or '}'")

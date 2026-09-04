@@ -5,7 +5,7 @@
 
 Current version: `0.7.0`
 
-MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses the existing `MiniLangCompilerPy` compiler and builds native Windows x64 executables.
+MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.3 or newer and builds native Windows x64 executables.
 
 MiniPixels focuses on a small but working 2D engine slice: a Win32 window, fixed logical framebuffer, optional OpenGL/WGL presentation, nearest-neighbor scaling, focus-aware keyboard input, sprites, MiniPixels asset packs with runtime PNG decoding, runtime file assets, tilemaps, camera scrolling, simple collision, bitmap text, basic audio, headless tests, and example projects.
 
@@ -14,8 +14,8 @@ MiniPixels focuses on a small but working 2D engine slice: a Win32 window, fixed
 ## Requirements
 
 - Windows
-- A checkout of `MiniLangCompilerPy` next to this repository, or a path passed with `--compiler`
-- Python 3 for the MiniPixels CLI
+- MiniLang Compiler 1.2.3 or newer in a sibling `MiniLangCompilerPy` checkout, or a Python/self-hosted compiler path passed with `--compiler`
+- Python 3.11 or newer for the MiniPixels CLI and compiler project cache
 
 Expected sibling layout during local development:
 
@@ -39,6 +39,8 @@ Build without running:
 python tools\minipixels.py build examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```
 
+The self-hosted 1.2.3 compiler is accepted directly as well, for example `--compiler ..\MiniLangCompilerML\build\mlc_win64.exe`.
+
 Build the native MiniLang CLI:
 
 ```powershell
@@ -59,7 +61,7 @@ Tooling split:
 | --- | --- | --- |
 | Create a project | `new` | `new` |
 | Inspect/validate manifests | `info`, `doctor`, `validate` | `info`, `doctor`, `validate` |
-| Generate `generated.assets` | `procedural` sprites and placeholder `image` sprites | procedural sprites plus image loaders backed by `assets.mpx` |
+| Generate `generated.assets` | `procedural` sprites and placeholder `image` sprites | image and procedural loaders backed by `assets.mpx` |
 | Generate `generated.levels` | MiniPixels `levels.json` | MiniPixels `levels.json` and Tiled JSON/TMJ |
 | Create/copy runtime assets | Not yet | `assets.mpx` for images/audio/files |
 | Build/run/package | Not yet | `build`, `run`, `package`, `pack` |
@@ -249,9 +251,11 @@ python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler
 python tools\minipixels.py package
 ```
 
-The Python CLI validates project JSON, reads 8-bit RGB/RGBA image assets at build time, writes a deterministic MiniPixels asset container (`assets.mpx`), generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, includes runtime assets such as `type: "audio"` or `type: "file"` in the pack, generates `generated.levels` from MiniPixels or Tiled JSON when `levels.path` is present, writes `asset-report.json`, and invokes the regular MiniLang compiler. Image payloads inside `assets.mpx` are PNG-encoded in the MiniPixels runtime profile and decoded by MiniLang code through `mp.loadPngFromPack(...)`. Audio payloads can be loaded as bytes and played directly from memory through WinMM `SND_MEMORY` clips, so example builds no longer need loose WAV files next to the executable. The native MiniLang CLI can already validate manifests and generate importable modules for `procedural` sprites and MiniPixels `levels.json`.
+The Python CLI validates project JSON, reads image assets and renders procedural assets at build time, writes a deterministic MiniPixels asset container (`assets.mpx`), generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, includes runtime assets such as `type: "audio"` or `type: "file"` in the pack, generates `generated.levels` from MiniPixels or Tiled JSON when `levels.path` is present, writes `asset-report.json`, and invokes the regular MiniLang compiler. Image payloads inside `assets.mpx` are PNG-encoded in the MiniPixels runtime profile and decoded by MiniLang code through `mp.loadPngFromPack(...)`. Audio payloads can be loaded as bytes and played directly from memory through WinMM `SND_MEMORY` clips, so example builds no longer need loose WAV files next to the executable. The native MiniLang CLI can already validate manifests and generate importable modules for `procedural` sprites and MiniPixels `levels.json`.
 
 Windowed games built through `tools\minipixels.py build` or `run` use the Windows GUI PE subsystem by default, so double-clicking the executable opens only the game window and no companion console. Use `--headless` for console-subsystem builds that are meant to print test or tool output.
+
+Builds use MiniLang's exact-hit incremental artifact cache by default. Use `--no-incremental` for a forced rebuild, `--debug` to enable MiniLang call profiling, `--release` to state the default non-instrumented mode explicitly, and `--verbose` to print the compiler invocation.
 
 ## MPX Asset Pack Format
 
@@ -283,11 +287,11 @@ Current `kind` values:
 
 | Kind | Asset type | Payload |
 | --- | --- | --- |
-| `1` | `image` | MiniPixels PNG-profile bytes |
+| `1` | `image` or `procedural` | MiniPixels PNG-profile bytes |
 | `2` | `audio` | Original audio file bytes, usually WAV |
 | `3` | `file` | Original file bytes |
 
-Image assets are transcoded by the Python CLI into the MiniPixels PNG profile before they are written to the pack. That profile is deliberately narrow so the MiniLang runtime decoder stays small: 8-bit RGBA, PNG filter type `0`, non-interlaced, and a zlib stream made of stored Deflate blocks. Audio and file assets are stored byte-for-byte.
+Image assets are transcoded and procedural assets are rendered by the Python CLI before they are written in the MiniPixels PNG profile. That profile is deliberately narrow so the MiniLang runtime decoder stays small: 8-bit RGBA, PNG filter type `0`, non-interlaced, and a zlib stream made of stored Deflate blocks. Audio and file assets are stored byte-for-byte.
 
 Runtime APIs:
 
@@ -366,7 +370,7 @@ Implemented:
 
 - Native Win32 window
 - Fixed logical resolution and resize stretch
-- CPU RGBA8888 framebuffer
+- CPU RGBA8888 framebuffer with direct masked-DIB GDI presentation
 - Nearest-neighbor GDI presentation and optional OpenGL/WGL presentation
 - Keyboard input only while the game window has focus
 - FPS in the window title

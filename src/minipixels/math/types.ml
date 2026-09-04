@@ -170,19 +170,19 @@ function rgb(r, g, b)
   return rgba(r, g, b, 255)
 end function
 
-function colorR(c)
+function inline colorR(c)
   return (c >> 24) & 255
 end function
 
-function colorG(c)
+function inline colorG(c)
   return (c >> 16) & 255
 end function
 
-function colorB(c)
+function inline colorB(c)
   return (c >> 8) & 255
 end function
 
-function colorA(c)
+function inline colorA(c)
   return c & 255
 end function
 
@@ -204,9 +204,9 @@ function alphaBlend(dst, src)
   if sa <= 0 then return dst end if
   if sa >= 255 then return src end if
   inv = 255 - sa
-  r = ((colorR(src) * sa) + (colorR(dst) * inv)) / 255
-  g = ((colorG(src) * sa) + (colorG(dst) * inv)) / 255
-  b = ((colorB(src) * sa) + (colorB(dst) * inv)) / 255
+  r = floorInt(((colorR(src) * sa) + (colorR(dst) * inv)) / 255)
+  g = floorInt(((colorG(src) * sa) + (colorG(dst) * inv)) / 255)
+  b = floorInt(((colorB(src) * sa) + (colorB(dst) * inv)) / 255)
   return rgba(r, g, b, 255)
 end function
 

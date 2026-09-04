@@ -4,14 +4,14 @@ import minipixels.math.types as mt
 import minipixels.graphics.sprite as sp
 
 struct Canvas
-  width
-  height
-  pixels
+  width as int
+  height as int
+  pixels as bytes
   cameraX
   cameraY
-  spriteCount
-  tileCount
-  drawCalls
+  spriteCount as int
+  tileCount as int
+  drawCalls as int
 
   function clear(color)
     return minipixels.graphics.canvas.clearCanvas(this, color)
@@ -98,7 +98,7 @@ function resetStats(c)
   c.drawCalls = 0
 end function
 
-function index(c, x, y)
+function inline index(c, x, y)
   return ((y * c.width) + x) * 4
 end function
 
@@ -107,15 +107,20 @@ function clearCanvas(c, color)
   g = mt.colorG(color)
   b = mt.colorB(color)
   a = mt.colorA(color)
-  i = 0
   n = len(c.pixels)
-  while i < n
-    c.pixels[i] = r
-    c.pixels[i + 1] = g
-    c.pixels[i + 2] = b
-    c.pixels[i + 3] = a
-    i = i + 4
-  end while
+  if n >= 4 then
+    c.pixels[0] = r
+    c.pixels[1] = g
+    c.pixels[2] = b
+    c.pixels[3] = a
+    filled = 4
+    while filled < n
+      amount = filled
+      if amount > n - filled then amount = n - filled end if
+      copyBytes(c.pixels, filled, c.pixels, 0, amount)
+      filled = filled + amount
+    end while
+  end if
   c.drawCalls = c.drawCalls + 1
 end function
 
@@ -131,15 +136,15 @@ function setPixel(c, x, y, color)
   return true
 end function
 
-function setPixelRaw(c, x, y, color)
-  x = mt.floorInt(x)
-  y = mt.floorInt(y)
+function blendPixelRaw(c, x, y, color)
   if x < 0 or y < 0 or x >= c.width or y >= c.height then return false end if
   i = index(c, x, y)
-  c.pixels[i] = mt.colorR(color)
-  c.pixels[i + 1] = mt.colorG(color)
-  c.pixels[i + 2] = mt.colorB(color)
-  c.pixels[i + 3] = mt.colorA(color)
+  dst = mt.rgba(c.pixels[i], c.pixels[i + 1], c.pixels[i + 2], c.pixels[i + 3])
+  blended = mt.alphaBlend(dst, color)
+  c.pixels[i] = mt.colorR(blended)
+  c.pixels[i + 1] = mt.colorG(blended)
+  c.pixels[i + 2] = mt.colorB(blended)
+  c.pixels[i + 3] = mt.colorA(blended)
   return true
 end function
 
@@ -188,23 +193,36 @@ function fillRect(c, x, y, w, h, color)
   r = mt.colorR(color)
   g = mt.colorG(color)
   b = mt.colorB(color)
-  yy = y0
-  while yy < y1
-    xx = x0
-    while xx < x1
-      if a >= 255 then
-        i = index(c, xx, yy)
-        c.pixels[i] = r
-        c.pixels[i + 1] = g
-        c.pixels[i + 2] = b
-        c.pixels[i + 3] = a
-      else
-        setPixelRaw(c, xx, yy, color)
-      end if
-      xx = xx + 1
+  if x0 < x1 and y0 < y1 and a >= 255 then
+    rowStart = index(c, x0, y0)
+    rowBytes = (x1 - x0) * 4
+    c.pixels[rowStart] = r
+    c.pixels[rowStart + 1] = g
+    c.pixels[rowStart + 2] = b
+    c.pixels[rowStart + 3] = a
+    filled = 4
+    while filled < rowBytes
+      amount = filled
+      if amount > rowBytes - filled then amount = rowBytes - filled end if
+      copyBytes(c.pixels, rowStart + filled, c.pixels, rowStart, amount)
+      filled = filled + amount
     end while
-    yy = yy + 1
-  end while
+    yy = y0 + 1
+    while yy < y1
+      copyBytes(c.pixels, index(c, x0, yy), c.pixels, rowStart, rowBytes)
+      yy = yy + 1
+    end while
+  else
+    yy = y0
+    while yy < y1
+      xx = x0
+      while xx < x1
+        blendPixelRaw(c, xx, yy, color)
+        xx = xx + 1
+      end while
+      yy = yy + 1
+    end while
+  end if
   c.drawCalls = c.drawCalls + 1
 end function
 
@@ -338,27 +356,31 @@ function drawSpriteFast1x(c, spr, x, y)
     srcX = spr.sx + (x0 - x)
     si = ((srcY * spr.image.width) + srcX) * 4
     di = ((yy * c.width) + x0) * 4
-    xx = x0
-    while xx < x1
-      a = spr.image.pixels[si + 3]
-      if a >= 255 then
-        c.pixels[di] = spr.image.pixels[si]
-        c.pixels[di + 1] = spr.image.pixels[si + 1]
-        c.pixels[di + 2] = spr.image.pixels[si + 2]
-        c.pixels[di + 3] = 255
-      else
-        if a > 0 then
-          inv = 255 - a
-          c.pixels[di] = mt.clamp(mt.floorInt(((spr.image.pixels[si] * a) + (c.pixels[di] * inv)) / 255), 0, 255)
-          c.pixels[di + 1] = mt.clamp(mt.floorInt(((spr.image.pixels[si + 1] * a) + (c.pixels[di + 1] * inv)) / 255), 0, 255)
-          c.pixels[di + 2] = mt.clamp(mt.floorInt(((spr.image.pixels[si + 2] * a) + (c.pixels[di + 2] * inv)) / 255), 0, 255)
+    if spr.image.opaque then
+      copyBytes(c.pixels, di, spr.image.pixels, si, (x1 - x0) * 4)
+    else
+      xx = x0
+      while xx < x1
+        a = spr.image.pixels[si + 3]
+        if a >= 255 then
+          c.pixels[di] = spr.image.pixels[si]
+          c.pixels[di + 1] = spr.image.pixels[si + 1]
+          c.pixels[di + 2] = spr.image.pixels[si + 2]
           c.pixels[di + 3] = 255
+        else
+          if a > 0 then
+            inv = 255 - a
+            c.pixels[di] = mt.clamp(mt.floorInt(((spr.image.pixels[si] * a) + (c.pixels[di] * inv)) / 255), 0, 255)
+            c.pixels[di + 1] = mt.clamp(mt.floorInt(((spr.image.pixels[si + 1] * a) + (c.pixels[di + 1] * inv)) / 255), 0, 255)
+            c.pixels[di + 2] = mt.clamp(mt.floorInt(((spr.image.pixels[si + 2] * a) + (c.pixels[di + 2] * inv)) / 255), 0, 255)
+            c.pixels[di + 3] = 255
+          end if
         end if
-      end if
-      si = si + 4
-      di = di + 4
-      xx = xx + 1
-    end while
+        si = si + 4
+        di = di + 4
+        xx = xx + 1
+      end while
+    end if
     yy = yy + 1
   end while
   c.spriteCount = c.spriteCount + 1
