@@ -11,6 +11,24 @@ MiniPixels focuses on a small but working 2D engine slice: a Win32 window, fixed
 
 ![Moving Sprite](docs/images/moving-sprite.png)
 
+## API documentation
+
+Browse the committed [MiniDoc API reference](docs/api/markdown/README.md), or
+open `docs/api/html/index.html` locally for the searchable offline site. Source
+files use `//!` file documentation and `///` declaration comments with
+structured `@param` and `@returns` contracts.
+
+Regenerate both formats, or validate the source documentation without writing
+output:
+
+```powershell
+pwsh .\tools\generate_minidoc.ps1
+pwsh .\tools\generate_minidoc.ps1 -Check
+```
+
+The strict [`minidoc.toml`](minidoc.toml) configuration treats documentation
+diagnostics as failures.
+
 ## Requirements
 
 - Windows

@@ -1,0 +1,82 @@
+# Package `minipixels`
+
+[Home](README.md) · [Packages](Packages.md)
+
+## Files
+
+- [src/minipixels.ml](File-src-minipixels-ml-1730909391.md)
+
+## Symbols
+
+- [`minipixels.activeRenderer`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-activerenderer-function-activerenderer-game-src-minipixels-ml-1731526494) — function
+- [`minipixels.animation`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-animation-function-animation-maxframes-src-minipixels-ml-1356665698) — function
+- [`minipixels.animationFromSheet`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-animationfromsheet-function-animationfromsheet-sheet-start-count-duration-src-minipixels-ml-308571094) — function
+- [`minipixels.assetKindFromPack`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-assetkindfrompack-function-assetkindfrompack-assetpack-name-src-minipixels-ml-482972938) — function
+- [`minipixels.audioBackend`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiobackend-function-audiobackend-src-minipixels-ml-1835271036) — function
+- [`minipixels.audioClip`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audioclip-function-audioclip-path-name-src-minipixels-ml-515413188) — function
+- [`minipixels.audioClipFromBytes`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audioclipfrombytes-function-audioclipfrombytes-data-name-src-minipixels-ml-1400301461) — function
+- [`minipixels.audioMixer`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiomixer-function-audiomixer-maxchannels-src-minipixels-ml-246446996) — function
+- [`minipixels.audioState`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiostate-function-audiostate-src-minipixels-ml-872649788) — function
+- [`minipixels.audioSupportsMultipleSfx`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiosupportsmultiplesfx-function-audiosupportsmultiplesfx-src-minipixels-ml-155152452) — function
+- [`minipixels.audioSupportsVolumeControl`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiosupportsvolumecontrol-function-audiosupportsvolumecontrol-src-minipixels-ml-442255824) — function
+- [`minipixels.callIfFunction`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-calliffunction-function-calliffunction-fn-a-src-minipixels-ml-1622940695) — function
+- [`minipixels.callRender`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-callrender-function-callrender-fn-game-canvas-src-minipixels-ml-417238454) — function
+- [`minipixels.callUpdate`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-callupdate-function-callupdate-fn-game-dt-src-minipixels-ml-623549234) — function
+- [`minipixels.camera`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-camera-function-camera-width-height-src-minipixels-ml-1194025291) — function
+- [`minipixels.createConfig`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-createconfig-function-createconfig-title-width-height-scale-src-minipixels-ml-867415209) — function
+- [`minipixels.createGame`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-creategame-function-creategame-cfg-src-minipixels-ml-177514248) — function
+- [`minipixels.drawRectWorld`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-drawrectworld-function-drawrectworld-canvas-camera-x-y-w-h-color-src-minipixels-ml-629981828) — function
+- [`minipixels.drawSpriteWorld`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-drawspriteworld-function-drawspriteworld-canvas-camera-sprite-x-y-src-minipixels-ml-379099541) — function
+- [`minipixels.drawSpriteWorldEx`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-drawspriteworldex-function-drawspriteworldex-canvas-camera-sprite-x-y-flipx-flipy-scale-tint-src-minipixels-ml-480820627) — function
+- [`minipixels.drawText`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-drawtext-function-drawtext-canvas-text-x-y-scale-color-src-minipixels-ml-520545259) — function
+- [`minipixels.drawTextCentered`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-drawtextcentered-function-drawtextcentered-canvas-text-y-scale-color-src-minipixels-ml-1797824963) — function
+- [`minipixels.fillRectWorld`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-fillrectworld-function-fillrectworld-canvas-camera-x-y-w-h-color-src-minipixels-ml-1539538118) — function
+- [`minipixels.frameHash`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-framehash-function-framehash-canvas-src-minipixels-ml-1907773514) — function
+- [`minipixels.Game`](Type-minipixels-game-1761105865.md) — struct
+- [`minipixels.GameConfig`](Type-minipixels-gameconfig-282091547.md) — struct
+- [`minipixels.image`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-image-function-image-width-height-pixels-name-src-minipixels-ml-1561410215) — function
+- [`minipixels.inputDown`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-inputdown-function-inputdown-input-action-src-minipixels-ml-1105939080) — function
+- [`minipixels.inputPressed`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-inputpressed-function-inputpressed-input-action-src-minipixels-ml-574904456) — function
+- [`minipixels.inputReleased`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-inputreleased-function-inputreleased-input-action-src-minipixels-ml-2125100718) — function
+- [`minipixels.isGpuRenderer`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-isgpurenderer-function-isgpurenderer-game-src-minipixels-ml-1641277372) — function
+- [`minipixels.loadBytesFromPack`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-loadbytesfrompack-function-loadbytesfrompack-assetpack-name-src-minipixels-ml-594477536) — function
+- [`minipixels.loadPngFromPack`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-loadpngfrompack-function-loadpngfrompack-assetpack-name-src-minipixels-ml-560140056) — function
+- [`minipixels.mixerPlayMusic`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-mixerplaymusic-function-mixerplaymusic-mixer-clip-src-minipixels-ml-680020851) — function
+- [`minipixels.mixerPlaySfx`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-mixerplaysfx-function-mixerplaysfx-mixer-clip-src-minipixels-ml-1261022307) — function
+- [`minipixels.mixerStopAll`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-mixerstopall-function-mixerstopall-mixer-src-minipixels-ml-1666561493) — function
+- [`minipixels.musicClip`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-musicclip-function-musicclip-path-name-src-minipixels-ml-1876241718) — function
+- [`minipixels.openAssetPack`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-openassetpack-function-openassetpack-path-src-minipixels-ml-1608444883) — function
+- [`minipixels.playAudio`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-playaudio-function-playaudio-audio-clip-src-minipixels-ml-1404017418) — function
+- [`minipixels.playMusic`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-playmusic-function-playmusic-path-src-minipixels-ml-497976999) — function
+- [`minipixels.playMusicWithState`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-playmusicwithstate-function-playmusicwithstate-audio-path-src-minipixels-ml-57082401) — function
+- [`minipixels.playSfx`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-playsfx-function-playsfx-audio-path-src-minipixels-ml-1629492027) — function
+- [`minipixels.playSound`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-playsound-function-playsound-path-src-minipixels-ml-908724171) — function
+- [`minipixels.playSoundLoop`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-playsoundloop-function-playsoundloop-path-src-minipixels-ml-1662601623) — function
+- [`minipixels.playSoundSync`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-playsoundsync-function-playsoundsync-path-src-minipixels-ml-959644505) — function
+- [`minipixels.random`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-random-function-random-seed-src-minipixels-ml-1310410303) — function
+- [`minipixels.recti`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-recti-function-recti-x-y-w-h-src-minipixels-ml-1140640022) — function
+- [`minipixels.rendererFallbackReason`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-rendererfallbackreason-function-rendererfallbackreason-game-src-minipixels-ml-512016926) — function
+- [`minipixels.rgb`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-rgb-function-rgb-r-g-b-src-minipixels-ml-1814822953) — function
+- [`minipixels.rgba`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-rgba-function-rgba-r-g-b-a-src-minipixels-ml-66620594) — function
+- [`minipixels.run`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-run-function-run-cfg-initialize-update-render-shutdown-src-minipixels-ml-1457808081) — function
+- [`minipixels.runHeadless`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-runheadless-function-runheadless-cfg-initialize-update-render-shutdown-src-minipixels-ml-1345190063) — function
+- [`minipixels.setRenderer`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-setrenderer-function-setrenderer-cfg-renderer-src-minipixels-ml-2072096035) — function
+- [`minipixels.setScaleMode`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-setscalemode-function-setscalemode-cfg-mode-src-minipixels-ml-628364205) — function
+- [`minipixels.setSmoothing`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-setsmoothing-function-setsmoothing-cfg-enabled-src-minipixels-ml-2017300397) — function
+- [`minipixels.solidImage`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-solidimage-function-solidimage-width-height-color-name-src-minipixels-ml-358627443) — function
+- [`minipixels.spriteFromImage`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-spritefromimage-function-spritefromimage-img-name-src-minipixels-ml-927567202) — function
+- [`minipixels.spriteSheet`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-spritesheet-function-spritesheet-img-fw-fh-spacing-margin-src-minipixels-ml-2134396515) — function
+- [`minipixels.stopSound`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-stopsound-function-stopsound-src-minipixels-ml-1217573942) — function
+- [`minipixels.textWidth`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-textwidth-function-textwidth-text-scale-src-minipixels-ml-979331937) — function
+- [`minipixels.tileLayer`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-tilelayer-function-tilelayer-name-width-height-data-visible-collision-px-py-src-minipixels-ml-1882362233) — function
+- [`minipixels.tilemap`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-tilemap-function-tilemap-tilewidth-tileheight-width-height-tileset-maxlayers-src-minipixels-ml-1267631058) — function
+- [`minipixels.tileMoveAndCollide`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-tilemoveandcollide-function-tilemoveandcollide-map-rect-vx-vy-src-minipixels-ml-522107279) — function
+- [`minipixels.tileset`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-tileset-function-tileset-sheet-src-minipixels-ml-313027703) — function
+- [`minipixels.timer`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-timer-function-timer-seconds-repeat-src-minipixels-ml-74789418) — function
+- [`minipixels.useCpuRenderer`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-usecpurenderer-function-usecpurenderer-cfg-src-minipixels-ml-861003236) — function
+- [`minipixels.useFitScale`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-usefitscale-function-usefitscale-cfg-src-minipixels-ml-1517206112) — function
+- [`minipixels.useGpuRenderer`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-usegpurenderer-function-usegpurenderer-cfg-src-minipixels-ml-702356132) — function
+- [`minipixels.useIntegerScale`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-useintegerscale-function-useintegerscale-cfg-src-minipixels-ml-1916074690) — function
+- [`minipixels.useStretchScale`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-usestretchscale-function-usestretchscale-cfg-src-minipixels-ml-482967016) — function
+- [`minipixels.vec2`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-vec2-function-vec2-x-y-src-minipixels-ml-1313943249) — function
+- [`minipixels.version`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-version-function-version-src-minipixels-ml-86816988) — function

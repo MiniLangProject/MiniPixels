@@ -1,0 +1,101 @@
+# `minipixels.assets.pack.AssetPack`
+
+[Home](README.md) · [Source file](File-src-minipixels-assets-pack-ml-1157891367.md)
+
+<a id="struct-struct-minipixels-assets-pack-assetpack-struct-assetpack-src-minipixels-assets-pack-ml-775817831"></a>
+## AssetPack
+
+```ml
+struct AssetPack
+```
+
+Represents the asset pack data used by the minipixels assets pack module.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L15)
+
+## Members
+
+<a id="field-field-minipixels-assets-pack-assetpack-count-count-src-minipixels-assets-pack-ml-1711272198"></a>
+### count
+
+```ml
+count
+```
+
+Stores the count value associated with asset pack.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L29)
+
+<a id="field-field-minipixels-assets-pack-assetpack-data-data-src-minipixels-assets-pack-ml-37947814"></a>
+### data
+
+```ml
+data
+```
+
+Stores the data value associated with asset pack.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L19)
+
+<a id="field-field-minipixels-assets-pack-assetpack-kinds-kinds-src-minipixels-assets-pack-ml-1471208638"></a>
+### kinds
+
+```ml
+kinds
+```
+
+Stores the kinds value associated with asset pack.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L23)
+
+<a id="field-field-minipixels-assets-pack-assetpack-names-names-src-minipixels-assets-pack-ml-979745314"></a>
+### names
+
+```ml
+names
+```
+
+Stores the names value associated with asset pack.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L21)
+
+<a id="field-field-minipixels-assets-pack-assetpack-offsets-offsets-src-minipixels-assets-pack-ml-2049450334"></a>
+### offsets
+
+```ml
+offsets
+```
+
+Stores the offsets value associated with asset pack.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L25)
+
+<a id="field-field-minipixels-assets-pack-assetpack-path-path-src-minipixels-assets-pack-ml-2058340300"></a>
+### path
+
+```ml
+path
+```
+
+Stores the path value associated with asset pack.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L17)
+
+<a id="field-field-minipixels-assets-pack-assetpack-sizes-sizes-src-minipixels-assets-pack-ml-2075833842"></a>
+### sizes
+
+```ml
+sizes
+```
+
+Stores the sizes value associated with asset pack.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L27)

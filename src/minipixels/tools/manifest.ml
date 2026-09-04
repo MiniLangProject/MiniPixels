@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+
+//! Provides minipixels tools manifest facilities for this project.
+
 package minipixels.tools.manifest
 
 import minipixels.tools.json as json
@@ -5,42 +9,71 @@ import std.array as arr
 import std.fs as fs
 import std.string as str
 
+/// Represents the manifest data used by the minipixels tools manifest module.
 struct Manifest
+  /// Stores the path value associated with manifest.
   path
+  /// Stores the root value associated with manifest.
   root
+  /// Stores the name value associated with manifest.
   name
+  /// Stores the main value associated with manifest.
   main
+  /// Stores the title value associated with manifest.
   title
+  /// Stores the width value associated with manifest.
   width
+  /// Stores the height value associated with manifest.
   height
+  /// Stores the scale value associated with manifest.
   scale
+  /// Stores the asset count value associated with manifest.
   assetCount
+  /// Stores the level path value associated with manifest.
   levelPath
+  /// Stores the errors value associated with manifest.
   errors
+  /// Stores the warnings value associated with manifest.
   warnings
 end struct
 
+/// Creates manifest for the minipixels tools manifest module.
+/// @param path Path of the file or directory used by the operation.
+/// @param root root value consumed by this operation.
 function newManifest(path, root)
   return Manifest(path, root, "", "", "", 0, 0, 1, 0, "", [], [])
 end function
 
+/// Adds error to the state managed by the minipixels tools manifest module.
+/// @param m m value consumed by this operation.
+/// @param msg msg value consumed by this operation.
 function addError(m, msg)
   m.errors = arr.append(m.errors, msg)
 end function
 
+/// Adds warning to the state managed by the minipixels tools manifest module.
+/// @param m m value consumed by this operation.
+/// @param msg msg value consumed by this operation.
 function addWarning(m, msg)
   m.warnings = arr.append(m.warnings, msg)
 end function
 
+/// Returns whether valid satisfies the required condition.
+/// @param m m value consumed by this operation.
 function isValid(m)
   return m is Manifest and len(m.errors) == 0
 end function
 
+/// Performs the maxInt operation for the minipixels tools manifest module.
+/// @param a a value consumed by this operation.
+/// @param b b value consumed by this operation.
 function maxInt(a, b)
   if a > b then return a end if
   return b
 end function
 
+/// Performs the dirname operation for the minipixels tools manifest module.
+/// @param path Path of the file or directory used by the operation.
 function dirname(path)
   lastSlash = str.lastIndexOf(path, "\\")
   lastForward = str.lastIndexOf(path, "/")
@@ -50,10 +83,15 @@ function dirname(path)
   return str.substr(path, 0, last)
 end function
 
+/// Joins join for the minipixels tools manifest workflow.
+/// @param root root value consumed by this operation.
+/// @param rel rel value consumed by this operation.
 function join(root, rel)
   return fs.joinPath(root, rel)
 end function
 
+/// Performs the safeIdentifier operation for the minipixels tools manifest module.
+/// @param id Stable identifier of the affected item.
 function safeIdentifier(id)
   if typeof(id) != "string" then return false end if
   if len(id) == 0 then return false end if
@@ -66,6 +104,9 @@ function safeIdentifier(id)
   return true
 end function
 
+/// Returns whether the supplied data contains string.
+/// @param items Items consumed or updated by the operation.
+/// @param value Value consumed or transformed by the operation.
 function containsString(items, value)
   if typeof(items) != "array" then return false end if
   if len(items) <= 0 then return false end if
@@ -75,6 +116,10 @@ function containsString(items, value)
   return false
 end function
 
+/// Performs the requireField operation for the minipixels tools manifest module.
+/// @param m m value consumed by this operation.
+/// @param obj obj value consumed by this operation.
+/// @param key key value consumed by this operation.
 function requireField(m, obj, key)
   if json.has(obj, key) == false then
     addError(m, "missing required field '" + key + "'")
@@ -83,6 +128,11 @@ function requireField(m, obj, key)
   return true
 end function
 
+/// Performs the stringField operation for the minipixels tools manifest module.
+/// @param m m value consumed by this operation.
+/// @param obj obj value consumed by this operation.
+/// @param key key value consumed by this operation.
+/// @param required required value consumed by this operation.
 function stringField(m, obj, key, required)
   v = json.get(obj, key)
   if typeof(v) == "void" then
@@ -96,6 +146,12 @@ function stringField(m, obj, key, required)
   return v.stringValue
 end function
 
+/// Performs the numberField operation for the minipixels tools manifest module.
+/// @param m m value consumed by this operation.
+/// @param obj obj value consumed by this operation.
+/// @param key key value consumed by this operation.
+/// @param required required value consumed by this operation.
+/// @param fallback Value returned when no explicit result is available.
 function numberField(m, obj, key, required, fallback)
   v = json.get(obj, key)
   if typeof(v) == "void" then
@@ -109,6 +165,10 @@ function numberField(m, obj, key, required, fallback)
   return v.numberValue
 end function
 
+/// Validates asset for the minipixels tools manifest workflow.
+/// @param m m value consumed by this operation.
+/// @param asset asset value consumed by this operation.
+/// @param seen seen value consumed by this operation.
 function validateAsset(m, asset, seen)
   if typeof(asset) != "struct" or asset.kind != "object" then
     addError(m, "asset must be an object")
@@ -153,6 +213,9 @@ function validateAsset(m, asset, seen)
   return seen
 end function
 
+/// Validates assets for the minipixels tools manifest workflow.
+/// @param m m value consumed by this operation.
+/// @param root root value consumed by this operation.
 function validateAssets(m, root)
   assets = json.get(root, "assets")
   if typeof(assets) == "void" then return end if
@@ -168,6 +231,9 @@ function validateAssets(m, root)
   end for
 end function
 
+/// Validates levels for the minipixels tools manifest workflow.
+/// @param m m value consumed by this operation.
+/// @param root root value consumed by this operation.
 function validateLevels(m, root)
   levels = json.get(root, "levels")
   if typeof(levels) == "void" then return end if
@@ -182,6 +248,9 @@ function validateLevels(m, root)
   end if
 end function
 
+/// Validates root for the minipixels tools manifest workflow.
+/// @param m m value consumed by this operation.
+/// @param root root value consumed by this operation.
 function validateRoot(m, root)
   if typeof(root) != "struct" or root.kind != "object" then
     addError(m, "manifest root must be an object")
@@ -218,6 +287,10 @@ function validateRoot(m, root)
   return m
 end function
 
+/// Parses text for the minipixels tools manifest workflow.
+/// @param text Text consumed by the operation.
+/// @param source source value consumed by this operation.
+/// @param root root value consumed by this operation.
 function parseText(text, source, root)
   parsed = try(json.parse(text))
   m = newManifest(source, root)
@@ -228,6 +301,8 @@ function parseText(text, source, root)
   return validateRoot(m, parsed)
 end function
 
+/// Loads load for the minipixels tools manifest module.
+/// @param path Path of the file or directory used by the operation.
 function load(path)
   root = dirname(path)
   text = try(fs.readAllText(path))
@@ -239,6 +314,8 @@ function load(path)
   return parseText(text, path, root)
 end function
 
+/// Prints report for the minipixels tools manifest workflow.
+/// @param m m value consumed by this operation.
 function printReport(m)
   if m is not Manifest then
     print "manifest: invalid report"

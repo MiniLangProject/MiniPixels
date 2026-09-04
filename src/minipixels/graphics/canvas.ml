@@ -1,107 +1,224 @@
+// SPDX-License-Identifier: Apache-2.0
+
+//! Provides minipixels graphics canvas facilities for this project.
+
 package minipixels.graphics.canvas
 
 import minipixels.math.types as mt
 import minipixels.graphics.sprite as sp
 
+/// Represents the canvas data used by the minipixels graphics canvas module.
 struct Canvas
+  /// Stores the width value associated with canvas.
   width as int
+  /// Stores the height value associated with canvas.
   height as int
+  /// Stores the pixels value associated with canvas.
   pixels as bytes
+  /// Stores the camera x value associated with canvas.
   cameraX
+  /// Stores the camera y value associated with canvas.
   cameraY
+  /// Stores the sprite count value associated with canvas.
   spriteCount as int
+  /// Stores the tile count value associated with canvas.
   tileCount as int
+  /// Stores the draw calls value associated with canvas.
   drawCalls as int
 
+  /// Clears clear maintained by the minipixels graphics canvas module.
+  /// @param color color value consumed by this operation.
   function clear(color)
     return minipixels.graphics.canvas.clearCanvas(this, color)
   end function
 
+  /// Updates pixel maintained by the minipixels graphics canvas module.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param color color value consumed by this operation.
   function setPixel(x, y, color)
     return minipixels.graphics.canvas.setPixel(this, x, y, color)
   end function
 
+  /// Returns pixel maintained by the minipixels graphics canvas module.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
   function getPixel(x, y)
     return minipixels.graphics.canvas.getPixel(this, x, y)
   end function
 
+  /// Draws line through the minipixels graphics canvas rendering path.
+  /// @param x1 x1 value consumed by this operation.
+  /// @param y1 y1 value consumed by this operation.
+  /// @param x2 x2 value consumed by this operation.
+  /// @param y2 y2 value consumed by this operation.
+  /// @param color color value consumed by this operation.
   function drawLine(x1, y1, x2, y2, color)
     return minipixels.graphics.canvas.drawLine(this, x1, y1, x2, y2, color)
   end function
 
+  /// Draws rect through the minipixels graphics canvas rendering path.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param w w value consumed by this operation.
+  /// @param h h value consumed by this operation.
+  /// @param color color value consumed by this operation.
   function drawRect(x, y, w, h, color)
     return minipixels.graphics.canvas.drawRect(this, x, y, w, h, color)
   end function
 
+  /// Performs the fillRect operation for the minipixels graphics canvas canvas module.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param w w value consumed by this operation.
+  /// @param h h value consumed by this operation.
+  /// @param color color value consumed by this operation.
   function fillRect(x, y, w, h, color)
     return minipixels.graphics.canvas.fillRect(this, x, y, w, h, color)
   end function
 
+  /// Draws circle through the minipixels graphics canvas rendering path.
+  /// @param cx cx value consumed by this operation.
+  /// @param cy cy value consumed by this operation.
+  /// @param r r value consumed by this operation.
+  /// @param color color value consumed by this operation.
   function drawCircle(cx, cy, r, color)
     return minipixels.graphics.canvas.drawCircle(this, cx, cy, r, color)
   end function
 
+  /// Performs the fillCircle operation for the minipixels graphics canvas canvas module.
+  /// @param cx cx value consumed by this operation.
+  /// @param cy cy value consumed by this operation.
+  /// @param r r value consumed by this operation.
+  /// @param color color value consumed by this operation.
   function fillCircle(cx, cy, r, color)
     return minipixels.graphics.canvas.fillCircle(this, cx, cy, r, color)
   end function
 
+  /// Performs the blit operation for the minipixels graphics canvas canvas module.
+  /// @param image image value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
   function blit(image, x, y)
     return minipixels.graphics.canvas.blitImage(this, image, x, y)
   end function
 
+  /// Performs the blitRegion operation for the minipixels graphics canvas canvas module.
+  /// @param image image value consumed by this operation.
+  /// @param sx sx value consumed by this operation.
+  /// @param sy sy value consumed by this operation.
+  /// @param sw sw value consumed by this operation.
+  /// @param sh sh value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
   function blitRegion(image, sx, sy, sw, sh, x, y)
     return minipixels.graphics.canvas.blitRegion(this, image, sx, sy, sw, sh, x, y)
   end function
 
+  /// Draws sprite through the minipixels graphics canvas rendering path.
+  /// @param sprite sprite value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
   function drawSprite(sprite, x, y)
     return minipixels.graphics.canvas.drawSprite(this, sprite, x, y)
   end function
 
+  /// Draws sprite ex through the minipixels graphics canvas rendering path.
+  /// @param sprite sprite value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param flipX flipX value consumed by this operation.
+  /// @param flipY flipY value consumed by this operation.
+  /// @param scale scale value consumed by this operation.
+  /// @param tint tint value consumed by this operation.
   function drawSpriteEx(sprite, x, y, flipX, flipY, scale, tint)
     return minipixels.graphics.canvas.drawSpriteEx(this, sprite, x, y, flipX, flipY, scale, tint)
   end function
 
+  /// Performs the fillRectWorld operation for the minipixels graphics canvas canvas module.
+  /// @param camera camera value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param w w value consumed by this operation.
+  /// @param h h value consumed by this operation.
+  /// @param color color value consumed by this operation.
   function fillRectWorld(camera, x, y, w, h, color)
     return minipixels.graphics.canvas.fillRectWorld(this, camera, x, y, w, h, color)
   end function
 
+  /// Draws rect world through the minipixels graphics canvas rendering path.
+  /// @param camera camera value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param w w value consumed by this operation.
+  /// @param h h value consumed by this operation.
+  /// @param color color value consumed by this operation.
   function drawRectWorld(camera, x, y, w, h, color)
     return minipixels.graphics.canvas.drawRectWorld(this, camera, x, y, w, h, color)
   end function
 
+  /// Draws sprite world through the minipixels graphics canvas rendering path.
+  /// @param camera camera value consumed by this operation.
+  /// @param sprite sprite value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
   function drawSpriteWorld(camera, sprite, x, y)
     return minipixels.graphics.canvas.drawSpriteWorld(this, camera, sprite, x, y)
   end function
 
+  /// Draws sprite world ex through the minipixels graphics canvas rendering path.
+  /// @param camera camera value consumed by this operation.
+  /// @param sprite sprite value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param flipX flipX value consumed by this operation.
+  /// @param flipY flipY value consumed by this operation.
+  /// @param scale scale value consumed by this operation.
+  /// @param tint tint value consumed by this operation.
   function drawSpriteWorldEx(camera, sprite, x, y, flipX, flipY, scale, tint)
     return minipixels.graphics.canvas.drawSpriteWorldEx(this, camera, sprite, x, y, flipX, flipY, scale, tint)
   end function
 
+  /// Performs the beginCamera operation for the minipixels graphics canvas canvas module.
+  /// @param camera camera value consumed by this operation.
   function beginCamera(camera)
     this.cameraX = camera.x
     this.cameraY = camera.y
   end function
 
+  /// Performs the endCamera operation for the minipixels graphics canvas canvas module.
   function endCamera()
     this.cameraX = 0
     this.cameraY = 0
   end function
 end struct
 
+/// Creates create for the minipixels graphics canvas module.
+/// @param width Width in the coordinate or storage units used by the caller.
+/// @param height Height in the coordinate or storage units used by the caller.
 function create(width, height)
   return Canvas(width, height, bytes(width * height * 4, 0), 0, 0, 0, 0, 0)
 end function
 
+/// Performs the resetStats operation for the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
 function resetStats(c)
   c.spriteCount = 0
   c.tileCount = 0
   c.drawCalls = 0
 end function
 
+/// Performs the index operation for the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
 function inline index(c, x, y)
   return ((y * c.width) + x) * 4
 end function
 
+/// Clears canvas maintained by the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
+/// @param color color value consumed by this operation.
 function clearCanvas(c, color)
   r = mt.colorR(color)
   g = mt.colorG(color)
@@ -124,6 +241,11 @@ function clearCanvas(c, color)
   c.drawCalls = c.drawCalls + 1
 end function
 
+/// Updates pixel maintained by the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param color color value consumed by this operation.
 function setPixel(c, x, y, color)
   x = mt.floorInt(x - c.cameraX)
   y = mt.floorInt(y - c.cameraY)
@@ -136,6 +258,11 @@ function setPixel(c, x, y, color)
   return true
 end function
 
+/// Performs the blendPixelRaw operation for the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param color color value consumed by this operation.
 function blendPixelRaw(c, x, y, color)
   if x < 0 or y < 0 or x >= c.width or y >= c.height then return false end if
   i = index(c, x, y)
@@ -148,6 +275,10 @@ function blendPixelRaw(c, x, y, color)
   return true
 end function
 
+/// Returns pixel maintained by the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
 function getPixel(c, x, y)
   x = mt.floorInt(x - c.cameraX)
   y = mt.floorInt(y - c.cameraY)
@@ -156,6 +287,11 @@ function getPixel(c, x, y)
   return mt.rgba(c.pixels[i], c.pixels[i + 1], c.pixels[i + 2], c.pixels[i + 3])
 end function
 
+/// Performs the blendPixel operation for the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param color color value consumed by this operation.
 function blendPixel(c, x, y, color)
   if mt.colorA(color) >= 255 then
     return setPixel(c, x, y, color)
@@ -164,6 +300,11 @@ function blendPixel(c, x, y, color)
   return setPixel(c, x, y, mt.alphaBlend(dst, color))
 end function
 
+/// Draws pixel fast through the minipixels graphics canvas rendering path.
+/// @param c c value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param color color value consumed by this operation.
 function drawPixelFast(c, x, y, color)
   if x < 0 or y < 0 or x >= c.width or y >= c.height then return false end if
   a = mt.colorA(color)
@@ -179,6 +320,13 @@ function drawPixelFast(c, x, y, color)
   return blendPixel(c, x, y, color)
 end function
 
+/// Performs the fillRect operation for the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param w w value consumed by this operation.
+/// @param h h value consumed by this operation.
+/// @param color color value consumed by this operation.
 function fillRect(c, x, y, w, h, color)
   if w <= 0 or h <= 0 then return end if
   x = mt.floorInt(x - c.cameraX)
@@ -226,6 +374,13 @@ function fillRect(c, x, y, w, h, color)
   c.drawCalls = c.drawCalls + 1
 end function
 
+/// Draws rect through the minipixels graphics canvas rendering path.
+/// @param c c value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param w w value consumed by this operation.
+/// @param h h value consumed by this operation.
+/// @param color color value consumed by this operation.
 function drawRect(c, x, y, w, h, color)
   drawLine(c, x, y, x + w - 1, y, color)
   drawLine(c, x, y + h - 1, x + w - 1, y + h - 1, color)
@@ -233,6 +388,13 @@ function drawRect(c, x, y, w, h, color)
   drawLine(c, x + w - 1, y, x + w - 1, y + h - 1, color)
 end function
 
+/// Draws line through the minipixels graphics canvas rendering path.
+/// @param c c value consumed by this operation.
+/// @param x1 x1 value consumed by this operation.
+/// @param y1 y1 value consumed by this operation.
+/// @param x2 x2 value consumed by this operation.
+/// @param y2 y2 value consumed by this operation.
+/// @param color color value consumed by this operation.
 function drawLine(c, x1, y1, x2, y2, color)
   x1 = mt.floorInt(x1)
   y1 = mt.floorInt(y1)
@@ -261,6 +423,12 @@ function drawLine(c, x1, y1, x2, y2, color)
   c.drawCalls = c.drawCalls + 1
 end function
 
+/// Draws circle through the minipixels graphics canvas rendering path.
+/// @param c c value consumed by this operation.
+/// @param cx cx value consumed by this operation.
+/// @param cy cy value consumed by this operation.
+/// @param r r value consumed by this operation.
+/// @param color color value consumed by this operation.
 function drawCircle(c, cx, cy, r, color)
   x = r
   y = 0
@@ -285,6 +453,12 @@ function drawCircle(c, cx, cy, r, color)
   c.drawCalls = c.drawCalls + 1
 end function
 
+/// Performs the fillCircle operation for the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
+/// @param cx cx value consumed by this operation.
+/// @param cy cy value consumed by this operation.
+/// @param r r value consumed by this operation.
+/// @param color color value consumed by this operation.
 function fillCircle(c, cx, cy, r, color)
   y = 0 - r
   while y <= r
@@ -300,19 +474,44 @@ function fillCircle(c, cx, cy, r, color)
   c.drawCalls = c.drawCalls + 1
 end function
 
+/// Performs the blitImage operation for the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
+/// @param img img value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
 function blitImage(c, img, x, y)
   return blitRegion(c, img, 0, 0, img.width, img.height, x, y)
 end function
 
+/// Performs the blitRegion operation for the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
+/// @param img img value consumed by this operation.
+/// @param sx sx value consumed by this operation.
+/// @param sy sy value consumed by this operation.
+/// @param sw sw value consumed by this operation.
+/// @param sh sh value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
 function blitRegion(c, img, sx, sy, sw, sh, x, y)
   spr = sp.Sprite(img, sx, sy, sw, sh, 0, 0, img.name)
   return drawSpriteEx(c, spr, x, y, false, false, 1, mt.rgba(255, 255, 255, 255))
 end function
 
+/// Draws sprite through the minipixels graphics canvas rendering path.
+/// @param c c value consumed by this operation.
+/// @param spr spr value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
 function drawSprite(c, spr, x, y)
   return drawSpriteEx(c, spr, x, y, false, false, 1, mt.rgba(255, 255, 255, 255))
 end function
 
+/// Performs the fillScaledPixel operation for the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param scale scale value consumed by this operation.
+/// @param color color value consumed by this operation.
 function fillScaledPixel(c, x, y, scale, color)
   a = mt.colorA(color)
   if a <= 0 then return end if
@@ -343,6 +542,11 @@ function fillScaledPixel(c, x, y, scale, color)
   end while
 end function
 
+/// Draws sprite fast1x through the minipixels graphics canvas rendering path.
+/// @param c c value consumed by this operation.
+/// @param spr spr value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
 function drawSpriteFast1x(c, spr, x, y)
   x0 = mt.clamp(x, 0, c.width)
   y0 = mt.clamp(y, 0, c.height)
@@ -387,6 +591,15 @@ function drawSpriteFast1x(c, spr, x, y)
   c.drawCalls = c.drawCalls + 1
 end function
 
+/// Draws sprite ex through the minipixels graphics canvas rendering path.
+/// @param c c value consumed by this operation.
+/// @param spr spr value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param flipX flipX value consumed by this operation.
+/// @param flipY flipY value consumed by this operation.
+/// @param scale scale value consumed by this operation.
+/// @param tint tint value consumed by this operation.
 function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
   if typeof(scale) != "int" or scale < 1 then scale = 1 end if
   x = mt.floorInt(x - spr.pivotX)
@@ -423,30 +636,70 @@ function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
   c.drawCalls = c.drawCalls + 1
 end function
 
+/// Performs the screenX operation for the minipixels graphics canvas module.
+/// @param camera camera value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
 function screenX(camera, x)
   return x - camera.x
 end function
 
+/// Performs the screenY operation for the minipixels graphics canvas module.
+/// @param camera camera value consumed by this operation.
+/// @param y Vertical coordinate used by the operation.
 function screenY(camera, y)
   return y - camera.y
 end function
 
+/// Performs the fillRectWorld operation for the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
+/// @param camera camera value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param w w value consumed by this operation.
+/// @param h h value consumed by this operation.
+/// @param color color value consumed by this operation.
 function fillRectWorld(c, camera, x, y, w, h, color)
   return fillRect(c, screenX(camera, x), screenY(camera, y), w, h, color)
 end function
 
+/// Draws rect world through the minipixels graphics canvas rendering path.
+/// @param c c value consumed by this operation.
+/// @param camera camera value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param w w value consumed by this operation.
+/// @param h h value consumed by this operation.
+/// @param color color value consumed by this operation.
 function drawRectWorld(c, camera, x, y, w, h, color)
   return drawRect(c, screenX(camera, x), screenY(camera, y), w, h, color)
 end function
 
+/// Draws sprite world through the minipixels graphics canvas rendering path.
+/// @param c c value consumed by this operation.
+/// @param camera camera value consumed by this operation.
+/// @param spr spr value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
 function drawSpriteWorld(c, camera, spr, x, y)
   return drawSprite(c, spr, screenX(camera, x), screenY(camera, y))
 end function
 
+/// Draws sprite world ex through the minipixels graphics canvas rendering path.
+/// @param c c value consumed by this operation.
+/// @param camera camera value consumed by this operation.
+/// @param spr spr value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param flipX flipX value consumed by this operation.
+/// @param flipY flipY value consumed by this operation.
+/// @param scale scale value consumed by this operation.
+/// @param tint tint value consumed by this operation.
 function drawSpriteWorldEx(c, camera, spr, x, y, flipX, flipY, scale, tint)
   return drawSpriteEx(c, spr, screenX(camera, x), screenY(camera, y), flipX, flipY, scale, tint)
 end function
 
+/// Performs the hash operation for the minipixels graphics canvas module.
+/// @param c c value consumed by this operation.
 function hash(c)
   h = 2166136261
   for each b in c.pixels

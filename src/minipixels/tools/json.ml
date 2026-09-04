@@ -1,64 +1,116 @@
+// SPDX-License-Identifier: Apache-2.0
+
+//! Provides minipixels tools json facilities for this project.
+
 package minipixels.tools.json
 
 import std.ds.list as list
 import std.string as str
 import std.string_builder as sb
 
+/// Represents the json value data used by the minipixels tools json module.
 struct JsonValue
+  /// Stores the kind value associated with json value.
   kind
+  /// Stores the string value value associated with json value.
   stringValue
+  /// Stores the number value value associated with json value.
   numberValue
+  /// Stores the bool value value associated with json value.
   boolValue
+  /// Stores the array items value associated with json value.
   arrayItems
+  /// Stores the object keys value associated with json value.
   objectKeys
+  /// Stores the object values value associated with json value.
   objectValues
 end struct
 
+/// Represents the parser data used by the minipixels tools json module.
 struct Parser
+  /// Stores the text value associated with parser.
   text
+  /// Stores the pos value associated with parser.
   pos
+  /// Stores the failed value associated with parser.
   failed
+  /// Stores the message value associated with parser.
   message
 end struct
 
+/// Performs the value operation for the minipixels tools json module.
+/// @param kind kind value consumed by this operation.
+/// @param s s value consumed by this operation.
+/// @param n n value consumed by this operation.
+/// @param b b value consumed by this operation.
+/// @param items Items consumed or updated by the operation.
+/// @param keys keys value consumed by this operation.
+/// @param vals vals value consumed by this operation.
 function value(kind, s, n, b, items, keys, vals)
   return JsonValue(kind, s, n, b, items, keys, vals)
 end function
 
+/// Performs the null operation for the minipixels tools json module.
 function null() return value("null", "", 0, false, [], [], []) end function
+/// Performs the string operation for the minipixels tools json module.
+/// @param s s value consumed by this operation.
 function string(s) return value("string", s, 0, false, [], [], []) end function
+/// Performs the number operation for the minipixels tools json module.
+/// @param n n value consumed by this operation.
 function number(n) return value("number", "", n, false, [], [], []) end function
+/// Performs the bool operation for the minipixels tools json module.
+/// @param v v value consumed by this operation.
 function bool(v) return value("bool", "", 0, v, [], [], []) end function
+/// Performs the array operation for the minipixels tools json module.
+/// @param items Items consumed or updated by the operation.
 function array(items) return value("array", "", 0, false, items, [], []) end function
+/// Performs the object operation for the minipixels tools json module.
+/// @param keys keys value consumed by this operation.
+/// @param vals vals value consumed by this operation.
 function object(keys, vals) return value("object", "", 0, false, [], keys, vals) end function
 
+/// Performs the parser operation for the minipixels tools json module.
+/// @param text Text consumed by the operation.
 function parser(text)
   return Parser(text, 0, false, "")
 end function
 
+/// Returns whether digit satisfies the required condition.
+/// @param ch ch value consumed by this operation.
 function isDigit(ch)
   return str.contains("0123456789", ch)
 end function
 
+/// Returns whether hex satisfies the required condition.
+/// @param ch ch value consumed by this operation.
 function isHex(ch)
   return str.contains("0123456789abcdefABCDEF", ch)
 end function
 
+/// Performs the atEnd operation for the minipixels tools json module.
+/// @param p p value consumed by this operation.
 function atEnd(p)
   return p.pos >= len(p.text)
 end function
 
+/// Performs the peek operation for the minipixels tools json module.
+/// @param p p value consumed by this operation.
 function peek(p)
   if atEnd(p) then return "" end if
   return p.text[p.pos]
 end function
 
+/// Performs the advance operation for the minipixels tools json module.
+/// @param p p value consumed by this operation.
 function advance(p)
   ch = peek(p)
   p.pos = p.pos + 1
   return ch
 end function
 
+/// Updates error maintained by the minipixels tools json module.
+/// @param p p value consumed by this operation.
+/// @param msg msg value consumed by this operation.
 function setError(p, msg)
   if p.failed == false then
     p.failed = true
@@ -67,6 +119,8 @@ function setError(p, msg)
   return
 end function
 
+/// Performs the skipWhitespace operation for the minipixels tools json module.
+/// @param p p value consumed by this operation.
 function skipWhitespace(p)
   while atEnd(p) == false
     ch = peek(p)
@@ -78,6 +132,9 @@ function skipWhitespace(p)
   end while
 end function
 
+/// Performs the lineCol operation for the minipixels tools json module.
+/// @param text Text consumed by the operation.
+/// @param pos pos value consumed by this operation.
 function lineCol(text, pos)
   line = 1
   col = 1
@@ -94,10 +151,16 @@ function lineCol(text, pos)
   return "line " + line + ", col " + col
 end function
 
+/// Parses error for the minipixels tools json workflow.
+/// @param p p value consumed by this operation.
 function parseError(p)
   return error(9100, p.message + " at " + lineCol(p.text, p.pos))
 end function
 
+/// Performs the expect operation for the minipixels tools json module.
+/// @param p p value consumed by this operation.
+/// @param ch ch value consumed by this operation.
+/// @param msg msg value consumed by this operation.
 function expect(p, ch, msg)
   if peek(p) != ch then
     setError(p, msg)
@@ -107,6 +170,8 @@ function expect(p, ch, msg)
   return true
 end function
 
+/// Parses string value for the minipixels tools json workflow.
+/// @param p p value consumed by this operation.
 function parseStringValue(p)
   if expect(p, "\"", "expected string") == false then return end if
   result = sb.StringBuilder.withCapacity(32)
@@ -150,6 +215,9 @@ function parseStringValue(p)
   return
 end function
 
+/// Performs the matchLiteral operation for the minipixels tools json module.
+/// @param p p value consumed by this operation.
+/// @param lit lit value consumed by this operation.
 function matchLiteral(p, lit)
   n = len(lit)
   if p.pos + n > len(p.text) then return false end if
@@ -158,6 +226,8 @@ function matchLiteral(p, lit)
   return true
 end function
 
+/// Parses number value for the minipixels tools json workflow.
+/// @param p p value consumed by this operation.
 function parseNumberValue(p)
   start = p.pos
   if peek(p) == "-" then p.pos = p.pos + 1 end if
@@ -206,6 +276,8 @@ function parseNumberValue(p)
   return number(n)
 end function
 
+/// Parses array value for the minipixels tools json workflow.
+/// @param p p value consumed by this operation.
 function parseArrayValue(p)
   expect(p, "[", "expected array")
   items = list.List.new()
@@ -234,6 +306,8 @@ function parseArrayValue(p)
   return
 end function
 
+/// Parses object value for the minipixels tools json workflow.
+/// @param p p value consumed by this operation.
 function parseObjectValue(p)
   expect(p, "{", "expected object")
   keys = list.List.new()
@@ -269,6 +343,8 @@ function parseObjectValue(p)
   return
 end function
 
+/// Parses value for the minipixels tools json workflow.
+/// @param p p value consumed by this operation.
 function parseValue(p)
   skipWhitespace(p)
   ch = peek(p)
@@ -283,6 +359,8 @@ function parseValue(p)
   return
 end function
 
+/// Parses parse for the minipixels tools json workflow.
+/// @param text Text consumed by the operation.
 function parse(text)
   if typeof(text) != "string" then return error(9100, "parse: expected string") end if
   p = parser(text)
@@ -296,6 +374,9 @@ function parse(text)
   return v
 end function
 
+/// Returns get maintained by the minipixels tools json module.
+/// @param obj obj value consumed by this operation.
+/// @param key key value consumed by this operation.
 function get(obj, key)
   if obj is not JsonValue then return end if
   if obj.kind != "object" then return end if
@@ -306,10 +387,16 @@ function get(obj, key)
   return
 end function
 
+/// Returns whether has is available.
+/// @param obj obj value consumed by this operation.
+/// @param key key value consumed by this operation.
 function has(obj, key)
   return typeof(get(obj, key)) != "void"
 end function
 
+/// Performs the at operation for the minipixels tools json module.
+/// @param v v value consumed by this operation.
+/// @param index Zero-based index of the affected item.
 function at(v, index)
   if v is not JsonValue then return end if
   if v.kind != "array" then return end if
@@ -317,21 +404,32 @@ function at(v, index)
   return v.arrayItems[index]
 end function
 
+/// Performs the asString operation for the minipixels tools json module.
+/// @param v v value consumed by this operation.
+/// @param fallback Value returned when no explicit result is available.
 function asString(v, fallback)
   if v is JsonValue and v.kind == "string" then return v.stringValue end if
   return fallback
 end function
 
+/// Performs the asNumber operation for the minipixels tools json module.
+/// @param v v value consumed by this operation.
+/// @param fallback Value returned when no explicit result is available.
 function asNumber(v, fallback)
   if v is JsonValue and v.kind == "number" then return v.numberValue end if
   return fallback
 end function
 
+/// Performs the asBool operation for the minipixels tools json module.
+/// @param v v value consumed by this operation.
+/// @param fallback Value returned when no explicit result is available.
 function asBool(v, fallback)
   if v is JsonValue and v.kind == "bool" then return v.boolValue end if
   return fallback
 end function
 
+/// Performs the lenOf operation for the minipixels tools json module.
+/// @param v v value consumed by this operation.
 function lenOf(v)
   if v is not JsonValue then return 0 end if
   if v.kind == "array" then return len(v.arrayItems) end if

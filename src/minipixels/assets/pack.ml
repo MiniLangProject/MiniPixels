@@ -1,34 +1,57 @@
+// SPDX-License-Identifier: Apache-2.0
+
+//! Provides minipixels assets pack facilities for this project.
+
 package minipixels.assets.pack
 
 import std.fs as fs
 import std.bytes as by
 import minipixels.assets.png as png
 
+/// Defines the pack err constant used by the minipixels assets pack module.
 const PACK_ERR = 9302
 
+/// Represents the asset pack data used by the minipixels assets pack module.
 struct AssetPack
+  /// Stores the path value associated with asset pack.
   path
+  /// Stores the data value associated with asset pack.
   data
+  /// Stores the names value associated with asset pack.
   names
+  /// Stores the kinds value associated with asset pack.
   kinds
+  /// Stores the offsets value associated with asset pack.
   offsets
+  /// Stores the sizes value associated with asset pack.
   sizes
+  /// Stores the count value associated with asset pack.
   count
 end struct
 
+/// Performs the packError operation for the minipixels assets pack module.
+/// @param message Human-readable message associated with the operation.
 function packError(message)
   return error(PACK_ERR, message)
 end function
 
+/// Returns whether range is available.
+/// @param data Input data consumed by the operation.
+/// @param offset Zero-based offset at which processing starts.
+/// @param size Size in the units required by the operation.
 function hasRange(data, offset, size)
   return typeof(data) == "bytes" and offset >= 0 and size >= 0 and offset + size <= len(data)
 end function
 
+/// Returns whether pack satisfies the required condition.
+/// @param data Input data consumed by the operation.
 function isPack(data)
   if not hasRange(data, 0, 8) then return false end if
   return data[0] == 77 and data[1] == 80 and data[2] == 88 and data[3] == 49
 end function
 
+/// Opens open for the minipixels assets pack module.
+/// @param path Path of the file or directory used by the operation.
 function open(path)
   data = try(fs.readAllBytes(path))
   if typeof(data) == "error" then return data end if
@@ -65,6 +88,9 @@ function open(path)
   return AssetPack(path, data, names, kinds, offsets, sizes, count)
 end function
 
+/// Finds find used by the minipixels assets pack module.
+/// @param pack pack value consumed by this operation.
+/// @param name Name of the affected item.
 function find(pack, name)
   if not (pack is AssetPack) then return -1 end if
   i = 0
@@ -75,18 +101,27 @@ function find(pack, name)
   return -1
 end function
 
+/// Returns bytes maintained by the minipixels assets pack module.
+/// @param pack pack value consumed by this operation.
+/// @param name Name of the affected item.
 function getBytes(pack, name)
   index = find(pack, name)
   if index < 0 then return packError("asset not found: " + name) end if
   return slice(pack.data, pack.offsets[index], pack.sizes[index])
 end function
 
+/// Returns kind maintained by the minipixels assets pack module.
+/// @param pack pack value consumed by this operation.
+/// @param name Name of the affected item.
 function getKind(pack, name)
   index = find(pack, name)
   if index < 0 then return -1 end if
   return pack.kinds[index]
 end function
 
+/// Loads png for the minipixels assets pack module.
+/// @param pack pack value consumed by this operation.
+/// @param name Name of the affected item.
 function loadPng(pack, name)
   payload = getBytes(pack, name)
   if typeof(payload) == "error" then return payload end if

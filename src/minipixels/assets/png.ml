@@ -1,23 +1,38 @@
+// SPDX-License-Identifier: Apache-2.0
+
+//! Provides minipixels assets png facilities for this project.
+
 package minipixels.assets.png
 
 import std.bytes as by
 import minipixels.graphics.sprite as sp
 
+/// Defines the png err constant used by the minipixels assets png module.
 const PNG_ERR = 9301
 
+/// Performs the pngError operation for the minipixels assets png module.
+/// @param message Human-readable message associated with the operation.
 function pngError(message)
   return error(PNG_ERR, message)
 end function
 
+/// Returns whether range is available.
+/// @param data Input data consumed by the operation.
+/// @param offset Zero-based offset at which processing starts.
+/// @param size Size in the units required by the operation.
 function hasRange(data, offset, size)
   return typeof(data) == "bytes" and offset >= 0 and size >= 0 and offset + size <= len(data)
 end function
 
+/// Returns whether png satisfies the required condition.
+/// @param data Input data consumed by the operation.
 function isPng(data)
   if not hasRange(data, 0, 8) then return false end if
   return data[0] == 137 and data[1] == 80 and data[2] == 78 and data[3] == 71 and data[4] == 13 and data[5] == 10 and data[6] == 26 and data[7] == 10
 end function
 
+/// Performs the inflateStored operation for the minipixels assets png module.
+/// @param z z value consumed by this operation.
 function inflateStored(z)
   if not hasRange(z, 0, 6) then return pngError("png zlib stream too small") end if
   pos = 2
@@ -56,6 +71,9 @@ function inflateStored(z)
   return result
 end function
 
+/// Decodes decode for the minipixels assets png workflow.
+/// @param data Input data consumed by the operation.
+/// @param name Name of the affected item.
 function decode(data, name)
   if not isPng(data) then return pngError("not a png") end if
   pos = 8

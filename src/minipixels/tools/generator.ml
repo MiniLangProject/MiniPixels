@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+
+//! Provides minipixels tools generator facilities for this project.
+
 package minipixels.tools.generator
 
 import minipixels.tools.fsutil as fsu
@@ -7,59 +11,98 @@ import std.array as arr
 import std.fs as fs
 import std.string_builder as sb
 
+/// Represents the generate result data used by the minipixels tools generator module.
 struct GenerateResult
+  /// Stores the ok value associated with generate result.
   ok
+  /// Stores the out dir value associated with generate result.
   outDir
+  /// Stores the warnings value associated with generate result.
   warnings
+  /// Stores the errors value associated with generate result.
   errors
 end struct
 
+/// Performs the result operation for the minipixels tools generator module.
+/// @param outDir outDir value consumed by this operation.
 function result(outDir)
   return GenerateResult(true, outDir, [], [])
 end function
 
+/// Adds warning to the state managed by the minipixels tools generator module.
+/// @param r r value consumed by this operation.
+/// @param msg msg value consumed by this operation.
 function addWarning(r, msg)
   r.warnings = arr.append(r.warnings, msg)
 end function
 
+/// Adds error to the state managed by the minipixels tools generator module.
+/// @param r r value consumed by this operation.
+/// @param msg msg value consumed by this operation.
 function addError(r, msg)
   r.ok = false
   r.errors = arr.append(r.errors, msg)
 end function
 
+/// Performs the defaultOutDir operation for the minipixels tools generator module.
+/// @param projectPath Path associated with project.
 function defaultOutDir(projectPath)
   root = manifest.dirname(projectPath)
   return fs.joinPath(fs.joinPath(fs.joinPath(root, "build"), "generated"), "generated")
 end function
 
+/// Performs the quote operation for the minipixels tools generator module.
+/// @param text Text consumed by the operation.
 function quote(text)
   return "\"" + text + "\""
 end function
 
+/// Joins join for the minipixels tools generator workflow.
+/// @param root root value consumed by this operation.
+/// @param rel rel value consumed by this operation.
 function join(root, rel)
   return fs.joinPath(root, rel)
 end function
 
+/// Performs the numberField operation for the minipixels tools generator module.
+/// @param obj obj value consumed by this operation.
+/// @param key key value consumed by this operation.
+/// @param fallback Value returned when no explicit result is available.
 function numberField(obj, key, fallback)
   return json.asNumber(json.get(obj, key), fallback)
 end function
 
+/// Performs the stringField operation for the minipixels tools generator module.
+/// @param obj obj value consumed by this operation.
+/// @param key key value consumed by this operation.
+/// @param fallback Value returned when no explicit result is available.
 function stringField(obj, key, fallback)
   return json.asString(json.get(obj, key), fallback)
 end function
 
+/// Performs the arrayField operation for the minipixels tools generator module.
+/// @param obj obj value consumed by this operation.
+/// @param key key value consumed by this operation.
 function arrayField(obj, key)
   v = json.get(obj, key)
   if typeof(v) == "void" or v.kind != "array" then return [] end if
   return v.arrayItems
 end function
 
+/// Performs the objectField operation for the minipixels tools generator module.
+/// @param obj obj value consumed by this operation.
+/// @param key key value consumed by this operation.
 function objectField(obj, key)
   v = json.get(obj, key)
   if typeof(v) == "void" or v.kind != "object" then return void end if
   return v
 end function
 
+/// Performs the colorPart operation for the minipixels tools generator module.
+/// @param asset asset value consumed by this operation.
+/// @param key key value consumed by this operation.
+/// @param index Zero-based index of the affected item.
+/// @param fallback Value returned when no explicit result is available.
 function colorPart(asset, key, index, fallback)
   color = json.get(asset, key)
   if typeof(color) == "void" or color.kind != "array" then return fallback end if
@@ -68,30 +111,45 @@ function colorPart(asset, key, index, fallback)
   return json.asNumber(item, fallback)
 end function
 
+/// Performs the sheetWidth operation for the minipixels tools generator module.
+/// @param asset asset value consumed by this operation.
+/// @param fallback Value returned when no explicit result is available.
 function sheetWidth(asset, fallback)
   sheet = objectField(asset, "sheet")
   if typeof(sheet) == "void" then return fallback end if
   return numberField(sheet, "frameWidth", fallback)
 end function
 
+/// Performs the sheetHeight operation for the minipixels tools generator module.
+/// @param asset asset value consumed by this operation.
+/// @param fallback Value returned when no explicit result is available.
 function sheetHeight(asset, fallback)
   sheet = objectField(asset, "sheet")
   if typeof(sheet) == "void" then return fallback end if
   return numberField(sheet, "frameHeight", fallback)
 end function
 
+/// Performs the assetWidth operation for the minipixels tools generator module.
+/// @param asset asset value consumed by this operation.
 function assetWidth(asset)
   return numberField(asset, "width", sheetWidth(asset, 16))
 end function
 
+/// Performs the assetHeight operation for the minipixels tools generator module.
+/// @param asset asset value consumed by this operation.
 function assetHeight(asset)
   return numberField(asset, "height", sheetHeight(asset, 16))
 end function
 
+/// Returns whether sheet is available.
+/// @param asset asset value consumed by this operation.
 function hasSheet(asset)
   return typeof(objectField(asset, "sheet")) != "void"
 end function
 
+/// Performs the sheetModule operation for the minipixels tools generator module.
+/// @param asset asset value consumed by this operation.
+/// @param id Stable identifier of the affected item.
 function sheetModule(asset, id)
   sheet = objectField(asset, "sheet")
   if typeof(sheet) == "void" then return "" end if
@@ -108,6 +166,7 @@ function sheetModule(asset, id)
   return code.toString()
 end function
 
+/// Performs the assetsHeader operation for the minipixels tools generator module.
 function assetsHeader()
   code = sb.StringBuilder.withCapacity(2048)
   code.appendLine("package generated.assets")
@@ -182,6 +241,9 @@ function assetsHeader()
   return code.toString()
 end function
 
+/// Performs the assetModule operation for the minipixels tools generator module.
+/// @param asset asset value consumed by this operation.
+/// @param r r value consumed by this operation.
 function assetModule(asset, r)
   id = stringField(asset, "id", "asset")
   typ = stringField(asset, "type", "image")
@@ -211,6 +273,9 @@ function assetModule(asset, r)
   return code.toString()
 end function
 
+/// Performs the assetsModule operation for the minipixels tools generator module.
+/// @param root root value consumed by this operation.
+/// @param r r value consumed by this operation.
 function assetsModule(root, r)
   code = sb.StringBuilder.withCapacity(4096)
   code.appendString(assetsHeader())
@@ -243,6 +308,7 @@ function assetsModule(root, r)
   return code.toString()
 end function
 
+/// Performs the levelsStubModule operation for the minipixels tools generator module.
 function levelsStubModule()
   return "package generated.levels\n\n" +
     "function count()\n" +
@@ -266,16 +332,30 @@ function levelsStubModule()
     "function coinY(level, index) return 0 end function\n"
 end function
 
+/// Performs the levelField operation for the minipixels tools generator module.
+/// @param level level value consumed by this operation.
+/// @param key key value consumed by this operation.
+/// @param fallback Value returned when no explicit result is available.
 function levelField(level, key, fallback)
   return numberField(level, key, fallback)
 end function
 
+/// Performs the pointField operation for the minipixels tools generator module.
+/// @param level level value consumed by this operation.
+/// @param key key value consumed by this operation.
+/// @param xFallback xFallback value consumed by this operation.
+/// @param yFallback yFallback value consumed by this operation.
 function pointField(level, key, xFallback, yFallback)
   p = objectField(level, key)
   if typeof(p) == "void" then return [xFallback, yFallback] end if
   return [numberField(p, "x", xFallback), numberField(p, "y", yFallback)]
 end function
 
+/// Performs the emitLevelScalar operation for the minipixels tools generator module.
+/// @param levels levels value consumed by this operation.
+/// @param fnName fnName value consumed by this operation.
+/// @param key key value consumed by this operation.
+/// @param subkey subkey value consumed by this operation.
 function emitLevelScalar(levels, fnName, key, subkey)
   code = sb.StringBuilder.withCapacity(256)
   code.appendLine("function " + fnName + "(level)")
@@ -298,6 +378,8 @@ function emitLevelScalar(levels, fnName, key, subkey)
   return code.toString()
 end function
 
+/// Performs the emitTileData operation for the minipixels tools generator module.
+/// @param levels levels value consumed by this operation.
 function emitTileData(levels)
   code = sb.StringBuilder.withCapacity(1024)
   code.appendLine("function tileData(level)")
@@ -334,6 +416,10 @@ function emitTileData(levels)
   return code.toString()
 end function
 
+/// Performs the emitCollectionCount operation for the minipixels tools generator module.
+/// @param levels levels value consumed by this operation.
+/// @param name Name of the affected item.
+/// @param key key value consumed by this operation.
 function emitCollectionCount(levels, name, key)
   code = sb.StringBuilder.withCapacity(256)
   code.appendLine("function " + name + "Count(level)")
@@ -349,6 +435,12 @@ function emitCollectionCount(levels, name, key)
   return code.toString()
 end function
 
+/// Performs the emitCollectionField operation for the minipixels tools generator module.
+/// @param levels levels value consumed by this operation.
+/// @param name Name of the affected item.
+/// @param key key value consumed by this operation.
+/// @param field field value consumed by this operation.
+/// @param functionSuffix functionSuffix value consumed by this operation.
 function emitCollectionField(levels, name, key, field, functionSuffix)
   code = sb.StringBuilder.withCapacity(512)
   code.appendLine("function " + name + functionSuffix + "(level, index)")
@@ -370,6 +462,10 @@ function emitCollectionField(levels, name, key, field, functionSuffix)
   return code.toString()
 end function
 
+/// Validates levels for the minipixels tools generator workflow.
+/// @param r r value consumed by this operation.
+/// @param levelsDoc levelsDoc value consumed by this operation.
+/// @param source source value consumed by this operation.
 function validateLevels(r, levelsDoc, source)
   levels = json.get(levelsDoc, "levels")
   if typeof(levels) == "void" or levels.kind != "array" or len(levels.arrayItems) <= 0 then
@@ -388,6 +484,9 @@ function validateLevels(r, levelsDoc, source)
   return levels.arrayItems
 end function
 
+/// Performs the levelsModule operation for the minipixels tools generator module.
+/// @param m m value consumed by this operation.
+/// @param r r value consumed by this operation.
 function levelsModule(m, r)
   path = join(m.root, m.levelPath)
   text = try(fs.readAllText(path))
@@ -458,6 +557,9 @@ function levelsModule(m, r)
   return code.toString()
 end function
 
+/// Loads json for the minipixels tools generator module.
+/// @param path Path of the file or directory used by the operation.
+/// @param r r value consumed by this operation.
 function loadJson(path, r)
   text = try(fs.readAllText(path))
   if typeof(text) == "error" then
@@ -472,6 +574,9 @@ function loadJson(path, r)
   return parsed
 end function
 
+/// Generates generate for the minipixels tools generator workflow.
+/// @param projectPath Path associated with project.
+/// @param outDir outDir value consumed by this operation.
 function generate(projectPath, outDir)
   target = outDir
   if target == "" then target = defaultOutDir(projectPath) end if
@@ -503,6 +608,8 @@ function generate(projectPath, outDir)
   return r
 end function
 
+/// Prints result for the minipixels tools generator workflow.
+/// @param r r value consumed by this operation.
 function printResult(r)
   if r is not GenerateResult then
     print "generate: invalid result"

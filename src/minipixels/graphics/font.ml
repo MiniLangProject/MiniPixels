@@ -1,7 +1,13 @@
+// SPDX-License-Identifier: Apache-2.0
+
+//! Provides minipixels graphics font facilities for this project.
+
 package minipixels.graphics.font
 
 import minipixels.graphics.canvas as cv
 
+/// Performs the glyphBits operation for the minipixels graphics font module.
+/// @param ch ch value consumed by this operation.
 function glyphBits(ch)
   if ch == "0" then return 0x3A39ACE2E end if
   if ch == "1" then return 0x388421184 end if
@@ -48,12 +54,22 @@ function glyphBits(ch)
   return 0x7E358D63F
 end function
 
+/// Performs the textWidth operation for the minipixels graphics font module.
+/// @param text Text consumed by the operation.
+/// @param scale scale value consumed by this operation.
 function textWidth(text, scale)
   if scale <= 0 then scale = 1 end if
   if len(text) <= 0 then return 0 end if
   return ((len(text) * 6) - 1) * scale
 end function
 
+/// Draws glyph through the minipixels graphics font rendering path.
+/// @param canvas canvas value consumed by this operation.
+/// @param ch ch value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param scale scale value consumed by this operation.
+/// @param color color value consumed by this operation.
 function drawGlyph(canvas, ch, x, y, scale, color)
   if scale <= 0 then scale = 1 end if
   if ch == " " then return end if
@@ -72,6 +88,13 @@ function drawGlyph(canvas, ch, x, y, scale, color)
   end while
 end function
 
+/// Draws text through the minipixels graphics font rendering path.
+/// @param canvas canvas value consumed by this operation.
+/// @param text Text consumed by the operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param scale scale value consumed by this operation.
+/// @param color color value consumed by this operation.
 function drawText(canvas, text, x, y, scale, color)
   if scale <= 0 then scale = 1 end if
   xx = x
@@ -81,6 +104,12 @@ function drawText(canvas, text, x, y, scale, color)
   end for
 end function
 
+/// Draws text centered through the minipixels graphics font rendering path.
+/// @param canvas canvas value consumed by this operation.
+/// @param text Text consumed by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param scale scale value consumed by this operation.
+/// @param color color value consumed by this operation.
 function drawTextCentered(canvas, text, y, scale, color)
   drawText(canvas, text, (canvas.width - textWidth(text, scale)) / 2, y, scale, color)
 end function
