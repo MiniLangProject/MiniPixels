@@ -8,6 +8,7 @@
 
 ## Symbols
 
+- [`minipixels.graphics.sprite.cacheFrames`](File-src-minipixels-graphics-sprite-ml-1992064667.md#function-function-minipixels-graphics-sprite-cacheframes-function-cacheframes-sheet-src-minipixels-graphics-sprite-ml-1688415125) — function
 - [`minipixels.graphics.sprite.Image`](Type-minipixels-graphics-sprite-image-712579706.md) — struct
 - [`minipixels.graphics.sprite.imageGetPixel`](File-src-minipixels-graphics-sprite-ml-1992064667.md#function-function-minipixels-graphics-sprite-imagegetpixel-function-imagegetpixel-img-x-y-src-minipixels-graphics-sprite-ml-595135794) — function
 - [`minipixels.graphics.sprite.imageIndex`](File-src-minipixels-graphics-sprite-ml-1992064667.md#function-function-minipixels-graphics-sprite-imageindex-inline-function-imageindex-img-x-y-src-minipixels-graphics-sprite-ml-1559316635) — function

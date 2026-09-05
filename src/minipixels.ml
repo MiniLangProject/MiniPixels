@@ -13,11 +13,13 @@ import minipixels.core.time as tm
 import minipixels.platform.windows as win
 import minipixels.assets.assets as ast
 import minipixels.assets.pack as pack
+import minipixels.assets.png as png
 import minipixels.scene.scene as scn
 import minipixels.debug.debug as dbg
 import minipixels.animation.animation as anim
 import minipixels.world.camera as cam
 import minipixels.world.tilemap as tile
+import minipixels.collision.collision as col
 import minipixels.audio.audio as aud
 
 /// Represents the game config data used by the minipixels module.
@@ -46,6 +48,10 @@ struct GameConfig
   scaleMode
   /// Stores the smoothing value associated with game config.
   smoothing
+  /// Maximum rendered frames per second, or zero for uncapped rendering.
+  maxFps
+  /// Whether simulation updates pause while the game window lacks focus.
+  pauseWhenUnfocused
 end struct
 
 /// Represents the game data used by the minipixels module.
@@ -86,7 +92,7 @@ function createConfig(title, width, height, scale)
   if width <= 0 then width = 320 end if
   if height <= 0 then height = 180 end if
   if scale <= 0 then scale = 4 end if
-  return GameConfig(title, width, height, scale, 60, 0.25, 5, false, 120, "auto", "stretch", false)
+  return GameConfig(title, width, height, scale, 60, 0.25, 5, false, 120, "auto", "stretch", false, 60, true)
 end function
 
 /// Creates game for the minipixels module.
@@ -98,7 +104,7 @@ function createGame(cfg)
     inp.create(),
     tm.create(cfg.updatesPerSecond),
     ast.create(64),
-    aud.create(),
+    aud.mixer(16),
     scn.create(16),
     true,
     void,
@@ -107,7 +113,7 @@ function createGame(cfg)
 end function
 
 /// Performs the version operation for the minipixels module.
-function version() return "0.7.0" end function
+function version() return "0.8.0" end function
 /// Updates renderer maintained by the minipixels module.
 /// @param cfg Configuration used by the operation.
 /// @param renderer renderer value consumed by this operation.
@@ -142,6 +148,23 @@ function useIntegerScale(cfg) return setScaleMode(cfg, "integer") end function
 /// @param enabled enabled value consumed by this operation.
 function setSmoothing(cfg, enabled)
   if cfg is GameConfig then cfg.smoothing = enabled end if
+  return cfg
+end function
+/// Sets the rendered-frame limit, using zero for an uncapped loop.
+/// @param cfg Configuration to update.
+/// @param maxFps Maximum rendered frames per second.
+function setMaxFps(cfg, maxFps)
+  if cfg is GameConfig then
+    if typeof(maxFps) != "int" or maxFps < 0 then maxFps = 0 end if
+    cfg.maxFps = maxFps
+  end if
+  return cfg
+end function
+/// Configures whether simulation pauses when the window loses focus.
+/// @param cfg Configuration to update.
+/// @param enabled Whether focus loss pauses simulation updates.
+function setPauseWhenUnfocused(cfg, enabled)
+  if cfg is GameConfig then cfg.pauseWhenUnfocused = enabled == true end if
   return cfg
 end function
 /// Performs the activeRenderer operation for the minipixels module.
@@ -214,6 +237,25 @@ function spriteFromImage(img, name) return sp.spriteFromImage(img, name) end fun
 /// @param spacing spacing value consumed by this operation.
 /// @param margin margin value consumed by this operation.
 function spriteSheet(img, fw, fh, spacing, margin) return sp.spriteSheet(img, fw, fh, spacing, margin) end function
+/// Creates an off-screen CPU render target.
+/// @param width Render-target width.
+/// @param height Render-target height.
+function renderTarget(width, height) return cv.create(width, height) end function
+/// Draws an off-screen render target onto another canvas.
+/// @param canvas Destination canvas.
+/// @param source Source render target.
+/// @param x Destination x coordinate.
+/// @param y Destination y coordinate.
+function drawRenderTarget(canvas, source, x, y) return cv.drawCanvas(canvas, source, x, y) end function
+/// Draws a sprite rotated around its configured pivot.
+/// @param canvas Destination canvas.
+/// @param sprite Sprite to draw.
+/// @param x Pivot x coordinate.
+/// @param y Pivot y coordinate.
+/// @param radians Clockwise rotation in radians.
+/// @param scale Positive integer scale.
+/// @param tint Multiplicative RGBA tint.
+function drawSpriteRotated(canvas, sprite, x, y, radians, scale, tint) return cv.drawSpriteRotated(canvas, sprite, x, y, radians, scale, tint) end function
 /// Opens asset pack for the minipixels module.
 /// @param path Path of the file or directory used by the operation.
 function openAssetPack(path) return pack.open(path) end function
@@ -229,6 +271,20 @@ function assetKindFromPack(assetPack, name) return pack.getKind(assetPack, name)
 /// @param assetPack assetPack value consumed by this operation.
 /// @param name Name of the affected item.
 function loadPngFromPack(assetPack, name) return pack.loadPng(assetPack, name) end function
+/// Loads a common non-interlaced PNG file directly from disk.
+/// @param path PNG file path.
+function loadPng(path) return png.load(path) end function
+/// Saves a canvas as a deterministic RGBA PNG screenshot.
+/// @param canvas Canvas to save.
+/// @param path Destination PNG path.
+function saveCanvasPng(canvas, path) return png.saveRgba(path, canvas.width, canvas.height, canvas.pixels) end function
+/// Drops cached payload and decoded-image data for one packed asset.
+/// @param assetPack Asset pack to mutate.
+/// @param name Registered packed asset name.
+function unloadPackedAsset(assetPack, name) return pack.unload(assetPack, name) end function
+/// Clears every cached payload and decoded image retained by an asset pack.
+/// @param assetPack Asset pack to mutate.
+function clearAssetPackCache(assetPack) return pack.clearCache(assetPack) end function
 /// Performs the animation operation for the minipixels module.
 /// @param maxFrames maxFrames value consumed by this operation.
 function animation(maxFrames) return anim.create(maxFrames) end function
@@ -244,7 +300,7 @@ function animationFromSheet(sheet, start, count, duration) return anim.fromSheet
 function camera(width, height) return cam.create(width, height) end function
 /// Performs the tileset operation for the minipixels module.
 /// @param sheet sheet value consumed by this operation.
-function tileset(sheet) return tile.Tileset(sheet) end function
+function tileset(sheet) return tile.Tileset(sp.cacheFrames(sheet)) end function
 /// Performs the tilemap operation for the minipixels module.
 /// @param tileWidth tileWidth value consumed by this operation.
 /// @param tileHeight tileHeight value consumed by this operation.
@@ -269,6 +325,53 @@ function tileLayer(name, width, height, data, visible, collision, px, py) return
 /// @param vx vx value consumed by this operation.
 /// @param vy vy value consumed by this operation.
 function tileMoveAndCollide(map, rect, vx, vy) return tile.moveAndCollide(map, rect, vx, vy) end function
+/// Returns whether a point lies inside a rectangle.
+/// @param x Point x coordinate.
+/// @param y Point y coordinate.
+/// @param rectangle Rectangle to test.
+function pointRect(x, y, rectangle) return col.pointRect(x, y, rectangle) end function
+/// Returns whether two rectangles overlap.
+/// @param first First rectangle.
+/// @param second Second rectangle.
+function rectRect(first, second) return col.rectRect(first, second) end function
+/// Returns whether a line segment intersects a rectangle.
+/// @param x1 Segment start x coordinate.
+/// @param y1 Segment start y coordinate.
+/// @param x2 Segment end x coordinate.
+/// @param y2 Segment end y coordinate.
+/// @param rectangle Rectangle to test.
+function lineRect(x1, y1, x2, y2, rectangle) return col.lineRect(x1, y1, x2, y2, rectangle) end function
+/// Creates a scene with optional lifecycle callbacks.
+/// @param name Stable scene name.
+/// @param state User-owned scene state.
+/// @param onEnter Callback invoked as onEnter(game, scene).
+/// @param onExit Callback invoked as onExit(game, scene).
+/// @param update Callback invoked as update(game, scene, dt).
+/// @param render Callback invoked as render(game, scene, canvas).
+/// @param onPause Callback invoked when another scene is pushed.
+/// @param onResume Callback invoked after the scene above is popped.
+/// @param renderBelow Whether scenes underneath remain visible.
+function scene(name, state = void, onEnter = void, onExit = void, update = void, render = void, onPause = void, onResume = void, renderBelow = false)
+  return scn.scene(name, state, onEnter, onExit, update, render, onPause, onResume, renderBelow)
+end function
+/// Registers a scene on a game.
+/// @param game Game owning the scene stack.
+/// @param value Scene to register.
+function registerScene(game, value)
+  if game is not Game then return false end if
+  return scn.register(game.scenes, value.name, value)
+end function
+/// Replaces the active game scene.
+/// @param game Game owning the scene stack.
+/// @param name Registered scene name.
+function changeScene(game, name) return scn.change(game.scenes, name, game) end function
+/// Pushes a registered game scene.
+/// @param game Game owning the scene stack.
+/// @param name Registered scene name.
+function pushScene(game, name) return scn.push(game.scenes, name, game) end function
+/// Pops the active game scene.
+/// @param game Game owning the scene stack.
+function popScene(game) return scn.pop(game.scenes, game) end function
 /// Performs the fillRectWorld operation for the minipixels module.
 /// @param canvas canvas value consumed by this operation.
 /// @param camera camera value consumed by this operation.
@@ -317,6 +420,21 @@ function inputPressed(input, action) return inp.pressed(input, action) end funct
 /// @param input input value consumed by this operation.
 /// @param action action value consumed by this operation.
 function inputReleased(input, action) return inp.released(input, action) end function
+/// Binds one virtual key to an input action.
+/// @param input Input state to configure.
+/// @param action Action name to configure.
+/// @param key Win32 virtual-key code.
+function bindKey(input, action, key) return inp.bindKeys(input, action, key, -1) end function
+/// Binds two alternative virtual keys to an input action.
+/// @param input Input state to configure.
+/// @param action Action name to configure.
+/// @param primary Primary Win32 virtual-key code.
+/// @param secondary Secondary Win32 virtual-key code, or -1.
+function bindKeys(input, action, primary, secondary) return inp.bindKeys(input, action, primary, secondary) end function
+/// Removes virtual-key bindings from an input action.
+/// @param input Input state to configure.
+/// @param action Action name to unbind.
+function unbindAction(input, action) return inp.unbind(input, action) end function
 /// Draws text through the minipixels rendering path.
 /// @param canvas canvas value consumed by this operation.
 /// @param text Text consumed by the operation.
@@ -431,18 +549,29 @@ end function
 /// @param shutdown shutdown value consumed by this operation.
 function runHeadless(cfg, initialize, update, render, shutdown)
   game = createGame(cfg)
-  callIfFunction(initialize, game)
+  failure = try(callIfFunction(initialize, game))
   frame = 0
-  while game.running and frame < cfg.headlessFrames
+  while game.running and frame < cfg.headlessFrames and typeof(failure) != "error"
     game.input.beginFrame()
     tm.beginFrame(game.time, game.time.fixedDelta)
-    callUpdate(update, game, game.time.fixedDelta)
-    tm.countUpdate(game.time)
+    game.input.beginUpdate()
+    failure = try(callUpdate(update, game, game.time.fixedDelta))
+    if typeof(failure) != "error" then failure = try(scn.updateCurrent(game.scenes, game, game.time.fixedDelta)) end if
+    game.input.endUpdate()
+    if typeof(failure) != "error" then tm.countUpdate(game.time) end if
+    tm.finishFrame(game.time, 0)
+    aud.update(game.audio)
     cv.resetStats(game.canvas)
-    callRender(render, game, game.canvas)
+    if typeof(failure) != "error" then failure = try(scn.renderStack(game.scenes, game, game.canvas)) end if
+    if typeof(failure) != "error" then failure = try(callRender(render, game, game.canvas)) end if
     frame = frame + 1
   end while
-  callIfFunction(shutdown, game)
+  sceneShutdownResult = try(scn.clear(game.scenes, game))
+  if typeof(failure) != "error" and typeof(sceneShutdownResult) == "error" then failure = sceneShutdownResult end if
+  shutdownResult = try(callIfFunction(shutdown, game))
+  aud.close(game.audio)
+  if typeof(failure) != "error" and typeof(shutdownResult) == "error" then failure = shutdownResult end if
+  if typeof(failure) == "error" then return failure end if
   return game
 end function
 
@@ -457,20 +586,21 @@ function run(cfg, initialize, update, render, shutdown)
   w = win.open(cfg.title, cfg.width, cfg.height, cfg.scale, cfg.renderer, cfg.scaleMode, cfg.smoothing)
   if typeof(w) == "error" then return w end if
   game.window = w
-  callIfFunction(initialize, game)
+  failure = try(callIfFunction(initialize, game))
 
-  lastTicks = win.ticks()
+  lastTime = win.seconds()
+  nextFrameTime = lastTime
   accumulator = 0.0
-  while game.running and win.running()
-    now = win.ticks()
-    elapsedMs = now - lastTicks
-    lastTicks = now
-    dt = elapsedMs / 1000.0
+  while game.running and win.running() and typeof(failure) != "error"
+    now = win.seconds()
+    dt = now - lastTime
+    lastTime = now
     if dt > cfg.maxFrameSeconds then dt = cfg.maxFrameSeconds end if
 
     win.pollEvents(w)
     win.updateInputForWindow(w, game.input)
     if game.input.escape then game.running = false end if
+    if cfg.pauseWhenUnfocused and win.hasFocus(w) == false then dt = 0 end if
 
     tm.beginFrame(game.time, dt)
     if game.time.frameNumber % 15 == 1 then
@@ -479,21 +609,42 @@ function run(cfg, initialize, update, render, shutdown)
     accumulator = accumulator + dt
     updates = 0
     while accumulator >= game.time.fixedDelta and updates < cfg.maxCatchUpUpdates
-      callUpdate(update, game, game.time.fixedDelta)
+      game.input.beginUpdate()
+      failure = try(callUpdate(update, game, game.time.fixedDelta))
+      if typeof(failure) != "error" then failure = try(scn.updateCurrent(game.scenes, game, game.time.fixedDelta)) end if
+      game.input.endUpdate()
+      if typeof(failure) == "error" then break end if
       tm.countUpdate(game.time)
       accumulator = accumulator - game.time.fixedDelta
       updates = updates + 1
     end while
-    if updates >= cfg.maxCatchUpUpdates then accumulator = 0 end if
+    if updates >= cfg.maxCatchUpUpdates and accumulator >= game.time.fixedDelta then accumulator = 0 end if
+    tm.finishFrame(game.time, accumulator / game.time.fixedDelta)
+    aud.update(game.audio)
 
     cv.resetStats(game.canvas)
-    callRender(render, game, game.canvas)
-    if game.debug then dbg.drawStats(game, game.canvas) end if
-    win.present(w, game.canvas)
-    win.sleepMs(0)
+    if typeof(failure) != "error" then failure = try(scn.renderStack(game.scenes, game, game.canvas)) end if
+    if typeof(failure) != "error" then failure = try(callRender(render, game, game.canvas)) end if
+    if typeof(failure) != "error" then
+      if game.debug then dbg.drawStats(game, game.canvas) end if
+      win.present(w, game.canvas)
+    end if
+    if cfg.maxFps > 0 then
+      nextFrameTime = nextFrameTime + (1.0 / cfg.maxFps)
+      currentTime = win.seconds()
+      if nextFrameTime < currentTime then nextFrameTime = currentTime end if
+      win.waitUntil(nextFrameTime)
+    else
+      win.sleepMs(0)
+    end if
   end while
 
-  callIfFunction(shutdown, game)
+  sceneShutdownResult = try(scn.clear(game.scenes, game))
+  if typeof(failure) != "error" and typeof(sceneShutdownResult) == "error" then failure = sceneShutdownResult end if
+  shutdownResult = try(callIfFunction(shutdown, game))
+  aud.close(game.audio)
   win.close(w)
+  if typeof(failure) != "error" and typeof(shutdownResult) == "error" then failure = shutdownResult end if
+  if typeof(failure) == "error" then return failure end if
   return 0
 end function

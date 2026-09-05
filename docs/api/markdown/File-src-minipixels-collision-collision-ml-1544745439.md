@@ -54,6 +54,25 @@ Performs the circleRect operation for the minipixels collision collision module.
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/collision/collision.ml#L59)
 
+<a id="function-function-minipixels-collision-collision-clipaxis-function-clipaxis-p-q-t0-t1-src-minipixels-collision-collision-ml-1426590628"></a>
+### clipAxis
+
+```ml
+function clipAxis(p, q, t0, t1)
+```
+
+Clips one Liang-Barsky segment interval against a rectangle boundary.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `p` | `dynamic` | — | Signed segment delta for the boundary. |
+| `q` | `dynamic` | — | Signed origin distance from the boundary. |
+| `t0` | `dynamic` | — | Current lower segment parameter. |
+| `t1` | `dynamic` | — | Current upper segment parameter. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/collision/collision.ml#L99)
+
 - [minipixels.collision.collision.CollisionResult](Type-minipixels-collision-collision-collisionresult-132924904.md) — struct
 <a id="function-function-minipixels-collision-collision-linerect-function-linerect-x1-y1-x2-y2-r-src-minipixels-collision-collision-ml-1481786696"></a>
 ### lineRect
@@ -125,4 +144,4 @@ Performs the result operation for the minipixels collision collision module.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/collision/collision.ml#L90)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/collision/collision.ml#L118)

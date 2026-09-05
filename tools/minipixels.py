@@ -18,7 +18,22 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 ASSET_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-VERSION = "0.7.0"
+VERSION = "0.8.0"
+
+
+def write_bytes_if_changed(path: Path, content: bytes) -> bool:
+    """Write bytes only when content changed, preserving incremental-build mtimes."""
+    if path.exists() and path.read_bytes() == content:
+        return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(content)
+    return True
+
+
+def write_text_if_changed(path: Path, content: str) -> bool:
+    """Write UTF-8 text only when content changed."""
+    encoded = content.encode("utf-8")
+    return write_bytes_if_changed(path, encoded)
 
 
 def die(message: str, code: int = 1) -> None:
@@ -616,7 +631,7 @@ def generate_levels_module(data: dict, out_dir: Path) -> Path | None:
     lines.append("end function")
     lines.append("")
 
-    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    write_text_if_changed(out, "\n".join(lines) + "\n")
     print(out)
     return out
 
@@ -677,7 +692,7 @@ def write_asset_pack(data: dict, root: Path, output: Path) -> Path:
         index.extend(struct.pack("<I", payload_base + entry["offset"]))
         index.extend(struct.pack("<I", entry["size"]))
 
-    output.write_bytes(bytes(index) + bytes(blob))
+    write_bytes_if_changed(output, bytes(index) + bytes(blob))
     print(output)
     return output
 
@@ -717,18 +732,30 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         )
     for asset in image_assets:
         aid = asset["id"]
+        lines.append(f"sprite_{aid}_cache = void")
+        lines.append("")
         lines.append(f"function make_{aid}()")
-        lines.append(f'  img = mp.loadPngFromPack(assetPack(), "{aid}")')
-        lines.append(f'  return mp.spriteFromImage(img, "{aid}")')
+        lines.append(f"  global sprite_{aid}_cache")
+        lines.append(f"  if sprite_{aid}_cache == void then")
+        lines.append(f'    img = mp.loadPngFromPack(assetPack(), "{aid}")')
+        lines.append(f'    sprite_{aid}_cache = mp.spriteFromImage(img, "{aid}")')
+        lines.append("  end if")
+        lines.append(f"  return sprite_{aid}_cache")
         lines.append("end function")
         lines.append("")
         sheet = sheet_config(asset)
         if sheet is not None:
+            lines.append(f"sheet_{aid}_cache = void")
+            lines.append("")
             lines.append(f"function sheet_{aid}()")
-            lines.append(f"  spr = make_{aid}()")
+            lines.append(f"  global sheet_{aid}_cache")
+            lines.append(f"  if sheet_{aid}_cache == void then")
+            lines.append(f"    spr = make_{aid}()")
             lines.append(
-                f'  return mp.spriteSheet(spr.image, {sheet["frameWidth"]}, {sheet["frameHeight"]}, {sheet["spacing"]}, {sheet["margin"]})'
+                f'    sheet_{aid}_cache = mp.spriteSheet(spr.image, {sheet["frameWidth"]}, {sheet["frameHeight"]}, {sheet["spacing"]}, {sheet["margin"]})'
             )
+            lines.append("  end if")
+            lines.append(f"  return sheet_{aid}_cache")
             lines.append("end function")
             lines.append("")
     for asset in audio_assets:
@@ -747,10 +774,10 @@ def generate(project_file: Path, out_dir: Path) -> Path:
     lines.append("  reg = assets.create(64)")
     for asset in image_assets:
         aid = asset["id"]
-        lines.append(f'  reg.add("{aid}", make_{aid}())')
+        lines.append(f'  reg.addLazy("{aid}", make_{aid})')
     lines.append("  return reg")
     lines.append("end function")
-    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    write_text_if_changed(out, "\n".join(lines) + "\n")
     generate_levels_module(data, out_dir)
     print(out)
     return out
@@ -796,7 +823,7 @@ def asset_report(data: dict, root: Path) -> dict:
 
 def write_asset_report(data: dict, root: Path, output: Path) -> Path:
     report_path = output.parent / "asset-report.json"
-    report_path.write_text(json.dumps(asset_report(data, root), indent=2, sort_keys=True), encoding="utf-8")
+    write_text_if_changed(report_path, json.dumps(asset_report(data, root), indent=2, sort_keys=True) + "\n")
     print(report_path)
     return report_path
 
@@ -861,7 +888,7 @@ def build(
         "compiler_args = [" + ", ".join(json.dumps(arg) for arg in compiler_args) + "]",
         "",
     ]
-    manifest_path.write_text("\n".join(manifest_lines), encoding="utf-8")
+    write_text_if_changed(manifest_path, "\n".join(manifest_lines))
     compiler_command = [sys.executable, str(compiler)] if compiler.suffix.lower() == ".py" else [str(compiler)]
     cmd = compiler_command + ["--project", str(manifest_path)]
     if verbose:

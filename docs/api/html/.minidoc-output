@@ -62,6 +62,8 @@ tests.html
 type-minipixels-animation-animation-animation-206177259.html
 type-minipixels-assets-assets-assetregistry-891835752.html
 type-minipixels-assets-pack-assetpack-1256806610.html
+type-minipixels-assets-png-bitreader-15679877.html
+type-minipixels-assets-png-huffman-1510650536.html
 type-minipixels-audio-audio-audiochannel-2041318038.html
 type-minipixels-audio-audio-audioclip-2035849473.html
 type-minipixels-audio-audio-audiomixer-583677548.html
@@ -84,6 +86,7 @@ type-minipixels-math-types-transform2d-753406466.html
 type-minipixels-math-types-vector2-666003535.html
 type-minipixels-math-types-vector2int-1351615520.html
 type-minipixels-platform-windows-window-369528407.html
+type-minipixels-scene-scene-scene-727861925.html
 type-minipixels-scene-scene-scenestack-1227700927.html
 type-minipixels-tools-generator-generateresult-1764755755.html
 type-minipixels-tools-json-jsonvalue-550249139.html

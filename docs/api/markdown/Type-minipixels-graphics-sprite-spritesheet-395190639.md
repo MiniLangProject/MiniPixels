@@ -52,6 +52,18 @@ Stores the frame height value associated with sprite sheet.
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L57)
 
+<a id="field-field-minipixels-graphics-sprite-spritesheet-frames-frames-src-minipixels-graphics-sprite-ml-206933779"></a>
+### frames
+
+```ml
+frames
+```
+
+Lazily populated cache of immutable frame descriptors.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L67)
+
 <a id="field-field-minipixels-graphics-sprite-spritesheet-framewidth-framewidth-as-int-src-minipixels-graphics-sprite-ml-1589277622"></a>
 ### frameWidth
 
@@ -78,7 +90,7 @@ Returns frame maintained by the minipixels graphics sprite module.
 | `index` | `dynamic` | — | Zero-based index of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L69)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L71)
 
 <a id="field-field-minipixels-graphics-sprite-spritesheet-image-image-src-minipixels-graphics-sprite-ml-1188201819"></a>
 ### image

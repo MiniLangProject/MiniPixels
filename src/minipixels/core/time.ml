@@ -20,13 +20,21 @@ struct TimeState
   fps
   /// Stores the ups value associated with time state.
   ups
+  /// Fraction of the next fixed update used for render interpolation.
+  alpha
+  /// Accumulated wall time used for smoothed rate reporting.
+  sampleElapsed
+  /// Number of rendered frames in the active rate sample.
+  sampleFrames
+  /// Number of fixed updates in the active rate sample.
+  sampleUpdates
 end struct
 
 /// Creates create for the minipixels core time module.
 /// @param updatesPerSecond updatesPerSecond value consumed by this operation.
 function create(updatesPerSecond)
   if updatesPerSecond <= 0 then updatesPerSecond = 60 end if
-  return TimeState(0, 1.0 / updatesPerSecond, 0, 0, 0, 0, updatesPerSecond)
+  return TimeState(0, 1.0 / updatesPerSecond, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 end function
 
 /// Performs the beginFrame operation for the minipixels core time module.
@@ -36,13 +44,29 @@ function beginFrame(t, delta)
   t.delta = delta
   t.elapsed = t.elapsed + delta
   t.frameNumber = t.frameNumber + 1
-  if delta > 0 then
-    t.fps = 1.0 / delta
-  end if
+  t.sampleElapsed = t.sampleElapsed + delta
+  t.sampleFrames = t.sampleFrames + 1
 end function
 
 /// Performs the countUpdate operation for the minipixels core time module.
 /// @param t t value consumed by this operation.
 function countUpdate(t)
   t.updateNumber = t.updateNumber + 1
+  t.sampleUpdates = t.sampleUpdates + 1
+end function
+
+/// Completes frame timing and updates interpolation and smoothed rates.
+/// @param t Time state to update.
+/// @param alpha Fraction of the next fixed update accumulated by the loop.
+function finishFrame(t, alpha)
+  if alpha < 0 then alpha = 0 end if
+  if alpha > 1 then alpha = 1 end if
+  t.alpha = alpha
+  if t.sampleElapsed >= 0.5 then
+    t.fps = t.sampleFrames / t.sampleElapsed
+    t.ups = t.sampleUpdates / t.sampleElapsed
+    t.sampleElapsed = 0
+    t.sampleFrames = 0
+    t.sampleUpdates = 0
+  end if
 end function

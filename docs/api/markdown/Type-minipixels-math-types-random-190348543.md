@@ -12,7 +12,7 @@ struct Random
 Represents the random data used by the minipixels math types module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L107)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L188)
 
 ## Members
 
@@ -30,7 +30,7 @@ Performs the chance operation for the minipixels math types random module.
 | `percent` | `dynamic` | — | percent value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L125)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L206)
 
 <a id="method-method-minipixels-math-types-random-nextfloat-function-nextfloat-src-minipixels-math-types-ml-165864756"></a>
 ### nextFloat
@@ -42,7 +42,7 @@ function nextFloat()
 Performs the nextFloat operation for the minipixels math types random module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L119)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L200)
 
 <a id="method-method-minipixels-math-types-random-nextint-function-nextint-minvalue-maxvalue-src-minipixels-math-types-ml-927279832"></a>
 ### nextInt
@@ -59,7 +59,7 @@ Performs the nextInt operation for the minipixels math types random module.
 | `maxValue` | `dynamic` | — | maxValue value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L114)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L195)
 
 <a id="field-field-minipixels-math-types-random-seed-seed-src-minipixels-math-types-ml-752823090"></a>
 ### seed
@@ -71,4 +71,4 @@ seed
 Stores the seed value associated with random.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L109)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L190)

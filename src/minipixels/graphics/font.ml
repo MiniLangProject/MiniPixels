@@ -73,6 +73,7 @@ end function
 function drawGlyph(canvas, ch, x, y, scale, color)
   if scale <= 0 then scale = 1 end if
   if ch == " " then return end if
+  previousDrawCalls = canvas.drawCalls
   bits = glyphBits(ch)
   yy = 0
   while yy < 7
@@ -80,12 +81,19 @@ function drawGlyph(canvas, ch, x, y, scale, color)
     xx = 0
     while xx < 5
       if (row & (16 >> xx)) != 0 then
-        cv.fillRect(canvas, x + (xx * scale), y + (yy * scale), scale, scale, color)
+        start = xx
+        xx = xx + 1
+        while xx < 5 and (row & (16 >> xx)) != 0
+          xx = xx + 1
+        end while
+        cv.fillRect(canvas, x + (start * scale), y + (yy * scale), (xx - start) * scale, scale, color)
+      else
+        xx = xx + 1
       end if
-      xx = xx + 1
     end while
     yy = yy + 1
   end while
+  canvas.drawCalls = previousDrawCalls + 1
 end function
 
 /// Draws text through the minipixels graphics font rendering path.

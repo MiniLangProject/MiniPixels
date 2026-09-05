@@ -108,7 +108,13 @@ end function
 /// @param map map value consumed by this operation.
 /// @param layer layer value consumed by this operation.
 function addLayer(map, layer)
-  if map.layerCount >= len(map.layers) then return false end if
+  if map.layerCount >= len(map.layers) then
+    nextCapacity = len(map.layers) * 2
+    if nextCapacity < 1 then nextCapacity = 4 end if
+    layers = array(nextCapacity)
+    if map.layerCount > 0 then copyArray(layers, 0, map.layers, 0, map.layerCount) end if
+    map.layers = layers
+  end if
   map.layers[map.layerCount] = layer
   map.layerCount = map.layerCount + 1
   return true
@@ -144,7 +150,9 @@ function drawLayer(map, layer, canvas, camera)
     for tx = firstCol to lastCol
       id = tileAt(layer, tx, ty)
       if id > 0 then
-        spr = map.tileset.sheet.getFrame(id - 1)
+        frameIndex = mt.clamp(id - 1, 0, map.tileset.sheet.frameCount - 1)
+        spr = map.tileset.sheet.frames[frameIndex]
+        if typeof(spr) == "void" then spr = map.tileset.sheet.getFrame(frameIndex) end if
         x = (tx * map.tileWidth) - ox
         y = (ty * map.tileHeight) - oy
         cv.drawSprite(canvas, spr, x, y)
@@ -195,40 +203,80 @@ end function
 function moveAndCollide(map, rect, vx, vy)
   res = col.result(rect.x, rect.y)
   nx = rect.x + vx
-  if vx != 0 then
-    test = mt.RectangleInt(nx, rect.y, rect.width, rect.height)
-    left = mt.floorInt(test.x / map.tileWidth)
-    right = mt.floorInt((test.x + test.width - 1) / map.tileWidth)
-    top = mt.floorInt(test.y / map.tileHeight)
-    bottom = mt.floorInt((test.y + test.height - 1) / map.tileHeight)
-    for ty = top to bottom
-      if vx > 0 and isSolidAtTile(map, right, ty) then
-        nx = (right * map.tileWidth) - rect.width
-        res.hitRight = true
-      end if
-      if vx < 0 and isSolidAtTile(map, left, ty) then
-        nx = (left + 1) * map.tileWidth
-        res.hitLeft = true
-      end if
-    end for
+  top = mt.floorInt(rect.y / map.tileHeight)
+  bottom = mt.floorInt((rect.y + rect.height - 1) / map.tileHeight)
+  if vx > 0 then
+    startColumn = mt.floorInt((rect.x + rect.width - 1) / map.tileWidth)
+    endColumn = mt.floorInt((nx + rect.width - 1) / map.tileWidth)
+    column = startColumn + 1
+    while column <= endColumn and res.hitRight == false
+      row = top
+      while row <= bottom
+        if isSolidAtTile(map, column, row) then
+          nx = (column * map.tileWidth) - rect.width
+          res.hitRight = true
+          break
+        end if
+        row = row + 1
+      end while
+      column = column + 1
+    end while
+  else
+    if vx < 0 then
+      startColumn = mt.floorInt(rect.x / map.tileWidth)
+      endColumn = mt.floorInt(nx / map.tileWidth)
+      column = startColumn - 1
+      while column >= endColumn and res.hitLeft == false
+        row = top
+        while row <= bottom
+          if isSolidAtTile(map, column, row) then
+            nx = (column + 1) * map.tileWidth
+            res.hitLeft = true
+            break
+          end if
+          row = row + 1
+        end while
+        column = column - 1
+      end while
+    end if
   end if
   ny = rect.y + vy
-  if vy != 0 then
-    test = mt.RectangleInt(nx, ny, rect.width, rect.height)
-    left = mt.floorInt(test.x / map.tileWidth)
-    right = mt.floorInt((test.x + test.width - 1) / map.tileWidth)
-    top = mt.floorInt(test.y / map.tileHeight)
-    bottom = mt.floorInt((test.y + test.height - 1) / map.tileHeight)
-    for tx = left to right
-      if vy > 0 and isSolidAtTile(map, tx, bottom) then
-        ny = (bottom * map.tileHeight) - rect.height
-        res.hitBottom = true
-      end if
-      if vy < 0 and isSolidAtTile(map, tx, top) then
-        ny = (top + 1) * map.tileHeight
-        res.hitTop = true
-      end if
-    end for
+  left = mt.floorInt(nx / map.tileWidth)
+  right = mt.floorInt((nx + rect.width - 1) / map.tileWidth)
+  if vy > 0 then
+    startRow = mt.floorInt((rect.y + rect.height - 1) / map.tileHeight)
+    endRow = mt.floorInt((ny + rect.height - 1) / map.tileHeight)
+    row = startRow + 1
+    while row <= endRow and res.hitBottom == false
+      column = left
+      while column <= right
+        if isSolidAtTile(map, column, row) then
+          ny = (row * map.tileHeight) - rect.height
+          res.hitBottom = true
+          break
+        end if
+        column = column + 1
+      end while
+      row = row + 1
+    end while
+  else
+    if vy < 0 then
+      startRow = mt.floorInt(rect.y / map.tileHeight)
+      endRow = mt.floorInt(ny / map.tileHeight)
+      row = startRow - 1
+      while row >= endRow and res.hitTop == false
+        column = left
+        while column <= right
+          if isSolidAtTile(map, column, row) then
+            ny = (row + 1) * map.tileHeight
+            res.hitTop = true
+            break
+          end if
+          column = column + 1
+        end while
+        row = row - 1
+      end while
+    end if
   end if
   worldW = map.width * map.tileWidth
   worldH = map.height * map.tileHeight

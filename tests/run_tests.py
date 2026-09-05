@@ -4,9 +4,12 @@ from __future__ import annotations
 import subprocess
 import sys
 import importlib.util
+import binascii
 import json
+import struct
 import tempfile
 import zipfile
+import zlib
 from pathlib import Path
 
 
@@ -20,6 +23,7 @@ TESTS = [
     "render_regression_tests.ml",
     "json_manifest_tests.ml",
     "generator_tests.ml",
+    "foundation_tests.ml",
 ]
 
 
@@ -33,6 +37,64 @@ def run_test_executable(exe: Path) -> None:
         raise subprocess.CalledProcessError(result.returncode, [str(exe)])
     if "[FAIL]" in result.stdout:
         raise RuntimeError(f"MiniLang assertions failed in {exe.name}")
+
+
+def png_chunk(kind: bytes, payload: bytes) -> bytes:
+    checked = kind + payload
+    return struct.pack(">I", len(payload)) + checked + struct.pack(">I", binascii.crc32(checked) & 0xFFFFFFFF)
+
+
+def filtered_rgba_png(width: int, height: int, *, fixed: bool = False) -> bytes:
+    previous = bytes(width * 4)
+    scanlines = bytearray()
+    for y in range(height):
+        row = bytearray()
+        for x in range(width):
+            row.extend(((x * 40 + y * 3) & 255, (y * 40 + x * 5) & 255, ((x + y) * 30) & 255, 255 - (x % 16) * 10))
+        filter_type = y % 5
+        encoded = bytearray(len(row))
+        for index, current in enumerate(row):
+            left = row[index - 4] if index >= 4 else 0
+            above = previous[index]
+            upper_left = previous[index - 4] if index >= 4 else 0
+            if filter_type == 0:
+                predictor = 0
+            elif filter_type == 1:
+                predictor = left
+            elif filter_type == 2:
+                predictor = above
+            elif filter_type == 3:
+                predictor = (left + above) // 2
+            else:
+                estimate = left + above - upper_left
+                distances = (abs(estimate - left), abs(estimate - above), abs(estimate - upper_left))
+                predictor = (left, above, upper_left)[distances.index(min(distances))]
+            encoded[index] = (current - predictor) & 255
+        scanlines.append(filter_type)
+        scanlines.extend(encoded)
+        previous = bytes(row)
+    if fixed:
+        compressor = zlib.compressobj(level=9, strategy=zlib.Z_FIXED)
+        compressed = compressor.compress(bytes(scanlines)) + compressor.flush()
+    else:
+        compressed = zlib.compress(bytes(scanlines), level=9)
+    header = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
+    return b"\x89PNG\r\n\x1a\n" + png_chunk(b"IHDR", header) + png_chunk(b"IDAT", compressed) + png_chunk(b"IEND", b"")
+
+
+def indexed_png() -> bytes:
+    header = struct.pack(">IIBBBBB", 4, 1, 2, 3, 0, 0, 0)
+    palette = bytes((255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 255, 0))
+    transparency = bytes((255, 192, 128, 0))
+    compressed = zlib.compress(bytes((0, 0b00011011)), level=9)
+    return (
+        b"\x89PNG\r\n\x1a\n"
+        + png_chunk(b"IHDR", header)
+        + png_chunk(b"PLTE", palette)
+        + png_chunk(b"tRNS", transparency)
+        + png_chunk(b"IDAT", compressed)
+        + png_chunk(b"IEND", b"")
+    )
 
 
 def create_asset_pack_fixture() -> None:
@@ -49,6 +111,27 @@ def create_asset_pack_fixture() -> None:
     large_pixels = bytes([17, 34, 51, 255]) * (129 * 128)
     (fixture_assets / "large.png").write_bytes(mod.write_png_rgba_store(129, 128, large_pixels))
     (fixture_assets / "tone.wav").write_bytes(bytes([82, 73, 73, 70, 1, 2, 3, 4]))
+    png_fixtures = ROOT / "build" / "tests" / "png"
+    png_fixtures.mkdir(parents=True, exist_ok=True)
+    dynamic_png = filtered_rgba_png(64, 32)
+    fixed_png = filtered_rgba_png(4, 5, fixed=True)
+    assert ((dynamic_png[43] >> 1) & 3) == 2, "fixture must exercise dynamic Deflate"
+    assert ((fixed_png[43] >> 1) & 3) == 1, "fixture must exercise fixed Deflate"
+    (png_fixtures / "dynamic_filters.png").write_bytes(dynamic_png)
+    (png_fixtures / "fixed_filters.png").write_bytes(fixed_png)
+    (png_fixtures / "indexed.png").write_bytes(indexed_png())
+    samples = (0, 1000, -1000, 32767, -32768, 500, -500, 0)
+    pcm = struct.pack("<" + "h" * len(samples), *samples)
+    wav = (
+        b"RIFF"
+        + struct.pack("<I", 36 + len(pcm))
+        + b"WAVEfmt "
+        + struct.pack("<IHHIIHH", 16, 1, 1, 22050, 44100, 2, 16)
+        + b"data"
+        + struct.pack("<I", len(pcm))
+        + pcm
+    )
+    (ROOT / "build" / "tests" / "tone_valid.wav").write_bytes(wav)
     mod.write_asset_pack(
         {
             "assets": [
@@ -69,7 +152,7 @@ def run_python_tests() -> None:
         raise RuntimeError("could not load tools/minipixels.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    assert mod.VERSION == "0.7.0", mod.VERSION
+    assert mod.VERSION == "0.8.0", mod.VERSION
     package_spec = importlib.util.spec_from_file_location("package_sdk", ROOT / "tools" / "package_sdk.py")
     if package_spec is None or package_spec.loader is None:
         raise RuntimeError("could not load tools/package_sdk.py")
@@ -235,7 +318,7 @@ def run_generated_smoke() -> None:
                 "function main(args)",
                 "  reg = gen.registry()",
                 "  spr = reg.getSprite(\"player\")",
-                "  a.assertEq(spr.width, 32, \"generated sprite width\")",
+                "  a.assertEq(spr.width, 256, \"generated sprite uses packed PNG width\")",
                 "  sheet = gen.sheet_player()",
                 "  a.assertEq(sheet.frameWidth, 32, \"generated sheet width\")",
                 "  a.assertEq(lvl.count(), 3, \"generated level count\")",
@@ -327,6 +410,14 @@ def main() -> int:
         subprocess.check_call(cmd, cwd=str(ROOT))
         print("run:", exe)
         run_test_executable(exe)
+        if test == "foundation_tests.ml":
+            junit = build / "foundation-results.xml"
+            subprocess.check_call(
+                [str(exe), "--format", "junit", "--output", str(junit), "--quiet"],
+                cwd=str(ROOT),
+            )
+            if not junit.is_file():
+                raise RuntimeError("std.test did not write its JUnit report")
     run_generated_smoke()
     print("MiniPixels tests passed")
     return 0

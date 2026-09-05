@@ -12,7 +12,7 @@ struct Game
 Represents the game data used by the minipixels module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L52)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L58)
 
 ## Members
 
@@ -26,7 +26,7 @@ assets
 Stores the assets value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L62)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L68)
 
 <a id="field-field-minipixels-game-audio-audio-src-minipixels-ml-1014532685"></a>
 ### audio
@@ -38,7 +38,7 @@ audio
 Stores the audio value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L64)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L70)
 
 <a id="field-field-minipixels-game-canvas-canvas-src-minipixels-ml-395912317"></a>
 ### canvas
@@ -50,7 +50,7 @@ canvas
 Stores the canvas value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L56)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L62)
 
 <a id="field-field-minipixels-game-config-config-src-minipixels-ml-569195077"></a>
 ### config
@@ -62,7 +62,7 @@ config
 Stores the config value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L54)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L60)
 
 <a id="field-field-minipixels-game-debug-debug-src-minipixels-ml-383497305"></a>
 ### debug
@@ -74,7 +74,7 @@ debug
 Stores the debug value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L72)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L78)
 
 <a id="field-field-minipixels-game-input-input-src-minipixels-ml-1213036537"></a>
 ### input
@@ -86,7 +86,7 @@ input
 Stores the input value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L58)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L64)
 
 <a id="method-method-minipixels-game-quit-function-quit-src-minipixels-ml-1528183005"></a>
 ### quit
@@ -98,7 +98,7 @@ function quit()
 Performs the quit operation for the minipixels game module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L75)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L81)
 
 <a id="field-field-minipixels-game-running-running-src-minipixels-ml-1634284809"></a>
 ### running
@@ -110,7 +110,7 @@ running
 Stores the running value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L68)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L74)
 
 <a id="field-field-minipixels-game-scenes-scenes-src-minipixels-ml-1552745623"></a>
 ### scenes
@@ -122,7 +122,7 @@ scenes
 Stores the scenes value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L66)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L72)
 
 <a id="field-field-minipixels-game-time-time-src-minipixels-ml-951476339"></a>
 ### time
@@ -134,7 +134,7 @@ time
 Stores the time value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L60)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L66)
 
 <a id="field-field-minipixels-game-window-window-src-minipixels-ml-1978613613"></a>
 ### window
@@ -146,4 +146,4 @@ window
 Stores the window value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L70)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L76)

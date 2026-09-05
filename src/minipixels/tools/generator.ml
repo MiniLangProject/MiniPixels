@@ -7,8 +7,12 @@ package minipixels.tools.generator
 import minipixels.tools.fsutil as fsu
 import minipixels.tools.json as json
 import minipixels.tools.manifest as manifest
+import minipixels.assets.png as png
 import std.array as arr
+import std.bytes as by
 import std.fs as fs
+import std.sort as sorting
+import std.string as strings
 import std.string_builder as sb
 
 /// Represents the generate result data used by the minipixels tools generator module.
@@ -57,11 +61,76 @@ function quote(text)
   return "\"" + text + "\""
 end function
 
+/// Quotes a generated source path after normalizing directory separators.
+/// @param text Path text.
+function quotePath(text)
+  return quote(strings.replaceAll(text, "\\", "/"))
+end function
+
+/// Returns the ASCII code of one validated identifier character.
+/// @param ch One-character string.
+function identifierCode(ch)
+  uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  lowercase = "abcdefghijklmnopqrstuvwxyz"
+  digits = "0123456789"
+  offset = strings.indexOf(uppercase, ch, 0)
+  if offset >= 0 then return 65 + offset end if
+  offset = strings.indexOf(lowercase, ch, 0)
+  if offset >= 0 then return 97 + offset end if
+  offset = strings.indexOf(digits, ch, 0)
+  if offset >= 0 then return 48 + offset end if
+  return 95
+end function
+
+/// Encodes the manifest's ASCII-safe identifiers as bytes.
+/// @param text Validated MiniLang identifier.
+function identifierBytes(text)
+  result = bytes(len(text), 0)
+  for index = 0 to len(text) - 1
+    result[index] = identifierCode(text[index])
+  end for
+  return result
+end function
+
 /// Joins join for the minipixels tools generator workflow.
 /// @param root root value consumed by this operation.
 /// @param rel rel value consumed by this operation.
 function join(root, rel)
   return fs.joinPath(root, rel)
+end function
+
+/// Divides non-negative integers while retaining an integer result.
+/// @param value Dividend.
+/// @param divisor Positive divisor.
+function integerDivide(value, divisor)
+  return (value - (value % divisor)) / divisor
+end function
+
+/// Orders manifest assets by stable id for reproducible output.
+/// @param left First asset object.
+/// @param right Second asset object.
+function assetLess(left, right)
+  leftId = stringField(left, "id", "")
+  rightId = stringField(right, "id", "")
+  count = len(leftId)
+  if len(rightId) < count then count = len(rightId) end if
+  for index = 0 to count - 1
+    leftCode = identifierCode(leftId[index])
+    rightCode = identifierCode(rightId[index])
+    if leftCode < rightCode then return true end if
+    if leftCode > rightCode then return false end if
+  end for
+  return len(leftId) < len(rightId)
+end function
+
+/// Returns a sorted copy of a JSON asset array.
+/// @param root Parsed project root.
+function sortedAssets(root)
+  items = arrayField(root, "assets")
+  result = array(len(items))
+  if len(items) > 0 then copyArray(result, 0, items, 0, len(items)) end if
+  sorting.sortBy(result, assetLess)
+  return result
 end function
 
 /// Performs the numberField operation for the minipixels tools generator module.
@@ -141,6 +210,132 @@ function assetHeight(asset)
   return numberField(asset, "height", sheetHeight(asset, 16))
 end function
 
+/// Renders one procedural manifest asset into RGBA8888 pixels.
+/// @param asset Procedural asset object.
+function renderProceduralPixels(asset)
+  width = assetWidth(asset)
+  height = assetHeight(asset)
+  kind = stringField(asset, "kind", "checker")
+  primary = [colorPart(asset, "color", 0, 255), colorPart(asset, "color", 1, 128), colorPart(asset, "color", 2, 0), colorPart(asset, "color", 3, 255)]
+  secondary = [colorPart(asset, "secondary", 0, 40), colorPart(asset, "secondary", 1, 40), colorPart(asset, "secondary", 2, 50), colorPart(asset, "secondary", 3, 255)]
+  pixels = bytes(width * height * 4, 0)
+  tileWidth = integerDivide(width, 4)
+  tileHeight = integerDivide(height, 4)
+  if tileWidth < 1 then tileWidth = 1 end if
+  if tileHeight < 1 then tileHeight = 1 end if
+  for y = 0 to height - 1
+    for x = 0 to width - 1
+      color = primary
+      if kind == "blank" then
+        color = [0, 0, 0, 0]
+      else if kind == "player" then
+        if x == 0 or x == width - 1 or y == 0 or y == height - 1 then
+          color = [0, 0, 0, 0]
+        else if y < integerDivide(height, 3) then
+          color = [255, 232, 170, 255]
+        else if x >= integerDivide(width, 2) then
+          color = secondary
+        end if
+      else if kind == "tiles" then
+        if (integerDivide(x, tileWidth) + integerDivide(y, tileHeight)) % 2 != 0 then color = secondary end if
+      else
+        if (integerDivide(x, 4) + integerDivide(y, 4)) % 2 != 0 then color = secondary end if
+      end if
+      offset = ((y * width) + x) * 4
+      pixels[offset] = color[0]
+      pixels[offset + 1] = color[1]
+      pixels[offset + 2] = color[2]
+      pixels[offset + 3] = color[3]
+    end for
+  end for
+  return pixels
+end function
+
+/// Returns the MPX kind identifier for an asset type.
+/// @param asset Manifest asset object.
+function assetKind(asset)
+  typ = stringField(asset, "type", "image")
+  if typ == "audio" then return 2 end if
+  if typ == "file" then return 3 end if
+  return 1
+end function
+
+/// Loads or generates a payload for native MPX packaging.
+/// @param asset Manifest asset object.
+/// @param projectRoot Project directory.
+function assetPayload(asset, projectRoot)
+  typ = stringField(asset, "type", "image")
+  if typ == "procedural" then
+    return png.encodeRgba(assetWidth(asset), assetHeight(asset), renderProceduralPixels(asset))
+  end if
+  path = stringField(asset, "path", "")
+  if path == "" then return error(9201, "asset '" + stringField(asset, "id", "asset") + "' requires a path") end if
+  return fs.readAllBytes(join(projectRoot, path))
+end function
+
+/// Writes a deterministic native MiniPixels asset pack.
+/// @param root Parsed project root.
+/// @param projectRoot Project directory.
+/// @param path Output MPX path.
+/// @param r Generation result receiving diagnostics.
+function writeAssetPack(root, projectRoot, path, r)
+  sourceAssets = sortedAssets(root)
+  count = len(sourceAssets)
+  ids = array(count)
+  kinds = array(count, 0)
+  payloads = array(count)
+  indexSize = 8
+  payloadSize = 0
+  if count > 0 then
+    for index = 0 to count - 1
+      asset = sourceAssets[index]
+      id = stringField(asset, "id", "asset")
+      payload = try(assetPayload(asset, projectRoot))
+      if typeof(payload) == "error" then
+        addError(r, payload.message)
+        return false
+      end if
+      encodedId = identifierBytes(id)
+      ids[index] = encodedId
+      kinds[index] = assetKind(asset)
+      payloads[index] = payload
+      indexSize = indexSize + 12 + len(encodedId)
+      payloadSize = payloadSize + len(payload)
+    end for
+  end if
+  output = bytes(indexSize + payloadSize, 0)
+  output[0] = 77
+  output[1] = 80
+  output[2] = 88
+  output[3] = 49
+  by.writeU32LE(output, 4, count)
+  entryOffset = 8
+  payloadOffset = indexSize
+  if count > 0 then
+    for index = 0 to count - 1
+      idBytes = ids[index]
+      payload = payloads[index]
+      by.writeU16LE(output, entryOffset, len(idBytes))
+      copyBytes(output, entryOffset + 2, idBytes, 0, len(idBytes))
+      entryOffset = entryOffset + 2 + len(idBytes)
+      output[entryOffset] = kinds[index]
+      output[entryOffset + 1] = 0
+      by.writeU32LE(output, entryOffset + 2, payloadOffset)
+      by.writeU32LE(output, entryOffset + 6, len(payload))
+      entryOffset = entryOffset + 10
+      if len(payload) > 0 then copyBytes(output, payloadOffset, payload, 0, len(payload)) end if
+      payloadOffset = payloadOffset + len(payload)
+    end for
+  end if
+  written = try(fsu.writeBytes(path, output))
+  if typeof(written) == "error" or written == false then
+    if typeof(written) != "error" then written = error(9201, "could not write asset pack: " + path) end if
+    addError(r, written.message)
+    return false
+  end if
+  return true
+end function
+
 /// Returns whether sheet is available.
 /// @param asset asset value consumed by this operation.
 function hasSheet(asset)
@@ -158,84 +353,39 @@ function sheetModule(asset, id)
   spacing = numberField(sheet, "spacing", 0)
   margin = numberField(sheet, "margin", 0)
   code = sb.StringBuilder.withCapacity(256)
+  code.appendLine("sheet_" + id + "_cache = void")
+  code.appendLine("")
   code.appendLine("function sheet_" + id + "()")
-  code.appendLine("  spr = make_" + id + "()")
-  code.appendLine("  return mp.spriteSheet(spr.image, " + fw + ", " + fh + ", " + spacing + ", " + margin + ")")
+  code.appendLine("  global sheet_" + id + "_cache")
+  code.appendLine("  if sheet_" + id + "_cache == void then")
+  code.appendLine("    spr = make_" + id + "()")
+  code.appendLine("    sheet_" + id + "_cache = mp.spriteSheet(spr.image, " + fw + ", " + fh + ", " + spacing + ", " + margin + ")")
+  code.appendLine("  end if")
+  code.appendLine("  return sheet_" + id + "_cache")
   code.appendLine("end function")
   code.appendLine("")
   return code.toString()
 end function
 
 /// Performs the assetsHeader operation for the minipixels tools generator module.
-function assetsHeader()
+/// @param fallbackPackPath Project-relative fallback path to the generated pack.
+function assetsHeader(fallbackPackPath)
   code = sb.StringBuilder.withCapacity(2048)
   code.appendLine("package generated.assets")
   code.appendLine("")
   code.appendLine("import minipixels as mp")
   code.appendLine("import minipixels.assets.assets as assets")
   code.appendLine("")
-  // The generated module keeps procedural drawing local so projects can compile without the Python asset processor.
-  code.appendLine("function setPixel(pix, width, x, y, r, g, b, a)")
-  code.appendLine("  i = ((y * width) + x) * 4")
-  code.appendLine("  pix[i] = r")
-  code.appendLine("  pix[i + 1] = g")
-  code.appendLine("  pix[i + 2] = b")
-  code.appendLine("  pix[i + 3] = a")
-  code.appendLine("end function")
+  code.appendLine("assetPackCache = void")
   code.appendLine("")
-  code.appendLine("function proceduralPixels(width, height, kind, pr, pg, pb, pa, sr, sg, sb, sa)")
-  code.appendLine("  pix = bytes(width * height * 4, 0)")
-  code.appendLine("  tileW = width / 4")
-  code.appendLine("  if tileW < 1 then tileW = 1 end if")
-  code.appendLine("  tileH = height / 4")
-  code.appendLine("  if tileH < 1 then tileH = 1 end if")
-  code.appendLine("  for y = 0 to height - 1")
-  code.appendLine("    for x = 0 to width - 1")
-  code.appendLine("      r = pr")
-  code.appendLine("      g = pg")
-  code.appendLine("      b = pb")
-  code.appendLine("      a = pa")
-  code.appendLine("      if kind == \"blank\" then")
-  code.appendLine("        r = 0")
-  code.appendLine("        g = 0")
-  code.appendLine("        b = 0")
-  code.appendLine("        a = 0")
-  code.appendLine("      else if kind == \"player\" then")
-  code.appendLine("        if x == 0 or x == width - 1 or y == 0 or y == height - 1 then")
-  code.appendLine("          r = 0")
-  code.appendLine("          g = 0")
-  code.appendLine("          b = 0")
-  code.appendLine("          a = 0")
-  code.appendLine("        else if y < height / 3 then")
-  code.appendLine("          r = 255")
-  code.appendLine("          g = 232")
-  code.appendLine("          b = 170")
-  code.appendLine("          a = 255")
-  code.appendLine("        else if x >= width / 2 then")
-  code.appendLine("          r = sr")
-  code.appendLine("          g = sg")
-  code.appendLine("          b = sb")
-  code.appendLine("          a = sa")
-  code.appendLine("        end if")
-  code.appendLine("      else if kind == \"tiles\" then")
-  code.appendLine("        if ((x / tileW) + (y / tileH)) % 2 != 0 then")
-  code.appendLine("          r = sr")
-  code.appendLine("          g = sg")
-  code.appendLine("          b = sb")
-  code.appendLine("          a = sa")
-  code.appendLine("        end if")
-  code.appendLine("      else")
-  code.appendLine("        if ((x / 4) + (y / 4)) % 2 != 0 then")
-  code.appendLine("          r = sr")
-  code.appendLine("          g = sg")
-  code.appendLine("          b = sb")
-  code.appendLine("          a = sa")
-  code.appendLine("        end if")
-  code.appendLine("      end if")
-  code.appendLine("      setPixel(pix, width, x, y, r, g, b, a)")
-  code.appendLine("    end for")
-  code.appendLine("  end for")
-  code.appendLine("  return pix")
+  code.appendLine("function assetPack()")
+  code.appendLine("  global assetPackCache")
+  code.appendLine("  if assetPackCache == void then")
+  code.appendLine("    assetPackCache = try(mp.openAssetPack(\"assets.mpx\"))")
+  code.appendLine("    if typeof(assetPackCache) == \"error\" then assetPackCache = try(mp.openAssetPack(\"build\\\\assets.mpx\")) end if")
+  code.appendLine("    if typeof(assetPackCache) == \"error\" then assetPackCache = mp.openAssetPack(" + quotePath(fallbackPackPath) + ") end if")
+  code.appendLine("  end if")
+  code.appendLine("  return assetPackCache")
   code.appendLine("end function")
   code.appendLine("")
   return code.toString()
@@ -246,39 +396,52 @@ end function
 /// @param r r value consumed by this operation.
 function assetModule(asset, r)
   id = stringField(asset, "id", "asset")
-  typ = stringField(asset, "type", "image")
-  w = assetWidth(asset)
-  h = assetHeight(asset)
-  kind = stringField(asset, "kind", "checker")
-  pr = colorPart(asset, "color", 0, 255)
-  pg = colorPart(asset, "color", 1, 128)
-  pb = colorPart(asset, "color", 2, 0)
-  pa = colorPart(asset, "color", 3, 255)
-  sr = colorPart(asset, "secondary", 0, 40)
-  sg = colorPart(asset, "secondary", 1, 40)
-  sb = colorPart(asset, "secondary", 2, 50)
-  sa = colorPart(asset, "secondary", 3, 255)
-  if typ == "image" then
-    addWarning(r, "image asset '" + id + "' uses native placeholder pixels; PNG embedding is still legacy")
-    kind = "checker"
-  end if
   code = sb.StringBuilder.withCapacity(512)
+  code.appendLine("sprite_" + id + "_cache = void")
+  code.appendLine("")
   code.appendLine("function make_" + id + "()")
-  code.appendLine("  pix = proceduralPixels(" + w + ", " + h + ", " + quote(kind) + ", " + pr + ", " + pg + ", " + pb + ", " + pa + ", " + sr + ", " + sg + ", " + sb + ", " + sa + ")")
-  code.appendLine("  img = mp.image(" + w + ", " + h + ", pix, " + quote(id) + ")")
-  code.appendLine("  return mp.spriteFromImage(img, " + quote(id) + ")")
+  code.appendLine("  global sprite_" + id + "_cache")
+  code.appendLine("  if sprite_" + id + "_cache == void then")
+  code.appendLine("    img = mp.loadPngFromPack(assetPack(), " + quote(id) + ")")
+  code.appendLine("    sprite_" + id + "_cache = mp.spriteFromImage(img, " + quote(id) + ")")
+  code.appendLine("  end if")
+  code.appendLine("  return sprite_" + id + "_cache")
   code.appendLine("end function")
   code.appendLine("")
   code.appendString(sheetModule(asset, id))
   return code.toString()
 end function
 
+/// Emits an audio or generic-file accessor backed by the generated pack.
+/// @param asset Manifest asset object.
+function runtimeAssetModule(asset)
+  id = stringField(asset, "id", "asset")
+  typ = stringField(asset, "type", "file")
+  code = sb.StringBuilder.withCapacity(256)
+  if typ == "audio" then
+    code.appendLine("audio_" + id + "_cache = void")
+    code.appendLine("")
+    code.appendLine("function audio_" + id + "()")
+    code.appendLine("  global audio_" + id + "_cache")
+    code.appendLine("  if audio_" + id + "_cache == void then audio_" + id + "_cache = mp.audioClipFromBytes(mp.loadBytesFromPack(assetPack(), " + quote(id) + "), " + quote(id) + ") end if")
+    code.appendLine("  return audio_" + id + "_cache")
+    code.appendLine("end function")
+  else
+    code.appendLine("function file_" + id + "()")
+    code.appendLine("  return mp.loadBytesFromPack(assetPack(), " + quote(id) + ")")
+    code.appendLine("end function")
+  end if
+  code.appendLine("")
+  return code.toString()
+end function
+
 /// Performs the assetsModule operation for the minipixels tools generator module.
 /// @param root root value consumed by this operation.
+/// @param fallbackPackPath Project-relative fallback pack path.
 /// @param r r value consumed by this operation.
-function assetsModule(root, r)
+function assetsModule(root, fallbackPackPath, r)
   code = sb.StringBuilder.withCapacity(4096)
-  code.appendString(assetsHeader())
+  code.appendString(assetsHeader(fallbackPackPath))
   assets = json.get(root, "assets")
   embedded = []
   if typeof(assets) != "void" and assets.kind == "array" and len(assets.arrayItems) > 0 then
@@ -290,7 +453,7 @@ function assetsModule(root, r)
         code.appendString(assetModule(asset, r))
         embedded = arr.append(embedded, asset)
       else
-        addWarning(r, "runtime asset '" + id + "' is validated but not embedded by native generate yet")
+        code.appendString(runtimeAssetModule(asset))
       end if
     end for
   end if
@@ -300,7 +463,7 @@ function assetsModule(root, r)
     for i = 0 to len(embedded) - 1
       asset = embedded[i]
       id = stringField(asset, "id", "asset")
-      code.appendLine("  reg.add(" + quote(id) + ", make_" + id + "())")
+      code.appendLine("  reg.addLazy(" + quote(id) + ", make_" + id + ")")
     end for
   end if
   code.appendLine("  return reg")
@@ -484,6 +647,168 @@ function validateLevels(r, levelsDoc, source)
   return levels.arrayItems
 end function
 
+/// Returns a named Tiled property or a direct object field.
+/// @param obj Tiled layer or object.
+/// @param key Property name.
+function tiledProperty(obj, key)
+  properties = arrayField(obj, "properties")
+  if len(properties) > 0 then
+    for index = 0 to len(properties) - 1
+      property = properties[index]
+      if stringField(property, "name", "") == key then return json.get(property, "value") end if
+    end for
+  end if
+  return json.get(obj, key)
+end function
+
+/// Returns whether a JSON value represents true.
+/// @param value JSON value to inspect.
+function jsonTrue(value)
+  return typeof(value) != "void" and value.kind == "bool" and value.boolValue
+end function
+
+/// Returns whether a Tiled tile layer is explicitly marked as collision data.
+/// @param layer Tiled layer object.
+function tiledLayerIsSolid(layer)
+  name = strings.toLowerAscii(stringField(layer, "name", ""))
+  if name == "collision" or name == "collisions" or name == "solid" or name == "ground" then return true end if
+  return jsonTrue(tiledProperty(layer, "collision")) or jsonTrue(tiledProperty(layer, "solid"))
+end function
+
+/// Returns a normalized Tiled object kind.
+/// @param obj Tiled object.
+function tiledObjectKind(obj)
+  kind = stringField(obj, "type", "")
+  if kind == "" then kind = stringField(obj, "name", "") end if
+  if kind == "" then kind = json.asString(tiledProperty(obj, "kind"), "") end if
+  if kind == "" then kind = json.asString(tiledProperty(obj, "type"), "") end if
+  return strings.toLowerAscii(kind)
+end function
+
+/// Reads an integer-valued Tiled field or property.
+/// @param obj Tiled object.
+/// @param key Field or property name.
+/// @param fallback Value used when absent.
+function tiledNumber(obj, key, fallback)
+  return json.asNumber(tiledProperty(obj, key), fallback)
+end function
+
+/// Creates a two-dimensional JSON point object.
+/// @param x Point x coordinate.
+/// @param y Point y coordinate.
+function jsonPoint(x, y)
+  return json.object(["x", "y"], [json.number(x), json.number(y)])
+end function
+
+/// Normalizes one finite CSV-encoded Tiled map into the MiniPixels level model.
+/// @param document Parsed Tiled map.
+/// @param r Generation result receiving diagnostics.
+/// @param source Source path used in diagnostics.
+function normalizeTiled(document, r, source)
+  width = numberField(document, "width", 0)
+  height = numberField(document, "height", 0)
+  tileWidth = numberField(document, "tilewidth", 32)
+  tileHeight = numberField(document, "tileheight", 32)
+  if width <= 0 or height <= 0 then
+    addError(r, source + ": Tiled map width and height must be greater than zero")
+    return void
+  end if
+  layers = arrayField(document, "layers")
+  explicitSolid = false
+  if len(layers) > 0 then
+    for index = 0 to len(layers) - 1
+      layer = layers[index]
+      if stringField(layer, "type", "") == "tilelayer" and tiledLayerIsSolid(layer) then explicitSolid = true end if
+    end for
+  end if
+  platforms = []
+  if len(layers) > 0 then
+    for layerIndex = 0 to len(layers) - 1
+      layer = layers[layerIndex]
+      if stringField(layer, "type", "") == "tilelayer" and (explicitSolid == false or tiledLayerIsSolid(layer)) then
+        layerWidth = numberField(layer, "width", width)
+        layerHeight = numberField(layer, "height", height)
+        if layerHeight > height then layerHeight = height end if
+        data = arrayField(layer, "data")
+        if len(data) == 0 then
+          addError(r, source + ": Tiled CSV-encoded layer data is required")
+          return void
+        end if
+        y = 0
+        while y < layerHeight
+          x = 0
+          while x < layerWidth
+            offset = y * layerWidth + x
+            gid = 0
+            if offset < len(data) then gid = json.asNumber(data[offset], 0) & 0x1FFFFFFF end if
+            if gid <= 0 then
+              x = x + 1
+            else
+              start = x
+              while x < layerWidth
+                scanOffset = y * layerWidth + x
+                scan = 0
+                if scanOffset < len(data) then scan = json.asNumber(data[scanOffset], 0) & 0x1FFFFFFF end if
+                if scan != gid then break end if
+                x = x + 1
+              end while
+              platforms = arr.append(platforms, json.object(
+                ["x", "y", "w", "tile"],
+                [json.number(start), json.number(y), json.number(x - start), json.number(gid)]
+              ))
+            end if
+          end while
+          y = y + 1
+        end while
+      end if
+    end for
+  end if
+  spawnY = (height - 3) * tileHeight
+  if spawnY < 0 then spawnY = 0 end if
+  exitX = (width * tileWidth) - (3 * tileWidth)
+  exitY = (height - 4) * tileHeight
+  if exitX < 0 then exitX = 0 end if
+  if exitY < 0 then exitY = 0 end if
+  spawn = jsonPoint(48, spawnY)
+  exitPoint = jsonPoint(exitX, exitY)
+  enemies = []
+  coins = []
+  if len(layers) > 0 then
+    for layerIndex = 0 to len(layers) - 1
+      layer = layers[layerIndex]
+      if stringField(layer, "type", "") == "objectgroup" then
+        objects = arrayField(layer, "objects")
+        if len(objects) > 0 then
+          for objectIndex = 0 to len(objects) - 1
+            obj = objects[objectIndex]
+            kind = tiledObjectKind(obj)
+            x = numberField(obj, "x", 0)
+            y = numberField(obj, "y", 0)
+            if kind == "spawn" or kind == "player" then
+              spawn = jsonPoint(x, y)
+            else if kind == "exit" or kind == "goal" then
+              exitPoint = jsonPoint(x, y)
+            else if kind == "coin" then
+              coins = arr.append(coins, jsonPoint(x, y))
+            else if kind == "enemy" then
+              objectWidth = numberField(obj, "width", tileWidth * 4)
+              enemies = arr.append(enemies, json.object(
+                ["x", "y", "minX", "maxX", "kind"],
+                [json.number(x), json.number(y), json.number(tiledNumber(obj, "minX", x)), json.number(tiledNumber(obj, "maxX", x + objectWidth)), json.number(tiledNumber(obj, "kind", 0))]
+              ))
+            end if
+          end for
+        end if
+      end if
+    end for
+  end if
+  level = json.object(
+    ["width", "height", "spawn", "exit", "platforms", "enemies", "coins"],
+    [json.number(width), json.number(height), spawn, exitPoint, json.array(platforms), json.array(enemies), json.array(coins)]
+  )
+  return json.object(["levels"], [json.array([level])])
+end function
+
 /// Performs the levelsModule operation for the minipixels tools generator module.
 /// @param m m value consumed by this operation.
 /// @param r r value consumed by this operation.
@@ -500,9 +825,13 @@ function levelsModule(m, r)
     return levelsStubModule()
   end if
   if json.has(parsed, "levels") == false then
-    // Tiled/TMJ support still belongs to the Python pipeline until the native importer is ported.
-    addWarning(r, "native Tiled/TMJ import is not implemented yet; wrote generated.levels stub")
-    return levelsStubModule()
+    if json.has(parsed, "layers") and json.has(parsed, "tilewidth") then
+      parsed = normalizeTiled(parsed, r, path)
+      if typeof(parsed) == "void" then return levelsStubModule() end if
+    else
+      addError(r, path + ": unsupported level JSON shape")
+      return levelsStubModule()
+    end if
   end if
   levels = validateLevels(r, parsed, path)
   if len(levels) <= 0 then return levelsStubModule() end if
@@ -596,7 +925,9 @@ function generate(projectPath, outDir)
     addError(r, "could not create output directory: " + target)
     return r
   end if
-  wr = try(fsu.writeText(fs.joinPath(target, "assets.ml"), assetsModule(root, r)))
+  packPath = fs.joinPath(fs.joinPath(m.root, "build"), "assets.mpx")
+  if writeAssetPack(root, m.root, packPath, r) == false then return r end if
+  wr = try(fsu.writeText(fs.joinPath(target, "assets.ml"), assetsModule(root, packPath, r)))
   if typeof(wr) == "error" then
     addError(r, wr.message)
     return r

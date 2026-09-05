@@ -9,12 +9,48 @@
 struct AudioClip
 ```
 
-Represents the audio clip data used by the minipixels audio audio module.
+Represents a WAV clip and its lazily parsed PCM payload.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L97)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L145)
 
 ## Members
+
+<a id="field-field-minipixels-audio-audio-audioclip-bitspersample-bitspersample-src-minipixels-audio-audio-ml-619087673"></a>
+### bitsPerSample
+
+```ml
+bitsPerSample
+```
+
+Source bits per sample.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L167)
+
+<a id="field-field-minipixels-audio-audio-audioclip-blockalign-blockalign-src-minipixels-audio-audio-ml-1937899229"></a>
+### blockAlign
+
+```ml
+blockAlign
+```
+
+Source bytes per interleaved frame.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L169)
+
+<a id="field-field-minipixels-audio-audio-audioclip-channels-channels-src-minipixels-audio-audio-ml-909289801"></a>
+### channels
+
+```ml
+channels
+```
+
+Source channel count.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L163)
 
 <a id="field-field-minipixels-audio-audio-audioclip-data-data-src-minipixels-audio-audio-ml-810038921"></a>
 ### data
@@ -23,10 +59,34 @@ Represents the audio clip data used by the minipixels audio audio module.
 data
 ```
 
-Stores the data value associated with audio clip.
+Original WAV file bytes, when loaded in memory.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L107)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L155)
+
+<a id="field-field-minipixels-audio-audio-audioclip-formattag-formattag-src-minipixels-audio-audio-ml-40666461"></a>
+### formatTag
+
+```ml
+formatTag
+```
+
+WAV format identifier.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L161)
+
+<a id="field-field-minipixels-audio-audio-audioclip-framecount-framecount-src-minipixels-audio-audio-ml-59754737"></a>
+### frameCount
+
+```ml
+frameCount
+```
+
+Number of source sample frames.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L173)
 
 <a id="field-field-minipixels-audio-audio-audioclip-looping-looping-src-minipixels-audio-audio-ml-1320651897"></a>
 ### looping
@@ -35,10 +95,10 @@ Stores the data value associated with audio clip.
 looping
 ```
 
-Stores the looping value associated with audio clip.
+Whether playback loops after the final frame.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L105)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L153)
 
 <a id="field-field-minipixels-audio-audio-audioclip-name-name-src-minipixels-audio-audio-ml-793758243"></a>
 ### name
@@ -47,10 +107,10 @@ Stores the looping value associated with audio clip.
 name
 ```
 
-Stores the name value associated with audio clip.
+Stable clip name.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L101)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L149)
 
 <a id="field-field-minipixels-audio-audio-audioclip-path-path-src-minipixels-audio-audio-ml-140685895"></a>
 ### path
@@ -59,10 +119,10 @@ Stores the name value associated with audio clip.
 path
 ```
 
-Stores the path value associated with audio clip.
+Optional source path.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L99)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L147)
 
 <a id="method-method-minipixels-audio-audio-audioclip-play-function-play-audio-src-minipixels-audio-audio-ml-1822210437"></a>
 ### play
@@ -71,14 +131,50 @@ Stores the path value associated with audio clip.
 function play(audio)
 ```
 
-Performs the play operation for the minipixels audio audio audio clip module.
+Plays this clip through an AudioState or AudioMixer.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `audio` | `dynamic` | — | audio value consumed by this operation. |
+| `audio` | `dynamic` | — | Destination audio state or mixer. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L123)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L187)
+
+<a id="field-field-minipixels-audio-audio-audioclip-prepared-prepared-src-minipixels-audio-audio-ml-1124427359"></a>
+### prepared
+
+```ml
+prepared
+```
+
+Whether WAV parsing has been attempted.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L157)
+
+<a id="field-field-minipixels-audio-audio-audioclip-sampledata-sampledata-src-minipixels-audio-audio-ml-1356099641"></a>
+### sampleData
+
+```ml
+sampleData
+```
+
+Detached PCM sample payload.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L171)
+
+<a id="field-field-minipixels-audio-audio-audioclip-samplerate-samplerate-src-minipixels-audio-audio-ml-596789577"></a>
+### sampleRate
+
+```ml
+sampleRate
+```
+
+Source sample rate.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L165)
 
 <a id="method-method-minipixels-audio-audio-audioclip-setlooping-function-setlooping-value-src-minipixels-audio-audio-ml-1044269888"></a>
 ### setLooping
@@ -87,14 +183,14 @@ Performs the play operation for the minipixels audio audio audio clip module.
 function setLooping(value)
 ```
 
-Updates looping maintained by the minipixels audio audio module.
+Sets looping behavior.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `value` | `dynamic` | — | Value consumed or transformed by the operation. |
+| `value` | `dynamic` | — | Whether playback should loop. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L117)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L182)
 
 <a id="method-method-minipixels-audio-audio-audioclip-setvolume-function-setvolume-value-src-minipixels-audio-audio-ml-232371152"></a>
 ### setVolume
@@ -103,14 +199,26 @@ Updates looping maintained by the minipixels audio audio module.
 function setVolume(value)
 ```
 
-Updates volume maintained by the minipixels audio audio module.
+Sets clip volume.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `value` | `dynamic` | — | Value consumed or transformed by the operation. |
+| `value` | `dynamic` | — | Percentage from 0 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L111)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L177)
+
+<a id="field-field-minipixels-audio-audio-audioclip-valid-valid-src-minipixels-audio-audio-ml-1965274953"></a>
+### valid
+
+```ml
+valid
+```
+
+Whether the parsed format is supported.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L159)
 
 <a id="field-field-minipixels-audio-audio-audioclip-volume-volume-src-minipixels-audio-audio-ml-143217357"></a>
 ### volume
@@ -119,7 +227,7 @@ Updates volume maintained by the minipixels audio audio module.
 volume
 ```
 
-Stores the volume value associated with audio clip.
+Clip volume percentage.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L103)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L151)

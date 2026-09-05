@@ -3,11 +3,11 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.7.0`
+Current version: `0.8.0`
 
-MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.3 or newer and builds native Windows x64 executables.
+MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.4 or newer and builds native Windows x64 executables.
 
-MiniPixels focuses on a small but working 2D engine slice: a Win32 window, fixed logical framebuffer, optional OpenGL/WGL presentation, nearest-neighbor scaling, focus-aware keyboard input, sprites, MiniPixels asset packs with runtime PNG decoding, runtime file assets, tilemaps, camera scrolling, simple collision, bitmap text, basic audio, headless tests, and example projects.
+MiniPixels focuses on a small but working 2D engine slice: a Win32 window, fixed logical framebuffer, optional OpenGL/WGL presentation, configurable keyboard/mouse actions, sprites and rotated render targets, cached asset packs with general PNG decoding, scene stacks, swept tile collision, bitmap text, multi-voice PCM audio, headless tests, and example projects.
 
 ![Moving Sprite](docs/images/moving-sprite.png)
 
@@ -32,7 +32,7 @@ diagnostics as failures.
 ## Requirements
 
 - Windows
-- MiniLang Compiler 1.2.3 or newer in a sibling `MiniLangCompilerPy` checkout, or a Python/self-hosted compiler path passed with `--compiler`
+- MiniLang Compiler 1.2.4 or newer in a sibling `MiniLangCompilerPy` checkout, or a Python/self-hosted compiler path passed with `--compiler`
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
 
 Expected sibling layout during local development:
@@ -57,7 +57,7 @@ Build without running:
 python tools\minipixels.py build examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```
 
-The self-hosted 1.2.3 compiler is accepted directly as well, for example `--compiler ..\MiniLangCompilerML\build\mlc_win64.exe`.
+The self-hosted 1.2.4 compiler is accepted directly as well, for example `--compiler ..\MiniLangCompilerML\build\mlc_win64.exe`.
 
 Build the native MiniLang CLI:
 
@@ -71,7 +71,7 @@ build\tools\minipixels.exe generate examples\jump-and-run\minipixels.json exampl
 build\tools\minipixels.exe new my-game platformer
 ```
 
-The native CLI currently provides `info`, `doctor`, `validate`, `generate`, and `new`. Native `generate` writes importable `generated.assets` and `generated.levels` modules, supports `procedural` sprites, emits sheet helpers, and imports MiniPixels `levels.json`. The full image asset pack pipeline, Tiled/TMJ import, runtime asset copying, `build`, `run`, and `package` still live in the Python tool while those pieces are moved into MiniLang.
+The native CLI provides `info`, `doctor`, `validate`, `generate`, and `new`. Native `generate` writes a deterministic `assets.mpx`, importable `generated.assets` and `generated.levels` modules, sheet/audio/file helpers, and imports either MiniPixels level JSON or Tiled/TMJ. Compiler launching and SDK packaging remain in the Python project driver.
 
 Tooling split:
 
@@ -79,9 +79,9 @@ Tooling split:
 | --- | --- | --- |
 | Create a project | `new` | `new` |
 | Inspect/validate manifests | `info`, `doctor`, `validate` | `info`, `doctor`, `validate` |
-| Generate `generated.assets` | `procedural` sprites and placeholder `image` sprites | image and procedural loaders backed by `assets.mpx` |
-| Generate `generated.levels` | MiniPixels `levels.json` | MiniPixels `levels.json` and Tiled JSON/TMJ |
-| Create/copy runtime assets | Not yet | `assets.mpx` for images/audio/files |
+| Generate `generated.assets` | image/procedural/audio/file helpers backed by `assets.mpx` | image/procedural/audio/file helpers backed by `assets.mpx` |
+| Generate `generated.levels` | MiniPixels `levels.json` and Tiled JSON/TMJ | MiniPixels `levels.json` and Tiled JSON/TMJ |
+| Create runtime assets | deterministic `assets.mpx` | deterministic `assets.mpx` plus build reports |
 | Build/run/package | Not yet | `build`, `run`, `package`, `pack` |
 
 Run tests:
@@ -253,7 +253,7 @@ Demonstrates direct per-pixel framebuffer manipulation from MiniLang.
 python tools\minipixels.py run examples\tiled-platformer\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```
 
-Demonstrates the Python build pipeline's Tiled JSON/TMJ importer with a solid tile layer and object-layer spawn, exit, coins, and enemy patrol data. The native MiniLang generator currently writes a level stub for Tiled maps until native Tiled import is added.
+Demonstrates the shared Tiled JSON/TMJ importer with a solid tile layer and object-layer spawn, exit, coins, and enemy patrol data.
 
 ## CLI
 
@@ -269,7 +269,7 @@ python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler
 python tools\minipixels.py package
 ```
 
-The Python CLI validates project JSON, reads image assets and renders procedural assets at build time, writes a deterministic MiniPixels asset container (`assets.mpx`), generates deterministic MiniLang asset modules, emits SpriteSheet helper factories for assets with `sheet` metadata, includes runtime assets such as `type: "audio"` or `type: "file"` in the pack, generates `generated.levels` from MiniPixels or Tiled JSON when `levels.path` is present, writes `asset-report.json`, and invokes the regular MiniLang compiler. Image payloads inside `assets.mpx` are PNG-encoded in the MiniPixels runtime profile and decoded by MiniLang code through `mp.loadPngFromPack(...)`. Audio payloads can be loaded as bytes and played directly from memory through WinMM `SND_MEMORY` clips, so example builds no longer need loose WAV files next to the executable. The native MiniLang CLI can already validate manifests and generate importable modules for `procedural` sprites and MiniPixels `levels.json`.
+The Python CLI validates project JSON, writes deterministic asset/level modules and `assets.mpx`, emits `asset-report.json`, and invokes the MiniLang compiler. The native MiniLang generator now covers the same runtime asset kinds and level formats. Generated audio helpers create memory-backed WAV clips, so example builds do not need loose sound files next to the executable.
 
 Windowed games built through `tools\minipixels.py build` or `run` use the Windows GUI PE subsystem by default, so double-clicking the executable opens only the game window and no companion console. Use `--headless` for console-subsystem builds that are meant to print test or tool output.
 
@@ -305,11 +305,11 @@ Current `kind` values:
 
 | Kind | Asset type | Payload |
 | --- | --- | --- |
-| `1` | `image` or `procedural` | MiniPixels PNG-profile bytes |
+| `1` | `image` or `procedural` | non-interlaced PNG bytes |
 | `2` | `audio` | Original audio file bytes, usually WAV |
 | `3` | `file` | Original file bytes |
 
-Image assets are transcoded and procedural assets are rendered by the Python CLI before they are written in the MiniPixels PNG profile. That profile is deliberately narrow so the MiniLang runtime decoder stays small: 8-bit RGBA, PNG filter type `0`, non-interlaced, and a zlib stream made of stored Deflate blocks. Audio and file assets are stored byte-for-byte.
+The runtime decodes stored, fixed, and dynamic Deflate streams, PNG filters 0 through 4, grayscale, RGB, indexed, grayscale-alpha, and RGBA data. Current decoding is non-interlaced; the Python packer still emits a deterministic 8-bit RGBA profile while the native packer can retain ordinary source PNG bytes. Audio and file assets are stored byte-for-byte.
 
 Runtime APIs:
 
@@ -373,9 +373,9 @@ mp.playAudio(game.audio, clip)
 - `minipixels.graphics.font`: 5x7 bitmap text helpers
 - `minipixels.graphics.sprite`: images, sprites, sprite sheets
 - `minipixels.assets.pack`: MiniPixels `.mpx` asset container reader
-- `minipixels.assets.png`: MiniPixels PNG-profile decoder for packed RGBA images
+- `minipixels.assets.png`: PNG decoder/encoder and screenshot support
 - `minipixels.platform.windows`: Win32 window, input, DIB renderer
-- `minipixels.input.input`: keyboard snapshot and action helpers
+- `minipixels.input.input`: buffered configurable keyboard/mouse actions
 - `minipixels.world.camera`: pixel-snapped 2D camera
 - `minipixels.world.tilemap`: tile rendering and AABB tile collisions
 - `minipixels.animation.animation`: frame-duration sprite animations
@@ -390,29 +390,29 @@ Implemented:
 - Fixed logical resolution and resize stretch
 - CPU RGBA8888 framebuffer with direct masked-DIB GDI presentation
 - Nearest-neighbor GDI presentation and optional OpenGL/WGL presentation
-- Keyboard input only while the game window has focus
-- FPS in the window title
+- Buffered keyboard/mouse input only while the game window has focus
+- High-resolution fixed updates, interpolation alpha, smoothed FPS/UPS, focus pause, and frame limiting
 - Safe pixel operations and primitive drawing
-- MiniPixels `.mpx` asset container generation in the Python pipeline
-- Runtime PNG decoding in MiniLang for packed RGBA image assets
-- Native MiniLang generation for procedural sprites and MiniPixels `levels.json`
+- MiniPixels `.mpx` generation in both project pipelines with indexed runtime caches
+- General non-interlaced PNG hot-loading plus deterministic screenshot encoding
+- Native MiniLang generation for real image/procedural/audio/file assets and MiniPixels/Tiled levels
 - Runtime asset packing for image/audio/file assets
-- Sprites, sprite sheets, animation
-- Facade helpers for world drawing, text, input edges, animation-from-sheet, and audio state/loop/stop
+- Cached spritesheets, animation, rotated sprites, render targets, and dirty-region GPU uploads
+- Scene stack with enter/exit/pause/resume/update/render lifecycle
+- Configurable action bindings, pointer coordinates/deltas/buttons, and wheel input
+- Multi-voice PCM WAV mixer with bus/clip/channel volume, pan, and looping music
 - Build-time SpriteSheet metadata and `asset-report.json`
 - Build-time level JSON generation through `generated.levels`
 - Camera, scrolling, parallax bands
-- Tilemap culling and simple collision
-- Headless and framehash regression tests
+- Tilemap culling, cached frames, growable layers, and swept collision
+- Headless, framehash, PNG, PCM, lifecycle, and `std.test` regression tests
 - GitHub Actions CI for tests and example builds
 - SDK ZIP packaging with SHA256 checksum and release upload on `v*` tags
 - Version file, changelog, and first-game guide
 
 Not yet implemented:
 
-- General-purpose PNG hot-loading outside MiniPixels asset packs
-- Native asset-pack generation and native Tiled/TMJ import
-- Cross-platform audio mixer beyond the WinMM hook
+- Cross-platform window/audio backends beyond Win32, OpenGL/WGL, and waveOut
 - Full editor tooling
 - Advanced physics or ECS
 

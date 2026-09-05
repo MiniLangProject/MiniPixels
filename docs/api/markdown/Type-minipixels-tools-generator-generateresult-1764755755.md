@@ -12,7 +12,7 @@ struct GenerateResult
 Represents the generate result data used by the minipixels tools generator module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L15)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L19)
 
 ## Members
 
@@ -26,7 +26,7 @@ errors
 Stores the errors value associated with generate result.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L23)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L27)
 
 <a id="field-field-minipixels-tools-generator-generateresult-ok-ok-src-minipixels-tools-generator-ml-129629161"></a>
 ### ok
@@ -38,7 +38,7 @@ ok
 Stores the ok value associated with generate result.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L17)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L21)
 
 <a id="field-field-minipixels-tools-generator-generateresult-outdir-outdir-src-minipixels-tools-generator-ml-605069535"></a>
 ### outDir
@@ -50,7 +50,7 @@ outDir
 Stores the out dir value associated with generate result.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L19)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L23)
 
 <a id="field-field-minipixels-tools-generator-generateresult-warnings-warnings-src-minipixels-tools-generator-ml-414230183"></a>
 ### warnings
@@ -62,4 +62,4 @@ warnings
 Stores the warnings value associated with generate result.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L21)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L25)

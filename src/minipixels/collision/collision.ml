@@ -72,16 +72,44 @@ end function
 /// @param r r value consumed by this operation.
 function lineRect(x1, y1, x2, y2, r)
   if pointRect(x1, y1, r) or pointRect(x2, y2, r) then return true end if
-  // Conservative broad-phase fallback until exact segment-vs-rect clipping is needed.
-  minX = x1
-  if x2 < minX then minX = x2 end if
-  minY = y1
-  if y2 < minY then minY = y2 end if
-  maxX = x1
-  if x2 > maxX then maxX = x2 end if
-  maxY = y1
-  if y2 > maxY then maxY = y2 end if
-  return rectRect(mt.RectangleInt(minX, minY, maxX - minX + 1, maxY - minY + 1), r)
+  dx = x2 - x1
+  dy = y2 - y1
+  t0 = 0.0
+  t1 = 1.0
+  clipped = clipAxis(0 - dx, x1 - r.x, t0, t1)
+  if typeof(clipped) == "void" then return false end if
+  t0 = clipped[0]
+  t1 = clipped[1]
+  clipped = clipAxis(dx, (r.x + r.width) - x1, t0, t1)
+  if typeof(clipped) == "void" then return false end if
+  t0 = clipped[0]
+  t1 = clipped[1]
+  clipped = clipAxis(0 - dy, y1 - r.y, t0, t1)
+  if typeof(clipped) == "void" then return false end if
+  t0 = clipped[0]
+  t1 = clipped[1]
+  return typeof(clipAxis(dy, (r.y + r.height) - y1, t0, t1)) != "void"
+end function
+
+/// Clips one Liang-Barsky segment interval against a rectangle boundary.
+/// @param p Signed segment delta for the boundary.
+/// @param q Signed origin distance from the boundary.
+/// @param t0 Current lower segment parameter.
+/// @param t1 Current upper segment parameter.
+function clipAxis(p, q, t0, t1)
+  if p == 0 then
+    if q < 0 then return void end if
+    return [t0, t1]
+  end if
+  ratio = q / p
+  if p < 0 then
+    if ratio > t1 then return void end if
+    if ratio > t0 then t0 = ratio end if
+  else
+    if ratio < t0 then return void end if
+    if ratio < t1 then t1 = ratio end if
+  end if
+  return [t0, t1]
 end function
 
 /// Performs the result operation for the minipixels collision collision module.

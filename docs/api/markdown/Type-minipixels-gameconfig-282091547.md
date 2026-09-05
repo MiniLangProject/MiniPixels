@@ -12,7 +12,7 @@ struct GameConfig
 Represents the game config data used by the minipixels module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L24)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L26)
 
 ## Members
 
@@ -26,7 +26,7 @@ debug
 Stores the debug value associated with game config.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L40)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L42)
 
 <a id="field-field-minipixels-gameconfig-headlessframes-headlessframes-src-minipixels-ml-1559294237"></a>
 ### headlessFrames
@@ -38,7 +38,7 @@ headlessFrames
 Stores the headless frames value associated with game config.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L42)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L44)
 
 <a id="field-field-minipixels-gameconfig-height-height-src-minipixels-ml-886452465"></a>
 ### height
@@ -50,7 +50,7 @@ height
 Stores the height value associated with game config.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L30)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L32)
 
 <a id="field-field-minipixels-gameconfig-maxcatchupupdates-maxcatchupupdates-src-minipixels-ml-1058827955"></a>
 ### maxCatchUpUpdates
@@ -62,7 +62,19 @@ maxCatchUpUpdates
 Stores the max catch up updates value associated with game config.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L38)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L40)
+
+<a id="field-field-minipixels-gameconfig-maxfps-maxfps-src-minipixels-ml-346150769"></a>
+### maxFps
+
+```ml
+maxFps
+```
+
+Maximum rendered frames per second, or zero for uncapped rendering.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L52)
 
 <a id="field-field-minipixels-gameconfig-maxframeseconds-maxframeseconds-src-minipixels-ml-591262295"></a>
 ### maxFrameSeconds
@@ -74,7 +86,19 @@ maxFrameSeconds
 Stores the max frame seconds value associated with game config.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L36)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L38)
+
+<a id="field-field-minipixels-gameconfig-pausewhenunfocused-pausewhenunfocused-src-minipixels-ml-1546612791"></a>
+### pauseWhenUnfocused
+
+```ml
+pauseWhenUnfocused
+```
+
+Whether simulation updates pause while the game window lacks focus.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L54)
 
 <a id="field-field-minipixels-gameconfig-renderer-renderer-src-minipixels-ml-25430425"></a>
 ### renderer
@@ -86,7 +110,7 @@ renderer
 Stores the renderer value associated with game config.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L44)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L46)
 
 <a id="field-field-minipixels-gameconfig-scale-scale-src-minipixels-ml-241048491"></a>
 ### scale
@@ -98,7 +122,7 @@ scale
 Stores the scale value associated with game config.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L32)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L34)
 
 <a id="field-field-minipixels-gameconfig-scalemode-scalemode-src-minipixels-ml-1476792435"></a>
 ### scaleMode
@@ -110,7 +134,7 @@ scaleMode
 Stores the scale mode value associated with game config.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L46)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L48)
 
 <a id="field-field-minipixels-gameconfig-smoothing-smoothing-src-minipixels-ml-1598548587"></a>
 ### smoothing
@@ -122,7 +146,7 @@ smoothing
 Stores the smoothing value associated with game config.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L48)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L50)
 
 <a id="field-field-minipixels-gameconfig-title-title-src-minipixels-ml-592233563"></a>
 ### title
@@ -134,7 +158,7 @@ title
 Stores the title value associated with game config.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L26)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L28)
 
 <a id="field-field-minipixels-gameconfig-updatespersecond-updatespersecond-src-minipixels-ml-6454409"></a>
 ### updatesPerSecond
@@ -146,7 +170,7 @@ updatesPerSecond
 Stores the updates per second value associated with game config.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L34)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L36)
 
 <a id="field-field-minipixels-gameconfig-width-width-src-minipixels-ml-1480066967"></a>
 ### width
@@ -158,4 +182,4 @@ width
 Stores the width value associated with game config.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L28)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L30)

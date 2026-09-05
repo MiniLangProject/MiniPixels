@@ -63,6 +63,8 @@ struct SpriteSheet
   columns as int
   /// Stores the frame count value associated with sprite sheet.
   frameCount as int
+  /// Lazily populated cache of immutable frame descriptors.
+  frames
 
   /// Returns frame maintained by the minipixels graphics sprite module.
   /// @param index Zero-based index of the affected item.
@@ -196,7 +198,8 @@ function spriteSheet(img, frameWidth, frameHeight, spacing, margin)
     availableY = availableY - stepY
   end while
   if rows < 1 then rows = 1 end if
-  return SpriteSheet(img, frameWidth, frameHeight, spacing, margin, columns, columns * rows)
+  count = columns * rows
+  return SpriteSheet(img, frameWidth, frameHeight, spacing, margin, columns, count, array(count))
 end function
 
 /// Performs the spriteSheetFrame operation for the minipixels graphics sprite module.
@@ -206,6 +209,8 @@ function spriteSheetFrame(sheet, index)
   if typeof(index) != "int" then index = 0 end if
   if index < 0 then index = 0 end if
   if index >= sheet.frameCount then index = sheet.frameCount - 1 end if
+  cached = sheet.frames[index]
+  if typeof(cached) != "void" then return cached end if
   col = index % sheet.columns
   row = 0
   scan = index
@@ -215,5 +220,17 @@ function spriteSheetFrame(sheet, index)
   end while
   sx = sheet.margin + (col * (sheet.frameWidth + sheet.spacing))
   sy = sheet.margin + (row * (sheet.frameHeight + sheet.spacing))
-  return Sprite(sheet.image, sx, sy, sheet.frameWidth, sheet.frameHeight, 0, 0, sheet.image.name + "#" + index)
+  frame = Sprite(sheet.image, sx, sy, sheet.frameWidth, sheet.frameHeight, 0, 0, sheet.image.name + "#" + index)
+  sheet.frames[index] = frame
+  return frame
+end function
+
+/// Populates every frame descriptor cache ahead of a hot rendering loop.
+/// @param sheet Sprite sheet to prewarm.
+function cacheFrames(sheet)
+  if sheet.frameCount <= 0 then return sheet end if
+  for index = 0 to sheet.frameCount - 1
+    spriteSheetFrame(sheet, index)
+  end for
+  return sheet
 end function

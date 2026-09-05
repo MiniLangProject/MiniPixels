@@ -15,6 +15,23 @@ Reachable from entry: **no**
 
 ## Declarations
 
+<a id="function-function-minipixels-tools-fsutil-bytesequal-function-bytesequal-first-second-src-minipixels-tools-fsutil-ml-1514726528"></a>
+### bytesEqual
+
+```ml
+function bytesEqual(first, second)
+```
+
+Returns whether two byte buffers have identical contents.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `first` | `dynamic` | — | First byte buffer. |
+| `second` | `dynamic` | — | Second byte buffer. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L57)
+
 <a id="extern_function-extern-function-minipixels-tools-fsutil-createdirectoryw-extern-function-createdirectoryw-path-as-wstr-security-as-ptr-from-kernel32-dll-returns-bool-src-minipixels-tools-fsutil-ml-1089767167"></a>
 ### CreateDirectoryW
 
@@ -99,6 +116,23 @@ Performs the mkdir operation for the minipixels tools fsutil module.
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L18)
 
+<a id="function-function-minipixels-tools-fsutil-writebytes-function-writebytes-path-data-src-minipixels-tools-fsutil-ml-1097382007"></a>
+### writeBytes
+
+```ml
+function writeBytes(path, data)
+```
+
+Writes bytes only when their contents differ from the existing file.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `path` | `dynamic` | — | Path of the file used by the operation. |
+| `data` | `dynamic` | — | Byte payload to persist. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L70)
+
 <a id="function-function-minipixels-tools-fsutil-writetext-function-writetext-path-text-src-minipixels-tools-fsutil-ml-719235936"></a>
 ### writeText
 
@@ -106,7 +140,7 @@ Performs the mkdir operation for the minipixels tools fsutil module.
 function writeText(path, text)
 ```
 
-Writes text for the minipixels tools fsutil workflow.
+Writes text only when its contents differ from the existing file.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -114,4 +148,4 @@ Writes text for the minipixels tools fsutil workflow.
 | `text` | `dynamic` | — | Text consumed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L57)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L86)

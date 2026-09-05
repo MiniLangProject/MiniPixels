@@ -4,12 +4,69 @@
 
 package minipixels.math.types
 
+import std.math as math
+
 /// Represents the vector2 data used by the minipixels math types module.
 struct Vector2
   /// Stores the x value associated with vector2.
   x
   /// Stores the y value associated with vector2.
   y
+
+  /// Adds two vectors component-wise.
+  /// @param left Left vector.
+  /// @param right Right vector.
+  /// @returns Component-wise sum.
+  operator inline +(left as Vector2, right as Vector2) returns Vector2
+    return Vector2(left.x + right.x, left.y + right.y)
+  end operator
+
+  /// Subtracts two vectors component-wise.
+  /// @param left Left vector.
+  /// @param right Right vector.
+  /// @returns Component-wise difference.
+  operator inline -(left as Vector2, right as Vector2) returns Vector2
+    return Vector2(left.x - right.x, left.y - right.y)
+  end operator
+
+  /// Negates both vector components.
+  /// @param value Vector to negate.
+  /// @returns Negated vector.
+  operator inline -(value as Vector2) returns Vector2
+    return Vector2(0 - value.x, 0 - value.y)
+  end operator
+
+  /// Multiplies a vector by an integer scalar.
+  /// @param left Vector to scale.
+  /// @param scale Integer scale.
+  /// @returns Scaled vector.
+  operator inline *(left as Vector2, scale as int) returns Vector2
+    return Vector2(left.x * scale, left.y * scale)
+  end operator
+
+  /// Multiplies a vector by a floating-point scalar.
+  /// @param left Vector to scale.
+  /// @param scale Floating-point scale.
+  /// @returns Scaled vector.
+  operator inline *(left as Vector2, scale as float) returns Vector2
+    return Vector2(left.x * scale, left.y * scale)
+  end operator
+
+  /// Divides a vector by an integer scalar.
+  /// @param left Vector to scale.
+  /// @param divisor Integer divisor.
+  /// @returns Scaled vector.
+  operator inline /(left as Vector2, divisor as int) returns Vector2
+    return Vector2(left.x / divisor, left.y / divisor)
+  end operator
+
+  /// Divides a vector by a floating-point scalar.
+  /// @param left Vector to scale.
+  /// @param divisor Floating-point divisor.
+  /// @returns Scaled vector.
+  operator inline /(left as Vector2, divisor as float) returns Vector2
+    return Vector2(left.x / divisor, left.y / divisor)
+  end operator
 end struct
 
 /// Represents the vector2 int data used by the minipixels math types module.
@@ -18,6 +75,30 @@ struct Vector2Int
   x
   /// Stores the y value associated with vector2 int.
   y
+
+  /// Adds two integer vectors component-wise.
+  /// @param left Left vector.
+  /// @param right Right vector.
+  /// @returns Component-wise sum.
+  operator inline +(left as Vector2Int, right as Vector2Int) returns Vector2Int
+    return Vector2Int(left.x + right.x, left.y + right.y)
+  end operator
+
+  /// Subtracts two integer vectors component-wise.
+  /// @param left Left vector.
+  /// @param right Right vector.
+  /// @returns Component-wise difference.
+  operator inline -(left as Vector2Int, right as Vector2Int) returns Vector2Int
+    return Vector2Int(left.x - right.x, left.y - right.y)
+  end operator
+
+  /// Multiplies an integer vector by an integer scalar.
+  /// @param left Vector to scale.
+  /// @param scale Integer scale.
+  /// @returns Scaled vector.
+  operator inline *(left as Vector2Int, scale as int) returns Vector2Int
+    return Vector2Int(left.x * scale, left.y * scale)
+  end operator
 end struct
 
 /// Represents the size data used by the minipixels math types module.
@@ -218,7 +299,7 @@ end function
 /// Performs the vector2Length operation for the minipixels math types module.
 /// @param a a value consumed by this operation.
 function vector2Length(a)
-  return ((a.x * a.x) + (a.y * a.y)) / 1.0
+  return math.sqrt(((a.x * a.x) + (a.y * a.y)) / 1.0)
 end function
 
 /// Performs the vector2Normalize operation for the minipixels math types module.

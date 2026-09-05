@@ -36,6 +36,14 @@ jobs:
         working-directory: MiniPixels
         run: python tests\run_tests.py
 
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: minipixels-test-report
+          path: MiniPixels/build/tests/foundation-results.xml
+          if-no-files-found: ignore
+
       - name: Build examples
         working-directory: MiniPixels
         run: python tools\build_examples.py

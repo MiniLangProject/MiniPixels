@@ -6,6 +6,7 @@ package minipixels.graphics.canvas
 
 import minipixels.math.types as mt
 import minipixels.graphics.sprite as sp
+import std.math as math
 
 /// Represents the canvas data used by the minipixels graphics canvas module.
 struct Canvas
@@ -25,6 +26,18 @@ struct Canvas
   tileCount as int
   /// Stores the draw calls value associated with canvas.
   drawCalls as int
+  /// Image view sharing this canvas's pixel storage.
+  imageView
+  /// Whether the canvas contains pixels not yet uploaded by a presenter.
+  dirty
+  /// Inclusive minimum dirty x coordinate.
+  dirtyX0
+  /// Inclusive minimum dirty y coordinate.
+  dirtyY0
+  /// Exclusive maximum dirty x coordinate.
+  dirtyX1
+  /// Exclusive maximum dirty y coordinate.
+  dirtyY1
 
   /// Clears clear maintained by the minipixels graphics canvas module.
   /// @param color color value consumed by this operation.
@@ -135,6 +148,25 @@ struct Canvas
     return minipixels.graphics.canvas.drawSpriteEx(this, sprite, x, y, flipX, flipY, scale, tint)
   end function
 
+  /// Draws a sprite rotated around its configured pivot.
+  /// @param sprite Sprite to draw.
+  /// @param x Pivot x coordinate.
+  /// @param y Pivot y coordinate.
+  /// @param radians Clockwise rotation in radians.
+  /// @param scale Positive integer scale.
+  /// @param tint Multiplicative RGBA tint.
+  function drawSpriteRotated(sprite, x, y, radians, scale, tint)
+    return minipixels.graphics.canvas.drawSpriteRotated(this, sprite, x, y, radians, scale, tint)
+  end function
+
+  /// Draws another canvas as a CPU render target.
+  /// @param source Source canvas.
+  /// @param x Destination x coordinate.
+  /// @param y Destination y coordinate.
+  function drawCanvas(source, x, y)
+    return minipixels.graphics.canvas.drawCanvas(this, source, x, y)
+  end function
+
   /// Performs the fillRectWorld operation for the minipixels graphics canvas canvas module.
   /// @param camera camera value consumed by this operation.
   /// @param x Horizontal coordinate used by the operation.
@@ -197,7 +229,45 @@ end struct
 /// @param width Width in the coordinate or storage units used by the caller.
 /// @param height Height in the coordinate or storage units used by the caller.
 function create(width, height)
-  return Canvas(width, height, bytes(width * height * 4, 0), 0, 0, 0, 0, 0)
+  pixels = bytes(width * height * 4, 0)
+  view = sp.Image(width, height, pixels, "render-target", false)
+  return Canvas(width, height, pixels, 0, 0, 0, 0, 0, view, true, 0, 0, width, height)
+end function
+
+/// Expands the pending upload region to include a rectangle.
+/// @param c Canvas to mark.
+/// @param x Rectangle x coordinate in canvas space.
+/// @param y Rectangle y coordinate in canvas space.
+/// @param w Rectangle width.
+/// @param h Rectangle height.
+function markDirty(c, x, y, w, h)
+  x0 = mt.clamp(mt.floorInt(x), 0, c.width)
+  y0 = mt.clamp(mt.floorInt(y), 0, c.height)
+  x1 = mt.clamp(mt.floorInt(x + w), 0, c.width)
+  y1 = mt.clamp(mt.floorInt(y + h), 0, c.height)
+  if x0 >= x1 or y0 >= y1 then return end if
+  if c.dirty == false then
+    c.dirtyX0 = x0
+    c.dirtyY0 = y0
+    c.dirtyX1 = x1
+    c.dirtyY1 = y1
+    c.dirty = true
+    return
+  end if
+  if x0 < c.dirtyX0 then c.dirtyX0 = x0 end if
+  if y0 < c.dirtyY0 then c.dirtyY0 = y0 end if
+  if x1 > c.dirtyX1 then c.dirtyX1 = x1 end if
+  if y1 > c.dirtyY1 then c.dirtyY1 = y1 end if
+end function
+
+/// Clears the pending upload region after presentation.
+/// @param c Canvas whose dirty state is consumed.
+function resetDirty(c)
+  c.dirty = false
+  c.dirtyX0 = 0
+  c.dirtyY0 = 0
+  c.dirtyX1 = 0
+  c.dirtyY1 = 0
 end function
 
 /// Performs the resetStats operation for the minipixels graphics canvas module.
@@ -238,6 +308,8 @@ function clearCanvas(c, color)
       filled = filled + amount
     end while
   end if
+  c.imageView.opaque = a >= 255
+  markDirty(c, 0, 0, c.width, c.height)
   c.drawCalls = c.drawCalls + 1
 end function
 
@@ -255,6 +327,8 @@ function setPixel(c, x, y, color)
   c.pixels[i + 1] = mt.colorG(color)
   c.pixels[i + 2] = mt.colorB(color)
   c.pixels[i + 3] = mt.colorA(color)
+  if mt.colorA(color) < 255 then c.imageView.opaque = false end if
+  markDirty(c, x, y, 1, 1)
   return true
 end function
 
@@ -371,6 +445,8 @@ function fillRect(c, x, y, w, h, color)
       yy = yy + 1
     end while
   end if
+  if a < 255 then c.imageView.opaque = false end if
+  markDirty(c, x0, y0, x1 - x0, y1 - y0)
   c.drawCalls = c.drawCalls + 1
 end function
 
@@ -460,18 +536,27 @@ end function
 /// @param r r value consumed by this operation.
 /// @param color color value consumed by this operation.
 function fillCircle(c, cx, cy, r, color)
-  y = 0 - r
-  while y <= r
-    x = 0 - r
-    while x <= r
-      if x * x + y * y <= r * r then
-        setPixel(c, cx + x, cy + y, color)
-      end if
-      x = x + 1
-    end while
+  if r < 0 then return end if
+  previousDrawCalls = c.drawCalls
+  x = r
+  y = 0
+  decision = 1 - r
+  while y <= x
+    fillRect(c, cx - x, cy + y, (x * 2) + 1, 1, color)
+    if y != 0 then fillRect(c, cx - x, cy - y, (x * 2) + 1, 1, color) end if
+    if x != y then
+      fillRect(c, cx - y, cy + x, (y * 2) + 1, 1, color)
+      if x != 0 then fillRect(c, cx - y, cy - x, (y * 2) + 1, 1, color) end if
+    end if
     y = y + 1
+    if decision < 0 then
+      decision = decision + (2 * y) + 1
+    else
+      x = x - 1
+      decision = decision + (2 * (y - x)) + 1
+    end if
   end while
-  c.drawCalls = c.drawCalls + 1
+  c.drawCalls = previousDrawCalls + 1
 end function
 
 /// Performs the blitImage operation for the minipixels graphics canvas module.
@@ -553,6 +638,8 @@ function drawSpriteFast1x(c, spr, x, y)
   x1 = mt.clamp(x + spr.width, 0, c.width)
   y1 = mt.clamp(y + spr.height, 0, c.height)
   if x0 >= x1 or y0 >= y1 then return end if
+  markDirty(c, x0, y0, x1 - x0, y1 - y0)
+  if spr.image.opaque == false then c.imageView.opaque = false end if
 
   yy = y0
   while yy < y1
@@ -605,6 +692,8 @@ function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
   x = mt.floorInt(x - spr.pivotX)
   y = mt.floorInt(y - spr.pivotY)
   if x >= c.width or y >= c.height or x + (spr.width * scale) <= 0 or y + (spr.height * scale) <= 0 then return end if
+  markDirty(c, x, y, spr.width * scale, spr.height * scale)
+  if spr.image.opaque == false or mt.colorA(tint) < 255 then c.imageView.opaque = false end if
   white = mt.rgba(255, 255, 255, 255)
   if scale == 1 and flipX == false and flipY == false and tint == white then
     return drawSpriteFast1x(c, spr, x, y)
@@ -634,6 +723,77 @@ function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
   end while
   c.spriteCount = c.spriteCount + 1
   c.drawCalls = c.drawCalls + 1
+end function
+
+/// Draws a sprite rotated around its configured pivot using inverse sampling.
+/// @param c Destination canvas.
+/// @param spr Sprite to draw.
+/// @param x Pivot x coordinate.
+/// @param y Pivot y coordinate.
+/// @param radians Clockwise rotation in radians.
+/// @param scale Positive integer scale.
+/// @param tint Multiplicative RGBA tint.
+function drawSpriteRotated(c, spr, x, y, radians, scale, tint)
+  if typeof(scale) != "int" or scale < 1 then scale = 1 end if
+  if radians == 0 then return drawSpriteEx(c, spr, x, y, false, false, scale, tint) end if
+  cosine = math.cos(radians)
+  sine = math.sin(radians)
+  pivotX = spr.pivotX
+  pivotY = spr.pivotY
+  left = 0 - pivotX
+  top = 0 - pivotY
+  right = spr.width - pivotX
+  bottom = spr.height - pivotY
+  x0 = mt.floorInt(x + (left * cosine - top * sine) * scale)
+  x1 = x0
+  y0 = mt.floorInt(y + (left * sine + top * cosine) * scale)
+  y1 = y0
+  cornersX = [right, right, left]
+  cornersY = [top, bottom, bottom]
+  for corner = 0 to 2
+    rx = mt.floorInt(x + (cornersX[corner] * cosine - cornersY[corner] * sine) * scale)
+    ry = mt.floorInt(y + (cornersX[corner] * sine + cornersY[corner] * cosine) * scale)
+    if rx < x0 then x0 = rx end if
+    if rx > x1 then x1 = rx end if
+    if ry < y0 then y0 = ry end if
+    if ry > y1 then y1 = ry end if
+  end for
+  x0 = mt.clamp(x0, 0, c.width - 1)
+  y0 = mt.clamp(y0, 0, c.height - 1)
+  x1 = mt.clamp(x1 + 1, 0, c.width)
+  y1 = mt.clamp(y1 + 1, 0, c.height)
+  if x0 >= x1 or y0 >= y1 then return end if
+  white = mt.rgba(255, 255, 255, 255)
+  yy = y0
+  while yy < y1
+    xx = x0
+    while xx < x1
+      dx = (xx + 0.5 - x) / scale
+      dy = (yy + 0.5 - y) / scale
+      sourceX = mt.floorInt((dx * cosine) + (dy * sine) + pivotX)
+      sourceY = mt.floorInt((0 - dx * sine) + (dy * cosine) + pivotY)
+      if sourceX >= 0 and sourceY >= 0 and sourceX < spr.width and sourceY < spr.height then
+        color = sp.imageGetPixel(spr.image, spr.sx + sourceX, spr.sy + sourceY)
+        if tint != white then color = mt.tintColor(color, tint) end if
+        if mt.colorA(color) > 0 then drawPixelFast(c, xx, yy, color) end if
+      end if
+      xx = xx + 1
+    end while
+    yy = yy + 1
+  end while
+  markDirty(c, x0, y0, x1 - x0, y1 - y0)
+  if spr.image.opaque == false or mt.colorA(tint) < 255 then c.imageView.opaque = false end if
+  c.spriteCount = c.spriteCount + 1
+  c.drawCalls = c.drawCalls + 1
+end function
+
+/// Draws a source canvas as a reusable CPU render target.
+/// @param destination Destination canvas.
+/// @param source Source canvas.
+/// @param x Destination x coordinate.
+/// @param y Destination y coordinate.
+function drawCanvas(destination, source, x, y)
+  return blitImage(destination, source.imageView, x, y)
 end function
 
 /// Performs the screenX operation for the minipixels graphics canvas module.

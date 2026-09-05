@@ -42,14 +42,14 @@ Asset types:
 
 | Type | Meaning | Python CLI | Native CLI `generate` |
 | --- | --- | --- | --- |
-| `image` | 8-bit RGB/RGBA PNG image asset | stores PNG-profile payload in `assets.mpx` and generates loader functions | emits a compileable placeholder sprite until native asset-pack generation is added |
-| `procedural` | generated checker/player/tile sprite data from manifest fields | renders a PNG-profile payload into `assets.mpx` and generates a loader | embeds generated pixels |
-| `audio` | runtime audio file, usually WAV | stores payload in `assets.mpx` and generates memory-clip helpers | validates only |
-| `file` | runtime data file | stores payload in `assets.mpx` | validates only |
+| `image` | non-interlaced PNG image asset | stores deterministic RGBA PNG payload and generates lazy loader functions | stores source PNG payload and generates lazy loader functions |
+| `procedural` | generated checker/player/tile sprite data from manifest fields | renders a PNG payload into `assets.mpx` and generates a loader | renders a deterministic PNG payload and generates a loader |
+| `audio` | runtime audio file, usually PCM WAV | stores payload and generates a memory-clip helper | stores payload and generates a memory-clip helper |
+| `file` | runtime data file | stores payload and generates pack access | stores payload and generates pack access |
 
 Assets with `sheet` metadata also get generated helpers such as `gen.sheet_player()`.
 
-The Python build writes `build/assets.mpx` and copies it next to the executable. Image entries are transcoded and procedural entries are rendered into the MiniPixels PNG profile so MiniLang runtime code can decode them without embedding large pixel arrays into generated source. Audio entries are loaded from the pack as bytes and can be played as in-memory SFX clips.
+Both generators write `build/assets.mpx`; the Python build additionally copies it next to the executable. The runtime accepts ordinary non-interlaced grayscale, RGB, indexed, grayscale-alpha, and RGBA PNGs. Audio entries are loaded as bytes and can be mixed as in-memory PCM clips.
 
 ## MiniPixels Level JSON
 
@@ -79,7 +79,7 @@ Platform `x`, `y`, and `w` are measured in tiles. Spawn, exit, enemies, and coin
 
 ## Tiled JSON/TMJ Import
 
-When using the Python build pipeline, `levels.path` may also point to a Tiled JSON/TMJ map. MiniPixels imports one Tiled map as one generated level. The native MiniLang generator validates the manifest but currently writes a level stub for Tiled/TMJ maps; native Tiled import is a follow-up migration step.
+With either generator, `levels.path` may point to a finite CSV-encoded Tiled JSON/TMJ map. MiniPixels imports one Tiled map as one generated level.
 
 Supported conventions:
 

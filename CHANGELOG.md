@@ -2,10 +2,23 @@
 
 ## Unreleased
 
-- Optimized framebuffer clears, opaque rectangle fills, and opaque sprite blits with MiniLang 1.2.3 native byte-copy operations.
+## 0.8.0
+
+- Added configurable, growable input actions with buffered fixed-update edges, logical mouse coordinates, deltas, buttons, wheel input, and focus-safe releases.
+- Reworked the game loop around a high-resolution monotonic clock with interpolation alpha, smoothed FPS/UPS, configurable frame limiting, focus pause, and cleanup-preserving callback errors.
+- Added a growable scene stack with enter, exit, pause, resume, update, overlay render, and shutdown lifecycle hooks.
+- Added CPU render targets, pivot-based sprite rotation, deterministic PNG screenshots, midpoint circle fills, grouped font spans, and dirty-region OpenGL uploads.
+- Added cached sprite-sheet frames, hash-indexed asset registries/packs, lazy generated assets, cache eviction, and swept tile collision that prevents tunneling.
+- Expanded PNG support to stored/fixed/dynamic Deflate, filters 0-4, grayscale, RGB, indexed transparency, grayscale-alpha, and RGBA hot-loading.
+- Replaced the mixer-shaped audio placeholder with a buffered waveOut PCM mixer supporting simultaneous SFX, looping memory music, mono/stereo PCM, rate conversion, volume buses, channel volume, and pan.
+- Added exact line/rectangle clipping and corrected vector length/normalization; vector operators now use MiniLang 1.2.4 inline operator overloads.
+- Ported real asset-pack generation and finite CSV-encoded Tiled/TMJ import to the native MiniLang generator, with write-if-changed incremental output.
+- Replaced long native CLI template concatenations with `StringBuilder`, avoiding a pathological MiniLang 1.2.4 compile path.
+- Added a `std.test` foundation suite covering input, scenes, assets, collision, rendering, PNG, PCM audio, timing, and callback cleanup.
+- Optimized framebuffer clears, opaque rectangle fills, and opaque sprite blits with MiniLang 1.2.4 native byte-copy operations.
 - Removed the GDI frame-by-frame RGBA-to-BGRA conversion by describing the RGBA framebuffer with explicit DIB color masks.
 - Fixed alpha blending for translucent rectangles and generic color blending.
-- Added typed primitive engine fields and selective inline helpers for MiniLang 1.2.3 local type flow.
+- Added typed primitive engine fields and selective inline helpers for MiniLang 1.2.4 local type flow.
 - Moved Python-generated procedural images into `assets.mpx` instead of emitting thousands of MiniLang byte assignments.
 - Reworked PNG stored-block and IDAT assembly to allocate once and use native byte copies.
 - Added compiler-project manifests and exact-hit incremental build caching to the Python CLI.

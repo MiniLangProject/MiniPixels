@@ -5,11 +5,14 @@
 package minipixels.platform.windows
 
 import minipixels.input.input as inp
+import minipixels.math.types as mt
 
 /// Defines the wm destroy constant used by the minipixels platform windows module.
 const WM_DESTROY = 0x0002
 /// Defines the wm close constant used by the minipixels platform windows module.
 const WM_CLOSE = 0x0010
+/// Defines the mouse-wheel message consumed by the input provider.
+const WM_MOUSEWHEEL = 0x020A
 /// Defines the pm remove constant used by the minipixels platform windows module.
 const PM_REMOVE = 0x0001
 /// Defines the cs owndc constant used by the minipixels platform windows module.
@@ -60,6 +63,12 @@ const GL_NEAREST = 0x2600
 const GL_CLAMP = 0x2900
 /// Defines the gl unpack alignment constant used by the minipixels platform windows module.
 const GL_UNPACK_ALIGNMENT = 0x0CF5
+/// Defines source row length for partial texture uploads.
+const GL_UNPACK_ROW_LENGTH = 0x0CF2
+/// Defines source rows skipped for partial texture uploads.
+const GL_UNPACK_SKIP_ROWS = 0x0CF3
+/// Defines source pixels skipped for partial texture uploads.
+const GL_UNPACK_SKIP_PIXELS = 0x0CF4
 /// Defines the gl quads constant used by the minipixels platform windows module.
 const GL_QUADS = 0x0007
 /// Defines the blackness constant used by the minipixels platform windows module.
@@ -75,6 +84,14 @@ extern function GetConsoleWindow() from "kernel32.dll" returns ptr
 /// Invokes the native GetTickCount64 entry point used by the minipixels platform windows module.
 /// @returns Native u64 result produced by the call.
 extern function GetTickCount64() from "kernel32.dll" returns u64
+/// Reads the high-resolution performance counter.
+/// @param value Eight-byte destination receiving the counter value.
+/// @returns Whether the counter was available.
+extern function QueryPerformanceCounter(value as bytes) from "kernel32.dll" returns bool
+/// Reads the high-resolution performance-counter frequency.
+/// @param value Eight-byte destination receiving ticks per second.
+/// @returns Whether the counter was available.
+extern function QueryPerformanceFrequency(value as bytes) from "kernel32.dll" returns bool
 /// Invokes the native Sleep entry point used by the minipixels platform windows module.
 /// @param ms ms value consumed by this operation.
 extern function Sleep(ms as int) from "kernel32.dll" returns void
@@ -163,6 +180,15 @@ extern function GetForegroundWindow() from "user32.dll" returns ptr
 /// @param rect rect value consumed by this operation.
 /// @returns Native bool result produced by the call.
 extern function GetClientRect(hwnd as ptr, rect as bytes) from "user32.dll" returns bool
+/// Reads the current pointer position in screen coordinates.
+/// @param point Eight-byte POINT destination.
+/// @returns Whether the pointer position was read.
+extern function GetCursorPos(point as bytes) from "user32.dll" returns bool
+/// Converts a POINT from screen coordinates to client coordinates.
+/// @param hwnd Window owning the client coordinate system.
+/// @param point Eight-byte POINT value to convert in place.
+/// @returns Whether the conversion succeeded.
+extern function ScreenToClient(hwnd as ptr, point as bytes) from "user32.dll" returns bool
 /// Invokes the native GetDC entry point used by the minipixels platform windows module.
 /// @param hwnd hwnd value consumed by this operation.
 /// @returns Native ptr result produced by the call.
@@ -304,6 +330,12 @@ extern function glVertex2i(x as int, y as int) from "opengl32.dll" returns void
 windowRunning = true
 /// Stores module-wide registered class name state for the minipixels platform windows module.
 registeredClassName = void
+/// Stores wheel steps received by the window callback until input polling consumes them.
+mouseWheelAccumulator = 0
+/// Reusable buffer for high-resolution counter queries.
+performanceCounterBuffer = bytes(8, 0)
+/// Cached high-resolution performance-counter frequency.
+performanceFrequency = 0
 
 /// Represents the window data used by the minipixels platform windows module.
 struct Window
@@ -353,6 +385,8 @@ struct Window
   fallbackReason
   /// Stores the viewport value associated with window.
   viewport
+  /// Stores a reusable Win32 POINT buffer for pointer polling.
+  point
 end struct
 
 /// Performs the putU32 operation for the minipixels platform windows module.
@@ -392,6 +426,22 @@ function getU32(buf, off)
   return buf[off] + (buf[off + 1] << 8) + (buf[off + 2] << 16) + (buf[off + 3] << 24)
 end function
 
+/// Returns a signed 32-bit integer stored in a byte buffer.
+/// @param buf Buffer containing the encoded integer.
+/// @param off Byte offset of the encoded integer.
+function getI32(buf, off)
+  value = getU32(buf, off)
+  if value >= 2147483648 then return value - 4294967296 end if
+  return value
+end function
+
+/// Returns an unsigned 64-bit integer stored in a byte buffer.
+/// @param buf Buffer containing the encoded integer.
+/// @param off Byte offset of the encoded integer.
+function getU64(buf, off)
+  return getU32(buf, off) + (getU32(buf, off + 4) << 32)
+end function
+
 /// Performs the wndProc operation for the minipixels platform windows module.
 /// @param hwnd hwnd value consumed by this operation.
 /// @param msg msg value consumed by this operation.
@@ -399,6 +449,13 @@ end function
 /// @param lParam lParam value consumed by this operation.
 function wndProc(hwnd, msg, wParam, lParam)
   global windowRunning
+  global mouseWheelAccumulator
+  if msg == WM_MOUSEWHEEL then
+    delta = (wParam >> 16) & 0xFFFF
+    if delta >= 0x8000 then delta = delta - 0x10000 end if
+    mouseWheelAccumulator = mouseWheelAccumulator + (delta / 120)
+    return 0
+  end if
   if msg == WM_CLOSE then
     windowRunning = false
     DestroyWindow(hwnd)
@@ -516,7 +573,7 @@ function open(title, width, height, scale, renderer, scaleMode, smoothing)
   UpdateWindow(hwnd)
   SetForegroundWindow(hwnd)
   mode = normalizeRenderer(renderer)
-  w = Window(hwnd, width, height, scale, sw, sh, createBitmapInfo(width, height), bytes(48, 0), bytes(16, 0), title, className, "gdi", 0, 0, 0, width, height, bytes(4, 0), false, normalizeScaleMode(scaleMode), smoothing, "", bytes(16, 0))
+  w = Window(hwnd, width, height, scale, sw, sh, createBitmapInfo(width, height), bytes(48, 0), bytes(16, 0), title, className, "gdi", 0, 0, 0, width, height, bytes(4, 0), false, normalizeScaleMode(scaleMode), smoothing, "", bytes(16, 0), bytes(8, 0))
   if mode == "auto" or mode == "opengl" then
     if initOpenGL(w) then
       w.renderer = "opengl"
@@ -610,26 +667,63 @@ end function
 function updateInputForWindow(w, input)
   input.beginFrame()
   if hasFocus(w) == false then
-    inp.setKeyboard(input, false, false, false, false, false, false, false)
+    inp.releaseAll(input)
+    inp.setMousePosition(input, input.mouseX, input.mouseY, false)
+    consumeMouseWheel()
     return
   end if
-  inp.setKeyboard(
-    input,
-    keyDown(0x25) or keyDown(0x41),
-    keyDown(0x27) or keyDown(0x44),
-    keyDown(0x26) or keyDown(0x57),
-    keyDown(0x28) or keyDown(0x53),
-    keyDown(0x20),
-    keyDown(0x5A) or keyDown(0x58),
-    keyDown(0x1B)
-  )
+  if input.actionCount > 0 then
+    for slot = 0 to input.actionCount - 1
+      primary = input.primaryKeys[slot]
+      secondary = input.secondaryKeys[slot]
+      held = false
+      if primary >= 0 and keyDown(primary) then held = true end if
+      if secondary >= 0 and keyDown(secondary) then held = true end if
+      inp.setActionState(input, input.actionNames[slot], held)
+    end for
+  end if
+  updatePointerForWindow(w, input)
+  wheel = consumeMouseWheel()
+  if wheel != 0 then inp.addMouseWheel(input, wheel) end if
 end function
 
 /// Updates input for the minipixels platform windows workflow.
 /// @param input input value consumed by this operation.
 function updateInput(input)
   input.beginFrame()
-  inp.setKeyboard(input, false, false, false, false, false, false, false)
+  inp.releaseAll(input)
+end function
+
+/// Consumes wheel steps accumulated by the window callback.
+function consumeMouseWheel()
+  global mouseWheelAccumulator
+  value = mouseWheelAccumulator
+  mouseWheelAccumulator = 0
+  return value
+end function
+
+/// Updates the logical pointer position for a window and its active viewport.
+/// @param w Window whose client area is sampled.
+/// @param input Input state receiving logical coordinates.
+function updatePointerForWindow(w, input)
+  if GetCursorPos(w.point) == false then return false end if
+  if ScreenToClient(w.hwnd, w.point) == false then return false end if
+  updateViewport(w)
+  clientX = getI32(w.point, 0)
+  clientY = getI32(w.point, 4)
+  vx = viewportX(w)
+  vy = viewportY(w)
+  vw = viewportW(w)
+  vh = viewportH(w)
+  inside = clientX >= vx and clientY >= vy and clientX < vx + vw and clientY < vy + vh
+  logicalX = 0
+  logicalY = 0
+  if vw > 0 then logicalX = mt.floorInt(((clientX - vx) * w.logicalWidth) / vw) end if
+  if vh > 0 then logicalY = mt.floorInt(((clientY - vy) * w.logicalHeight) / vh) end if
+  logicalX = mt.clamp(logicalX, 0, w.logicalWidth - 1)
+  logicalY = mt.clamp(logicalY, 0, w.logicalHeight - 1)
+  inp.setMousePosition(input, logicalX, logicalY, inside)
+  return true
 end function
 
 /// Performs the clientWidth operation for the minipixels platform windows module.
@@ -800,7 +894,20 @@ function presentOpenGL(w, canvas)
   glColor3ub(255, 255, 255)
   glBindTexture(GL_TEXTURE_2D, w.texture)
   applyTextureFilter(w)
-  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, canvas.width, canvas.height, GL_RGBA, GL_UNSIGNED_BYTE, canvas.pixels)
+  if canvas.dirty then
+    uploadX = canvas.dirtyX0
+    uploadY = canvas.dirtyY0
+    uploadW = canvas.dirtyX1 - uploadX
+    uploadH = canvas.dirtyY1 - uploadY
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, canvas.width)
+    glPixelStorei(GL_UNPACK_SKIP_PIXELS, uploadX)
+    glPixelStorei(GL_UNPACK_SKIP_ROWS, uploadY)
+    glTexSubImage2D(GL_TEXTURE_2D, 0, uploadX, uploadY, uploadW, uploadH, GL_RGBA, GL_UNSIGNED_BYTE, canvas.pixels)
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0)
+    glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0)
+    glPixelStorei(GL_UNPACK_SKIP_ROWS, 0)
+    canvas.dirty = false
+  end if
   u = canvas.width / w.texWidth
   v = canvas.height / w.texHeight
   glBegin(GL_QUADS)
@@ -828,6 +935,7 @@ function presentGDI(w, canvas)
   PatBlt(dc, 0, 0, clientW, clientH, BLACKNESS)
   StretchDIBits(dc, viewportX(w), viewportY(w), viewportW(w), viewportH(w), 0, 0, canvas.width, canvas.height, canvas.pixels, w.bmi, DIB_RGB_COLORS, SRCCOPY)
   ReleaseDC(w.hwnd, dc)
+  canvas.dirty = false
 end function
 
 /// Performs the present operation for the minipixels platform windows module.
@@ -844,6 +952,35 @@ end function
 /// Performs the ticks operation for the minipixels platform windows module.
 function ticks()
   return GetTickCount64()
+end function
+
+/// Returns a high-resolution monotonic time value in seconds.
+function seconds()
+  global performanceCounterBuffer
+  global performanceFrequency
+  if performanceFrequency <= 0 then
+    if QueryPerformanceFrequency(performanceCounterBuffer) then
+      performanceFrequency = getU64(performanceCounterBuffer, 0)
+    end if
+  end if
+  if performanceFrequency <= 0 then return GetTickCount64() / 1000.0 end if
+  if QueryPerformanceCounter(performanceCounterBuffer) == false then return GetTickCount64() / 1000.0 end if
+  return getU64(performanceCounterBuffer, 0) / performanceFrequency
+end function
+
+/// Waits until a high-resolution deadline while leaving time for other threads.
+/// @param deadline Absolute value previously obtained from seconds().
+function waitUntil(deadline)
+  now = seconds()
+  while now < deadline
+    remainingMs = mt.floorInt((deadline - now) * 1000)
+    if remainingMs > 1 then
+      Sleep(remainingMs - 1)
+    else
+      Sleep(0)
+    end if
+    now = seconds()
+  end while
 end function
 
 /// Performs the sleepMs operation for the minipixels platform windows module.

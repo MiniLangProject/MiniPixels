@@ -12,7 +12,7 @@ struct Rectangle
 Represents the rectangle data used by the minipixels math types module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L32)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L113)
 
 ## Members
 
@@ -26,7 +26,7 @@ height
 Stores the height value associated with rectangle.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L40)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L121)
 
 <a id="field-field-minipixels-math-types-rectangle-width-width-src-minipixels-math-types-ml-346548878"></a>
 ### width
@@ -38,7 +38,7 @@ width
 Stores the width value associated with rectangle.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L38)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L119)
 
 <a id="field-field-minipixels-math-types-rectangle-x-x-src-minipixels-math-types-ml-580623290"></a>
 ### x
@@ -50,7 +50,7 @@ x
 Stores the x value associated with rectangle.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L34)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L115)
 
 <a id="field-field-minipixels-math-types-rectangle-y-y-src-minipixels-math-types-ml-1148786246"></a>
 ### y
@@ -62,4 +62,4 @@ y
 Stores the y value associated with rectangle.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L36)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L117)

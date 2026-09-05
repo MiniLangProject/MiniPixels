@@ -9,10 +9,10 @@
 struct AudioChannel
 ```
 
-Represents the audio channel data used by the minipixels audio audio module.
+Represents one independently mixed sound-effect voice.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L129)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L193)
 
 ## Members
 
@@ -23,10 +23,22 @@ Represents the audio channel data used by the minipixels audio audio module.
 clip
 ```
 
-Stores the clip value associated with audio channel.
+Active clip.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L133)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L197)
+
+<a id="field-field-minipixels-audio-audio-audiochannel-cursor-cursor-src-minipixels-audio-audio-ml-1692099430"></a>
+### cursor
+
+```ml
+cursor
+```
+
+Fractional source-frame cursor.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L205)
 
 <a id="field-field-minipixels-audio-audio-audiochannel-id-id-src-minipixels-audio-audio-ml-764030132"></a>
 ### id
@@ -35,10 +47,22 @@ Stores the clip value associated with audio channel.
 id
 ```
 
-Stores the id value associated with audio channel.
+Stable channel identifier.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L131)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L195)
+
+<a id="field-field-minipixels-audio-audio-audiochannel-pan-pan-src-minipixels-audio-audio-ml-1658644898"></a>
+### pan
+
+```ml
+pan
+```
+
+Channel pan from -100 (left) to 100 (right).
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L203)
 
 <a id="field-field-minipixels-audio-audio-audiochannel-playing-playing-src-minipixels-audio-audio-ml-1494561126"></a>
 ### playing
@@ -47,10 +71,10 @@ Stores the id value associated with audio channel.
 playing
 ```
 
-Stores the playing value associated with audio channel.
+Whether this voice is active.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L135)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L199)
 
 <a id="field-field-minipixels-audio-audio-audiochannel-volume-volume-src-minipixels-audio-audio-ml-1481483718"></a>
 ### volume
@@ -59,7 +83,7 @@ Stores the playing value associated with audio channel.
 volume
 ```
 
-Stores the volume value associated with audio channel.
+Channel volume percentage.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L137)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L201)

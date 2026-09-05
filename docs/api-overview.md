@@ -14,7 +14,7 @@ Callbacks:
 - `render(game, canvas)`
 - `shutdown(game)`
 
-The game loop runs on the main thread. Input is sampled only when the game window has focus. The window title includes the current FPS.
+The game loop uses a high-resolution monotonic clock, fixed simulation updates, a clamped catch-up budget, and a separate render cadence. `game.time.alpha` exposes interpolation progress; FPS and UPS are smoothed over half-second samples. Input is sampled only when the game window has focus and simulation pauses on focus loss by default.
 
 ## Renderer
 
@@ -26,9 +26,10 @@ mp.useGpuRenderer(cfg)      # force OpenGL/WGL presentation when available
 # mp.useCpuRenderer(cfg)    # force the classic GDI presentation path
 mp.useIntegerScale(cfg)     # pixel-perfect integer scaling with letterboxing
 mp.setSmoothing(cfg, false) # nearest-neighbor pixels by default
+mp.setMaxFps(cfg, 120)      # use 0 for uncapped rendering
 ```
 
-You can also set `cfg.renderer` manually to `"auto"`, `"opengl"`, `"gpu"`, `"gdi"`, or `"cpu"`. The OpenGL path uploads the CPU canvas as a texture each frame and uses the GPU for scaling and swapping the window framebuffer. Canvas drawing, collisions, animation state, and frame hashes stay CPU-side and deterministic.
+You can also set `cfg.renderer` manually to `"auto"`, `"opengl"`, `"gpu"`, `"gdi"`, or `"cpu"`. The OpenGL path uploads the canvas's dirty rectangle and uses the GPU for scaling and swapping the window framebuffer. Canvas drawing, collisions, animation state, and frame hashes stay CPU-side and deterministic.
 
 Presentation scale modes:
 
@@ -55,11 +56,12 @@ canvas.clear(mp.rgb(20, 20, 30))
 canvas.setPixel(10, 10, mp.rgb(255, 0, 0))
 canvas.fillRect(20, 20, 32, 16, mp.rgba(255, 128, 0, 200))
 canvas.drawSprite(sprite, x, y)
+canvas.drawSpriteRotated(sprite, x, y, radians, 1, mp.rgb(255, 255, 255))
 mp.drawSpriteWorld(canvas, camera, sprite, worldX, worldY)
 ```
 
 Coordinates are snapped to integer pixels. Out-of-bounds pixel writes are ignored safely.
-`drawSpriteEx` supports clipping, horizontal/vertical flips, integer scale, tint, and alpha blending. World helpers subtract a camera position without mutating canvas state.
+`drawSpriteEx` supports clipping, horizontal/vertical flips, integer scale, tint, and alpha blending. `mp.renderTarget(...)` creates an off-screen canvas and `mp.drawRenderTarget(...)` composites it. `mp.saveCanvasPng(...)` writes deterministic visual captures. World helpers subtract a camera position without mutating canvas state.
 
 ## Colors
 
@@ -85,7 +87,7 @@ function initialize(game)
 end function
 ```
 
-The Python CLI writes supported 8-bit RGB/RGBA PNG images and rendered `procedural` assets into `build/assets.mpx` and generates MiniLang loader functions for them. The runtime opens that MiniPixels asset pack and decodes image payloads with MiniPixels' own PNG-profile decoder. Assets with `type: "audio"` or `type: "file"` are stored in the same container. Audio helpers load WAV bytes from the pack and create memory-backed clips. The native MiniLang CLI already generates importable modules for `procedural` assets and sheet helpers; for `image` assets it emits placeholder pixels until native asset-pack generation is added.
+Both project generators write image, procedural, audio, and file assets into `build/assets.mpx` and emit lazy MiniLang loader functions. The runtime indexes pack entries with a hash map and caches payloads plus decoded images. Its non-interlaced PNG decoder supports stored/fixed/dynamic Deflate, all PNG scanline filters, and grayscale, RGB, indexed, grayscale-alpha, and RGBA color types. `mp.loadPng(path)` also hot-loads ordinary PNG files directly.
 
 ```json
 {
@@ -109,12 +111,13 @@ sheet = gen.sheet_player()
 
 Each build also writes `asset-report.json` next to the executable with embedded/container/runtime asset sizes and sheet metadata.
 
-Manual pack access is available when game code wants to load a packed image directly:
+Manual pack access is available when game code wants to load or explicitly evict a packed image:
 
 ```ml
 pack = mp.openAssetPack("assets.mpx")
 image = mp.loadPngFromPack(pack, "player")
 sprite = mp.spriteFromImage(image, "player")
+mp.unloadPackedAsset(pack, "player")
 ```
 
 ## Level Data
@@ -129,7 +132,7 @@ Project manifests can point at MiniPixels level JSON:
 }
 ```
 
-Both CLIs can generate `generated.levels` for MiniPixels `levels.json`:
+Both CLIs can generate `generated.levels` for MiniPixels `levels.json` and finite CSV-encoded Tiled JSON/TMJ maps:
 
 ```ml
 import generated.levels as lvl
@@ -141,7 +144,7 @@ enemyCount = lvl.enemyCount(levelIndex)
 coinCount = lvl.coinCount(levelIndex)
 ```
 
-The Python CLI also supports Tiled JSON/TMJ import. The native MiniLang CLI validates Tiled manifests but still writes a stub for them. This keeps example game code small while still producing plain MiniLang for the runtime. The full manifest and Tiled conventions are documented in `docs/manifest-reference.md`.
+Tiled collision layers are converted into horizontal solid runs; spawn, exit, coin, and enemy objects become ordinary generated accessors. The full manifest and Tiled conventions are documented in `docs/manifest-reference.md`.
 
 ## Text
 
@@ -155,7 +158,7 @@ width = mp.textWidth("READY", 2)
 
 ## Input
 
-The `game.input` state exposes booleans like `left`, `right`, `jump`, and `escape`. The facade also has edge helpers:
+The `game.input` state preserves compatibility booleans like `left`, `right`, `jump`, and `escape`, while its action table is growable and configurable. Edges are buffered until a fixed update, so a short key press cannot disappear between render and simulation frames:
 
 ```ml
 if mp.inputPressed(game.input, "jump") then
@@ -164,9 +167,23 @@ end if
 if mp.inputReleased(game.input, "fire") then
   mp.stopSound()
 end if
+mp.bindKeys(game.input, "dash", 0x10, 0x43) # Shift or C
 ```
 
-Input is sampled only when the game window has focus.
+Logical `mouseX`/`mouseY`, `mouseDeltaX`/`mouseDeltaY`, `mouseWheel`, `mouseInside`, and mouse-button actions are updated from the active viewport. Input is released when the window loses focus.
+
+## Scenes
+
+Scenes can be registered, changed, or stacked for overlays and pause menus. Lifecycle hooks receive `(game, scene)`; update and render additionally receive `dt` or `canvas`.
+
+```ml
+menu = mp.scene("menu", void, onEnter, onExit, updateMenu, renderMenu)
+pause = mp.scene("pause", void, void, void, updatePause, renderPause, void, void, true)
+mp.registerScene(game, menu)
+mp.registerScene(game, pause)
+mp.changeScene(game, "menu")
+mp.pushScene(game, "pause")
+```
 
 ## Animation
 
@@ -183,7 +200,7 @@ Animations support `play`, `pause`, `stop`, `reset`, looping, ping-pong playback
 
 ## Audio
 
-The first audio layer uses the WinMM backend on Windows:
+Legacy one-shot helpers remain available through `PlaySoundW`:
 
 ```ml
 mp.playSound("assets\\audio\\coin.wav")
@@ -193,14 +210,14 @@ mp.playMusic("assets\\audio\\theme.wav")
 mp.stopSound()
 ```
 
-Games also get `game.audio`, a small state layer for SFX/music volume and mute handling:
+Games get a lazily opened waveOut PCM mixer with independent SFX voices and a dedicated music voice:
 
 ```ml
 game.audio.setMasterVolume(90)
 game.audio.setSfxVolume(75)
 coin = mp.audioClip("assets\\audio\\coin.wav", "coin")
 mp.playAudio(game.audio, coin)
-mp.playMusicWithState(game.audio, "assets\\audio\\theme.wav")
+game.audio.playMusic(mp.musicClip("assets\\audio\\theme.wav", "theme"))
 game.audio.mute()
 ```
 
@@ -211,7 +228,7 @@ coin = gen.audio_coin_sfx()
 mp.playAudio(game.audio, coin)
 ```
 
-For game code that wants a mixer-shaped API, use `AudioMixer`:
+Standalone mixers are also available:
 
 ```ml
 mixer = mp.audioMixer(4)
@@ -219,10 +236,11 @@ jump = mp.audioClip("assets\\audio\\jump.wav", "jump")
 theme = mp.musicClip("assets\\audio\\theme.wav", "theme")
 mixer.playSfx(jump)
 mixer.playMusic(theme)
+mixer.setChannel(0, 75, -30)
 mixer.stopAll()
 ```
 
-The current backend is still WinMM, so this is a stable high-level API rather than a true multi-voice software mixer. SFX clips can be path-backed or memory-backed; looping music remains path-backed for now. `mp.audioBackend()`, `mp.audioSupportsMultipleSfx()`, and `mp.audioSupportsVolumeControl()` make backend capability limits explicit.
+PCM WAV input supports mono/stereo 8/16/24/32-bit samples, nearest-rate conversion to 44.1 kHz stereo, looping memory-backed music, master/bus/clip/channel volume, and pan. `mp.audioBackend()` reports `waveout-pcm`; capability helpers report multi-SFX and volume support.
 
 ## Releases
 
@@ -248,4 +266,4 @@ rect = mp.recti(player.x, player.y, 12, 15)
 res = mp.tileMoveAndCollide(map, rect, vx, vy)
 ```
 
-The collider resolves X and Y separately and clamps bodies to world bounds.
+The collider resolves X and Y separately, checks every crossed row/column to prevent tunneling, and clamps bodies to world bounds. `mp.lineRect(...)` uses exact segment clipping rather than a broad-phase approximation.

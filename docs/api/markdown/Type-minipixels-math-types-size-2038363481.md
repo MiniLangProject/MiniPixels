@@ -12,7 +12,7 @@ struct Size
 Represents the size data used by the minipixels math types module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L24)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L105)
 
 ## Members
 
@@ -26,7 +26,7 @@ height
 Stores the height value associated with size.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L28)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L109)
 
 <a id="field-field-minipixels-math-types-size-width-width-src-minipixels-math-types-ml-247798518"></a>
 ### width
@@ -38,4 +38,4 @@ width
 Stores the width value associated with size.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L26)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L107)

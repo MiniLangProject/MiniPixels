@@ -25,7 +25,7 @@ Performs the beginFrame operation for the minipixels core time module.
 | `delta` | `dynamic` | — | delta value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/core/time.ml#L35)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/core/time.ml#L43)
 
 <a id="function-function-minipixels-core-time-countupdate-function-countupdate-t-src-minipixels-core-time-ml-1880197972"></a>
 ### countUpdate
@@ -41,7 +41,7 @@ Performs the countUpdate operation for the minipixels core time module.
 | `t` | `dynamic` | — | t value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/core/time.ml#L46)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/core/time.ml#L53)
 
 <a id="function-function-minipixels-core-time-create-function-create-updatespersecond-src-minipixels-core-time-ml-833778889"></a>
 ### create
@@ -57,6 +57,23 @@ Creates create for the minipixels core time module.
 | `updatesPerSecond` | `dynamic` | — | updatesPerSecond value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/core/time.ml#L27)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/core/time.ml#L35)
+
+<a id="function-function-minipixels-core-time-finishframe-function-finishframe-t-alpha-src-minipixels-core-time-ml-1212090146"></a>
+### finishFrame
+
+```ml
+function finishFrame(t, alpha)
+```
+
+Completes frame timing and updates interpolation and smoothed rates.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `t` | `dynamic` | — | Time state to update. |
+| `alpha` | `dynamic` | — | Fraction of the next fixed update accumulated by the loop. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/core/time.ml#L61)
 
 - [minipixels.core.time.TimeState](Type-minipixels-core-time-timestate-995826067.md) — struct

@@ -27,7 +27,7 @@ build\tools\minipixels.exe validate examples\jump-and-run\minipixels.json
 build\tools\minipixels.exe generate examples\jump-and-run\minipixels.json examples\jump-and-run\build\generated\generated
 ```
 
-Native `generate` supports procedural sprites, sheet helpers, and MiniPixels `levels.json`. The Python CLI still owns MiniPixels asset-pack generation for images/audio/files, Tiled/TMJ import, build/run, packaging, and compiler launching.
+Native `generate` writes real image/procedural/audio/file asset packs, sheet and audio helpers, and MiniPixels or Tiled/TMJ level modules. The Python CLI remains the recommended end-to-end build/run/package driver because it also launches the compiler and emits build reports.
 
 ## Minimal game
 
@@ -60,12 +60,12 @@ Colors are packed as `0xRRGGBBAA`. Canvas pixels are stored as RGBA bytes. Alpha
 
 ## Thread model
 
-Game logic, input polling, rendering, and Win32 presentation run on the main thread. The audio wrapper delegates to WinMM and may use system-managed audio threads internally. Public MiniPixels objects should be created and used on the main thread in this version.
+Game logic, input polling, PCM mixing, rendering, and Win32 presentation run on the main thread. waveOut consumes retained mixer buffers asynchronously. Public MiniPixels objects should be created and used on the main thread in this version.
 
 ## Implemented now
 
-Canvas, sprites, MiniPixels `.mpx` asset packs, runtime PNG decoding for packed RGBA images, native procedural asset generation, runtime audio/file asset packing, sprite sheets, generated level data, animation helpers, camera, tilemaps, parallax, collision helpers, bitmap text, input/action snapshots, AudioMixer API, headless tests, framehash regression tests, Win32 GDI and OpenGL/WGL presentation, CLI, CI workflow, SDK packaging, and examples are present.
+Canvas, render targets, rotated sprites, deterministic PNG screenshots, cached `.mpx` asset packs, general non-interlaced PNG loading, native asset/Tiled generation, sprite sheets, scene stacks, animation, camera, tilemaps, parallax, swept collision, bitmap text, buffered configurable input, a real multi-voice PCM mixer, headless/visual regression tests, Win32 GDI and OpenGL/WGL presentation, CLI, CI, SDK packaging, and examples are present.
 
 ## Not yet in the engine
 
-Native asset-pack generation, native Tiled/TMJ import, general PNG hot-loading outside `.mpx`, advanced audio mixing, async asset loading, arbitrary rotation, GPU render targets, a complete ECS, and visual golden-image management are documented extension points rather than current engine features.
+Cross-platform backends, compressed/streaming audio, Adam7/16-bit PNG decoding, background asset I/O, GPU-native render targets, a complete ECS/physics layer, and an editor remain extension points.

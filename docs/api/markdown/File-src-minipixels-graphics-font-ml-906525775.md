@@ -54,7 +54,7 @@ Draws text through the minipixels graphics font rendering path.
 | `color` | `dynamic` | — | color value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/font.ml#L98)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/font.ml#L106)
 
 <a id="function-function-minipixels-graphics-font-drawtextcentered-function-drawtextcentered-canvas-text-y-scale-color-src-minipixels-graphics-font-ml-1722252689"></a>
 ### drawTextCentered
@@ -74,7 +74,7 @@ Draws text centered through the minipixels graphics font rendering path.
 | `color` | `dynamic` | — | color value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/font.ml#L113)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/font.ml#L121)
 
 <a id="function-function-minipixels-graphics-font-glyphbits-function-glyphbits-ch-src-minipixels-graphics-font-ml-1627811811"></a>
 ### glyphBits

@@ -9,10 +9,10 @@
 struct AudioState
 ```
 
-Represents the audio state data used by the minipixels audio audio module.
+Represents legacy state used by direct PlaySound-compatible helpers.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L36)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L91)
 
 ## Members
 
@@ -23,10 +23,10 @@ Represents the audio state data used by the minipixels audio audio module.
 masterVolume
 ```
 
-Stores the master volume value associated with audio state.
+Master volume percentage.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L38)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L93)
 
 <a id="field-field-minipixels-audio-audio-audiostate-musicpath-musicpath-src-minipixels-audio-audio-ml-897396192"></a>
 ### musicPath
@@ -35,10 +35,10 @@ Stores the master volume value associated with audio state.
 musicPath
 ```
 
-Stores the music path value associated with audio state.
+Last legacy music path.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L46)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L101)
 
 <a id="field-field-minipixels-audio-audio-audiostate-musicvolume-musicvolume-src-minipixels-audio-audio-ml-980377204"></a>
 ### musicVolume
@@ -47,10 +47,10 @@ Stores the music path value associated with audio state.
 musicVolume
 ```
 
-Stores the music volume value associated with audio state.
+Music bus volume percentage.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L42)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L97)
 
 <a id="method-method-minipixels-audio-audio-audiostate-mute-function-mute-src-minipixels-audio-audio-ml-1822477818"></a>
 ### mute
@@ -59,10 +59,10 @@ Stores the music volume value associated with audio state.
 function mute()
 ```
 
-Performs the mute operation for the minipixels audio audio audio state module.
+Mutes legacy playback.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L67)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L119)
 
 <a id="field-field-minipixels-audio-audio-audiostate-muted-muted-src-minipixels-audio-audio-ml-1930108828"></a>
 ### muted
@@ -71,10 +71,10 @@ Performs the mute operation for the minipixels audio audio audio state module.
 muted
 ```
 
-Stores the muted value associated with audio state.
+Whether playback is muted.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L44)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L99)
 
 <a id="method-method-minipixels-audio-audio-audiostate-playmusic-function-playmusic-path-src-minipixels-audio-audio-ml-2020149201"></a>
 ### playMusic
@@ -83,14 +83,14 @@ Stores the muted value associated with audio state.
 function playMusic(path)
 ```
 
-Performs the playMusic operation for the minipixels audio audio audio state module.
+Plays looping legacy music from a file.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `path` | `dynamic` | — | Path of the file or directory used by the operation. |
+| `path` | `dynamic` | — | WAV file path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L85)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L134)
 
 <a id="method-method-minipixels-audio-audio-audiostate-playsfx-function-playsfx-path-src-minipixels-audio-audio-ml-1714481429"></a>
 ### playSfx
@@ -99,14 +99,14 @@ Performs the playMusic operation for the minipixels audio audio audio state modu
 function playSfx(path)
 ```
 
-Performs the playSfx operation for the minipixels audio audio audio state module.
+Plays a legacy sound effect from a file.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `path` | `dynamic` | — | Path of the file or directory used by the operation. |
+| `path` | `dynamic` | — | WAV file path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L79)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L129)
 
 <a id="method-method-minipixels-audio-audio-audiostate-setmastervolume-function-setmastervolume-value-src-minipixels-audio-audio-ml-37365463"></a>
 ### setMasterVolume
@@ -115,14 +115,14 @@ Performs the playSfx operation for the minipixels audio audio audio state module
 function setMasterVolume(value)
 ```
 
-Updates master volume maintained by the minipixels audio audio module.
+Sets master volume.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `value` | `dynamic` | — | Value consumed or transformed by the operation. |
+| `value` | `dynamic` | — | Percentage from 0 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L50)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L105)
 
 <a id="method-method-minipixels-audio-audio-audiostate-setmusicvolume-function-setmusicvolume-value-src-minipixels-audio-audio-ml-331730887"></a>
 ### setMusicVolume
@@ -131,14 +131,14 @@ Updates master volume maintained by the minipixels audio audio module.
 function setMusicVolume(value)
 ```
 
-Updates music volume maintained by the minipixels audio audio module.
+Sets music volume.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `value` | `dynamic` | — | Value consumed or transformed by the operation. |
+| `value` | `dynamic` | — | Percentage from 0 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L62)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L115)
 
 <a id="method-method-minipixels-audio-audio-audiostate-setsfxvolume-function-setsfxvolume-value-src-minipixels-audio-audio-ml-8602475"></a>
 ### setSfxVolume
@@ -147,14 +147,14 @@ Updates music volume maintained by the minipixels audio audio module.
 function setSfxVolume(value)
 ```
 
-Updates sfx volume maintained by the minipixels audio audio module.
+Sets sound-effect volume.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `value` | `dynamic` | — | Value consumed or transformed by the operation. |
+| `value` | `dynamic` | — | Percentage from 0 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L56)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L110)
 
 <a id="field-field-minipixels-audio-audio-audiostate-sfxvolume-sfxvolume-src-minipixels-audio-audio-ml-1304137504"></a>
 ### sfxVolume
@@ -163,10 +163,10 @@ Updates sfx volume maintained by the minipixels audio audio module.
 sfxVolume
 ```
 
-Stores the sfx volume value associated with audio state.
+Sound-effect bus volume percentage.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L40)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L95)
 
 <a id="method-method-minipixels-audio-audio-audiostate-stop-function-stop-src-minipixels-audio-audio-ml-1667517674"></a>
 ### stop
@@ -175,10 +175,10 @@ Stores the sfx volume value associated with audio state.
 function stop()
 ```
 
-Stops stop for the minipixels audio audio workflow.
+Stops legacy playback.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L90)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L138)
 
 <a id="method-method-minipixels-audio-audio-audiostate-unmute-function-unmute-src-minipixels-audio-audio-ml-40986830"></a>
 ### unmute
@@ -187,7 +187,7 @@ Stops stop for the minipixels audio audio workflow.
 function unmute()
 ```
 
-Performs the unmute operation for the minipixels audio audio audio state module.
+Unmutes legacy playback.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L73)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L124)
