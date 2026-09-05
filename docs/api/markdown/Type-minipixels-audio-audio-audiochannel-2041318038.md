@@ -12,7 +12,7 @@ struct AudioChannel
 Represents one independently mixed sound-effect voice.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L193)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L220)
 
 ## Members
 
@@ -26,7 +26,7 @@ clip
 Active clip.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L197)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L224)
 
 <a id="field-field-minipixels-audio-audio-audiochannel-cursor-cursor-src-minipixels-audio-audio-ml-1692099430"></a>
 ### cursor
@@ -38,7 +38,7 @@ cursor
 Fractional source-frame cursor.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L205)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L232)
 
 <a id="field-field-minipixels-audio-audio-audiochannel-id-id-src-minipixels-audio-audio-ml-764030132"></a>
 ### id
@@ -50,7 +50,7 @@ id
 Stable channel identifier.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L195)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L222)
 
 <a id="field-field-minipixels-audio-audio-audiochannel-pan-pan-src-minipixels-audio-audio-ml-1658644898"></a>
 ### pan
@@ -62,7 +62,7 @@ pan
 Channel pan from -100 (left) to 100 (right).
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L203)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L230)
 
 <a id="field-field-minipixels-audio-audio-audiochannel-playing-playing-src-minipixels-audio-audio-ml-1494561126"></a>
 ### playing
@@ -74,7 +74,7 @@ playing
 Whether this voice is active.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L199)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L226)
 
 <a id="field-field-minipixels-audio-audio-audiochannel-volume-volume-src-minipixels-audio-audio-ml-1481483718"></a>
 ### volume
@@ -86,4 +86,4 @@ volume
 Channel volume percentage.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L201)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L228)

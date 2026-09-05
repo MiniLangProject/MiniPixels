@@ -1,5 +1,9 @@
 import minipixels.graphics.canvas as cv
+#if TARGET_OS == "windows"
 import minipixels.platform.windows as win
+#else
+import minipixels.platform.linux as win
+#endif
 import minipixels as mp
 
 function main(args)
@@ -18,6 +22,12 @@ function main(args)
   print "WINDOW_RENDERER " + win.rendererName(w)
   print "WINDOW_RENDERER_GPU " + win.isGpuRenderer(w)
   print "WINDOW_RENDERER_FALLBACK " + win.rendererFallbackReason(w)
+#if TARGET_OS == "linux"
+  // Exercise the safe crop path used when an integer-scale window is smaller than its logical canvas.
+  w.clientWidth = canvas.width - 5
+  w.clientHeight = canvas.height - 3
+  if win.present(w, canvas) == false then return 2 end if
+#endif
   win.sleepMs(120)
   win.close(w)
   return 0

@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 ASSET_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 VERSION = "0.8.0"
+DEFAULT_TARGET = "windows-x64" if os.name == "nt" else "linux-x64"
 
 
 def write_bytes_if_changed(path: Path, content: bytes) -> bool:
@@ -723,7 +724,7 @@ def generate(project_file: Path, out_dir: Path) -> Path:
                 "  global assetPackCache",
                 "  if assetPackCache == void then",
                 '    assetPackCache = mp.openAssetPack("assets.mpx")',
-                '    if typeof(assetPackCache) == "error" then assetPackCache = mp.openAssetPack("build\\\\assets.mpx") end if',
+                '    if typeof(assetPackCache) == "error" then assetPackCache = mp.openAssetPack("build/assets.mpx") end if',
                 "  end if",
                 "  return assetPackCache",
                 "end function",
@@ -858,6 +859,7 @@ def build(
     output: Path | None,
     compiler: Path,
     generated_dir: Path,
+    target: str = DEFAULT_TARGET,
     subsystem: str = "windows",
     debug: bool = False,
     incremental: bool = True,
@@ -868,7 +870,8 @@ def build(
     generate(project_file, generated_dir)
     main = root / data["main"]
     if output is None:
-        output = root / "build" / f"{data.get('name', 'game')}.exe"
+        suffix = ".exe" if target == "windows-x64" else ""
+        output = root / "build" / f"{data.get('name', 'game')}{suffix}"
     output.parent.mkdir(parents=True, exist_ok=True)
     manifest_path = output.parent / "minilang.toml"
     compiler_root = compiler.parent
@@ -881,7 +884,7 @@ def build(
         f"entry = {json.dumps(str(main))}",
         f"output = {json.dumps(str(output))}",
         "include = [" + ", ".join(json.dumps(str(path)) for path in include_paths) + "]",
-        'target = "windows-x64"',
+        f"target = {json.dumps(target)}",
         f"subsystem = {json.dumps(subsystem)}",
         f"incremental = {'true' if incremental else 'false'}",
         f"cache_dir = {json.dumps(str(output.parent / '.minilang-cache'))}",
@@ -963,6 +966,7 @@ def main(argv: list[str]) -> int:
         sp = sub.add_parser(name)
         sp.add_argument("project", nargs="?", default="minipixels.json")
         sp.add_argument("--compiler", default=str(DEFAULT_COMPILER))
+        sp.add_argument("--target", choices=("windows-x64", "linux-x64"), default=DEFAULT_TARGET)
         sp.add_argument("--output")
         sp.add_argument("--generated-dir")
         mode = sp.add_mutually_exclusive_group()
@@ -998,12 +1002,13 @@ def main(argv: list[str]) -> int:
     elif args.cmd == "build":
         gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"
         out = Path(args.output).resolve() if args.output else None
-        subsystem = "console" if args.headless else "windows"
+        subsystem = "console" if args.headless or args.target == "linux-x64" else "windows"
         build(
             project,
             out,
             Path(args.compiler).resolve(),
             gen_dir,
+            target=args.target,
             subsystem=subsystem,
             debug=args.debug,
             incremental=not args.no_incremental,
@@ -1012,17 +1017,20 @@ def main(argv: list[str]) -> int:
     elif args.cmd == "run":
         gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"
         out = Path(args.output).resolve() if args.output else None
-        subsystem = "console" if args.headless else "windows"
+        subsystem = "console" if args.headless or args.target == "linux-x64" else "windows"
         exe = build(
             project,
             out,
             Path(args.compiler).resolve(),
             gen_dir,
+            target=args.target,
             subsystem=subsystem,
             debug=args.debug,
             incremental=not args.no_incremental,
             verbose=args.verbose,
         )
+        if args.target != DEFAULT_TARGET:
+            die(f"built {args.target} output at {exe}; run it on a matching host")
         subprocess.check_call([str(exe)], cwd=str(project.parent))
     return 0
 

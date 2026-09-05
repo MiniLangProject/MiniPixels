@@ -1,6 +1,10 @@
 import minipixels as mp
 import minipixels.graphics.canvas as cv
+#if TARGET_OS == "windows"
 import minipixels.platform.windows as win
+#else
+import minipixels.platform.linux as win
+#endif
 
 function drawFrame(canvas, frame)
   canvas.clear(mp.rgb((frame * 3) & 255, 24, 42))

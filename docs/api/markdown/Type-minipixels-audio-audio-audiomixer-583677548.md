@@ -9,10 +9,10 @@
 struct AudioMixer
 ```
 
-Represents a software PCM mixer backed by WinMM waveOut.
+Represents a software PCM mixer backed by WinMM waveOut or ALSA.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L209)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L236)
 
 ## Members
 
@@ -26,7 +26,7 @@ audio
 Shared bus volume and mute state.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L211)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L238)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-buffercount-buffercount-src-minipixels-audio-audio-ml-1557663584"></a>
 ### bufferCount
@@ -38,7 +38,7 @@ bufferCount
 Number of queued buffers.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L237)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L264)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-bufferframes-bufferframes-src-minipixels-audio-audio-ml-721824012"></a>
 ### bufferFrames
@@ -50,7 +50,7 @@ bufferFrames
 Stereo sample frames per buffer.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L235)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L262)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-buffers-buffers-src-minipixels-audio-audio-ml-2016976192"></a>
 ### buffers
@@ -62,7 +62,7 @@ buffers
 Retained output byte buffers.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L231)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L258)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-channelcount-channelcount-src-minipixels-audio-audio-ml-1974549612"></a>
 ### channelCount
@@ -74,7 +74,7 @@ channelCount
 Number of sound-effect voices.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L215)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L242)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-channels-channels-src-minipixels-audio-audio-ml-351011016"></a>
 ### channels
@@ -86,7 +86,7 @@ channels
 Sound-effect voices.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L213)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L240)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-close-function-close-src-minipixels-audio-audio-ml-1133851762"></a>
 ### close
@@ -98,7 +98,7 @@ function close()
 Releases the native output device.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L306)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L333)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-format-format-src-minipixels-audio-audio-ml-1754452030"></a>
 ### format
@@ -107,10 +107,10 @@ Releases the native output device.
 format
 ```
 
-Native PCM WAVEFORMATEX storage.
+Native PCM WAVEFORMATEX storage used on Windows.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L229)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L256)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-handle-handle-src-minipixels-audio-audio-ml-981249164"></a>
 ### handle
@@ -119,10 +119,10 @@ Native PCM WAVEFORMATEX storage.
 handle
 ```
 
-Native waveOut handle.
+Native waveOut or ALSA PCM handle.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L225)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L252)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-handlestorage-handlestorage-src-minipixels-audio-audio-ml-487586528"></a>
 ### handleStorage
@@ -134,7 +134,7 @@ handleStorage
 Native handle output storage.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L227)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L254)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-headers-headers-src-minipixels-audio-audio-ml-1307128444"></a>
 ### headers
@@ -143,10 +143,10 @@ Native handle output storage.
 headers
 ```
 
-Retained native WAVEHDR structures.
+Retained native WAVEHDR structures used on Windows.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L233)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L260)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-lasterror-lasterror-src-minipixels-audio-audio-ml-1444303204"></a>
 ### lastError
@@ -155,10 +155,10 @@ Retained native WAVEHDR structures.
 lastError
 ```
 
-Last multimedia-system error code.
+Last native audio error code.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L245)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L272)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-mixleft-mixleft-src-minipixels-audio-audio-ml-710958788"></a>
 ### mixLeft
@@ -170,7 +170,7 @@ mixLeft
 Reusable left-channel mixing accumulator.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L239)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L266)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-mixright-mixright-src-minipixels-audio-audio-ml-1332356952"></a>
 ### mixRight
@@ -182,7 +182,7 @@ mixRight
 Reusable right-channel mixing accumulator.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L241)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L268)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-music-music-src-minipixels-audio-audio-ml-611737000"></a>
 ### music
@@ -194,7 +194,7 @@ music
 Active music clip retained for compatibility.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L219)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L246)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-musicchannel-musicchannel-src-minipixels-audio-audio-ml-522760268"></a>
 ### musicChannel
@@ -206,7 +206,7 @@ musicChannel
 Dedicated music voice.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L221)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L248)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-mute-function-mute-src-minipixels-audio-audio-ml-587003342"></a>
 ### mute
@@ -218,7 +218,7 @@ function mute()
 Mutes all buses for subsequently mixed samples.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L266)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L293)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-nextchannel-nextchannel-src-minipixels-audio-audio-ml-1240139108"></a>
 ### nextChannel
@@ -230,7 +230,7 @@ nextChannel
 Round-robin replacement cursor.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L217)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L244)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-playmusic-function-playmusic-clip-src-minipixels-audio-audio-ml-1170273894"></a>
 ### playMusic
@@ -246,7 +246,7 @@ Starts or replaces the dedicated music voice.
 | `clip` | `dynamic` | — | PCM WAV clip. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L282)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L309)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-playsfx-function-playsfx-clip-src-minipixels-audio-audio-ml-869959498"></a>
 ### playSfx
@@ -262,7 +262,7 @@ Starts a sound-effect voice.
 | `clip` | `dynamic` | — | PCM WAV clip. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L277)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L304)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-ready-ready-src-minipixels-audio-audio-ml-530294568"></a>
 ### ready
@@ -271,10 +271,10 @@ Starts a sound-effect voice.
 ready
 ```
 
-Whether the waveOut backend is open.
+Whether the native PCM backend is open.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L243)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L270)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-samplerate-samplerate-src-minipixels-audio-audio-ml-1540088640"></a>
 ### sampleRate
@@ -286,7 +286,7 @@ sampleRate
 Output sample rate.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L223)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L250)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-setchannel-function-setchannel-id-volume-pan-src-minipixels-audio-audio-ml-654725674"></a>
 ### setChannel
@@ -304,7 +304,7 @@ Sets volume and pan for one sound-effect channel.
 | `pan` | `dynamic` | — | Pan from -100 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L302)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L329)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-setmastervolume-function-setmastervolume-value-src-minipixels-audio-audio-ml-195509011"></a>
 ### setMasterVolume
@@ -320,7 +320,7 @@ Sets master volume for subsequently mixed samples.
 | `value` | `dynamic` | — | Percentage from 0 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L249)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L276)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-setmusicvolume-function-setmusicvolume-value-src-minipixels-audio-audio-ml-987640579"></a>
 ### setMusicVolume
@@ -336,7 +336,7 @@ Sets music bus volume for subsequently mixed samples.
 | `value` | `dynamic` | — | Percentage from 0 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L261)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L288)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-setsfxvolume-function-setsfxvolume-value-src-minipixels-audio-audio-ml-1926371943"></a>
 ### setSfxVolume
@@ -352,7 +352,7 @@ Sets sound-effect bus volume for subsequently mixed samples.
 | `value` | `dynamic` | — | Percentage from 0 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L255)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L282)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-stopall-function-stopall-src-minipixels-audio-audio-ml-2353796"></a>
 ### stopAll
@@ -364,7 +364,7 @@ function stopAll()
 Stops every active voice.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L290)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L317)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-stopchannel-function-stopchannel-id-src-minipixels-audio-audio-ml-549842483"></a>
 ### stopChannel
@@ -380,7 +380,7 @@ Stops one sound-effect channel.
 | `id` | `dynamic` | — | Zero-based channel identifier. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L295)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L322)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-unmute-function-unmute-src-minipixels-audio-audio-ml-1780619714"></a>
 ### unmute
@@ -392,7 +392,7 @@ function unmute()
 Unmutes all buses for subsequently mixed samples.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L271)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L298)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-update-function-update-src-minipixels-audio-audio-ml-701288054"></a>
 ### update
@@ -404,4 +404,4 @@ function update()
 Refills completed output buffers.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L286)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L313)

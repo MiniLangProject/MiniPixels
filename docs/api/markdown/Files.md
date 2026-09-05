@@ -9,7 +9,7 @@
 | [src/minipixels/assets/assets.ml](File-src-minipixels-assets-assets-ml-652120143.md) | `minipixels.assets.assets` | yes | 24 |
 | [src/minipixels/assets/pack.ml](File-src-minipixels-assets-pack-ml-1157891367.md) | `minipixels.assets.pack` | yes | 22 |
 | [src/minipixels/assets/png.ml](File-src-minipixels-assets-png-ml-1155821131.md) | `minipixels.assets.png` | yes | 45 |
-| [src/minipixels/audio/audio.ml](File-src-minipixels-audio-audio-ml-660527635.md) | `minipixels.audio.audio` | yes | 139 |
+| [src/minipixels/audio/audio.ml](File-src-minipixels-audio-audio-ml-660527635.md) | `minipixels.audio.audio` | yes | 143 |
 | [src/minipixels/collision/collision.ml](File-src-minipixels-collision-collision-ml-1544745439.md) | `minipixels.collision.collision` | yes | 14 |
 | [src/minipixels/core/time.ml](File-src-minipixels-core-time-ml-1360759889.md) | `minipixels.core.time` | yes | 16 |
 | [src/minipixels/debug/debug.ml](File-src-minipixels-debug-debug-ml-1202344879.md) | `minipixels.debug.debug` | yes | 5 |
@@ -18,6 +18,7 @@
 | [src/minipixels/graphics/sprite.ml](File-src-minipixels-graphics-sprite-ml-1992064667.md) | `minipixels.graphics.sprite` | yes | 37 |
 | [src/minipixels/input/input.ml](File-src-minipixels-input-input-ml-1476207415.md) | `minipixels.input.input` | yes | 67 |
 | [src/minipixels/math/types.ml](File-src-minipixels-math-types-ml-311947336.md) | `minipixels.math.types` | yes | 79 |
+| [src/minipixels/platform/linux.ml](File-src-minipixels-platform-linux-ml-1856075630.md) | `minipixels.platform.linux` | no | 104 |
 | [src/minipixels/platform/windows.ml](File-src-minipixels-platform-windows-ml-1027159307.md) | `minipixels.platform.windows` | yes | 157 |
 | [src/minipixels/scene/scene.ml](File-src-minipixels-scene-scene-ml-552680371.md) | `minipixels.scene.scene` | yes | 45 |
 | [src/minipixels/tools/fsutil.ml](File-src-minipixels-tools-fsutil-ml-605704885.md) | `minipixels.tools.fsutil` | no | 8 |

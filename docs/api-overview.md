@@ -18,7 +18,7 @@ The game loop uses a high-resolution monotonic clock, fixed simulation updates, 
 
 ## Renderer
 
-MiniPixels renders into a fixed-size RGBA canvas and then presents that framebuffer to the native window. On Windows the default renderer mode is `auto`: MiniPixels first tries the OpenGL/WGL presenter and falls back to the GDI presenter if GPU initialization is not available.
+MiniPixels renders into a fixed-size RGBA canvas and then presents that framebuffer to the native window. On Windows the default renderer mode is `auto`: MiniPixels first tries the OpenGL/WGL presenter and falls back to GDI if GPU initialization is not available. Linux uses the X11/XImage presenter and reports a fallback reason when OpenGL is requested.
 
 ```ml
 cfg = mp.createConfig("Title", 320, 180, 4)
@@ -210,7 +210,7 @@ mp.playMusic("assets\\audio\\theme.wav")
 mp.stopSound()
 ```
 
-Games get a lazily opened waveOut PCM mixer with independent SFX voices and a dedicated music voice:
+Games get a lazily opened PCM mixer (waveOut on Windows, ALSA on Linux) with independent SFX voices and a dedicated music voice:
 
 ```ml
 game.audio.setMasterVolume(90)

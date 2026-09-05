@@ -16,6 +16,7 @@ File-src-minipixels-graphics-sprite-ml-1992064667.md
 File-src-minipixels-input-input-ml-1476207415.md
 File-src-minipixels-math-types-ml-311947336.md
 File-src-minipixels-ml-1730909391.md
+File-src-minipixels-platform-linux-ml-1856075630.md
 File-src-minipixels-platform-windows-ml-1027159307.md
 File-src-minipixels-scene-scene-ml-552680371.md
 File-src-minipixels-tools-fsutil-ml-605704885.md
@@ -43,6 +44,7 @@ Package-minipixels-graphics-font-76916397.md
 Package-minipixels-graphics-sprite-484808201.md
 Package-minipixels-input-input-1057851307.md
 Package-minipixels-math-types-2130299542.md
+Package-minipixels-platform-linux-1505480356.md
 Package-minipixels-platform-windows-647622739.md
 Package-minipixels-scene-scene-2050449523.md
 Package-minipixels-tools-fsutil-368541163.md
@@ -82,6 +84,7 @@ Type-minipixels-math-types-timer-1595408457.md
 Type-minipixels-math-types-transform2d-753406466.md
 Type-minipixels-math-types-vector2-666003535.md
 Type-minipixels-math-types-vector2int-1351615520.md
+Type-minipixels-platform-linux-window-788017826.md
 Type-minipixels-platform-windows-window-369528407.md
 Type-minipixels-scene-scene-scene-727861925.md
 Type-minipixels-scene-scene-scenestack-1227700927.md

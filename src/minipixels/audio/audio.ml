@@ -8,6 +8,7 @@ import std.bytes as by
 import std.fs as fs
 import minipixels.math.types as mt
 
+#if TARGET_OS == "windows"
 /// Invokes the legacy PlaySoundW file entry point.
 /// @param path UTF-16 WAV file path.
 /// @param module Optional resource module handle.
@@ -55,6 +56,24 @@ extern function waveOutReset(handle as ptr) from "winmm.dll" returns u32
 /// @param handle Open waveform output handle.
 /// @returns Multimedia-system result code.
 extern function waveOutClose(handle as ptr) from "winmm.dll" returns u32
+#else
+/// Opens an ALSA PCM stream.
+extern function snd_pcm_open(handle as bytes, name as cstr, stream as int, mode as int) from "libasound.so.2" returns i32
+/// Configures a simple interleaved PCM stream.
+extern function snd_pcm_set_params(handle as ptr, format as int, access as int, channels as u32, rate as u32, softResample as int, latencyUs as u32) from "libasound.so.2" returns i32
+/// Returns the number of sample frames currently accepted by the stream.
+extern function snd_pcm_avail_update(handle as ptr) from "libasound.so.2" returns i64
+/// Writes interleaved sample frames without blocking.
+extern function snd_pcm_writei(handle as ptr, data as ptr, frames as u64) from "libasound.so.2" returns i64
+/// Recovers from underruns and suspended streams.
+extern function snd_pcm_recover(handle as ptr, code as int, silent as int) from "libasound.so.2" returns i32
+/// Stops the current PCM stream immediately.
+extern function snd_pcm_drop(handle as ptr) from "libasound.so.2" returns i32
+/// Prepares a stopped PCM stream for more output.
+extern function snd_pcm_prepare(handle as ptr) from "libasound.so.2" returns i32
+/// Closes an ALSA PCM stream.
+extern function snd_pcm_close(handle as ptr) from "libasound.so.2" returns i32
+#endif
 
 /// Legacy synchronous playback flag.
 const SND_SYNC = 0x0000
@@ -80,6 +99,14 @@ const MMSYSERR_NOERROR = 0
 const WHDR_DONE = 0x00000001
 /// Native WAVEHDR size on x64 Windows.
 const WAVEHDR_SIZE = 48
+/// ALSA playback stream selector.
+const SND_PCM_STREAM_PLAYBACK = 0
+/// ALSA non-blocking open flag.
+const SND_PCM_NONBLOCK = 1
+/// ALSA signed 16-bit little-endian sample format.
+const SND_PCM_FORMAT_S16_LE = 2
+/// ALSA read/write interleaved access mode.
+const SND_PCM_ACCESS_RW_INTERLEAVED = 3
 /// Default mixer sample rate.
 const MIXER_SAMPLE_RATE = 44100
 /// Number of stereo frames in one queued mixer buffer.
@@ -205,7 +232,7 @@ struct AudioChannel
   cursor
 end struct
 
-/// Represents a software PCM mixer backed by WinMM waveOut.
+/// Represents a software PCM mixer backed by WinMM waveOut or ALSA.
 struct AudioMixer
   /// Shared bus volume and mute state.
   audio
@@ -221,15 +248,15 @@ struct AudioMixer
   musicChannel
   /// Output sample rate.
   sampleRate
-  /// Native waveOut handle.
+  /// Native waveOut or ALSA PCM handle.
   handle
   /// Native handle output storage.
   handleStorage
-  /// Native PCM WAVEFORMATEX storage.
+  /// Native PCM WAVEFORMATEX storage used on Windows.
   format
   /// Retained output byte buffers.
   buffers
-  /// Retained native WAVEHDR structures.
+  /// Retained native WAVEHDR structures used on Windows.
   headers
   /// Stereo sample frames per buffer.
   bufferFrames
@@ -239,9 +266,9 @@ struct AudioMixer
   mixLeft
   /// Reusable right-channel mixing accumulator.
   mixRight
-  /// Whether the waveOut backend is open.
+  /// Whether the native PCM backend is open.
   ready
-  /// Last multimedia-system error code.
+  /// Last native audio error code.
   lastError
 
   /// Sets master volume for subsequently mixed samples.
@@ -398,7 +425,11 @@ end function
 
 /// Returns the primary advanced audio backend name.
 function backendName()
+#if TARGET_OS == "windows"
   return "waveout-pcm"
+#else
+  return "alsa-pcm"
+#endif
 end function
 
 /// Returns whether the mixer supports simultaneous sound effects.
@@ -415,40 +446,64 @@ end function
 /// @param path WAV file path.
 function playSound(path)
   if typeof(path) != "string" then return false end if
+#if TARGET_OS == "windows"
   return PlaySoundW(path, 0, SND_ASYNC | SND_FILENAME | SND_NODEFAULT)
+#else
+  return false
+#endif
 end function
 
 /// Plays one WAV file synchronously through the legacy helper.
 /// @param path WAV file path.
 function playSoundSync(path)
   if typeof(path) != "string" then return false end if
+#if TARGET_OS == "windows"
   return PlaySoundW(path, 0, SND_SYNC | SND_FILENAME | SND_NODEFAULT)
+#else
+  return false
+#endif
 end function
 
 /// Plays one looping WAV file through the legacy helper.
 /// @param path WAV file path.
 function playSoundLoop(path)
   if typeof(path) != "string" then return false end if
+#if TARGET_OS == "windows"
   return PlaySoundW(path, 0, SND_ASYNC | SND_LOOP | SND_FILENAME | SND_NODEFAULT)
+#else
+  return false
+#endif
 end function
 
 /// Plays WAV file bytes through the legacy helper.
 /// @param data Complete WAV file bytes.
 function playSoundBytes(data)
   if typeof(data) != "bytes" or len(data) <= 0 then return false end if
+#if TARGET_OS == "windows"
   return PlaySoundMemory(nativeBytesPtr(data), 0, SND_ASYNC | SND_MEMORY | SND_NODEFAULT)
+#else
+  return false
+#endif
 end function
 
 /// Plays WAV file bytes synchronously through the legacy helper.
 /// @param data Complete WAV file bytes.
 function playSoundBytesSync(data)
   if typeof(data) != "bytes" or len(data) <= 0 then return false end if
+#if TARGET_OS == "windows"
   return PlaySoundMemory(nativeBytesPtr(data), 0, SND_SYNC | SND_MEMORY | SND_NODEFAULT)
+#else
+  return false
+#endif
 end function
 
 /// Stops legacy direct playback.
 function stopSound()
+#if TARGET_OS == "windows"
   return PlaySoundW("", 0, SND_PURGE)
+#else
+  return false
+#endif
 end function
 
 /// Plays looping legacy music from a path.
@@ -720,10 +775,11 @@ function prepareMixerFormat(value)
   by.writeU16LE(format, 16, 0)
 end function
 
-/// Opens waveOut and queues the initial retained buffers.
+/// Opens the platform PCM device and prepares retained output buffers.
 /// @param value Mixer to open.
 function ensureBackend(value)
   if value.ready then return true end if
+#if TARGET_OS == "windows"
   prepareMixerFormat(value)
   result = waveOutOpen(value.handleStorage, WAVE_MAPPER, value.format, 0, 0, 0)
   if result != MMSYSERR_NOERROR then
@@ -752,6 +808,22 @@ function ensureBackend(value)
       return false
     end if
   end for
+#else
+  result = snd_pcm_open(value.handleStorage, "default", SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK)
+  if result < 0 then
+    value.lastError = result
+    return false
+  end if
+  value.handle = getU64(value.handleStorage, 0)
+  result = snd_pcm_set_params(value.handle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, 2, value.sampleRate, 1, 50000)
+  if result < 0 then
+    value.lastError = result
+    snd_pcm_close(value.handle)
+    value.handle = 0
+    return false
+  end if
+  value.buffers[0] = bytes(value.bufferFrames * 4, 0)
+#endif
   value.ready = true
   value.lastError = 0
   return true
@@ -805,10 +877,11 @@ function mixerPlayMusic(value, source)
   return true
 end function
 
-/// Refills every completed native output header.
+/// Refills completed Windows headers or an available ALSA period.
 /// @param value Mixer to update.
 function updateMixer(value)
   if value is not AudioMixer or value.ready == false then return false end if
+#if TARGET_OS == "windows"
   wrote = false
   for index = 0 to value.bufferCount - 1
     header = value.headers[index]
@@ -823,6 +896,27 @@ function updateMixer(value)
     end if
   end for
   return wrote
+#else
+  available = snd_pcm_avail_update(value.handle)
+  if available < 0 then
+    result = snd_pcm_recover(value.handle, available, 1)
+    if result < 0 then
+      value.lastError = result
+      return false
+    end if
+    available = snd_pcm_avail_update(value.handle)
+  end if
+  if available < value.bufferFrames then return false end if
+  output = value.buffers[0]
+  mixBuffer(value, output)
+  written = snd_pcm_writei(value.handle, nativeBytesPtr(output), value.bufferFrames)
+  if written < 0 then
+    result = snd_pcm_recover(value.handle, written, 1)
+    if result < 0 then value.lastError = result end if
+    return false
+  end if
+  return written > 0
+#endif
 end function
 
 /// Applies a volume or mute change to subsequently mixed buffers.
@@ -846,8 +940,13 @@ function mixerStopAll(value)
   value.musicChannel.cursor = 0.0
   value.music = void
   if value.ready then
+#if TARGET_OS == "windows"
     waveOutReset(value.handle)
     updateMixer(value)
+#else
+    snd_pcm_drop(value.handle)
+    snd_pcm_prepare(value.handle)
+#endif
   end if
   return true
 end function
@@ -878,22 +977,31 @@ function setChannel(value, id, volume, pan)
   return refreshMixer(value)
 end function
 
-/// Releases retained headers and closes the native waveform output device.
+/// Releases retained buffers and closes the native PCM output device.
 /// @param value Mixer to close.
 function closeMixer(value)
   if value is not AudioMixer or value.handle == 0 then
     if value is AudioMixer then value.ready = false end if
     return true
   end if
+#if TARGET_OS == "windows"
   waveOutReset(value.handle)
   for index = 0 to value.bufferCount - 1
     header = value.headers[index]
     if typeof(header) == "bytes" then waveOutUnprepareHeader(value.handle, header, WAVEHDR_SIZE) end if
   end for
   result = waveOutClose(value.handle)
+#else
+  snd_pcm_drop(value.handle)
+  result = snd_pcm_close(value.handle)
+#endif
   value.handle = 0
   value.ready = false
+#if TARGET_OS == "windows"
   if result != MMSYSERR_NOERROR then
+#else
+  if result < 0 then
+#endif
     value.lastError = result
     return false
   end if

@@ -15,17 +15,17 @@ function main(args)
   bad = try(json.parse("{\"x\": [1,]}"))
   a.assertEq(typeof(bad), "error", "json syntax error returns error")
 
-  m = mani.load("examples\\moving-sprite\\minipixels.json")
+  m = mani.load("examples/moving-sprite/minipixels.json")
   a.assertTrue(mani.isValid(m), "moving-sprite manifest valid")
   a.assertEq(m.name, "moving-sprite", "manifest name")
   a.assertEq(m.width, 320, "manifest width")
   a.assertEq(m.assetCount, 1, "manifest asset count")
 
-  j = mani.load("examples\\jump-and-run\\minipixels.json")
+  j = mani.load("examples/jump-and-run/minipixels.json")
   a.assertTrue(mani.isValid(j), "jump-and-run manifest valid")
   a.assertEq(j.levelPath, "assets/levels/levels.json", "manifest level path")
 
-  t = mani.load("examples\\tiled-platformer\\minipixels.json")
+  t = mani.load("examples/tiled-platformer/minipixels.json")
   a.assertTrue(mani.isValid(t), "procedural asset manifest valid")
 
   invalid = mani.parseText("{\"name\":\"bad\",\"window\":{\"width\":0,\"height\":180}}", "inline", ".")

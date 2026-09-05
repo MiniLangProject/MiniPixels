@@ -7,17 +7,25 @@ package minipixels.tools.fsutil
 import std.fs as fs
 import std.string as str
 
-/// Invokes the native CreateDirectoryW entry point used by the minipixels tools fsutil module.
-/// @param path Path of the file or directory used by the operation.
-/// @param security security value consumed by this operation.
-/// @returns Native bool result produced by the call.
+#if TARGET_OS == "windows"
+/// Creates a directory through Win32.
+/// @internal
 extern function CreateDirectoryW(path as wstr, security as ptr) from "kernel32.dll" returns bool
+#else
+/// Creates a directory through POSIX, with permissions filtered by the process umask.
+/// @internal
+extern function PosixMkdir(path as cstr, mode as u32) from "libc.so.6" symbol "mkdir" returns i32
+#endif
 
 /// Performs the mkdir operation for the minipixels tools fsutil module.
 /// @param path Path of the file or directory used by the operation.
 function mkdir(path)
   if fs.exists(path) then return fs.isDir(path) end if
+#if TARGET_OS == "windows"
   return CreateDirectoryW(path, 0)
+#else
+  return PosixMkdir(path, 0x1ED) == 0
+#endif
 end function
 
 /// Performs the maxInt operation for the minipixels tools fsutil module.

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
+import os
 import subprocess
 import sys
 import importlib.util
@@ -15,6 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
+DEFAULT_TARGET = "windows-x64" if os.name == "nt" else "linux-x64"
 TESTS = [
     "canvas_tests.ml",
     "systems_tests.ml",
@@ -27,14 +30,43 @@ TESTS = [
 ]
 
 
-def run_test_executable(exe: Path) -> None:
-    result = subprocess.run([str(exe)], cwd=str(ROOT), text=True, capture_output=True)
+def output_path(name: str, target: str) -> Path:
+    suffix = ".exe" if target == "windows-x64" else ""
+    return ROOT / "build" / "tests" / f"{name}{suffix}"
+
+
+def wsl_path(path: Path) -> str:
+    resolved = path.resolve()
+    drive = resolved.drive.rstrip(":").lower()
+    tail = resolved.as_posix().split(":", 1)[-1]
+    return f"/mnt/{drive}{tail}"
+
+
+def executable_command(exe: Path, target: str, args: list[str] | None = None) -> list[str]:
+    extra = list(args or [])
+    if target == "linux-x64" and os.name == "nt":
+        return [
+            "wsl.exe",
+            "-d",
+            os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"),
+            "--cd",
+            wsl_path(ROOT),
+            "--",
+            wsl_path(exe),
+            *extra,
+        ]
+    return [str(exe), *extra]
+
+
+def run_test_executable(exe: Path, target: str, args: list[str] | None = None) -> None:
+    cmd = executable_command(exe, target, args)
+    result = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
     if result.stdout:
         print(result.stdout, end="")
     if result.stderr:
         print(result.stderr, end="", file=sys.stderr)
     if result.returncode != 0:
-        raise subprocess.CalledProcessError(result.returncode, [str(exe)])
+        raise subprocess.CalledProcessError(result.returncode, cmd)
     if "[FAIL]" in result.stdout:
         raise RuntimeError(f"MiniLang assertions failed in {exe.name}")
 
@@ -302,7 +334,7 @@ def run_python_tests() -> None:
     print("Python tool tests passed")
 
 
-def run_generated_smoke() -> None:
+def run_generated_smoke(compiler: Path, target: str) -> None:
     generated_root = ROOT / "build" / "tests" / "native_generated_levels"
     generated = generated_root / "generated"
     if not (generated / "assets.ml").exists() or not (generated / "levels.ml").exists():
@@ -334,10 +366,10 @@ def run_generated_smoke() -> None:
         ),
         encoding="utf-8",
     )
-    exe = ROOT / "build" / "tests" / "generated_smoke.exe"
+    exe = output_path("generated_smoke", target)
     cmd = [
         sys.executable,
-        str(COMPILER),
+        str(compiler),
         str(smoke),
         str(exe),
         "-I",
@@ -346,11 +378,13 @@ def run_generated_smoke() -> None:
         str(ROOT.parent / "MiniLangCompilerPy"),
         "-I",
         str(generated_root),
+        "--target",
+        target,
     ]
     print("compile:", " ".join(cmd))
     subprocess.check_call(cmd, cwd=str(ROOT))
     print("run:", exe)
-    run_test_executable(exe)
+    run_test_executable(exe, target)
 
     procedural_root = ROOT / "build" / "tests" / "native_generated_procedural"
     if not (procedural_root / "generated" / "assets.ml").exists():
@@ -378,10 +412,10 @@ def run_generated_smoke() -> None:
         ),
         encoding="utf-8",
     )
-    procedural_exe = ROOT / "build" / "tests" / "generated_procedural_smoke.exe"
+    procedural_exe = output_path("generated_procedural_smoke", target)
     cmd = [
         sys.executable,
-        str(COMPILER),
+        str(compiler),
         str(procedural_smoke),
         str(procedural_exe),
         "-I",
@@ -390,36 +424,53 @@ def run_generated_smoke() -> None:
         str(ROOT.parent / "MiniLangCompilerPy"),
         "-I",
         str(procedural_root),
+        "--target",
+        target,
     ]
     print("compile:", " ".join(cmd))
     subprocess.check_call(cmd, cwd=str(ROOT))
     print("run:", procedural_exe)
-    run_test_executable(procedural_exe)
+    run_test_executable(procedural_exe, target)
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Compile and run the MiniPixels test suite")
+    parser.add_argument("--target", choices=("windows-x64", "linux-x64"), default=DEFAULT_TARGET)
+    parser.add_argument("--compiler", default=str(COMPILER))
+    args = parser.parse_args(argv)
+    target = args.target
+    compiler = Path(args.compiler).resolve()
     run_python_tests()
     build = ROOT / "build" / "tests"
     build.mkdir(parents=True, exist_ok=True)
     create_asset_pack_fixture()
     for test in TESTS:
         src = ROOT / "tests" / test
-        exe = build / (Path(test).stem + ".exe")
-        cmd = [sys.executable, str(COMPILER), str(src), str(exe), "-I", str(ROOT / "src"), "-I", str(ROOT.parent / "MiniLangCompilerPy")]
+        exe = output_path(Path(test).stem, target)
+        cmd = [
+            sys.executable,
+            str(compiler),
+            str(src),
+            str(exe),
+            "-I",
+            str(ROOT / "src"),
+            "-I",
+            str(ROOT.parent / "MiniLangCompilerPy"),
+            "--target",
+            target,
+        ]
         print("compile:", " ".join(cmd))
         subprocess.check_call(cmd, cwd=str(ROOT))
         print("run:", exe)
-        run_test_executable(exe)
+        run_test_executable(exe, target)
         if test == "foundation_tests.ml":
-            junit = build / "foundation-results.xml"
-            subprocess.check_call(
-                [str(exe), "--format", "junit", "--output", str(junit), "--quiet"],
-                cwd=str(ROOT),
-            )
+            report_name = "foundation-results.xml" if target == "windows-x64" else "foundation-results-linux.xml"
+            junit = build / report_name
+            run_test_executable(exe, target, ["--format", "junit", "--output", f"build/tests/{report_name}", "--quiet"])
             if not junit.is_file():
                 raise RuntimeError("std.test did not write its JUnit report")
-    run_generated_smoke()
-    print("MiniPixels tests passed")
+    run_generated_smoke(compiler, target)
+    print(f"MiniPixels tests passed ({target})")
     return 0
 
 

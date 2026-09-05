@@ -11,6 +11,81 @@ permissions:
   contents: write
 
 jobs:
+  linux:
+    name: Linux tests and examples
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout MiniPixels
+        uses: actions/checkout@v5
+        with:
+          path: MiniPixels
+
+      - name: Checkout MiniLangCompilerPy
+        uses: actions/checkout@v5
+        with:
+          repository: MiniLangProject/MiniLangCompilerPy
+          path: MiniLangCompilerPy
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install native runtime dependencies
+        run: sudo apt-get update && sudo apt-get install -y xvfb libx11-6 libasound2t64
+
+      - name: Run MiniPixels tests
+        working-directory: MiniPixels
+        run: python tests/run_tests.py --target linux-x64
+
+      - name: Upload Linux test report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: minipixels-linux-test-report
+          path: MiniPixels/build/tests/foundation-results-linux.xml
+          if-no-files-found: ignore
+
+      - name: Build examples
+        working-directory: MiniPixels
+        run: python tools/build_examples.py --target linux-x64
+
+      - name: Smoke X11 presenter
+        working-directory: MiniPixels
+        run: |
+          python ../MiniLangCompilerPy/mlc_win64.py tests/window_renderer_smoke.ml build/tests/window_renderer_smoke -I src -I ../MiniLangCompilerPy --target linux-x64
+          xvfb-run -a build/tests/window_renderer_smoke
+
+      - name: Build and smoke native MiniLang CLI
+        working-directory: MiniPixels
+        run: |
+          mkdir -p build/tools
+          python ../MiniLangCompilerPy/mlc_win64.py tools/minipixels_cli.ml build/tools/minipixels -I src -I ../MiniLangCompilerPy --target linux-x64
+          build/tools/minipixels info
+          build/tools/minipixels doctor
+          build/tools/minipixels validate examples/moving-sprite/minipixels.json
+          build/tools/minipixels validate examples/scrolling-world/minipixels.json
+          build/tools/minipixels validate examples/pixel-effects/minipixels.json
+          build/tools/minipixels validate examples/jump-and-run/minipixels.json
+          build/tools/minipixels validate examples/tiled-platformer/minipixels.json
+          build/tools/minipixels generate examples/pixel-effects/minipixels.json build/native-generated/pixel-effects
+          build/tools/minipixels generate examples/jump-and-run/minipixels.json build/native-generated/jump-and-run/generated
+
+      - name: Smoke native MiniLang CLI templates
+        working-directory: MiniPixels
+        run: |
+          tmp=$(mktemp -d)
+          cp build/tools/minipixels "$tmp/minipixels"
+          cd "$tmp"
+          for tpl in basic platformer pixel-art; do
+            name="demo-$tpl"
+            ./minipixels new "$name" "$tpl"
+            ./minipixels validate "$name/minipixels.json"
+            ./minipixels generate "$name/minipixels.json"
+            python "$GITHUB_WORKSPACE/MiniLangCompilerPy/mlc_win64.py" "$tmp/$name/src/main.ml" "$tmp/$name/$name" -I "$GITHUB_WORKSPACE/MiniPixels/src" -I "$GITHUB_WORKSPACE/MiniLangCompilerPy" --target linux-x64
+          done
+
   windows:
     name: Windows tests and examples
     runs-on: windows-latest

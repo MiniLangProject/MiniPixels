@@ -30,7 +30,7 @@ Returns whether two byte buffers have identical contents.
 | `second` | `dynamic` | — | Second byte buffer. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L57)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L65)
 
 <a id="extern_function-extern-function-minipixels-tools-fsutil-createdirectoryw-extern-function-createdirectoryw-path-as-wstr-security-as-ptr-from-kernel32-dll-returns-bool-src-minipixels-tools-fsutil-ml-1089767167"></a>
 ### CreateDirectoryW
@@ -39,17 +39,15 @@ Returns whether two byte buffers have identical contents.
 extern function CreateDirectoryW(path as wstr, security as ptr) from "kernel32.dll" returns bool
 ```
 
-Invokes the native CreateDirectoryW entry point used by the minipixels tools fsutil module.
+Creates a directory through Win32.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `path` | `wstr` | — | Path of the file or directory used by the operation. |
-| `security` | `ptr` | — | security value consumed by this operation. |
+| `path` | `wstr` | — |  |
+| `security` | `ptr` | — |  |
 
 
-**Returns:** Native bool result produced by the call.
-
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L14)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L13)
 
 <a id="function-function-minipixels-tools-fsutil-dirname-function-dirname-path-src-minipixels-tools-fsutil-ml-896912947"></a>
 ### dirname
@@ -65,7 +63,7 @@ Performs the dirname operation for the minipixels tools fsutil module.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L33)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L41)
 
 <a id="function-function-minipixels-tools-fsutil-ensuredir-function-ensuredir-path-src-minipixels-tools-fsutil-ml-1756570909"></a>
 ### ensureDir
@@ -81,7 +79,7 @@ Ensures dir is available to the minipixels tools fsutil workflow.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L44)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L52)
 
 <a id="function-function-minipixels-tools-fsutil-maxint-function-maxint-a-b-src-minipixels-tools-fsutil-ml-545445319"></a>
 ### maxInt
@@ -98,7 +96,7 @@ Performs the maxInt operation for the minipixels tools fsutil module.
 | `b` | `dynamic` | — | b value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L26)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L34)
 
 <a id="function-function-minipixels-tools-fsutil-mkdir-function-mkdir-path-src-minipixels-tools-fsutil-ml-1993442249"></a>
 ### mkdir
@@ -114,7 +112,7 @@ Performs the mkdir operation for the minipixels tools fsutil module.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L18)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L22)
 
 <a id="function-function-minipixels-tools-fsutil-writebytes-function-writebytes-path-data-src-minipixels-tools-fsutil-ml-1097382007"></a>
 ### writeBytes
@@ -131,7 +129,7 @@ Writes bytes only when their contents differ from the existing file.
 | `data` | `dynamic` | — | Byte payload to persist. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L70)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L78)
 
 <a id="function-function-minipixels-tools-fsutil-writetext-function-writetext-path-text-src-minipixels-tools-fsutil-ml-719235936"></a>
 ### writeText
@@ -148,4 +146,4 @@ Writes text only when its contents differ from the existing file.
 | `text` | `dynamic` | — | Text consumed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L86)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/fsutil.ml#L94)

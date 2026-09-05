@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added native Linux x64 support with an X11/XImage window, resize-aware presentation, focus-safe keyboard/mouse input, and monotonic frame timing.
+- Added a non-blocking ALSA output backend for the existing multi-voice PCM mixer and POSIX directory creation for native tooling.
+- Added `--target windows-x64|linux-x64` to the Python build, test, and example drivers, including correct PE/ELF output naming and target-aware manifests.
+- Added Ubuntu CI coverage for the full native test suite, all examples, the renderer smoke test, and the native MiniLang CLI.
+
 ## 0.8.0
 
 - Added configurable, growable input actions with buffered fixed-update edges, logical mouse coordinates, deltas, buttons, wheel input, and focus-safe releases.

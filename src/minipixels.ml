@@ -10,7 +10,11 @@ import minipixels.graphics.sprite as sp
 import minipixels.graphics.font as font
 import minipixels.input.input as inp
 import minipixels.core.time as tm
+#if TARGET_OS == "windows"
 import minipixels.platform.windows as win
+#else
+import minipixels.platform.linux as win
+#endif
 import minipixels.assets.assets as ast
 import minipixels.assets.pack as pack
 import minipixels.assets.png as png

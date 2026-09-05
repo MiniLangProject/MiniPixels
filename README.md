@@ -5,9 +5,9 @@
 
 Current version: `0.8.0`
 
-MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.4 or newer and builds native Windows x64 executables.
+MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.4 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
-MiniPixels focuses on a small but working 2D engine slice: a Win32 window, fixed logical framebuffer, optional OpenGL/WGL presentation, configurable keyboard/mouse actions, sprites and rotated render targets, cached asset packs with general PNG decoding, scene stacks, swept tile collision, bitmap text, multi-voice PCM audio, headless tests, and example projects.
+MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, a fixed logical framebuffer, OpenGL/WGL, GDI and XImage presentation, configurable keyboard/mouse actions, sprites and rotated render targets, cached asset packs with general PNG decoding, scene stacks, swept tile collision, bitmap text, multi-voice PCM audio through waveOut or ALSA, headless tests, and example projects.
 
 ![Moving Sprite](docs/images/moving-sprite.png)
 
@@ -31,7 +31,7 @@ diagnostics as failures.
 
 ## Requirements
 
-- Windows
+- Windows x64 or Linux x64 with glibc, X11 (`libX11.so.6`) and ALSA (`libasound.so.2`)
 - MiniLang Compiler 1.2.4 or newer in a sibling `MiniLangCompilerPy` checkout, or a Python/self-hosted compiler path passed with `--compiler`
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
 
@@ -57,6 +57,18 @@ Build without running:
 python tools\minipixels.py build examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```
 
+On Linux, the CLI selects `linux-x64` automatically. Cross-compile the same ELF output from Windows by passing the target explicitly:
+
+```powershell
+python tools\minipixels.py build examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py --target linux-x64
+```
+
+```bash
+python3 tools/minipixels.py run examples/moving-sprite/minipixels.json --compiler ../MiniLangCompilerPy/mlc_win64.py
+python3 tests/run_tests.py --target linux-x64
+python3 tools/build_examples.py --target linux-x64
+```
+
 The self-hosted 1.2.4 compiler is accepted directly as well, for example `--compiler ..\MiniLangCompilerML\build\mlc_win64.exe`.
 
 Build the native MiniLang CLI:
@@ -69,6 +81,13 @@ build\tools\minipixels.exe info examples\moving-sprite\minipixels.json
 build\tools\minipixels.exe generate examples\pixel-effects\minipixels.json
 build\tools\minipixels.exe generate examples\jump-and-run\minipixels.json examples\jump-and-run\build\generated\generated
 build\tools\minipixels.exe new my-game platformer
+```
+
+On Linux, add `--target linux-x64` to the compiler command and omit the `.exe` suffix:
+
+```bash
+python3 ../MiniLangCompilerPy/mlc_win64.py tools/minipixels_cli.ml build/tools/minipixels -I src -I ../MiniLangCompilerPy --target linux-x64
+build/tools/minipixels info
 ```
 
 The native CLI provides `info`, `doctor`, `validate`, `generate`, and `new`. Native `generate` writes a deterministic `assets.mpx`, importable `generated.assets` and `generated.levels` modules, sheet/audio/file helpers, and imports either MiniPixels level JSON or Tiled/TMJ. Compiler launching and SDK packaging remain in the Python project driver.
@@ -144,7 +163,7 @@ function main(args)
 end function
 ```
 
-`createConfig` uses `renderer = "auto"` by default. On Windows that tries the OpenGL/WGL presenter first and falls back to the classic GDI presenter if GPU initialization is unavailable. Use `mp.useCpuRenderer(cfg)` when you want the old GDI path explicitly.
+`createConfig` uses `renderer = "auto"` by default. On Windows that tries the OpenGL/WGL presenter first and falls back to GDI. Linux uses the X11/XImage CPU presenter; a requested GPU renderer reports `opengl-unavailable-linux` as its fallback reason. Use `mp.useCpuRenderer(cfg)` to request the native CPU path explicitly.
 
 Presentation scaling can be selected per game:
 
@@ -271,7 +290,7 @@ python tools\minipixels.py package
 
 The Python CLI validates project JSON, writes deterministic asset/level modules and `assets.mpx`, emits `asset-report.json`, and invokes the MiniLang compiler. The native MiniLang generator now covers the same runtime asset kinds and level formats. Generated audio helpers create memory-backed WAV clips, so example builds do not need loose sound files next to the executable.
 
-Windowed games built through `tools\minipixels.py build` or `run` use the Windows GUI PE subsystem by default, so double-clicking the executable opens only the game window and no companion console. Use `--headless` for console-subsystem builds that are meant to print test or tool output.
+Windowed Windows games built through `tools\minipixels.py build` or `run` use the GUI PE subsystem by default, so double-clicking the executable opens only the game window and no companion console. Linux builds are normal ELF executables. Use `--headless` for Windows console-subsystem builds that are meant to print test or tool output.
 
 Builds use MiniLang's exact-hit incremental artifact cache by default. Use `--no-incremental` for a forced rebuild, `--debug` to enable MiniLang call profiling, `--release` to state the default non-instrumented mode explicitly, and `--verbose` to print the compiler invocation.
 
@@ -375,6 +394,7 @@ mp.playAudio(game.audio, clip)
 - `minipixels.assets.pack`: MiniPixels `.mpx` asset container reader
 - `minipixels.assets.png`: PNG decoder/encoder and screenshot support
 - `minipixels.platform.windows`: Win32 window, input, DIB renderer
+- `minipixels.platform.linux`: X11 window, input, timing, and XImage renderer
 - `minipixels.input.input`: buffered configurable keyboard/mouse actions
 - `minipixels.world.camera`: pixel-snapped 2D camera
 - `minipixels.world.tilemap`: tile rendering and AABB tile collisions
@@ -386,10 +406,10 @@ mp.playAudio(game.audio, clip)
 
 Implemented:
 
-- Native Win32 window
+- Native Win32 and X11 windows
 - Fixed logical resolution and resize stretch
 - CPU RGBA8888 framebuffer with direct masked-DIB GDI presentation
-- Nearest-neighbor GDI presentation and optional OpenGL/WGL presentation
+- Nearest-neighbor GDI/XImage presentation and optional OpenGL/WGL presentation on Windows
 - Buffered keyboard/mouse input only while the game window has focus
 - High-resolution fixed updates, interpolation alpha, smoothed FPS/UPS, focus pause, and frame limiting
 - Safe pixel operations and primitive drawing
@@ -400,19 +420,19 @@ Implemented:
 - Cached spritesheets, animation, rotated sprites, render targets, and dirty-region GPU uploads
 - Scene stack with enter/exit/pause/resume/update/render lifecycle
 - Configurable action bindings, pointer coordinates/deltas/buttons, and wheel input
-- Multi-voice PCM WAV mixer with bus/clip/channel volume, pan, and looping music
+- Multi-voice PCM WAV mixer through waveOut/ALSA with bus/clip/channel volume, pan, and looping music
 - Build-time SpriteSheet metadata and `asset-report.json`
 - Build-time level JSON generation through `generated.levels`
 - Camera, scrolling, parallax bands
 - Tilemap culling, cached frames, growable layers, and swept collision
 - Headless, framehash, PNG, PCM, lifecycle, and `std.test` regression tests
-- GitHub Actions CI for tests and example builds
+- Windows and Ubuntu GitHub Actions CI for tests and example builds
 - SDK ZIP packaging with SHA256 checksum and release upload on `v*` tags
 - Version file, changelog, and first-game guide
 
 Not yet implemented:
 
-- Cross-platform window/audio backends beyond Win32, OpenGL/WGL, and waveOut
+- GPU-accelerated Linux presentation and additional Linux display protocols such as Wayland
 - Full editor tooling
 - Advanced physics or ECS
 

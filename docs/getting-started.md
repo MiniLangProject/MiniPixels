@@ -6,6 +6,12 @@ MiniPixels lives in this folder and uses the existing Python compiler:
 python ..\MiniLangCompilerPy\mlc_win64.py <main.ml> <game.exe> -I src
 ```
 
+For Linux x64, select the ELF target and omit the `.exe` suffix:
+
+```bash
+python3 ../MiniLangCompilerPy/mlc_win64.py <main.ml> <game> -I src --target linux-x64
+```
+
 The recommended full build/run workflow is the Python CLI:
 
 ```powershell
@@ -16,6 +22,13 @@ python tools\minipixels.py build examples\moving-sprite\minipixels.json --compil
 python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
 python tools\build_examples.py
 python tools\package_sdk.py
+```
+
+On Linux the build and test drivers choose `linux-x64` automatically. From Windows, use `--target linux-x64` to cross-compile an ELF executable:
+
+```powershell
+python tools\minipixels.py build examples\moving-sprite\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py --target linux-x64
+python tests\run_tests.py --target linux-x64
 ```
 
 There is also a native MiniLang CLI for the pieces that have already moved out of Python:
@@ -60,12 +73,12 @@ Colors are packed as `0xRRGGBBAA`. Canvas pixels are stored as RGBA bytes. Alpha
 
 ## Thread model
 
-Game logic, input polling, PCM mixing, rendering, and Win32 presentation run on the main thread. waveOut consumes retained mixer buffers asynchronously. Public MiniPixels objects should be created and used on the main thread in this version.
+Game logic, input polling, PCM mixing, rendering, and native presentation run on the main thread. Windows waveOut consumes retained mixer buffers asynchronously; Linux refills a non-blocking ALSA stream from the frame loop. Public MiniPixels objects should be created and used on the main thread in this version.
 
 ## Implemented now
 
-Canvas, render targets, rotated sprites, deterministic PNG screenshots, cached `.mpx` asset packs, general non-interlaced PNG loading, native asset/Tiled generation, sprite sheets, scene stacks, animation, camera, tilemaps, parallax, swept collision, bitmap text, buffered configurable input, a real multi-voice PCM mixer, headless/visual regression tests, Win32 GDI and OpenGL/WGL presentation, CLI, CI, SDK packaging, and examples are present.
+Canvas, render targets, rotated sprites, deterministic PNG screenshots, cached `.mpx` asset packs, general non-interlaced PNG loading, native asset/Tiled generation, sprite sheets, scene stacks, animation, camera, tilemaps, parallax, swept collision, bitmap text, buffered configurable input, a real multi-voice PCM mixer, headless/visual regression tests, Win32 GDI/OpenGL and Linux X11/XImage presentation, CLI, cross-platform CI, SDK packaging, and examples are present.
 
 ## Not yet in the engine
 
-Cross-platform backends, compressed/streaming audio, Adam7/16-bit PNG decoding, background asset I/O, GPU-native render targets, a complete ECS/physics layer, and an editor remain extension points.
+Wayland and GPU-accelerated Linux presentation, compressed/streaming audio, Adam7/16-bit PNG decoding, background asset I/O, GPU-native render targets, a complete ECS/physics layer, and an editor remain extension points.

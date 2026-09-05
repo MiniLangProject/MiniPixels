@@ -2,7 +2,7 @@ import minipixels as mp
 import std.assert as a
 
 function main(args)
-  pack = mp.openAssetPack("build\\tests\\assets.mpx")
+  pack = mp.openAssetPack("build/tests/assets.mpx")
   a.assertTrue(typeof(pack) != "error", "asset pack opens")
   img = mp.loadPngFromPack(pack, "hero")
   a.assertTrue(typeof(img) != "error", "packed png decodes")

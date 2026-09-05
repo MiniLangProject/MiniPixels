@@ -106,7 +106,11 @@ function main(args)
   a.assertFalse(mp.playSfx(audio, "missing.wav"), "muted audio skips sfx")
   audio.unmute()
   a.assertFalse(mp.playSfx(audio, 123), "stateful sfx rejects non-string")
+#if TARGET_OS == "windows"
   a.assertEq(mp.audioBackend(), "waveout-pcm", "audio backend name")
+#else
+  a.assertEq(mp.audioBackend(), "alsa-pcm", "audio backend name")
+#endif
   a.assertTrue(mp.audioSupportsMultipleSfx(), "PCM backend reports multi-sfx mixing")
   a.assertTrue(mp.audioSupportsVolumeControl(), "PCM backend reports volume control")
   clip = mp.audioClip("missing.wav", "missing")

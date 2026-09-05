@@ -12,7 +12,7 @@ struct AudioState
 Represents legacy state used by direct PlaySound-compatible helpers.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L91)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L118)
 
 ## Members
 
@@ -26,7 +26,7 @@ masterVolume
 Master volume percentage.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L93)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L120)
 
 <a id="field-field-minipixels-audio-audio-audiostate-musicpath-musicpath-src-minipixels-audio-audio-ml-897396192"></a>
 ### musicPath
@@ -38,7 +38,7 @@ musicPath
 Last legacy music path.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L101)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L128)
 
 <a id="field-field-minipixels-audio-audio-audiostate-musicvolume-musicvolume-src-minipixels-audio-audio-ml-980377204"></a>
 ### musicVolume
@@ -50,7 +50,7 @@ musicVolume
 Music bus volume percentage.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L97)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L124)
 
 <a id="method-method-minipixels-audio-audio-audiostate-mute-function-mute-src-minipixels-audio-audio-ml-1822477818"></a>
 ### mute
@@ -62,7 +62,7 @@ function mute()
 Mutes legacy playback.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L119)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L146)
 
 <a id="field-field-minipixels-audio-audio-audiostate-muted-muted-src-minipixels-audio-audio-ml-1930108828"></a>
 ### muted
@@ -74,7 +74,7 @@ muted
 Whether playback is muted.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L99)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L126)
 
 <a id="method-method-minipixels-audio-audio-audiostate-playmusic-function-playmusic-path-src-minipixels-audio-audio-ml-2020149201"></a>
 ### playMusic
@@ -90,7 +90,7 @@ Plays looping legacy music from a file.
 | `path` | `dynamic` | — | WAV file path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L134)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L161)
 
 <a id="method-method-minipixels-audio-audio-audiostate-playsfx-function-playsfx-path-src-minipixels-audio-audio-ml-1714481429"></a>
 ### playSfx
@@ -106,7 +106,7 @@ Plays a legacy sound effect from a file.
 | `path` | `dynamic` | — | WAV file path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L129)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L156)
 
 <a id="method-method-minipixels-audio-audio-audiostate-setmastervolume-function-setmastervolume-value-src-minipixels-audio-audio-ml-37365463"></a>
 ### setMasterVolume
@@ -122,7 +122,7 @@ Sets master volume.
 | `value` | `dynamic` | — | Percentage from 0 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L105)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L132)
 
 <a id="method-method-minipixels-audio-audio-audiostate-setmusicvolume-function-setmusicvolume-value-src-minipixels-audio-audio-ml-331730887"></a>
 ### setMusicVolume
@@ -138,7 +138,7 @@ Sets music volume.
 | `value` | `dynamic` | — | Percentage from 0 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L115)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L142)
 
 <a id="method-method-minipixels-audio-audio-audiostate-setsfxvolume-function-setsfxvolume-value-src-minipixels-audio-audio-ml-8602475"></a>
 ### setSfxVolume
@@ -154,7 +154,7 @@ Sets sound-effect volume.
 | `value` | `dynamic` | — | Percentage from 0 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L110)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L137)
 
 <a id="field-field-minipixels-audio-audio-audiostate-sfxvolume-sfxvolume-src-minipixels-audio-audio-ml-1304137504"></a>
 ### sfxVolume
@@ -166,7 +166,7 @@ sfxVolume
 Sound-effect bus volume percentage.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L95)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L122)
 
 <a id="method-method-minipixels-audio-audio-audiostate-stop-function-stop-src-minipixels-audio-audio-ml-1667517674"></a>
 ### stop
@@ -178,7 +178,7 @@ function stop()
 Stops legacy playback.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L138)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L165)
 
 <a id="method-method-minipixels-audio-audio-audiostate-unmute-function-unmute-src-minipixels-audio-audio-ml-40986830"></a>
 ### unmute
@@ -190,4 +190,4 @@ function unmute()
 Unmutes legacy playback.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L124)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L151)

@@ -192,8 +192,8 @@ function readmeFor(name, tpl)
   text.appendLine("")
   text.appendLine("Build with the MiniPixels project driver:")
   text.appendLine("")
-  text.appendLine("```powershell")
-  text.appendLine("..\\tools\\minipixels.py build minipixels.json --compiler ..\\..\\MiniLangCompilerPy\\mlc_win64.py")
+  text.appendLine("```shell")
+  text.appendLine("python ../tools/minipixels.py build minipixels.json --compiler ../../MiniLangCompilerPy/mlc_win64.py")
   text.appendLine("```")
   return text.toString()
 end function
@@ -237,19 +237,19 @@ end function
 function commandDoctor()
   print "MiniPixels native CLI doctor"
   ok = true
-  if fs.exists("src\\minipixels.ml") then
-    print "[OK] engine source found: src\\minipixels.ml"
+  if fs.exists("src/minipixels.ml") then
+    print "[OK] engine source found: src/minipixels.ml"
   else
     print "[WARN] engine source not found in current directory"
     ok = false
   end if
-  if fs.exists("tools\\minipixels_cli.ml") then
+  if fs.exists("tools/minipixels_cli.ml") then
     print "[OK] native CLI source found"
   else
     print "[WARN] native CLI source not found"
   end if
-  if fs.exists("..\\MiniLangCompilerPy\\mlc_win64.py") then
-    print "[OK] bootstrap compiler found: ..\\MiniLangCompilerPy\\mlc_win64.py"
+  if fs.exists("../MiniLangCompilerPy/mlc_win64.py") then
+    print "[OK] bootstrap compiler found: ../MiniLangCompilerPy/mlc_win64.py"
   else
     print "[WARN] bootstrap compiler not found next to this repo"
     ok = false
@@ -301,7 +301,7 @@ function commandNew(args)
   print "Template: " + tpl
   print "Next:"
   print "  cd " + name
-  print "  ..\\tools\\minipixels.py build minipixels.json --compiler ..\\..\\MiniLangCompilerPy\\mlc_win64.py"
+  print "  python ../tools/minipixels.py build minipixels.json --compiler ../../MiniLangCompilerPy/mlc_win64.py"
   return 0
 end function
 
