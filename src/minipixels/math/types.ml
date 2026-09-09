@@ -382,7 +382,9 @@ end function
 /// @param src src value consumed by this operation.
 /// @param tint tint value consumed by this operation.
 function tintChannel(src, tint)
-  return (src * tint) / 255
+  // rgba() deliberately rejects non-integer channels. Division is numeric in
+  // MiniLang, so quantize the multiplied channel before constructing a color.
+  return floorInt((src * tint) / 255)
 end function
 
 /// Performs the tintColor operation for the minipixels math types module.
@@ -404,11 +406,14 @@ function alphaBlend(dst, src)
   sa = colorA(src)
   if sa <= 0 then return dst end if
   if sa >= 255 then return src end if
+  da = colorA(dst)
   inv = 255 - sa
-  r = floorInt(((colorR(src) * sa) + (colorR(dst) * inv)) / 255)
-  g = floorInt(((colorG(src) * sa) + (colorG(dst) * inv)) / 255)
-  b = floorInt(((colorB(src) * sa) + (colorB(dst) * inv)) / 255)
-  return rgba(r, g, b, 255)
+  outA = sa + floorInt((da * inv) / 255)
+  if outA <= 0 then return rgba(0, 0, 0, 0) end if
+  r = floorInt(((colorR(src) * sa) + floorInt((colorR(dst) * da * inv) / 255)) / outA)
+  g = floorInt(((colorG(src) * sa) + floorInt((colorG(dst) * da * inv) / 255)) / outA)
+  b = floorInt(((colorB(src) * sa) + floorInt((colorB(dst) * da * inv) / 255)) / outA)
+  return rgba(r, g, b, outA)
 end function
 
 /// Performs the timerCreate operation for the minipixels math types module.

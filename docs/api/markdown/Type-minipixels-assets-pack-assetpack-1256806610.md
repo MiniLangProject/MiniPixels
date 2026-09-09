@@ -12,7 +12,7 @@ struct AssetPack
 Represents the asset pack data used by the minipixels assets pack module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L16)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L19)
 
 ## Members
 
@@ -26,7 +26,7 @@ count
 Stores the count value associated with asset pack.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L30)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L33)
 
 <a id="field-field-minipixels-assets-pack-assetpack-data-data-src-minipixels-assets-pack-ml-37947814"></a>
 ### data
@@ -38,7 +38,7 @@ data
 Stores the data value associated with asset pack.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L20)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L23)
 
 <a id="field-field-minipixels-assets-pack-assetpack-imagecache-imagecache-src-minipixels-assets-pack-ml-1457634964"></a>
 ### imageCache
@@ -50,7 +50,7 @@ imageCache
 Cache of decoded image objects.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L36)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L39)
 
 <a id="field-field-minipixels-assets-pack-assetpack-index-index-src-minipixels-assets-pack-ml-1521197782"></a>
 ### index
@@ -62,7 +62,7 @@ index
 Hash index mapping names to entry slots.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L32)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L35)
 
 <a id="field-field-minipixels-assets-pack-assetpack-kinds-kinds-src-minipixels-assets-pack-ml-1471208638"></a>
 ### kinds
@@ -74,7 +74,7 @@ kinds
 Stores the kinds value associated with asset pack.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L24)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L27)
 
 <a id="field-field-minipixels-assets-pack-assetpack-names-names-src-minipixels-assets-pack-ml-979745314"></a>
 ### names
@@ -86,7 +86,7 @@ names
 Stores the names value associated with asset pack.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L22)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L25)
 
 <a id="field-field-minipixels-assets-pack-assetpack-offsets-offsets-src-minipixels-assets-pack-ml-2049450334"></a>
 ### offsets
@@ -98,7 +98,7 @@ offsets
 Stores the offsets value associated with asset pack.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L26)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L29)
 
 <a id="field-field-minipixels-assets-pack-assetpack-path-path-src-minipixels-assets-pack-ml-2058340300"></a>
 ### path
@@ -110,7 +110,7 @@ path
 Stores the path value associated with asset pack.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L18)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L21)
 
 <a id="field-field-minipixels-assets-pack-assetpack-payloadcache-payloadcache-src-minipixels-assets-pack-ml-724104538"></a>
 ### payloadCache
@@ -122,7 +122,7 @@ payloadCache
 Cache of sliced payload byte buffers.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L34)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L37)
 
 <a id="field-field-minipixels-assets-pack-assetpack-sizes-sizes-src-minipixels-assets-pack-ml-2075833842"></a>
 ### sizes
@@ -134,4 +134,4 @@ sizes
 Stores the sizes value associated with asset pack.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L28)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L31)

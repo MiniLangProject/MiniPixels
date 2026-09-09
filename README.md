@@ -3,11 +3,13 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.8.0`
+Current version: `0.9.0`
+
+See the [0.9.0 release notes](RELEASE_NOTES_0.9.0.md) for the protected-asset workflow and upgrade notes.
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.4 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
-MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, a fixed logical framebuffer, OpenGL/WGL, GDI and XImage presentation, configurable keyboard/mouse actions, sprites and rotated render targets, cached asset packs with general PNG decoding, scene stacks, swept tile collision, bitmap text, multi-voice PCM audio through waveOut or ALSA, headless tests, and example projects.
+MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, a fixed logical framebuffer, OpenGL/WGL, GDI and XImage presentation, configurable keyboard/mouse actions, sprites and rotated render targets, signed and optionally encrypted asset packs, localized text and generated game data, scene stacks, swept tile collision, bitmap text, multi-voice PCM audio through waveOut or ALSA, headless tests, and example projects.
 
 ![Moving Sprite](docs/images/moving-sprite.png)
 
@@ -32,14 +34,21 @@ diagnostics as failures.
 ## Requirements
 
 - Windows x64 or Linux x64 with glibc, X11 (`libX11.so.6`) and ALSA (`libasound.so.2`)
-- MiniLang Compiler 1.2.4 or newer in a sibling `MiniLangCompilerPy` checkout, or a Python/self-hosted compiler path passed with `--compiler`
+- MiniLang Compiler 1.2.4 or newer in a sibling checkout; protected MPX2 builds require the current `MiniLangCompilerPy` with `std.crypto.ecdsa_p256`
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
+- The Python packages in `requirements.txt` for protected asset builds
 
 Expected sibling layout during local development:
 
 ```text
 MiniLangCompilerPy/
 MiniPixels/
+```
+
+Install the build dependency once before enabling protected assets:
+
+```powershell
+python -m pip install -r requirements.txt
 ```
 
 ## Quickstart
@@ -90,7 +99,7 @@ python3 ../MiniLangCompilerPy/mlc_win64.py tools/minipixels_cli.ml build/tools/m
 build/tools/minipixels info
 ```
 
-The native CLI provides `info`, `doctor`, `validate`, `generate`, and `new`. Native `generate` writes a deterministic `assets.mpx`, importable `generated.assets` and `generated.levels` modules, sheet/audio/file helpers, and imports either MiniPixels level JSON or Tiled/TMJ. Compiler launching and SDK packaging remain in the Python project driver.
+The native CLI provides `info`, `doctor`, `validate`, `generate`, and `new`. Native `generate` writes an unprotected deterministic `assets.mpx`, importable `generated.assets` and `generated.levels` modules, and image/procedural/audio/file/text/data helpers. Protected packs and generated constants use the Python project driver, which also launches the compiler and packages the SDK.
 
 Tooling split:
 
@@ -98,9 +107,9 @@ Tooling split:
 | --- | --- | --- |
 | Create a project | `new` | `new` |
 | Inspect/validate manifests | `info`, `doctor`, `validate` | `info`, `doctor`, `validate` |
-| Generate `generated.assets` | image/procedural/audio/file helpers backed by `assets.mpx` | image/procedural/audio/file helpers backed by `assets.mpx` |
+| Generate `generated.assets` | image/procedural/audio/file/text/data helpers backed by unprotected `assets.mpx` | all runtime helpers, localization, protection module, and constants |
 | Generate `generated.levels` | MiniPixels `levels.json` and Tiled JSON/TMJ | MiniPixels `levels.json` and Tiled JSON/TMJ |
-| Create runtime assets | deterministic `assets.mpx` | deterministic `assets.mpx` plus build reports |
+| Create runtime assets | deterministic MPX1 | MPX1 or signed/encrypted MPX2 plus build reports |
 | Build/run/package | Not yet | `build`, `run`, `package`, `pack` |
 
 Run tests:
@@ -288,7 +297,7 @@ python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler
 python tools\minipixels.py package
 ```
 
-The Python CLI validates project JSON, writes deterministic asset/level modules and `assets.mpx`, emits `asset-report.json`, and invokes the MiniLang compiler. The native MiniLang generator now covers the same runtime asset kinds and level formats. Generated audio helpers create memory-backed WAV clips, so example builds do not need loose sound files next to the executable.
+The Python CLI validates project JSON, writes asset, localization, constants, and level modules, emits `asset-report.json`, and invokes the MiniLang compiler. Run `security init` once to enable signed and encrypted MPX2 builds. Generated audio helpers create memory-backed WAV clips, so example builds do not need loose sound files next to the executable.
 
 Windowed Windows games built through `tools\minipixels.py build` or `run` use the GUI PE subsystem by default, so double-clicking the executable opens only the game window and no companion console. Linux builds are normal ELF executables. Use `--headless` for Windows console-subsystem builds that are meant to print test or tool output.
 
@@ -296,7 +305,7 @@ Builds use MiniLang's exact-hit incremental artifact cache by default. Use `--no
 
 ## MPX Asset Pack Format
 
-`assets.mpx` is MiniPixels' deterministic runtime asset container. It is intentionally simple: a fixed header, a compact entry table, and contiguous payload bytes.
+The logical MiniPixels container is MPX1: a fixed header, a compact entry table, and contiguous payload bytes. Without asset protection, `assets.mpx` contains MPX1 directly.
 
 All multi-byte integers are unsigned little-endian values.
 
@@ -327,6 +336,21 @@ Current `kind` values:
 | `1` | `image` or `procedural` | non-interlaced PNG bytes |
 | `2` | `audio` | Original audio file bytes, usually WAV |
 | `3` | `file` | Original file bytes |
+| `4` | `text` | Deterministic `MPT1` UTF-8 key/value catalog |
+| `5` | `data` | Canonical UTF-8 JSON |
+
+`constants` assets are intentionally absent from the pack: the generator turns their JSON values into MiniLang constants and a structured `data()` accessor at compile time.
+
+With `assetProtection.enabled`, the file is an MPX2 envelope containing the complete encrypted MPX1 payload. The build uses AES-256-GCM, signs the envelope with ECDSA P-256/SHA-256, and embeds the verification key plus an obfuscated reconstruction of the per-build AES key in generated MiniLang code. The private signing key remains a build secret and is never placed in the pack or generated source. Runtime loading verifies the signature before decrypting and rejects changed, truncated, wrongly keyed, or malformed files.
+
+Enable it once per project:
+
+```powershell
+python tools\minipixels.py security init path\to\minipixels.json
+python tools\minipixels.py security status path\to\minipixels.json
+```
+
+The default private key is `.minipixels/asset-signing-key.pem` and is added to the project's `.gitignore`. CI can provide `MINIPIXELS_ASSET_SIGNING_KEY` or `MINIPIXELS_ASSET_SIGNING_KEY_FILE` instead. This deliberately raises the effort needed for casual extraction and gives strong modification detection; it cannot make a client-side decryption key impossible to recover from a determined attacker.
 
 The runtime decodes stored, fixed, and dynamic Deflate streams, PNG filters 0 through 4, grayscale, RGB, indexed, grayscale-alpha, and RGBA data. Current decoding is non-interlaced; the Python packer still emits a deterministic 8-bit RGBA profile while the native packer can retain ordinary source PNG bytes. Audio and file assets are stored byte-for-byte.
 
@@ -336,6 +360,7 @@ Runtime APIs:
 pack = mp.openAssetPack("assets.mpx")
 img = mp.loadPngFromPack(pack, "player")
 raw = mp.loadBytesFromPack(pack, "coin_sfx")
+strings = mp.loadTextCatalogFromPack(pack, "ui", "de")
 kind = mp.assetKindFromPack(pack, "coin_sfx")
 ```
 
@@ -392,6 +417,7 @@ mp.playAudio(game.audio, clip)
 - `minipixels.graphics.font`: 5x7 bitmap text helpers
 - `minipixels.graphics.sprite`: images, sprites, sprite sheets
 - `minipixels.assets.pack`: MiniPixels `.mpx` asset container reader
+- `minipixels.assets.text`: UTF-8 catalogs, locale fallback, and placeholder formatting
 - `minipixels.assets.png`: PNG decoder/encoder and screenshot support
 - `minipixels.platform.windows`: Win32 window, input, DIB renderer
 - `minipixels.platform.linux`: X11 window, input, timing, and XImage renderer
@@ -415,8 +441,8 @@ Implemented:
 - Safe pixel operations and primitive drawing
 - MiniPixels `.mpx` generation in both project pipelines with indexed runtime caches
 - General non-interlaced PNG hot-loading plus deterministic screenshot encoding
-- Native MiniLang generation for real image/procedural/audio/file assets and MiniPixels/Tiled levels
-- Runtime asset packing for image/audio/file assets
+- Native MiniLang generation for image/procedural/audio/file/text/data assets and MiniPixels/Tiled levels
+- Python generation for signed/encrypted packs, localized text, canonical JSON data, and compiled constants
 - Cached spritesheets, animation, rotated sprites, render targets, and dirty-region GPU uploads
 - Scene stack with enter/exit/pause/resume/update/render lifecycle
 - Configurable action bindings, pointer coordinates/deltas/buttons, and wheel input

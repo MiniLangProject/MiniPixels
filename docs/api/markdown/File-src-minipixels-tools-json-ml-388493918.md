@@ -10,9 +10,9 @@ Reachable from entry: **no**
 
 ## Imports
 
-- `std/ds/list.ml` as `list` → `../MiniLangCompilerML/std/ds/list.ml` — external dependency
-- `std/string.ml` as `str` → `../MiniLangCompilerML/std/string.ml` — external dependency
-- `std/string_builder.ml` as `sb` → `../MiniLangCompilerML/std/string_builder.ml` — external dependency
+- `std/ds/list.ml` as `list` → `../MiniLangCompilerPy/std/ds/list.ml` — external dependency
+- `std/string.ml` as `str` → `../MiniLangCompilerPy/std/string.ml` — external dependency
+- `std/string_builder.ml` as `sb` → `../MiniLangCompilerPy/std/string_builder.ml` — external dependency
 
 ## Declarations
 

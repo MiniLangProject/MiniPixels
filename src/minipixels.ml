@@ -18,6 +18,7 @@ import minipixels.platform.linux as win
 import minipixels.assets.assets as ast
 import minipixels.assets.pack as pack
 import minipixels.assets.png as png
+import minipixels.assets.text as textAssets
 import minipixels.scene.scene as scn
 import minipixels.debug.debug as dbg
 import minipixels.animation.animation as anim
@@ -117,7 +118,7 @@ function createGame(cfg)
 end function
 
 /// Performs the version operation for the minipixels module.
-function version() return "0.8.0" end function
+function version() return "0.9.0" end function
 /// Updates renderer maintained by the minipixels module.
 /// @param cfg Configuration used by the operation.
 /// @param renderer renderer value consumed by this operation.
@@ -263,6 +264,13 @@ function drawSpriteRotated(canvas, sprite, x, y, radians, scale, tint) return cv
 /// Opens asset pack for the minipixels module.
 /// @param path Path of the file or directory used by the operation.
 function openAssetPack(path) return pack.open(path) end function
+/// Opens a signed and AES-256-GCM encrypted MPX2 asset pack.
+/// Generated MiniPixels asset modules call this automatically for protected builds.
+/// @param path Path to the protected pack.
+/// @param key Per-build 32-byte AES key.
+/// @param publicKey Embedded P-256 public verification key.
+/// @param keyId Embedded public-key fingerprint prefix.
+function openProtectedAssetPack(path, key, publicKey, keyId) return pack.openProtected(path, key, publicKey, keyId) end function
 /// Loads bytes from pack for the minipixels module.
 /// @param assetPack assetPack value consumed by this operation.
 /// @param name Name of the affected item.
@@ -271,6 +279,14 @@ function loadBytesFromPack(assetPack, name) return pack.getBytes(assetPack, name
 /// @param assetPack assetPack value consumed by this operation.
 /// @param name Name of the affected item.
 function assetKindFromPack(assetPack, name) return pack.getKind(assetPack, name) end function
+/// Loads a UTF-8 localization catalog from a packed text asset.
+/// @param assetPack Open asset pack.
+/// @param name Packed text asset id.
+/// @param locale Locale assigned to the decoded catalog.
+function loadTextCatalogFromPack(assetPack, name, locale) return textAssets.load(assetPack, name, locale) end function
+/// Creates a locale service with language-region fallback and a default locale.
+/// @param defaultLocale Locale used when a requested catalog or key is absent.
+function localization(defaultLocale) return textAssets.create(defaultLocale) end function
 /// Loads png from pack for the minipixels module.
 /// @param assetPack assetPack value consumed by this operation.
 /// @param name Name of the affected item.

@@ -8,6 +8,7 @@ file-src-minipixels-animation-animation-ml-2065983051.html
 file-src-minipixels-assets-assets-ml-652120143.html
 file-src-minipixels-assets-pack-ml-1157891367.html
 file-src-minipixels-assets-png-ml-1155821131.html
+file-src-minipixels-assets-text-ml-1300721413.html
 file-src-minipixels-audio-audio-ml-660527635.html
 file-src-minipixels-collision-collision-ml-1544745439.html
 file-src-minipixels-core-time-ml-1360759889.html
@@ -38,6 +39,7 @@ package-minipixels-animation-animation-417161807.html
 package-minipixels-assets-assets-1798617957.html
 package-minipixels-assets-pack-54195661.html
 package-minipixels-assets-png-1408634139.html
+package-minipixels-assets-text-1852764955.html
 package-minipixels-audio-audio-2063109159.html
 package-minipixels-collision-collision-1331696867.html
 package-minipixels-core-time-683059339.html
@@ -66,6 +68,8 @@ type-minipixels-assets-assets-assetregistry-891835752.html
 type-minipixels-assets-pack-assetpack-1256806610.html
 type-minipixels-assets-png-bitreader-15679877.html
 type-minipixels-assets-png-huffman-1510650536.html
+type-minipixels-assets-text-localization-191735638.html
+type-minipixels-assets-text-textcatalog-27174823.html
 type-minipixels-audio-audio-audiochannel-2041318038.html
 type-minipixels-audio-audio-audioclip-2035849473.html
 type-minipixels-audio-audio-audiomixer-583677548.html

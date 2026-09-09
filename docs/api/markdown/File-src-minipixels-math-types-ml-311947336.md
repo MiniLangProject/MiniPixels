@@ -10,7 +10,7 @@ Reachable from entry: **yes**
 
 ## Imports
 
-- `std/math.ml` as `math` → `../MiniLangCompilerML/std/math.ml` — external dependency
+- `std/math.ml` as `math` → `../MiniLangCompilerPy/std/math.ml` — external dependency
 
 ## Declarations
 
@@ -45,7 +45,7 @@ Performs the alphaBlend operation for the minipixels math types module.
 | `src` | `dynamic` | — | src value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L403)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L405)
 
 <a id="function-function-minipixels-math-types-clamp-function-clamp-v-lo-hi-src-minipixels-math-types-ml-108090010"></a>
 ### clamp
@@ -160,7 +160,7 @@ Performs the randomCreate operation for the minipixels math types module.
 | `seed` | `dynamic` | — | seed value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L440)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L445)
 
 <a id="function-function-minipixels-math-types-randomnextfloat-function-randomnextfloat-r-src-minipixels-math-types-ml-689060758"></a>
 ### randomNextFloat
@@ -176,7 +176,7 @@ Performs the randomNextFloat operation for the minipixels math types module.
 | `r` | `dynamic` | — | r value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L469)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L474)
 
 <a id="function-function-minipixels-math-types-randomnextint-function-randomnextint-r-minvalue-maxvalue-src-minipixels-math-types-ml-1985110602"></a>
 ### randomNextInt
@@ -194,7 +194,7 @@ Performs the randomNextInt operation for the minipixels math types module.
 | `maxValue` | `dynamic` | — | maxValue value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L457)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L462)
 
 <a id="function-function-minipixels-math-types-randomstep-function-randomstep-r-src-minipixels-math-types-ml-1868025314"></a>
 ### randomStep
@@ -210,7 +210,7 @@ Performs the randomStep operation for the minipixels math types module.
 | `r` | `dynamic` | — | r value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L448)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L453)
 
 <a id="function-function-minipixels-math-types-rect-function-rect-x-y-w-h-src-minipixels-math-types-ml-390795144"></a>
 ### rect
@@ -341,7 +341,7 @@ Performs the timerCreate operation for the minipixels math types module.
 | `repeat` | `dynamic` | — | repeat value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L417)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L422)
 
 <a id="function-function-minipixels-math-types-timerupdate-function-timerupdate-t-dt-src-minipixels-math-types-ml-1128017996"></a>
 ### timerUpdate
@@ -358,7 +358,7 @@ Performs the timerUpdate operation for the minipixels math types module.
 | `dt` | `dynamic` | — | dt value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L424)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L429)
 
 <a id="function-function-minipixels-math-types-tintchannel-function-tintchannel-src-tint-src-minipixels-math-types-ml-2118486447"></a>
 ### tintChannel
@@ -392,7 +392,7 @@ Performs the tintColor operation for the minipixels math types module.
 | `tint` | `dynamic` | — | tint value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L391)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L393)
 
 <a id="function-function-minipixels-math-types-transform2d-function-transform2d-x-y-src-minipixels-math-types-ml-1138130575"></a>
 ### transform2d

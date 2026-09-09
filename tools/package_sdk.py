@@ -23,6 +23,8 @@ INCLUDE_FILES = [
     "CHANGELOG.md",
     "LICENSE",
     "README.md",
+    "RELEASE_NOTES_0.9.0.md",
+    "requirements.txt",
     "VERSION",
 ]
 EXCLUDED_DIRS = {

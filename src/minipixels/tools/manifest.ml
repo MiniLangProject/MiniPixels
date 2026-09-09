@@ -186,8 +186,8 @@ function validateAsset(m, asset, seen)
   end if
   typ = stringField(m, asset, "type", false)
   if typ == "" then typ = "image" end if
-  if typ != "image" and typ != "procedural" and typ != "audio" and typ != "file" then
-    addError(m, "asset '" + id + "' type must be image, procedural, audio, or file")
+  if typ != "image" and typ != "procedural" and typ != "audio" and typ != "file" and typ != "text" and typ != "data" and typ != "constants" then
+    addError(m, "asset '" + id + "' type must be image, procedural, audio, file, text, data, or constants")
   end if
   path = stringField(m, asset, "path", false)
   if path != "" and fs.exists(join(m.root, path)) == false then

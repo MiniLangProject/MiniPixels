@@ -3,6 +3,12 @@
 MiniPixels lives in this folder and uses the existing Python compiler:
 
 ```powershell
+python -m pip install -r requirements.txt
+```
+
+The additional package is used by protected asset builds for key generation, encryption, and signing. The generated game runtime itself uses only MiniLang's native platform cryptography.
+
+```powershell
 python ..\MiniLangCompilerPy\mlc_win64.py <main.ml> <game.exe> -I src
 ```
 
@@ -40,7 +46,16 @@ build\tools\minipixels.exe validate examples\jump-and-run\minipixels.json
 build\tools\minipixels.exe generate examples\jump-and-run\minipixels.json examples\jump-and-run\build\generated\generated
 ```
 
-Native `generate` writes real image/procedural/audio/file asset packs, sheet and audio helpers, and MiniPixels or Tiled/TMJ level modules. The Python CLI remains the recommended end-to-end build/run/package driver because it also launches the compiler and emits build reports.
+Native `generate` writes unprotected image/procedural/audio/file/text/data packs and MiniPixels or Tiled/TMJ level modules. The Python CLI remains the recommended end-to-end driver: it also builds, emits reports, compiles constants, and creates signed/encrypted packs.
+
+To keep ordinary game development unchanged while protecting release assets, initialize protection once and continue using the normal `build`, `run`, and `package` commands:
+
+```powershell
+python tools\minipixels.py security init path\to\minipixels.json
+python tools\minipixels.py build path\to\minipixels.json --compiler ..\MiniLangCompilerPy\mlc_win64.py
+```
+
+Keep the generated private signing key outside version control. The public verification key and an obfuscated AES-key reconstruction are generated into the game automatically; no key files are needed beside the finished executable and `assets.mpx`.
 
 ## Minimal game
 
@@ -77,7 +92,7 @@ Game logic, input polling, PCM mixing, rendering, and native presentation run on
 
 ## Implemented now
 
-Canvas, render targets, rotated sprites, deterministic PNG screenshots, cached `.mpx` asset packs, general non-interlaced PNG loading, native asset/Tiled generation, sprite sheets, scene stacks, animation, camera, tilemaps, parallax, swept collision, bitmap text, buffered configurable input, a real multi-voice PCM mixer, headless/visual regression tests, Win32 GDI/OpenGL and Linux X11/XImage presentation, CLI, cross-platform CI, SDK packaging, and examples are present.
+Canvas, render targets, rotated sprites, deterministic PNG screenshots, cached signed/encrypted `.mpx` asset packs, localized text, generated constants/data, general non-interlaced PNG loading, native asset/Tiled generation, sprite sheets, scene stacks, animation, camera, tilemaps, parallax, swept collision, bitmap text, buffered configurable input, a real multi-voice PCM mixer, headless/visual regression tests, Win32 GDI/OpenGL and Linux X11/XImage presentation, CLI, cross-platform CI, SDK packaging, and examples are present.
 
 ## Not yet in the engine
 

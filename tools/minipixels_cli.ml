@@ -5,7 +5,7 @@ import minipixels.tools.manifest as manifest
 import minipixels.tools.generator as generator
 import minipixels.tools.fsutil as fsu
 
-const VERSION = "0.8.0"
+const VERSION = "0.9.0"
 
 function usage()
   print "MiniPixels native CLI " + VERSION

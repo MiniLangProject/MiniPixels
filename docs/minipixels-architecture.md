@@ -34,7 +34,8 @@ MiniPixels is a working engine prototype, not the full future engine. It contain
 - `minipixels.world.camera`, `tilemap`, `entity`: camera, parallax, tilemaps, entities.
 - `minipixels.collision.collision`: primitive collisions and simple tile collision.
 - `minipixels.assets.assets`: generated/static asset registry.
-- `minipixels.assets.pack`: deterministic `.mpx` container reader.
+- `minipixels.assets.pack`: deterministic MPX1 reader and authenticated MPX2 envelope loader.
+- `minipixels.assets.text`: packed UTF-8 catalogs and locale fallback service.
 - `minipixels.assets.png`: general non-interlaced PNG decoder plus deterministic encoder.
 - `minipixels.audio.audio`: legacy Windows PlaySoundW helpers and a buffered waveOut/ALSA PCM mixer.
 - `minipixels.debug.debug`: counters, overlays, and framebuffer hash.
@@ -50,9 +51,11 @@ The headless path runs deterministic fixed updates and renders exactly the reque
 
 ## Asset strategy
 
-Both generators validate `minipixels.json`, write a deterministic `assets.mpx` byte stream, generate lazy MiniLang asset modules, import MiniPixels or Tiled level data, and include referenced audio/file assets in the same container. Runtime game code does not need a JSON parser in release builds. Generated audio factories load WAV bytes from the same pack and create memory-backed mixer clips. The Python build driver also emits reports and compiler project manifests so unchanged builds use the compiler's exact-hit artifact cache.
+Both generators validate `minipixels.json`, write an `assets.mpx` byte stream, generate lazy MiniLang asset modules, import MiniPixels or Tiled level data, and include referenced image, audio, text, and data assets in the same container. Runtime game code does not need a JSON parser for text catalogs in release builds. Generated audio factories load WAV bytes from the same pack and create memory-backed mixer clips. The Python build driver also emits reports and compiler project manifests.
 
-The `.mpx` file starts with `MPX1`, followed by a little-endian entry table and contiguous payload bytes. Pack entries and decoded images are hash-indexed and cached. The PNG runtime handles stored/fixed/dynamic Deflate blocks, filters 0 through 4, and standard 8-bit color types plus 1/2/4-bit palettes; Adam7 interlace remains unsupported. Its encoder produces deterministic filter-0 RGBA files for screenshots and procedural assets.
+Protected builds wrap the complete deterministic MPX1 stream in MPX2. A fresh per-build AES-256-GCM key encrypts the index and all payloads; an ECDSA-P256-SHA256 signature authenticates the header, ciphertext, and GCM tag. The generated game module embeds only the public verification identity and a deliberately obfuscated AES key. Verification precedes decryption, and the reconstructed key is wiped after use. Signing keys remain build-only PEM secrets and may be supplied by the project key directory or CI environment.
+
+An unprotected `.mpx` file starts with `MPX1`, followed by a little-endian entry table and contiguous payload bytes. A protected file starts with `MPX2` and contains the encrypted MPX1 stream. Pack entries and decoded images are hash-indexed and cached. The PNG runtime handles stored/fixed/dynamic Deflate blocks, filters 0 through 4, and standard 8-bit color types plus 1/2/4-bit palettes; Adam7 interlace remains unsupported. Its encoder produces deterministic filter-0 RGBA files for screenshots and procedural assets.
 
 The native MiniLang CLI validates manifests and generates real `assets.mpx`, `generated.assets`, and `generated.levels` outputs for images, procedural sprites, audio/files, MiniPixels levels, and finite CSV-encoded Tiled/TMJ maps. Compiler launching, build reports, and SDK packaging remain in the Python driver.
 

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.9.0
+
+- Added the MPX2 protected asset envelope: complete MPX1 packs are encrypted with per-build AES-256-GCM keys and signed with ECDSA-P256-SHA256 before distribution.
+- Added automatic obfuscated AES-key and embedded public-key generation, signature-before-decryption runtime loading, key-id binding, secure key wiping, and fail-closed tamper handling on Windows and Linux.
+- Added `minipixels security init|status`, PEM signing-key support, CI secret overrides, and the `cryptography` build dependency.
+- Added packed UTF-8 text catalogs with locale fallback and placeholders, canonical JSON `data` assets, and generated compile-time `constants` modules for scalar and structured game configuration.
+- Added cross-platform ECDSA-P256 verification to MiniLang's platform crypto standard library.
 - Added native Linux x64 support with an X11/XImage window, resize-aware presentation, focus-safe keyboard/mouse input, and monotonic frame timing.
 - Added a non-blocking ALSA output backend for the existing multi-voice PCM mixer and POSIX directory creation for native tooling.
 - Added `--target windows-x64|linux-x64` to the Python build, test, and example drivers, including correct PE/ELF output naming and target-aware manifests.

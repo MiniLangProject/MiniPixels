@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import re
 import shutil
@@ -14,12 +15,24 @@ import sys
 import zlib
 from pathlib import Path
 
+TOOLS_DIR = Path(__file__).resolve().parent
+if str(TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR))
+from asset_security import generate_signing_key, key_id, load_signing_key, protect_pack, raw_public_key
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 ASSET_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-VERSION = "0.8.0"
+VERSION = "0.9.0"
 DEFAULT_TARGET = "windows-x64" if os.name == "nt" else "linux-x64"
+
+
+def asset_protection(data: dict) -> dict | None:
+    config = data.get("assetProtection")
+    if not isinstance(config, dict) or config.get("enabled") is not True:
+        return None
+    return config
 
 
 def write_bytes_if_changed(path: Path, content: bytes) -> bool:
@@ -74,7 +87,11 @@ def validate(project_file: Path) -> dict:
         errors.append(f"{project_file}: main source not found: {main}")
 
     seen: set[str] = set()
+    text_catalogs: list[tuple[str, str, dict[str, str]]] = []
     for asset in data.get("assets", []):
+        if not isinstance(asset, dict):
+            errors.append(f"{project_file}: every asset must be an object")
+            continue
         aid = asset.get("id")
         if not aid:
             errors.append(f"{project_file}: asset without id")
@@ -89,6 +106,20 @@ def validate(project_file: Path) -> dict:
             errors.append(f"{project_file}: asset '{aid}' path does not exist: {path}")
         if path:
             asset["_absolute_path"] = str((root / path).resolve())
+        kind = str(asset.get("type", "image")).lower()
+        if kind not in ("image", "procedural", "audio", "file", "text", "data", "constants"):
+            errors.append(f"{project_file}: asset '{aid}' has unsupported type '{kind}'")
+        if kind in ("text", "constants") and path and (root / path).is_file():
+            try:
+                structured = json.loads((root / path).read_text(encoding="utf-8"))
+                if not isinstance(structured, dict):
+                    errors.append(f"{project_file}: asset '{aid}' must contain a JSON object")
+                elif kind == "text" and any(not isinstance(k, str) or not isinstance(v, str) for k, v in structured.items()):
+                    errors.append(f"{project_file}: text asset '{aid}' values must all be strings")
+                elif kind == "text":
+                    text_catalogs.append((str(asset.get("locale", aid)), str(aid), structured))
+            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                errors.append(f"{project_file}: asset '{aid}' is not valid UTF-8 JSON: {exc}")
         sheet = asset.get("sheet")
         if sheet is not None:
             if not isinstance(sheet, dict):
@@ -100,6 +131,40 @@ def validate(project_file: Path) -> dict:
                     errors.append(f"{project_file}: asset '{aid}' sheet.frameWidth and sheet.frameHeight must be greater than zero")
                 if int(sheet.get("spacing", 0)) < 0 or int(sheet.get("margin", 0)) < 0:
                     errors.append(f"{project_file}: asset '{aid}' sheet.spacing and sheet.margin must not be negative")
+
+    localization = data.get("localization", {})
+    if localization is not None and not isinstance(localization, dict):
+        errors.append(f"{project_file}: localization must be an object")
+        localization = {}
+    if text_catalogs:
+        locales = [locale for locale, _, _ in text_catalogs]
+        if len(set(locales)) != len(locales):
+            errors.append(f"{project_file}: text asset locales must be unique")
+        default_locale = str(localization.get("defaultLocale", text_catalogs[0][0]))
+        base = next((catalog for locale, _, catalog in text_catalogs if locale == default_locale), None)
+        if base is None:
+            errors.append(f"{project_file}: localization.defaultLocale '{default_locale}' has no text asset")
+        else:
+            placeholder = re.compile(r"\{[0-9]+\}")
+            for locale, aid, catalog in text_catalogs:
+                missing = sorted(set(base) - set(catalog))
+                extra = sorted(set(catalog) - set(base))
+                if missing:
+                    errors.append(f"{project_file}: text asset '{aid}' is missing keys: {', '.join(missing)}")
+                if extra:
+                    errors.append(f"{project_file}: text asset '{aid}' has extra keys: {', '.join(extra)}")
+                for name in sorted(set(base) & set(catalog)):
+                    if set(placeholder.findall(base[name])) != set(placeholder.findall(catalog[name])):
+                        errors.append(f"{project_file}: text asset '{aid}' has different placeholders for '{name}'")
+
+    protection = data.get("assetProtection")
+    if protection is not None:
+        if not isinstance(protection, dict):
+            errors.append(f"{project_file}: assetProtection must be an object")
+        elif protection.get("enabled") not in (True, False, None):
+            errors.append(f"{project_file}: assetProtection.enabled must be boolean")
+        elif "signingKey" in protection and not isinstance(protection.get("signingKey"), str):
+            errors.append(f"{project_file}: assetProtection.signingKey must be a path string")
 
     levels = data.get("levels")
     if levels is not None:
@@ -449,12 +514,118 @@ def container_assets(data: dict) -> list[dict]:
     return [
         asset
         for asset in data.get("assets", [])
-        if str(asset.get("type", "image")).lower() in ("image", "procedural", "audio", "file")
+        if str(asset.get("type", "image")).lower() in ("image", "procedural", "audio", "file", "text", "data")
     ]
 
 
 def container_audio_assets(data: dict) -> list[dict]:
     return [asset for asset in data.get("assets", []) if str(asset.get("type", "image")).lower() == "audio"]
+
+
+def text_catalog_payload(path: Path) -> bytes:
+    """Encode a deterministic UTF-8 key/value catalog for the MiniPixels runtime."""
+    values = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(values, dict) or any(not isinstance(k, str) or not isinstance(v, str) for k, v in values.items()):
+        die(f"{path}: text assets must be JSON objects containing only string values")
+    out = bytearray(b"MPT1")
+    out.extend(struct.pack("<I", len(values)))
+    for name, value in sorted(values.items()):
+        encoded_name = name.encode("utf-8")
+        encoded_value = value.encode("utf-8")
+        if not encoded_name or len(encoded_name) > 0xFFFF:
+            die(f"{path}: translation key length must be between 1 and 65535 UTF-8 bytes")
+        out.extend(struct.pack("<HI", len(encoded_name), len(encoded_value)))
+        out.extend(encoded_name)
+        out.extend(encoded_value)
+    return bytes(out)
+
+
+def normalized_json_payload(path: Path) -> bytes:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        die(f"{path}: invalid data asset: {exc}")
+    return (json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
+
+
+def _ml_scalar(value) -> str:
+    if value is None:
+        return "void"
+    if value is True:
+        return "true"
+    if value is False:
+        return "false"
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValueError("constants must not contain NaN or infinity")
+        return repr(value)
+    if isinstance(value, str):
+        return json.dumps(value, ensure_ascii=False)
+    raise TypeError(type(value).__name__)
+
+
+def _constant_name(parts: list[str]) -> str:
+    return "_".join(re.sub(r"[^A-Za-z0-9_]", "_", part).upper() for part in parts)
+
+
+def _constant_leaves(value, parts: list[str]):
+    if isinstance(value, dict):
+        for key, child in sorted(value.items()):
+            yield from _constant_leaves(child, parts + [str(key)])
+    elif not isinstance(value, list):
+        yield _constant_name(parts), value
+
+
+def _emit_embedded_value(value, lines: list[str], counter: list[int]) -> str:
+    if not isinstance(value, (dict, list)):
+        return _ml_scalar(value)
+    name = f"value{counter[0]}"
+    counter[0] += 1
+    if isinstance(value, list):
+        lines.append(f"  {name} = array({len(value)})")
+        for index, child in enumerate(value):
+            expression = _emit_embedded_value(child, lines, counter)
+            lines.append(f"  {name}[{index}] = {expression}")
+    else:
+        lines.append(f"  {name} = hm.HashMap.withCapacity({len(value) * 2 + 1})")
+        for key, child in sorted(value.items()):
+            expression = _emit_embedded_value(child, lines, counter)
+            lines.append(f"  {name}.set({json.dumps(str(key), ensure_ascii=False)}, {expression})")
+    return name
+
+
+def generate_constants_modules(data: dict, out_dir: Path) -> list[Path]:
+    outputs: list[Path] = []
+    for asset in sorted(data.get("assets", []), key=lambda item: item["id"]):
+        if str(asset.get("type", "")).lower() != "constants":
+            continue
+        aid = asset["id"]
+        source = Path(asset["_absolute_path"])
+        value = json.loads(source.read_text(encoding="utf-8"))
+        if not isinstance(value, dict):
+            die(f"{source}: constants asset must contain a JSON object")
+        lines = [f"package generated.constants.{aid}", "", "import std.ds.hashmap as hm", ""]
+        seen_names: set[str] = set()
+        try:
+            for name, scalar in _constant_leaves(value, []):
+                if not name or not ASSET_ID_RE.match(name) or name in seen_names:
+                    die(f"{source}: constants produce an invalid or duplicate identifier '{name}'")
+                seen_names.add(name)
+                lines.append(f"const {name} = {_ml_scalar(scalar)}")
+            lines.extend(["", "function data()"])
+            setup: list[str] = []
+            result = _emit_embedded_value(value, setup, [0])
+            lines.extend(setup)
+            lines.extend([f"  return {result}", "end function", ""])
+        except (TypeError, ValueError) as exc:
+            die(f"{source}: unsupported constants value: {exc}")
+        output = out_dir / "constants" / f"{aid}.ml"
+        write_text_if_changed(output, "\n".join(lines))
+        outputs.append(output)
+        print(output)
+    return outputs
 
 
 def sheet_config(asset: dict) -> dict | None:
@@ -637,7 +808,48 @@ def generate_levels_module(data: dict, out_dir: Path) -> Path | None:
     return out
 
 
-def write_asset_pack(data: dict, root: Path, output: Path) -> Path:
+def _emit_bytes_function(lines: list[str], name: str, values: bytes) -> None:
+    lines.append(f"function {name}()")
+    lines.append(f"  value = bytes({len(values)}, 0)")
+    for index, byte in enumerate(values):
+        lines.append(f"  value[{index}] = {byte}")
+    lines.append("  return value")
+    lines.append("end function")
+    lines.append("")
+
+
+def write_asset_security_module(path: Path, protected) -> Path:
+    """Emit per-build key material without a contiguous AES key literal."""
+    order = list(range(32))
+    # Fisher-Yates with OS randomness keeps the emitted layout different for every protected build.
+    for index in range(31, 0, -1):
+        selected = int.from_bytes(os.urandom(4), "little") % (index + 1)
+        order[index], order[selected] = order[selected], order[index]
+    mask = os.urandom(32)
+    encoded = bytes(protected.aes_key[slot] ^ mask[index] ^ ((index * 73 + 41) & 0xFF) for index, slot in enumerate(order))
+    lines = [
+        "package generated.asset_security",
+        "",
+        "// Generated per protected build. This raises the extraction cost but is not a hardware trust boundary.",
+        "function aesKey()",
+        "  key = bytes(32, 0)",
+        "  mask = bytes(32, 0)",
+        "  encoded = bytes(32, 0)",
+    ]
+    for index, byte in enumerate(mask):
+        lines.append(f"  mask[{index}] = {byte}")
+    for index, byte in enumerate(encoded):
+        lines.append(f"  encoded[{index}] = {byte}")
+    for index, slot in enumerate(order):
+        lines.append(f"  key[{slot}] = encoded[{index}] ^ mask[{index}] ^ {((index * 73 + 41) & 0xFF)}")
+    lines.extend(["  return key", "end function", ""])
+    _emit_bytes_function(lines, "publicKey", protected.public_key)
+    _emit_bytes_function(lines, "keyId", protected.key_id)
+    write_text_if_changed(path, "\n".join(lines))
+    return path
+
+
+def write_asset_pack(data: dict, root: Path, output: Path, security_module: Path | None = None) -> Path:
     output.parent.mkdir(parents=True, exist_ok=True)
     entries: list[dict] = []
     blob = bytearray()
@@ -670,6 +882,18 @@ def write_asset_pack(data: dict, root: Path, output: Path) -> Path:
             path = root / raw_path
             payload = path.read_bytes()
             type_code = 3
+        elif kind == "text":
+            raw_path = asset.get("path")
+            if not raw_path:
+                continue
+            payload = text_catalog_payload(root / raw_path)
+            type_code = 4
+        elif kind == "data":
+            raw_path = asset.get("path")
+            if not raw_path:
+                continue
+            payload = normalized_json_payload(root / raw_path)
+            type_code = 5
         else:
             continue
         offset = len(blob)
@@ -693,7 +917,18 @@ def write_asset_pack(data: dict, root: Path, output: Path) -> Path:
         index.extend(struct.pack("<I", payload_base + entry["offset"]))
         index.extend(struct.pack("<I", entry["size"]))
 
-    write_bytes_if_changed(output, bytes(index) + bytes(blob))
+    content = bytes(index) + bytes(blob)
+    protection = asset_protection(data)
+    if protection is not None:
+        try:
+            signing_key = load_signing_key(root, protection)
+            protected = protect_pack(content, signing_key)
+        except (RuntimeError, ValueError) as exc:
+            die(str(exc))
+        content = protected.data
+        if security_module is not None:
+            write_asset_security_module(security_module, protected)
+    write_bytes_if_changed(output, content)
     print(output)
     return output
 
@@ -703,7 +938,9 @@ def generate(project_file: Path, out_dir: Path) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
     root = project_root(project_file)
     pack_path = out_dir.parent.parent / "assets.mpx"
-    write_asset_pack(data, root, pack_path)
+    protection = asset_protection(data)
+    security_module = out_dir / "asset_security.ml" if protection is not None else None
+    write_asset_pack(data, root, pack_path, security_module)
     out = out_dir / "assets.ml"
     lines = [
         "package generated.assets",
@@ -712,9 +949,13 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         "import minipixels.assets.assets as assets",
         "",
     ]
+    if protection is not None:
+        lines.insert(4, "import generated.asset_security as security")
     pack_assets = sorted(container_assets(data), key=lambda a: a["id"])
     image_assets = sorted(container_image_assets(data), key=lambda a: a["id"])
     audio_assets = sorted(container_audio_assets(data), key=lambda a: a["id"])
+    text_assets = sorted((asset for asset in pack_assets if str(asset.get("type", "")).lower() == "text"), key=lambda a: a["id"])
+    data_assets = sorted((asset for asset in pack_assets if str(asset.get("type", "")).lower() == "data"), key=lambda a: a["id"])
     if pack_assets:
         lines.extend(
             [
@@ -723,8 +964,8 @@ def generate(project_file: Path, out_dir: Path) -> Path:
                 "function assetPack()",
                 "  global assetPackCache",
                 "  if assetPackCache == void then",
-                '    assetPackCache = mp.openAssetPack("assets.mpx")',
-                '    if typeof(assetPackCache) == "error" then assetPackCache = mp.openAssetPack("build/assets.mpx") end if',
+                ('    assetPackCache = try(mp.openProtectedAssetPack("assets.mpx", security.aesKey(), security.publicKey(), security.keyId()))' if protection is not None else '    assetPackCache = try(mp.openAssetPack("assets.mpx"))'),
+                ('    if typeof(assetPackCache) == "error" then assetPackCache = try(mp.openProtectedAssetPack("build/assets.mpx", security.aesKey(), security.publicKey(), security.keyId())) end if' if protection is not None else '    if typeof(assetPackCache) == "error" then assetPackCache = try(mp.openAssetPack("build/assets.mpx")) end if'),
                 "  end if",
                 "  return assetPackCache",
                 "end function",
@@ -771,6 +1012,28 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         lines.append(f"  return audio_{aid}_cache")
         lines.append("end function")
         lines.append("")
+    for asset in text_assets:
+        aid = asset["id"]
+        locale = str(asset.get("locale", aid))
+        lines.append(f"function text_{aid}()")
+        lines.append(f"  return mp.loadTextCatalogFromPack(assetPack(), {json.dumps(aid)}, {json.dumps(locale)})")
+        lines.append("end function")
+        lines.append("")
+    if text_assets:
+        default_locale = str(data.get("localization", {}).get("defaultLocale", text_assets[0].get("locale", text_assets[0]["id"])))
+        lines.append("function localization()")
+        lines.append(f"  service = mp.localization({json.dumps(default_locale)})")
+        for asset in text_assets:
+            lines.append(f"  service.add(text_{asset['id']}())")
+        lines.append("  return service")
+        lines.append("end function")
+        lines.append("")
+    for asset in data_assets:
+        aid = asset["id"]
+        lines.append(f"function data_{aid}()")
+        lines.append(f"  return decode(mp.loadBytesFromPack(assetPack(), {json.dumps(aid)}))")
+        lines.append("end function")
+        lines.append("")
     lines.append("function registry()")
     lines.append("  reg = assets.create(64)")
     for asset in image_assets:
@@ -780,6 +1043,7 @@ def generate(project_file: Path, out_dir: Path) -> Path:
     lines.append("end function")
     write_text_if_changed(out, "\n".join(lines) + "\n")
     generate_levels_module(data, out_dir)
+    generate_constants_modules(data, out_dir)
     print(out)
     return out
 
@@ -787,7 +1051,8 @@ def generate(project_file: Path, out_dir: Path) -> Path:
 def pack(project_file: Path, output: Path) -> Path:
     data = validate(project_file)
     root = project_root(project_file)
-    return write_asset_pack(data, root, output)
+    security_module = root / "build" / "generated" / "generated" / "asset_security.ml" if asset_protection(data) is not None else None
+    return write_asset_pack(data, root, output, security_module)
 
 
 def asset_report(data: dict, root: Path) -> dict:
@@ -813,9 +1078,12 @@ def asset_report(data: dict, root: Path) -> dict:
             width, height, rgba = procedural_pixels(asset)
             size = len(write_png_rgba_store(width, height, rgba))
             entry["bytes"] = size
-        if kind in ("image", "procedural", "audio", "file"):
+        if kind in ("image", "procedural", "audio", "file", "text", "data"):
             report["container"].append(entry)
             report["totals"]["containerBytes"] += size
+        elif kind == "constants":
+            report["embedded"].append(entry)
+            report["totals"]["embeddedBytes"] += size
         else:
             report["runtime"].append(entry)
             report["totals"]["runtimeBytes"] += size
@@ -846,12 +1114,16 @@ def copy_runtime_assets(data: dict, root: Path, output: Path) -> None:
 
     for asset in data.get("assets", []):
         kind = str(asset.get("type", "image")).lower()
-        if kind in ("image", "procedural", "audio"):
+        if kind in ("image", "procedural", "audio", "file", "text", "data", "constants"):
             continue
         raw_path = asset.get("path")
         if not raw_path:
             continue
         copy_path(root / raw_path, Path(raw_path))
+    pack_source = (root / "build" / "assets.mpx").resolve()
+    pack_target = (output.parent / "assets.mpx").resolve()
+    if pack_source.is_file() and pack_source != pack_target:
+        shutil.copy2(pack_source, pack_target)
 
 
 def build(
@@ -917,6 +1189,59 @@ def new_project(name: str) -> None:
     print(root)
 
 
+def security_init(project_file: Path, force: bool = False) -> None:
+    data = load_project(project_file)
+    root = project_root(project_file)
+    config = data.get("assetProtection")
+    if config is None:
+        config = {"enabled": True, "signingKey": ".minipixels/asset-signing-key.pem"}
+        data["assetProtection"] = config
+    elif not isinstance(config, dict):
+        die(f"{project_file}: assetProtection must be an object")
+    else:
+        config["enabled"] = True
+        config.setdefault("signingKey", ".minipixels/asset-signing-key.pem")
+    private_path = (root / str(config["signingKey"])).resolve()
+    public_path = private_path.with_name("asset-signing-public.pem")
+    if (private_path.exists() or public_path.exists()) and not force:
+        die(f"asset signing keys already exist at {private_path.parent}; use --force to replace them")
+    public = generate_signing_key(private_path, public_path)
+    write_text_if_changed(project_file, json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+    ignore_path = root / ".gitignore"
+    try:
+        ignored = str(private_path.relative_to(root)).replace("\\", "/")
+    except ValueError:
+        ignored = None
+    if ignored is not None:
+        existing = ignore_path.read_text(encoding="utf-8") if ignore_path.exists() else ""
+        if ignored not in {line.strip().lstrip("/") for line in existing.splitlines()}:
+            separator = "" if not existing or existing.endswith("\n") else "\n"
+            write_text_if_changed(ignore_path, existing + separator + f"/{ignored}\n")
+    print(f"private signing key: {private_path}")
+    print(f"public signing key:  {public_path}")
+    print(f"public key id:       {key_id(public).hex()}")
+    print("asset protection enabled; keep the private key out of version control")
+
+
+def security_status(project_file: Path) -> None:
+    data = validate(project_file)
+    config = asset_protection(data)
+    if config is None:
+        print("asset protection: disabled")
+        return
+    try:
+        private_key = load_signing_key(project_root(project_file), config)
+        public = raw_public_key(private_key.public_key())
+    except (RuntimeError, ValueError) as exc:
+        print("asset protection: enabled")
+        print(f"signing key: unavailable ({exc})")
+        return
+    print("asset protection: enabled")
+    print("encryption: AES-256-GCM")
+    print("signature: ECDSA-P256-SHA256")
+    print(f"public key id: {key_id(public).hex()}")
+
+
 def print_project_info(project_file: Path) -> None:
     data = validate(project_file)
     window = data.get("window", {})
@@ -951,6 +1276,10 @@ def main(argv: list[str]) -> int:
     sub = p.add_subparsers(dest="cmd", required=True)
     sub.add_parser("new").add_argument("name")
     sub.add_parser("package").add_argument("--output-dir", default=str(ROOT / "dist"))
+    security_parser = sub.add_parser("security")
+    security_parser.add_argument("action", choices=("init", "status"))
+    security_parser.add_argument("project", nargs="?", default="minipixels.json")
+    security_parser.add_argument("--force", action="store_true")
     for name in ["info", "doctor"]:
         sp = sub.add_parser(name)
         sp.add_argument("project", nargs="?", default="minipixels.json")
@@ -983,6 +1312,14 @@ def main(argv: list[str]) -> int:
     if args.cmd == "package":
         cmd = [sys.executable, str(ROOT / "tools" / "package_sdk.py"), "--output-dir", str(Path(args.output_dir).resolve())]
         subprocess.check_call(cmd, cwd=str(ROOT))
+        return 0
+
+    if args.cmd == "security":
+        project = Path(args.project).resolve()
+        if args.action == "init":
+            security_init(project, args.force)
+        else:
+            security_status(project)
         return 0
 
     project = Path(args.project).resolve()

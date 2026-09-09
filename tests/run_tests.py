@@ -178,13 +178,83 @@ def create_asset_pack_fixture() -> None:
     )
 
 
+def create_protected_asset_fixture() -> Path:
+    spec = importlib.util.spec_from_file_location("minipixels_cli_protected", ROOT / "tools" / "minipixels.py")
+    if spec is None or spec.loader is None:
+        raise RuntimeError("could not load tools/minipixels.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    project = ROOT / "build" / "tests" / "protected_project"
+    assets = project / "assets"
+    source = project / "src"
+    assets.mkdir(parents=True, exist_ok=True)
+    source.mkdir(parents=True, exist_ok=True)
+    (assets / "de.json").write_text(json.dumps({"menu.start": "Start", "coins": "Münzen: {0}"}, ensure_ascii=False), encoding="utf-8")
+    (assets / "en.json").write_text(json.dumps({"menu.start": "Start", "coins": "Coins: {0}"}), encoding="utf-8")
+    (assets / "world.json").write_text(json.dumps({"map": [1, 2, 3], "enemy": {"health": 7}}), encoding="utf-8")
+    (assets / "balance.json").write_text(json.dumps({"player": {"speed": 120}, "enemies": {"slime": {"health": 3}}, "waves": [2, 4, 8]}), encoding="utf-8")
+    key_dir = project / ".minipixels"
+    mod.generate_signing_key(key_dir / "asset-signing-key.pem", key_dir / "asset-signing-public.pem")
+    manifest = {
+        "name": "protected-smoke",
+        "main": "src/main.ml",
+        "window": {"width": 32, "height": 32, "scale": 1},
+        "assetProtection": {"enabled": True, "signingKey": ".minipixels/asset-signing-key.pem"},
+        "localization": {"defaultLocale": "de"},
+        "assets": [
+            {"id": "de", "type": "text", "locale": "de", "path": "assets/de.json"},
+            {"id": "en", "type": "text", "locale": "en", "path": "assets/en.json"},
+            {"id": "world", "type": "data", "path": "assets/world.json"},
+            {"id": "balance", "type": "constants", "path": "assets/balance.json"},
+        ],
+    }
+    project_file = project / "minipixels.json"
+    project_file.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    (source / "main.ml").write_text("function main(args) return 0 end function\n", encoding="utf-8")
+    generated = project / "build" / "generated" / "generated"
+    mod.generate(project_file, generated)
+    pack = project / "build" / "assets.mpx"
+    data = pack.read_bytes()
+    assert data.startswith(b"MPX2"), data[:4]
+    assert b"menu.start" not in data and b"world" not in data and b"MPT1" not in data
+    tampered = bytearray(data)
+    tampered[80] ^= 1
+    (project / "build" / "assets-tampered.mpx").write_bytes(tampered)
+    assert (generated / "asset_security.ml").is_file()
+    assert (generated / "constants" / "balance.ml").is_file()
+    return project
+
+
 def run_python_tests() -> None:
     spec = importlib.util.spec_from_file_location("minipixels_cli", ROOT / "tools" / "minipixels.py")
     if spec is None or spec.loader is None:
         raise RuntimeError("could not load tools/minipixels.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    assert mod.VERSION == "0.8.0", mod.VERSION
+    assert mod.VERSION == "0.9.0", mod.VERSION
+    with tempfile.TemporaryDirectory(prefix="minipixels_security_") as td:
+        security_root = Path(td)
+        security_manifest = security_root / "minipixels.json"
+        security_manifest.write_text(
+            json.dumps(
+                {
+                    "name": "security-init",
+                    "main": "src/main.ml",
+                    "window": {"width": 32, "height": 32, "scale": 1},
+                    "assets": [],
+                }
+            ),
+            encoding="utf-8",
+        )
+        mod.security_init(security_manifest)
+        initialized = json.loads(security_manifest.read_text(encoding="utf-8"))
+        assert initialized["assetProtection"]["enabled"] is True, initialized
+        private_key = security_root / ".minipixels" / "asset-signing-key.pem"
+        public_key = security_root / ".minipixels" / "asset-signing-public.pem"
+        assert private_key.read_bytes().startswith(b"-----BEGIN PRIVATE KEY-----")
+        assert public_key.read_bytes().startswith(b"-----BEGIN PUBLIC KEY-----")
+        assert "/.minipixels/asset-signing-key.pem" in (security_root / ".gitignore").read_text(encoding="utf-8")
+        assert "PRIVATE KEY" not in security_manifest.read_text(encoding="utf-8")
     package_spec = importlib.util.spec_from_file_location("package_sdk", ROOT / "tools" / "package_sdk.py")
     if package_spec is None or package_spec.loader is None:
         raise RuntimeError("could not load tools/package_sdk.py")
@@ -433,6 +503,83 @@ def run_generated_smoke(compiler: Path, target: str) -> None:
     run_test_executable(procedural_exe, target)
 
 
+def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> None:
+    source = project / "src" / "protected_smoke.ml"
+    source.write_text(
+        "\n".join(
+            [
+                "import minipixels as mp",
+                "import generated.assets as gen",
+                "import generated.asset_security as security",
+                "import generated.constants.balance as balance",
+                "import std.assert as a",
+                "",
+                "function main(args)",
+                "  pack = gen.assetPack()",
+                "  a.assertTrue(typeof(pack) != \"error\", \"protected MPX2 opens\")",
+                "  a.assertEq(mp.assetKindFromPack(pack, \"de\"), 4, \"text kind\")",
+                "  a.assertEq(mp.assetKindFromPack(pack, \"world\"), 5, \"data kind\")",
+                "  i18n = gen.localization()",
+                "  a.assertEq(i18n.text(\"menu.start\"), \"Start\", \"default locale\")",
+                "  a.assertEq(i18n.format(\"coins\", [5]), \"Münzen: 5\", \"text formatting\")",
+                "  i18n.setLocale(\"en-US\")",
+                "  a.assertEq(i18n.format(\"coins\", [8]), \"Coins: 8\", \"language fallback\")",
+                "  a.assertEq(balance.PLAYER_SPEED, 120, \"compiled scalar constant\")",
+                "  a.assertEq(balance.ENEMIES_SLIME_HEALTH, 3, \"compiled nested constant\")",
+                "  values = balance.data()",
+                "  a.assertEq(values.get(\"waves\")[2], 8, \"compiled structured constants\")",
+                "  wrong = security.aesKey()",
+                "  wrong[0] = wrong[0] ^ 1",
+                "  rejectedKey = try(mp.openProtectedAssetPack(\"build/assets.mpx\", wrong, security.publicKey(), security.keyId()))",
+                "  a.assertTrue(typeof(rejectedKey) == \"error\", \"wrong AES key rejected\")",
+                "  rejectedTamper = try(mp.openProtectedAssetPack(\"build/assets-tampered.mpx\", security.aesKey(), security.publicKey(), security.keyId()))",
+                "  a.assertTrue(typeof(rejectedTamper) == \"error\", \"tampered signature rejected\")",
+                "  print \"=== PROTECTED ASSET SMOKE DONE ===\"",
+                "  return 0",
+                "end function",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    exe = output_path("protected_asset_smoke", target)
+    cmd = [
+        sys.executable,
+        str(compiler),
+        str(source),
+        str(exe),
+        "-I",
+        str(ROOT / "src"),
+        "-I",
+        str(ROOT.parent / "MiniLangCompilerPy"),
+        "-I",
+        str(project / "build" / "generated"),
+        "--target",
+        target,
+    ]
+    print("compile:", " ".join(cmd))
+    subprocess.check_call(cmd, cwd=str(ROOT))
+    print("run:", exe)
+    command = executable_command(exe, target)
+    if target == "linux-x64" and os.name == "nt":
+        command = [
+            "wsl.exe",
+            "-d",
+            os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"),
+            "--cd",
+            wsl_path(project),
+            "--",
+            wsl_path(exe),
+        ]
+    result = subprocess.run(command, cwd=str(project), text=True, capture_output=True)
+    if result.stdout:
+        print(result.stdout, end="")
+    if result.stderr:
+        print(result.stderr, end="", file=sys.stderr)
+    if result.returncode != 0 or "[FAIL]" in result.stdout:
+        raise RuntimeError(f"protected asset smoke failed ({target})")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Compile and run the MiniPixels test suite")
     parser.add_argument("--target", choices=("windows-x64", "linux-x64"), default=DEFAULT_TARGET)
@@ -444,6 +591,7 @@ def main(argv: list[str] | None = None) -> int:
     build = ROOT / "build" / "tests"
     build.mkdir(parents=True, exist_ok=True)
     create_asset_pack_fixture()
+    protected_project = create_protected_asset_fixture()
     for test in TESTS:
         src = ROOT / "tests" / test
         exe = output_path(Path(test).stem, target)
@@ -470,6 +618,7 @@ def main(argv: list[str] | None = None) -> int:
             if not junit.is_file():
                 raise RuntimeError("std.test did not write its JUnit report")
     run_generated_smoke(compiler, target)
+    run_protected_asset_smoke(compiler, target, protected_project)
     print(f"MiniPixels tests passed ({target})")
     return 0
 

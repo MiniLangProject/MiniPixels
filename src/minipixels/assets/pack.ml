@@ -6,6 +6,9 @@ package minipixels.assets.pack
 
 import std.fs as fs
 import std.bytes as by
+import std.crypto as crypto
+import std.crypto.aes_gcm as aes
+import std.crypto.ecdsa_p256 as ecdsa
 import std.ds.hashmap as hm
 import minipixels.assets.png as png
 
@@ -59,9 +62,8 @@ end function
 
 /// Opens open for the minipixels assets pack module.
 /// @param path Path of the file or directory used by the operation.
-function open(path)
-  data = try(fs.readAllBytes(path))
-  if typeof(data) == "error" then return data end if
+/// @param data Complete MPX1 byte buffer.
+function _openData(path, data)
   if not isPack(data) then return packError("not a MiniPixels asset pack") end if
   count = by.readU32LE(data, 4)
   if typeof(count) != "int" or count < 0 then return packError("invalid asset count") end if
@@ -103,6 +105,82 @@ function open(path)
     end for
   end if
   return AssetPack(path, data, names, kinds, offsets, sizes, count, index, hm.HashMap.withCapacity((count * 2) + 1), hm.HashMap.withCapacity((count * 2) + 1))
+end function
+
+/// Opens an ordinary MPX1 asset pack.
+/// @param path Path to the asset pack.
+function open(path)
+  data = try(fs.readAllBytes(path))
+  if typeof(data) == "error" then return data end if
+  return _openData(path, data)
+end function
+
+/// Reads one unsigned little-endian 64-bit size from an MPX2 header.
+/// @internal
+function _readU64LE(data, offset)
+  low = by.readU32LE(data, offset)
+  high = by.readU32LE(data, offset + 4)
+  if typeof(low) != "int" or typeof(high) != "int" then return -1 end if
+  return low + high * 4294967296
+end function
+
+/// Opens an authenticated and encrypted MPX2 pack. The ECDSA signature is
+/// checked before any decryption, and caller-owned AES key bytes are wiped.
+/// @param path Path to the protected pack.
+/// @param key Obfuscated build key reconstructed by generated game code.
+/// @param publicKey Embedded 64-byte P-256 public key.
+/// @param expectedKeyId Embedded 8-byte public-key fingerprint prefix.
+function openProtected(path, key, publicKey, expectedKeyId)
+  if typeof(key) != "bytes" or len(key) != 32 then return packError("invalid MPX2 AES key") end if
+  if typeof(publicKey) != "bytes" or len(publicKey) != 64 then
+    crypto.secureZero(key)
+    return packError("invalid MPX2 public key")
+  end if
+  if typeof(expectedKeyId) != "bytes" or len(expectedKeyId) != 8 then
+    crypto.secureZero(key)
+    return packError("invalid MPX2 key id")
+  end if
+  data = try(fs.readAllBytes(path))
+  if typeof(data) == "error" then
+    crypto.secureZero(key)
+    return data
+  end if
+  if not hasRange(data, 0, 144) or data[0] != 77 or data[1] != 80 or data[2] != 88 or data[3] != 50 then
+    crypto.secureZero(key)
+    return packError("not a protected MiniPixels asset pack")
+  end if
+  if data[4] != 2 or data[5] != 0 or data[6] != 1 or data[7] != 1 or by.readU16LE(data, 8) != 64 or by.readU16LE(data, 10) != 0 then
+    crypto.secureZero(key)
+    return packError("unsupported MPX2 header or algorithm suite")
+  end if
+  plaintextSize = _readU64LE(data, 12)
+  ciphertextSize = _readU64LE(data, 20)
+  expectedSize = 64 + ciphertextSize + 16 + 64
+  if plaintextSize < 8 or plaintextSize != ciphertextSize or expectedSize != len(data) then
+    crypto.secureZero(key)
+    return packError("invalid MPX2 payload size")
+  end if
+  storedKeyId = slice(data, 40, 8)
+  if not crypto.constantTimeEquals(storedKeyId, expectedKeyId) then
+    crypto.secureZero(key)
+    return packError("MPX2 signing key mismatch")
+  end if
+  signedLength = 64 + ciphertextSize + 16
+  signed = slice(data, 0, signedLength)
+  signature = slice(data, signedLength, 64)
+  if not ecdsa.verify(publicKey, signed, signature) then
+    crypto.secureZero(key)
+    return packError("MPX2 signature verification failed")
+  end if
+  header = slice(data, 0, 64)
+  nonce = slice(data, 28, 12)
+  ciphertext = slice(data, 64, ciphertextSize)
+  tag = slice(data, 64 + ciphertextSize, 16)
+  plaintext = try(aes.decrypt(key, nonce, ciphertext, tag, header))
+  crypto.secureZero(key)
+  if typeof(plaintext) == "error" then return packError("MPX2 decryption failed") end if
+  if len(plaintext) != plaintextSize then return packError("MPX2 plaintext size mismatch") end if
+  return _openData(path, plaintext)
 end function
 
 /// Finds find used by the minipixels assets pack module.

@@ -127,8 +127,12 @@ end function
 /// @param root Parsed project root.
 function sortedAssets(root)
   items = arrayField(root, "assets")
-  result = array(len(items))
-  if len(items) > 0 then copyArray(result, 0, items, 0, len(items)) end if
+  result = []
+  if len(items) > 0 then
+    for index = 0 to len(items) - 1
+      if stringField(items[index], "type", "image") != "constants" then result = arr.append(result, items[index]) end if
+    end for
+  end if
   sorting.sortBy(result, assetLess)
   return result
 end function
@@ -257,7 +261,51 @@ function assetKind(asset)
   typ = stringField(asset, "type", "image")
   if typ == "audio" then return 2 end if
   if typ == "file" then return 3 end if
+  if typ == "text" then return 4 end if
+  if typ == "data" then return 5 end if
   return 1
+end function
+
+/// Converts a JSON string catalog into the deterministic MPT1 payload format.
+/// @param path Source JSON file path.
+function textCatalogPayload(path)
+  source = try(fs.readAllText(path))
+  if typeof(source) == "error" then return source end if
+  root = try(json.parse(source))
+  if typeof(root) == "error" then return root end if
+  if root.kind != "object" then return error(9201, "text asset must contain a JSON object: " + path) end if
+  total = 8
+  if len(root.objectKeys) > 0 then
+    for i = 0 to len(root.objectKeys) - 1
+      value = root.objectValues[i]
+      if value.kind != "string" then return error(9201, "text asset values must be strings: " + path) end if
+      nameBytes = bytes(root.objectKeys[i])
+      valueBytes = bytes(value.stringValue)
+      if len(nameBytes) <= 0 or len(nameBytes) > 65535 then return error(9201, "invalid text key length: " + path) end if
+      total = total + 6 + len(nameBytes) + len(valueBytes)
+    end for
+  end if
+  output = bytes(total, 0)
+  output[0] = 77
+  output[1] = 80
+  output[2] = 84
+  output[3] = 49
+  by.writeU32LE(output, 4, len(root.objectKeys))
+  offset = 8
+  if len(root.objectKeys) > 0 then
+    for i = 0 to len(root.objectKeys) - 1
+      nameBytes = bytes(root.objectKeys[i])
+      valueBytes = bytes(root.objectValues[i].stringValue)
+      by.writeU16LE(output, offset, len(nameBytes))
+      by.writeU32LE(output, offset + 2, len(valueBytes))
+      offset = offset + 6
+      copyBytes(output, offset, nameBytes, 0, len(nameBytes))
+      offset = offset + len(nameBytes)
+      copyBytes(output, offset, valueBytes, 0, len(valueBytes))
+      offset = offset + len(valueBytes)
+    end for
+  end if
+  return output
 end function
 
 /// Loads or generates a payload for native MPX packaging.
@@ -270,6 +318,7 @@ function assetPayload(asset, projectRoot)
   end if
   path = stringField(asset, "path", "")
   if path == "" then return error(9201, "asset '" + stringField(asset, "id", "asset") + "' requires a path") end if
+  if typ == "text" then return textCatalogPayload(join(projectRoot, path)) end if
   return fs.readAllBytes(join(projectRoot, path))
 end function
 
@@ -426,6 +475,15 @@ function runtimeAssetModule(asset)
     code.appendLine("  if audio_" + id + "_cache == void then audio_" + id + "_cache = mp.audioClipFromBytes(mp.loadBytesFromPack(assetPack(), " + quote(id) + "), " + quote(id) + ") end if")
     code.appendLine("  return audio_" + id + "_cache")
     code.appendLine("end function")
+  else if typ == "text" then
+    locale = stringField(asset, "locale", id)
+    code.appendLine("function text_" + id + "()")
+    code.appendLine("  return mp.loadTextCatalogFromPack(assetPack(), " + quote(id) + ", " + quote(locale) + ")")
+    code.appendLine("end function")
+  else if typ == "data" then
+    code.appendLine("function data_" + id + "()")
+    code.appendLine("  return decode(mp.loadBytesFromPack(assetPack(), " + quote(id) + "))")
+    code.appendLine("end function")
   else
     code.appendLine("function file_" + id + "()")
     code.appendLine("  return mp.loadBytesFromPack(assetPack(), " + quote(id) + ")")
@@ -452,7 +510,7 @@ function assetsModule(root, fallbackPackPath, r)
       if typ == "image" or typ == "procedural" then
         code.appendString(assetModule(asset, r))
         embedded = arr.append(embedded, asset)
-      else
+      else if typ != "constants" then
         code.appendString(runtimeAssetModule(asset))
       end if
     end for
@@ -921,6 +979,20 @@ function generate(projectPath, outDir)
   end if
   root = loadJson(projectPath, r)
   if r.ok == false then return r end if
+  protection = objectField(root, "assetProtection")
+  if typeof(protection) != "void" and json.asBool(json.get(protection, "enabled"), false) then
+    addError(r, "protected MPX2 generation is a build operation; use tools/minipixels.py build or generate")
+    return r
+  end if
+  projectAssets = arrayField(root, "assets")
+  if len(projectAssets) > 0 then
+    for index = 0 to len(projectAssets) - 1
+      if stringField(projectAssets[index], "type", "image") == "constants" then
+        addError(r, "compiled constants require the Python build driver")
+        return r
+      end if
+    end for
+  end if
   if fsu.ensureDir(target) == false then
     addError(r, "could not create output directory: " + target)
     return r

@@ -11,11 +11,48 @@ Reachable from entry: **yes**
 ## Imports
 
 - `minipixels/assets/png.ml` as `png` → [src/minipixels/assets/png.ml](File-src-minipixels-assets-png-ml-1155821131.md)
-- `std/bytes.ml` as `by` → `../MiniLangCompilerML/std/bytes.ml` — external dependency
-- `std/ds/hashmap.ml` as `hm` → `../MiniLangCompilerML/std/ds/hashmap.ml` — external dependency
-- `std/fs.ml` as `fs` → `../MiniLangCompilerML/std/fs.ml` — external dependency
+- `std/bytes.ml` as `by` → `../MiniLangCompilerPy/std/bytes.ml` — external dependency
+- `std/crypto.ml` as `crypto` → `../MiniLangCompilerPy/std/crypto.ml` — external dependency
+- `std/crypto/aes_gcm.ml` as `aes` → `../MiniLangCompilerPy/std/crypto/aes_gcm.ml` — external dependency
+- `std/crypto/ecdsa_p256.ml` as `ecdsa` → `../MiniLangCompilerPy/std/crypto/ecdsa_p256.ml` — external dependency
+- `std/ds/hashmap.ml` as `hm` → `../MiniLangCompilerPy/std/ds/hashmap.ml` — external dependency
+- `std/fs.ml` as `fs` → `../MiniLangCompilerPy/std/fs.ml` — external dependency
 
 ## Declarations
+
+<a id="function-function-minipixels-assets-pack-opendata-function-opendata-path-data-src-minipixels-assets-pack-ml-1181079965"></a>
+### _openData
+
+```ml
+function _openData(path, data)
+```
+
+Opens open for the minipixels assets pack module.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `path` | `dynamic` | — | Path of the file or directory used by the operation. |
+| `data` | `dynamic` | — | Complete MPX1 byte buffer. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L66)
+
+<a id="function-function-minipixels-assets-pack-readu64le-function-readu64le-data-offset-src-minipixels-assets-pack-ml-400441839"></a>
+### _readU64LE
+
+```ml
+function _readU64LE(data, offset)
+```
+
+Reads one unsigned little-endian 64-bit size from an MPX2 header.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `data` | `dynamic` | — |  |
+| `offset` | `dynamic` | — |  |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L120)
 
 - [minipixels.assets.pack.AssetPack](Type-minipixels-assets-pack-assetpack-1256806610.md) — struct
 <a id="function-function-minipixels-assets-pack-clearcache-function-clearcache-pack-src-minipixels-assets-pack-ml-1435924141"></a>
@@ -32,7 +69,7 @@ Clears every derived payload and image cache while retaining the pack index.
 | `pack` | `dynamic` | — | Asset pack whose caches are cleared. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L166)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L244)
 
 <a id="function-function-minipixels-assets-pack-find-function-find-pack-name-src-minipixels-assets-pack-ml-234838308"></a>
 ### find
@@ -49,7 +86,7 @@ Finds find used by the minipixels assets pack module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L111)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L189)
 
 <a id="function-function-minipixels-assets-pack-getbytes-function-getbytes-pack-name-src-minipixels-assets-pack-ml-1640220432"></a>
 ### getBytes
@@ -66,7 +103,7 @@ Returns bytes maintained by the minipixels assets pack module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L122)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L200)
 
 <a id="function-function-minipixels-assets-pack-getkind-function-getkind-pack-name-src-minipixels-assets-pack-ml-1649210420"></a>
 ### getKind
@@ -83,7 +120,7 @@ Returns kind maintained by the minipixels assets pack module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L135)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L213)
 
 <a id="function-function-minipixels-assets-pack-hasrange-function-hasrange-data-offset-size-src-minipixels-assets-pack-ml-769445656"></a>
 ### hasRange
@@ -101,7 +138,7 @@ Returns whether range is available.
 | `size` | `dynamic` | — | Size in the units required by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L49)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L52)
 
 <a id="function-function-minipixels-assets-pack-ispack-function-ispack-data-src-minipixels-assets-pack-ml-36756322"></a>
 ### isPack
@@ -117,7 +154,7 @@ Returns whether pack satisfies the required condition.
 | `data` | `dynamic` | — | Input data consumed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L55)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L58)
 
 <a id="function-function-minipixels-assets-pack-loadpng-function-loadpng-pack-name-src-minipixels-assets-pack-ml-1158601410"></a>
 ### loadPng
@@ -134,7 +171,7 @@ Loads png for the minipixels assets pack module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L144)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L222)
 
 <a id="function-function-minipixels-assets-pack-open-function-open-path-src-minipixels-assets-pack-ml-569822995"></a>
 ### open
@@ -143,14 +180,33 @@ Loads png for the minipixels assets pack module.
 function open(path)
 ```
 
-Opens open for the minipixels assets pack module.
+Opens an ordinary MPX1 asset pack.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `path` | `dynamic` | — | Path of the file or directory used by the operation. |
+| `path` | `dynamic` | — | Path to the asset pack. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L62)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L112)
+
+<a id="function-function-minipixels-assets-pack-openprotected-function-openprotected-path-key-publickey-expectedkeyid-src-minipixels-assets-pack-ml-449955844"></a>
+### openProtected
+
+```ml
+function openProtected(path, key, publicKey, expectedKeyId)
+```
+
+Opens an authenticated and encrypted MPX2 pack. The ECDSA signature is checked before any decryption, and caller-owned AES key bytes are wiped.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `path` | `dynamic` | — | Path to the protected pack. |
+| `key` | `dynamic` | — | Obfuscated build key reconstructed by generated game code. |
+| `publicKey` | `dynamic` | — | Embedded 64-byte P-256 public key. |
+| `expectedKeyId` | `dynamic` | — | Embedded 8-byte public-key fingerprint prefix. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L133)
 
 <a id="constant-constant-minipixels-assets-pack-pack-err-const-pack-err-9302-src-minipixels-assets-pack-ml-666599551"></a>
 ### PACK_ERR
@@ -162,7 +218,7 @@ const PACK_ERR = 9302
 Defines the pack err constant used by the minipixels assets pack module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L13)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L16)
 
 <a id="function-function-minipixels-assets-pack-packerror-function-packerror-message-src-minipixels-assets-pack-ml-16473987"></a>
 ### packError
@@ -178,7 +234,7 @@ Performs the packError operation for the minipixels assets pack module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L41)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L44)
 
 <a id="function-function-minipixels-assets-pack-unload-function-unload-pack-name-src-minipixels-assets-pack-ml-1325636868"></a>
 ### unload
@@ -195,4 +251,4 @@ Removes cached payload and decoded image data for one entry.
 | `name` | `dynamic` | — | Stable asset name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L157)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L235)

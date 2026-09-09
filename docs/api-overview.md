@@ -87,7 +87,9 @@ function initialize(game)
 end function
 ```
 
-Both project generators write image, procedural, audio, and file assets into `build/assets.mpx` and emit lazy MiniLang loader functions. The runtime indexes pack entries with a hash map and caches payloads plus decoded images. Its non-interlaced PNG decoder supports stored/fixed/dynamic Deflate, all PNG scanline filters, and grayscale, RGB, indexed, grayscale-alpha, and RGBA color types. `mp.loadPng(path)` also hot-loads ordinary PNG files directly.
+Project generation writes image, procedural, audio, file, text, and JSON data assets into `build/assets.mpx` and emits lazy MiniLang loader functions. Constants become generated MiniLang code rather than runtime pack entries. The runtime indexes pack entries with a hash map and caches payloads plus decoded images. Its non-interlaced PNG decoder supports stored/fixed/dynamic Deflate, all PNG scanline filters, and grayscale, RGB, indexed, grayscale-alpha, and RGBA color types. `mp.loadPng(path)` also hot-loads ordinary PNG files directly.
+
+The Python driver can wrap the complete pack in signed, AES-256-GCM-encrypted MPX2. `python tools/minipixels.py security init <manifest>` creates the build-only P-256 signing key and enables protection. Generated game code reconstructs the obfuscated AES key, verifies the embedded public-key identity and signature, then decrypts the pack transparently.
 
 ```json
 {
@@ -119,6 +121,17 @@ image = mp.loadPngFromPack(pack, "player")
 sprite = mp.spriteFromImage(image, "player")
 mp.unloadPackedAsset(pack, "player")
 ```
+
+Localized text assets generate one helper per locale and a ready-to-use service:
+
+```ml
+texts = gen.localization_ui()
+texts.setLocale("de-DE")
+caption = texts.get("menu.play")
+score = texts.format("hud.score", [42])
+```
+
+Locale lookup falls back from a regional locale such as `de-DE` to `de`, then to the asset's configured default locale. Missing keys return the key itself. `data` helpers return canonical JSON text; `constants` modules expose flattened scalar constants and a `data()` accessor for the complete nested value.
 
 ## Level Data
 

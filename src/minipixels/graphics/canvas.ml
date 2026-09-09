@@ -148,6 +148,16 @@ struct Canvas
     return minipixels.graphics.canvas.drawSpriteEx(this, sprite, x, y, flipX, flipY, scale, tint)
   end function
 
+  /// Draws a sprite with an arbitrary positive nearest-neighbour scale.
+  /// @param sprite Sprite to draw.
+  /// @param x Destination x coordinate.
+  /// @param y Destination y coordinate.
+  /// @param scale Positive fractional or integral scale.
+  /// @param tint Multiplicative RGBA tint.
+  function drawSpriteScaled(sprite, x, y, scale, tint)
+    return minipixels.graphics.canvas.drawSpriteScaled(this, sprite, x, y, scale, tint)
+  end function
+
   /// Draws a sprite rotated around its configured pivot.
   /// @param sprite Sprite to draw.
   /// @param x Pivot x coordinate.
@@ -639,6 +649,7 @@ function drawSpriteFast1x(c, spr, x, y)
   y1 = mt.clamp(y + spr.height, 0, c.height)
   if x0 >= x1 or y0 >= y1 then return end if
   markDirty(c, x0, y0, x1 - x0, y1 - y0)
+  destinationOpaque = c.imageView.opaque
   if spr.image.opaque == false then c.imageView.opaque = false end if
 
   yy = y0
@@ -659,12 +670,22 @@ function drawSpriteFast1x(c, spr, x, y)
           c.pixels[di + 2] = spr.image.pixels[si + 2]
           c.pixels[di + 3] = 255
         else
-          if a > 0 then
+          if a > 0 and destinationOpaque then
             inv = 255 - a
             c.pixels[di] = mt.clamp(mt.floorInt(((spr.image.pixels[si] * a) + (c.pixels[di] * inv)) / 255), 0, 255)
             c.pixels[di + 1] = mt.clamp(mt.floorInt(((spr.image.pixels[si + 1] * a) + (c.pixels[di + 1] * inv)) / 255), 0, 255)
             c.pixels[di + 2] = mt.clamp(mt.floorInt(((spr.image.pixels[si + 2] * a) + (c.pixels[di + 2] * inv)) / 255), 0, 255)
             c.pixels[di + 3] = 255
+          else
+            if a > 0 then
+              dst = mt.rgba(c.pixels[di], c.pixels[di + 1], c.pixels[di + 2], c.pixels[di + 3])
+              src = mt.rgba(spr.image.pixels[si], spr.image.pixels[si + 1], spr.image.pixels[si + 2], a)
+              blended = mt.alphaBlend(dst, src)
+              c.pixels[di] = mt.colorR(blended)
+              c.pixels[di + 1] = mt.colorG(blended)
+              c.pixels[di + 2] = mt.colorB(blended)
+              c.pixels[di + 3] = mt.colorA(blended)
+            end if
           end if
         end if
         si = si + 4
@@ -721,6 +742,48 @@ function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
     end while
     yy = yy + 1
   end while
+  c.spriteCount = c.spriteCount + 1
+  c.drawCalls = c.drawCalls + 1
+end function
+
+/// Draws a sprite at an arbitrary nearest-neighbour scale. Unlike drawSpriteEx,
+/// this path intentionally accepts fractional scaling for smooth camera zoom.
+/// @param c Target canvas.
+/// @param spr Sprite to draw.
+/// @param x Horizontal pivot position.
+/// @param y Vertical pivot position.
+/// @param scale Positive scale factor.
+/// @param tint Multiplicative RGBA tint.
+function drawSpriteScaled(c, spr, x, y, scale, tint)
+  if scale <= 0 then return end if
+  if scale == 1 then return drawSpriteEx(c, spr, x, y, false, false, 1, tint) end if
+  x = mt.floorInt(x - spr.pivotX * scale)
+  y = mt.floorInt(y - spr.pivotY * scale)
+  scaledWidth = mt.floorInt(spr.width * scale + 0.5)
+  scaledHeight = mt.floorInt(spr.height * scale + 0.5)
+  if scaledWidth < 1 then scaledWidth = 1 end if
+  if scaledHeight < 1 then scaledHeight = 1 end if
+  x0 = mt.clamp(x, 0, c.width)
+  y0 = mt.clamp(y, 0, c.height)
+  x1 = mt.clamp(x + scaledWidth, 0, c.width)
+  y1 = mt.clamp(y + scaledHeight, 0, c.height)
+  if x0 >= x1 or y0 >= y1 then return end if
+  white = mt.rgba(255, 255, 255, 255)
+  yy = y0
+  while yy < y1
+    sourceY = mt.clamp(mt.floorInt((yy - y) / scale), 0, spr.height - 1)
+    xx = x0
+    while xx < x1
+      sourceX = mt.clamp(mt.floorInt((xx - x) / scale), 0, spr.width - 1)
+      color = sp.imageGetPixel(spr.image, spr.sx + sourceX, spr.sy + sourceY)
+      if tint != white then color = mt.tintColor(color, tint) end if
+      if mt.colorA(color) > 0 then drawPixelFast(c, xx, yy, color) end if
+      xx = xx + 1
+    end while
+    yy = yy + 1
+  end while
+  markDirty(c, x0, y0, x1 - x0, y1 - y0)
+  if spr.image.opaque == false or mt.colorA(tint) < 255 then c.imageView.opaque = false end if
   c.spriteCount = c.spriteCount + 1
   c.drawCalls = c.drawCalls + 1
 end function
