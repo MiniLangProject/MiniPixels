@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.10.0
+
+- Added arbitrary fixed, native-client, and fractional/multiple dynamic render resolutions with resize-safe Canvas storage, allocation caps, design-coordinate ratios, and per-frame resize notification.
+- Added dynamic OpenGL texture reallocation for changing framebuffer sizes.
+- Optimized unchanged-frame presentation on Windows and Linux, and made XImage convert/upload only dirty regions for native 1:1 output.
+- Expanded renderer benchmarks across 320x180, 960x540, and 1920x1080 framebuffers with megapixel throughput reporting.
+
 ## 0.9.0
 
 - Added the MPX2 protected asset envelope: complete MPX1 packs are encrypted with per-build AES-256-GCM keys and signed with ECDSA-P256-SHA256 before distribution.

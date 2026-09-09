@@ -19,8 +19,8 @@ function drawFrame(canvas, frame)
   canvas.fillRect(canvas.width - 72, (frame * 2) % (canvas.height - 36), 36, 36, mp.rgba(78, 205, 196, 220))
 end function
 
-function benchMode(label, renderer, scaleMode, smoothing)
-  canvas = cv.create(320, 180)
+function benchMode(label, renderer, scaleMode, smoothing, width, height)
+  canvas = cv.create(width, height)
   w = win.open("MiniPixels Renderer Bench " + label, canvas.width, canvas.height, 4, renderer, scaleMode, smoothing)
   if typeof(w) == "error" then
     print label + " ERROR"
@@ -37,8 +37,9 @@ function benchMode(label, renderer, scaleMode, smoothing)
   elapsed = win.ticks() - start
   if elapsed < 1 then elapsed = 1 end if
   fps = (frames * 1000) / elapsed
+  megapixelsPerSecond = (frames * width * height) / (elapsed * 1000.0)
   print label + " renderer=" + win.rendererName(w) + " scale=" + scaleMode + " smoothing=" + smoothing
-  print label + " frames=" + frames + " elapsedMs=" + elapsed + " fps=" + fps
+  print label + " size=" + width + "x" + height + " frames=" + frames + " elapsedMs=" + elapsed + " fps=" + fps + " MPix/s=" + megapixelsPerSecond
   if win.rendererFallbackReason(w) != "" then
     print label + " fallback=" + win.rendererFallbackReason(w)
   end if
@@ -46,9 +47,9 @@ function benchMode(label, renderer, scaleMode, smoothing)
 end function
 
 function main(args)
-  benchMode("gdi-stretch", "gdi", "stretch", false)
-  benchMode("opengl-stretch", "opengl", "stretch", false)
-  benchMode("opengl-integer", "opengl", "integer", false)
-  benchMode("opengl-fit-smooth", "opengl", "fit", true)
+  benchMode("gdi-320x180", "gdi", "stretch", false, 320, 180)
+  benchMode("opengl-320x180", "opengl", "stretch", false, 320, 180)
+  benchMode("opengl-960x540", "opengl", "fit", false, 960, 540)
+  benchMode("opengl-1920x1080", "opengl", "fit", false, 1920, 1080)
   return 0
 end function

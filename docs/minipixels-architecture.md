@@ -43,7 +43,9 @@ MiniPixels is a working engine prototype, not the full future engine. It contain
 
 ## Rendering strategy
 
-The public framebuffer format is straight-alpha RGBA8888 with packed colors as `0xRRGGBBAA`. `Canvas.pixels` stores bytes in `R,G,B,A` order. GDI uses explicit DIB color masks, avoiding a frame-by-frame channel conversion. The OpenGL/WGL presenter updates only the tracked dirty rectangle of the logical RGBA texture and lets the GPU scale it to the client area. Linux converts and scales into a retained native XImage. Scale modes support stretch, aspect-fit, and integer pixel-perfect presentation.
+The public framebuffer format is straight-alpha RGBA8888 with packed colors as `0xRRGGBBAA`. `Canvas.pixels` stores bytes in `R,G,B,A` order. A framebuffer policy selects a fixed size, the native client size, or a fractional/multiple client size with an aspect-preserving pixel cap. Runtime resize reallocates the pixel storage while retaining the public Canvas object and publishes the new render/design ratios on Game.
+
+GDI uses explicit DIB color masks, avoiding a frame-by-frame channel conversion. The OpenGL/WGL presenter updates only the tracked dirty rectangle of the logical RGBA texture, grows or shrinks its power-of-two texture when necessary, and lets the GPU scale it to the client area. Unchanged Windows frames skip presentation until WM_PAINT or WM_SIZE invalidates the retained output. Linux converts and scales into a retained native XImage; unchanged frames likewise skip native presentation, while native 1:1 dirty frames convert and upload only their changed rectangle. Presentation scale modes independently support stretch, aspect-fit, and integer pixel-perfect output.
 
 ## Game-loop strategy
 

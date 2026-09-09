@@ -11,9 +11,9 @@ Reachable from entry: **yes**
 ## Imports
 
 - `minipixels/graphics/sprite.ml` as `sp` → [src/minipixels/graphics/sprite.ml](File-src-minipixels-graphics-sprite-ml-1992064667.md)
-- `std/bytes.ml` as `by` → `../MiniLangCompilerPy/std/bytes.ml` — external dependency
-- `std/checksum/crc32.ml` as `crc` → `../MiniLangCompilerPy/std/checksum/crc32.ml` — external dependency
-- `std/fs.ml` as `fs` → `../MiniLangCompilerPy/std/fs.ml` — external dependency
+- `std/bytes.ml` as `by` → `../MiniLangCompilerML/std/bytes.ml` — external dependency
+- `std/checksum/crc32.ml` as `crc` → `../MiniLangCompilerML/std/checksum/crc32.ml` — external dependency
+- `std/fs.ml` as `fs` → `../MiniLangCompilerML/std/fs.ml` — external dependency
 
 ## Declarations
 

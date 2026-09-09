@@ -60,6 +60,17 @@ function main(args)
   mp.drawText(textCanvas, "A1", 1, 1, 1, mp.rgb(200, 210, 220))
   a.assertEq(mp.textWidth("A1", 1), 11, "textWidth uses 5px glyphs plus spacing")
   a.assertEq(textCanvas.getPixel(2, 1), mp.rgb(200, 210, 220), "drawText draws glyph pixels")
+  resizeCanvas = minipixels.graphics.canvas.create(3, 2)
+  originalCanvas = resizeCanvas
+  a.assertTrue(resizeCanvas.resize(7, 5), "canvas resize reallocates framebuffer")
+  a.assertTrue(resizeCanvas == originalCanvas, "canvas resize preserves object identity")
+  a.assertEq(resizeCanvas.width, 7, "canvas resize updates width")
+  a.assertEq(resizeCanvas.height, 5, "canvas resize updates height")
+  a.assertEq(len(resizeCanvas.pixels), 140, "canvas resize allocates exact pixel storage")
+  a.assertTrue(resizeCanvas.dirty, "canvas resize marks full surface dirty")
+  a.assertEq(resizeCanvas.dirtyX1, 7, "canvas resize dirty width")
+  a.assertEq(resizeCanvas.dirtyY1, 5, "canvas resize dirty height")
+  a.assertFalse(resizeCanvas.resize(7, 5), "same canvas size avoids reallocation")
   print "=== CANVAS TESTS DONE ==="
   return 0
 end function

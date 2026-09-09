@@ -14,12 +14,12 @@ Reachable from entry: **no**
 - `minipixels/tools/fsutil.ml` as `fsu` → [src/minipixels/tools/fsutil.ml](File-src-minipixels-tools-fsutil-ml-605704885.md)
 - `minipixels/tools/json.ml` as `json` → [src/minipixels/tools/json.ml](File-src-minipixels-tools-json-ml-388493918.md)
 - `minipixels/tools/manifest.ml` as `manifest` → [src/minipixels/tools/manifest.ml](File-src-minipixels-tools-manifest-ml-1067201239.md)
-- `std/array.ml` as `arr` → `../MiniLangCompilerPy/std/array.ml` — external dependency
-- `std/bytes.ml` as `by` → `../MiniLangCompilerPy/std/bytes.ml` — external dependency
-- `std/fs.ml` as `fs` → `../MiniLangCompilerPy/std/fs.ml` — external dependency
-- `std/sort.ml` as `sorting` → `../MiniLangCompilerPy/std/sort.ml` — external dependency
-- `std/string.ml` as `strings` → `../MiniLangCompilerPy/std/string.ml` — external dependency
-- `std/string_builder.ml` as `sb` → `../MiniLangCompilerPy/std/string_builder.ml` — external dependency
+- `std/array.ml` as `arr` → `../MiniLangCompilerML/std/array.ml` — external dependency
+- `std/bytes.ml` as `by` → `../MiniLangCompilerML/std/bytes.ml` — external dependency
+- `std/fs.ml` as `fs` → `../MiniLangCompilerML/std/fs.ml` — external dependency
+- `std/sort.ml` as `sorting` → `../MiniLangCompilerML/std/sort.ml` — external dependency
+- `std/string.ml` as `strings` → `../MiniLangCompilerML/std/string.ml` — external dependency
+- `std/string_builder.ml` as `sb` → `../MiniLangCompilerML/std/string_builder.ml` — external dependency
 
 ## Declarations
 

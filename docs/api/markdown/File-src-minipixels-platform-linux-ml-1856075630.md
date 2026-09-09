@@ -12,7 +12,7 @@ Reachable from entry: **no**
 
 - `minipixels/input/input.ml` as `inp` → [src/minipixels/input/input.ml](File-src-minipixels-input-input-ml-1476207415.md)
 - `minipixels/math/types.ml` as `mt` → [src/minipixels/math/types.ml](File-src-minipixels-math-types-ml-311947336.md)
-- `std/time.ml` as `time` → `../MiniLangCompilerPy/std/time.ml` — external dependency
+- `std/time.ml` as `time` → `../MiniLangCompilerML/std/time.ml` — external dependency
 
 ## Declarations
 
@@ -34,7 +34,7 @@ const BUTTON_PRESS_MASK = 4
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L75)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L76)
 
 <a id="constant-constant-minipixels-platform-linux-button-release-const-button-release-5-src-minipixels-platform-linux-ml-1988003638"></a>
 ### BUTTON_RELEASE
@@ -54,7 +54,7 @@ const BUTTON_RELEASE_MASK = 8
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L76)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L77)
 
 <a id="function-function-minipixels-platform-linux-clearkeystates-function-clearkeystates-w-src-minipixels-platform-linux-ml-1514843137"></a>
 ### clearKeyStates
@@ -68,7 +68,7 @@ function clearKeyStates(w)
 | `w` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L286)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L288)
 
 <a id="constant-constant-minipixels-platform-linux-client-message-const-client-message-33-src-minipixels-platform-linux-ml-942536031"></a>
 ### CLIENT_MESSAGE
@@ -78,7 +78,39 @@ const CLIENT_MESSAGE = 33
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L71)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L72)
+
+<a id="function-function-minipixels-platform-linux-clientheight-function-clientheight-w-src-minipixels-platform-linux-ml-139569905"></a>
+### clientHeight
+
+```ml
+function clientHeight(w)
+```
+
+Returns the current native client height.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `w` | `dynamic` | — | Window to inspect. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L377)
+
+<a id="function-function-minipixels-platform-linux-clientwidth-function-clientwidth-w-src-minipixels-platform-linux-ml-1541008415"></a>
+### clientWidth
+
+```ml
+function clientWidth(w)
+```
+
+Returns the current native client width.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `w` | `dynamic` | — | Window to inspect. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L370)
 
 <a id="function-function-minipixels-platform-linux-close-function-close-w-src-minipixels-platform-linux-ml-1037820029"></a>
 ### close
@@ -94,7 +126,7 @@ Releases one X11 window and its native resources.
 | `w` | `dynamic` | — | Window to close. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L205)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L207)
 
 <a id="constant-constant-minipixels-platform-linux-configure-notify-const-configure-notify-22-src-minipixels-platform-linux-ml-1996509491"></a>
 ### CONFIGURE_NOTIFY
@@ -104,7 +136,26 @@ const CONFIGURE_NOTIFY = 22
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L70)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L71)
+
+<a id="function-function-minipixels-platform-linux-convertnativeregion-function-convertnativeregion-w-canvas-x0-y0-x1-y1-src-minipixels-platform-linux-ml-1909208729"></a>
+### convertNativeRegion
+
+```ml
+function convertNativeRegion(w, canvas, x0, y0, x1, y1)
+```
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `w` | `dynamic` | — |  |
+| `canvas` | `dynamic` | — |  |
+| `x0` | `dynamic` | — |  |
+| `y0` | `dynamic` | — |  |
+| `x1` | `dynamic` | — |  |
+| `y1` | `dynamic` | — |  |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L480)
 
 <a id="constant-constant-minipixels-platform-linux-destroy-notify-const-destroy-notify-17-src-minipixels-platform-linux-ml-369994039"></a>
 ### DESTROY_NOTIFY
@@ -114,7 +165,7 @@ const DESTROY_NOTIFY = 17
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L69)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L70)
 
 <a id="function-function-minipixels-platform-linux-ensureimage-function-ensureimage-w-src-minipixels-platform-linux-ml-902793707"></a>
 ### ensureImage
@@ -128,7 +179,7 @@ function ensureImage(w)
 | `w` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L430)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L469)
 
 <a id="constant-constant-minipixels-platform-linux-enter-notify-const-enter-notify-7-src-minipixels-platform-linux-ml-826901888"></a>
 ### ENTER_NOTIFY
@@ -148,7 +199,17 @@ const ENTER_WINDOW_MASK = 16
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L77)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L78)
+
+<a id="constant-constant-minipixels-platform-linux-expose-const-expose-12-src-minipixels-platform-linux-ml-97557590"></a>
+### EXPOSE
+
+```ml
+const EXPOSE = 12
+```
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L69)
 
 <a id="constant-constant-minipixels-platform-linux-exposure-mask-const-exposure-mask-32768-src-minipixels-platform-linux-ml-7648341"></a>
 ### EXPOSURE_MASK
@@ -158,7 +219,7 @@ const EXPOSURE_MASK = 32768
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L82)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L83)
 
 <a id="constant-constant-minipixels-platform-linux-focus-change-mask-const-focus-change-mask-2097152-src-minipixels-platform-linux-ml-1025755099"></a>
 ### FOCUS_CHANGE_MASK
@@ -168,7 +229,7 @@ const FOCUS_CHANGE_MASK = 2097152
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L81)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L82)
 
 <a id="constant-constant-minipixels-platform-linux-focus-in-const-focus-in-9-src-minipixels-platform-linux-ml-1845542310"></a>
 ### FOCUS_IN
@@ -203,7 +264,7 @@ function getI32(buffer, offset)
 | `offset` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L123)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L125)
 
 <a id="function-function-minipixels-platform-linux-getu32-function-getu32-buffer-offset-src-minipixels-platform-linux-ml-1087970109"></a>
 ### getU32
@@ -218,7 +279,7 @@ function getU32(buffer, offset)
 | `offset` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L118)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L120)
 
 <a id="function-function-minipixels-platform-linux-getu64-function-getu64-buffer-offset-src-minipixels-platform-linux-ml-1270060673"></a>
 ### getU64
@@ -233,7 +294,7 @@ function getU64(buffer, offset)
 | `offset` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L130)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L132)
 
 <a id="function-function-minipixels-platform-linux-hasfocus-function-hasfocus-w-src-minipixels-platform-linux-ml-32365145"></a>
 ### hasFocus
@@ -249,7 +310,7 @@ Returns whether the window currently owns keyboard focus.
 | `w` | `dynamic` | — | Window to inspect. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L353)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L363)
 
 <a id="function-function-minipixels-platform-linux-isgpurenderer-function-isgpurenderer-w-src-minipixels-platform-linux-ml-278633347"></a>
 ### isGpuRenderer
@@ -265,7 +326,7 @@ Returns whether the active Linux presenter is GPU-accelerated.
 | `w` | `dynamic` | — | Window to inspect. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L235)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L237)
 
 <a id="constant-constant-minipixels-platform-linux-key-press-const-key-press-2-src-minipixels-platform-linux-ml-1202460127"></a>
 ### KEY_PRESS
@@ -285,7 +346,7 @@ const KEY_PRESS_MASK = 1
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L73)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L74)
 
 <a id="constant-constant-minipixels-platform-linux-key-release-const-key-release-3-src-minipixels-platform-linux-ml-1613803594"></a>
 ### KEY_RELEASE
@@ -305,7 +366,7 @@ const KEY_RELEASE_MASK = 2
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L74)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L75)
 
 <a id="function-function-minipixels-platform-linux-keysymtovirtualkey-function-keysymtovirtualkey-sym-src-minipixels-platform-linux-ml-656400771"></a>
 ### keysymToVirtualKey
@@ -319,7 +380,7 @@ function keysymToVirtualKey(sym)
 | `sym` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L256)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L258)
 
 <a id="constant-constant-minipixels-platform-linux-leave-notify-const-leave-notify-8-src-minipixels-platform-linux-ml-2071650097"></a>
 ### LEAVE_NOTIFY
@@ -339,7 +400,7 @@ const LEAVE_WINDOW_MASK = 32
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L78)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L79)
 
 <a id="constant-constant-minipixels-platform-linux-motion-notify-const-motion-notify-6-src-minipixels-platform-linux-ml-1007878915"></a>
 ### MOTION_NOTIFY
@@ -363,7 +424,7 @@ function normalizeScaleMode(value)
 | `value` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L142)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L144)
 
 <a id="function-function-minipixels-platform-linux-open-function-open-title-width-height-scale-renderer-scalemode-smoothing-src-minipixels-platform-linux-ml-979195075"></a>
 ### open
@@ -385,7 +446,7 @@ Opens an X11 window. Linux currently uses the CPU XImage presenter.
 | `smoothing` | `dynamic` | — | Smoothing preference retained for renderer compatibility. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L156)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L158)
 
 <a id="constant-constant-minipixels-platform-linux-pointer-motion-mask-const-pointer-motion-mask-64-src-minipixels-platform-linux-ml-1959507439"></a>
 ### POINTER_MOTION_MASK
@@ -395,7 +456,7 @@ const POINTER_MOTION_MASK = 64
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L79)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L80)
 
 <a id="function-function-minipixels-platform-linux-pollevents-function-pollevents-w-src-minipixels-platform-linux-ml-1310229189"></a>
 ### pollEvents
@@ -411,7 +472,7 @@ Drains pending X11 events into retained window state.
 | `w` | `dynamic` | — | Window whose event queue is polled. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L343)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L353)
 
 <a id="function-function-minipixels-platform-linux-present-function-present-w-canvas-src-minipixels-platform-linux-ml-200856739"></a>
 ### present
@@ -428,7 +489,7 @@ Scales and presents an RGBA canvas through an X11 XImage.
 | `canvas` | `dynamic` | — | Source logical framebuffer. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L506)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L562)
 
 <a id="function-function-minipixels-platform-linux-processevent-function-processevent-w-src-minipixels-platform-linux-ml-1603153957"></a>
 ### processEvent
@@ -442,7 +503,7 @@ function processEvent(w)
 | `w` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L293)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L295)
 
 <a id="function-function-minipixels-platform-linux-putu64-function-putu64-buffer-offset-value-src-minipixels-platform-linux-ml-1316549622"></a>
 ### putU64
@@ -458,7 +519,7 @@ function putU64(buffer, offset, value)
 | `value` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L135)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L137)
 
 <a id="function-function-minipixels-platform-linux-rendererfallbackreason-function-rendererfallbackreason-w-src-minipixels-platform-linux-ml-373066441"></a>
 ### rendererFallbackReason
@@ -474,7 +535,7 @@ Returns the renderer fallback reason, if any.
 | `w` | `dynamic` | — | Window to inspect. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L241)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L243)
 
 <a id="function-function-minipixels-platform-linux-renderername-function-renderername-w-src-minipixels-platform-linux-ml-430412433"></a>
 ### rendererName
@@ -490,7 +551,7 @@ Returns the active native renderer name.
 | `w` | `dynamic` | — | Window to inspect. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L228)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L230)
 
 <a id="function-function-minipixels-platform-linux-running-function-running-src-minipixels-platform-linux-ml-2002804818"></a>
 ### running
@@ -502,7 +563,7 @@ function running()
 Returns whether the active Linux window remains open.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L198)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L200)
 
 <a id="function-function-minipixels-platform-linux-scalegeneric-function-scalegeneric-w-canvas-vx-vy-vw-vh-src-minipixels-platform-linux-ml-1368856059"></a>
 ### scaleGeneric
@@ -521,7 +582,7 @@ function scaleGeneric(w, canvas, vx, vy, vw, vh)
 | `vh` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L468)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L524)
 
 <a id="function-function-minipixels-platform-linux-scaleinteger-function-scaleinteger-w-canvas-vx-vy-factor-src-minipixels-platform-linux-ml-2141798853"></a>
 ### scaleInteger
@@ -539,7 +600,7 @@ function scaleInteger(w, canvas, vx, vy, factor)
 | `factor` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L440)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L496)
 
 <a id="function-function-minipixels-platform-linux-seconds-function-seconds-src-minipixels-platform-linux-ml-1074978038"></a>
 ### seconds
@@ -551,7 +612,7 @@ function seconds()
 Returns monotonic time in fractional seconds.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L532)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L613)
 
 <a id="function-function-minipixels-platform-linux-setkeystate-function-setkeystate-w-virtualkey-down-src-minipixels-platform-linux-ml-65846199"></a>
 ### setKeyState
@@ -567,7 +628,25 @@ function setKeyState(w, virtualKey, down)
 | `down` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L281)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L283)
+
+<a id="function-function-minipixels-platform-linux-setrendersize-function-setrendersize-w-width-height-src-minipixels-platform-linux-ml-1030483646"></a>
+### setRenderSize
+
+```ml
+function setRenderSize(w, width, height)
+```
+
+Updates the logical source size used by presentation and pointer mapping.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `w` | `dynamic` | — | Window to update. |
+| `width` | `dynamic` | — | New framebuffer width. |
+| `height` | `dynamic` | — | New framebuffer height. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L386)
 
 <a id="function-function-minipixels-platform-linux-settitle-function-settitle-w-title-src-minipixels-platform-linux-ml-1668393081"></a>
 ### setTitle
@@ -584,7 +663,7 @@ Updates the native window title.
 | `title` | `dynamic` | — | New human-readable title. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L249)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L251)
 
 <a id="function-function-minipixels-platform-linux-sleepms-function-sleepms-ms-src-minipixels-platform-linux-ml-209195542"></a>
 ### sleepMs
@@ -600,7 +679,7 @@ Sleeps for a number of milliseconds.
 | `ms` | `dynamic` | — | Milliseconds to sleep. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L549)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L630)
 
 <a id="constant-constant-minipixels-platform-linux-structure-notify-mask-const-structure-notify-mask-131072-src-minipixels-platform-linux-ml-1485325941"></a>
 ### STRUCTURE_NOTIFY_MASK
@@ -610,7 +689,7 @@ const STRUCTURE_NOTIFY_MASK = 131072
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L80)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L81)
 
 <a id="function-function-minipixels-platform-linux-ticks-function-ticks-src-minipixels-platform-linux-ml-506196644"></a>
 ### ticks
@@ -622,7 +701,7 @@ function ticks()
 Returns monotonic milliseconds since system start.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L527)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L608)
 
 <a id="function-function-minipixels-platform-linux-updateinput-function-updateinput-input-src-minipixels-platform-linux-ml-1889085674"></a>
 ### updateInput
@@ -638,7 +717,7 @@ Clears platform input for callers without an active window.
 | `input` | `dynamic` | — | Destination input state. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L396)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L435)
 
 <a id="function-function-minipixels-platform-linux-updateinputforwindow-function-updateinputforwindow-w-input-src-minipixels-platform-linux-ml-310592467"></a>
 ### updateInputForWindow
@@ -655,7 +734,7 @@ Publishes retained X11 keyboard and pointer state to an input frame.
 | `input` | `dynamic` | — | Destination input state. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L361)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L400)
 
 <a id="function-function-minipixels-platform-linux-viewport-function-viewport-w-logicalwidth-logicalheight-src-minipixels-platform-linux-ml-1080072856"></a>
 ### viewport
@@ -671,7 +750,7 @@ function viewport(w, logicalWidth, logicalHeight)
 | `logicalHeight` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L402)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L441)
 
 <a id="function-function-minipixels-platform-linux-waituntil-function-waituntil-deadline-src-minipixels-platform-linux-ml-1619829530"></a>
 ### waitUntil
@@ -687,7 +766,7 @@ Waits until an absolute monotonic deadline.
 | `deadline` | `dynamic` | — | Absolute value previously returned by seconds(). |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L538)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L619)
 
 - [minipixels.platform.linux.Window](Type-minipixels-platform-linux-window-788017826.md) — struct
 <a id="global-global-minipixels-platform-linux-windowrunning-windowrunning-src-minipixels-platform-linux-ml-1764017184"></a>
@@ -698,7 +777,7 @@ windowRunning
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L85)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L86)
 
 <a id="extern_function-extern-function-minipixels-platform-linux-xblackpixel-extern-function-xblackpixel-display-as-ptr-screen-as-int-from-libx11-so-6-returns-u64-src-minipixels-platform-linux-ml-1041730539"></a>
 ### XBlackPixel
@@ -1093,4 +1172,4 @@ const ZPIXMAP = 2
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L83)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L84)

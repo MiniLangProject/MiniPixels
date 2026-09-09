@@ -3,13 +3,13 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.9.0`
+Current version: `0.10.0`
 
-See the [0.9.0 release notes](RELEASE_NOTES_0.9.0.md) for the protected-asset workflow and upgrade notes.
+See the [0.10.0 release notes](RELEASE_NOTES_0.10.0.md) for dynamic-resolution and renderer-performance details.
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.4 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
-MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, a fixed logical framebuffer, OpenGL/WGL, GDI and XImage presentation, configurable keyboard/mouse actions, sprites and rotated render targets, signed and optionally encrypted asset packs, localized text and generated game data, scene stacks, swept tile collision, bitmap text, multi-voice PCM audio through waveOut or ALSA, headless tests, and example projects.
+MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, fixed/native/scaled framebuffers, OpenGL/WGL, GDI and XImage presentation, configurable keyboard/mouse actions, sprites and rotated render targets, signed and optionally encrypted asset packs, localized text and generated game data, scene stacks, swept tile collision, bitmap text, multi-voice PCM audio through waveOut or ALSA, headless tests, and example projects.
 
 ![Moving Sprite](docs/images/moving-sprite.png)
 
@@ -182,6 +182,22 @@ mp.useFitScale(cfg)      # keep aspect ratio
 mp.useIntegerScale(cfg)  # pixel-perfect integer scaling
 mp.setSmoothing(cfg, false)
 ```
+
+The framebuffer itself can now be fixed, native, or dynamically scaled with the window:
+
+```ml
+cfg = mp.createConfig("MiniPixels Game", 320, 180, 4)
+
+mp.useFixedRenderResolution(cfg, 640, 360) # arbitrary fixed framebuffer
+mp.useNativeRenderResolution(cfg)          # one render pixel per client pixel
+mp.useScaledRenderResolution(cfg, 0.75)    # 75% of native width and height
+mp.setMaxRenderPixels(cfg, 2073600)        # optional allocation guard
+mp.setDesignResolution(cfg, 320, 180)      # optional coordinate reference
+```
+
+`game.renderWidth`, `game.renderHeight`, `game.renderScaleX`, and `game.renderScaleY` expose the active values. `game.resolutionChanged` is true for the update/render frame following a framebuffer resize. Drawing remains pixel-based; use `mp.designToRenderX/Y` and `mp.renderToDesignX/Y` when game logic uses a separate design coordinate system.
+
+For higher FPS, start with the OpenGL renderer and a scaled framebuffer such as `0.5` or `0.75`; reducing each dimension to 75% reduces framebuffer work to roughly 56%. Use `mp.setMaxFps(cfg, 0)` only when genuinely uncapped rendering is useful. A native 4K CPU framebuffer is substantially more expensive than a fixed or scaled render target.
 
 ## Project Layout
 
@@ -433,7 +449,7 @@ mp.playAudio(game.audio, clip)
 Implemented:
 
 - Native Win32 and X11 windows
-- Fixed logical resolution and resize stretch
+- Fixed, native, and dynamically scaled render resolutions with resize-safe framebuffers
 - CPU RGBA8888 framebuffer with direct masked-DIB GDI presentation
 - Nearest-neighbor GDI/XImage presentation and optional OpenGL/WGL presentation on Windows
 - Buffered keyboard/mouse input only while the game window has focus

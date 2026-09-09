@@ -530,6 +530,23 @@ Stores the pixels value associated with canvas.
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L18)
 
+<a id="method-method-minipixels-graphics-canvas-canvas-resize-function-resize-width-height-src-minipixels-graphics-canvas-ml-320755980"></a>
+### resize
+
+```ml
+function resize(width, height)
+```
+
+Reallocates this framebuffer and discards its previous pixels.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `width` | `dynamic` | — | New pixel width. |
+| `height` | `dynamic` | — | New pixel height. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L240)
+
 <a id="method-method-minipixels-graphics-canvas-canvas-setpixel-function-setpixel-x-y-color-src-minipixels-graphics-canvas-ml-1492748631"></a>
 ### setPixel
 

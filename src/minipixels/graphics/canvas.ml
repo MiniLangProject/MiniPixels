@@ -233,6 +233,13 @@ struct Canvas
     this.cameraX = 0
     this.cameraY = 0
   end function
+
+  /// Reallocates this framebuffer and discards its previous pixels.
+  /// @param width New pixel width.
+  /// @param height New pixel height.
+  function resize(width, height)
+    return minipixels.graphics.canvas.resize(this, width, height)
+  end function
 end struct
 
 /// Creates create for the minipixels graphics canvas module.
@@ -242,6 +249,30 @@ function create(width, height)
   pixels = bytes(width * height * 4, 0)
   view = sp.Image(width, height, pixels, "render-target", false)
   return Canvas(width, height, pixels, 0, 0, 0, 0, 0, view, true, 0, 0, width, height)
+end function
+
+/// Reallocate a canvas while preserving the Canvas object itself.
+/// Existing pixel contents are discarded and the new surface starts transparent.
+/// @param c Canvas to resize.
+/// @param width New pixel width.
+/// @param height New pixel height.
+function resize(c, width, height)
+  if not (c is Canvas) then return false end if
+  width = mt.floorInt(width)
+  height = mt.floorInt(height)
+  if width < 1 or height < 1 then return false end if
+  if c.width == width and c.height == height then return false end if
+  pixels = bytes(width * height * 4, 0)
+  c.width = width
+  c.height = height
+  c.pixels = pixels
+  c.imageView = sp.Image(width, height, pixels, "render-target", false)
+  c.dirty = true
+  c.dirtyX0 = 0
+  c.dirtyY0 = 0
+  c.dirtyX1 = width
+  c.dirtyY1 = height
+  return true
 end function
 
 /// Expands the pending upload region to include a rectangle.
@@ -650,7 +681,8 @@ function drawSpriteFast1x(c, spr, x, y)
   if x0 >= x1 or y0 >= y1 then return end if
   markDirty(c, x0, y0, x1 - x0, y1 - y0)
   destinationOpaque = c.imageView.opaque
-  if spr.image.opaque == false then c.imageView.opaque = false end if
+  // Source-over compositing cannot make an opaque destination transparent.
+  // Keep the flag so subsequent sprites can use the opaque blend fast path.
 
   yy = y0
   while yy < y1
@@ -714,7 +746,6 @@ function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
   y = mt.floorInt(y - spr.pivotY)
   if x >= c.width or y >= c.height or x + (spr.width * scale) <= 0 or y + (spr.height * scale) <= 0 then return end if
   markDirty(c, x, y, spr.width * scale, spr.height * scale)
-  if spr.image.opaque == false or mt.colorA(tint) < 255 then c.imageView.opaque = false end if
   white = mt.rgba(255, 255, 255, 255)
   if scale == 1 and flipX == false and flipY == false and tint == white then
     return drawSpriteFast1x(c, spr, x, y)

@@ -11,12 +11,12 @@ Reachable from entry: **yes**
 ## Imports
 
 - `minipixels/assets/png.ml` as `png` → [src/minipixels/assets/png.ml](File-src-minipixels-assets-png-ml-1155821131.md)
-- `std/bytes.ml` as `by` → `../MiniLangCompilerPy/std/bytes.ml` — external dependency
-- `std/crypto.ml` as `crypto` → `../MiniLangCompilerPy/std/crypto.ml` — external dependency
-- `std/crypto/aes_gcm.ml` as `aes` → `../MiniLangCompilerPy/std/crypto/aes_gcm.ml` — external dependency
-- `std/crypto/ecdsa_p256.ml` as `ecdsa` → `../MiniLangCompilerPy/std/crypto/ecdsa_p256.ml` — external dependency
-- `std/ds/hashmap.ml` as `hm` → `../MiniLangCompilerPy/std/ds/hashmap.ml` — external dependency
-- `std/fs.ml` as `fs` → `../MiniLangCompilerPy/std/fs.ml` — external dependency
+- `std/bytes.ml` as `by` → `../MiniLangCompilerML/std/bytes.ml` — external dependency
+- `std/crypto.ml` as `crypto` → `../MiniLangCompilerML/std/crypto.ml` — external dependency
+- `std/crypto/aes_gcm.ml` as `aes` → `../MiniLangCompilerML/std/crypto/aes_gcm.ml` — external dependency
+- `std/crypto/ecdsa_p256.ml` as `ecdsa` → `../MiniLangCompilerML/std/crypto/ecdsa_p256.ml` — external dependency
+- `std/ds/hashmap.ml` as `hm` → `../MiniLangCompilerML/std/ds/hashmap.ml` — external dependency
+- `std/fs.ml` as `fs` → `../MiniLangCompilerML/std/fs.ml` — external dependency
 
 ## Declarations
 

@@ -10,8 +10,8 @@ Reachable from entry: **no**
 
 ## Imports
 
-- `std/fs.ml` as `fs` → `../MiniLangCompilerPy/std/fs.ml` — external dependency
-- `std/string.ml` as `str` → `../MiniLangCompilerPy/std/string.ml` — external dependency
+- `std/fs.ml` as `fs` → `../MiniLangCompilerML/std/fs.ml` — external dependency
+- `std/string.ml` as `str` → `../MiniLangCompilerML/std/string.ml` — external dependency
 
 ## Declarations
 

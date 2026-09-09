@@ -26,6 +26,7 @@ import minipixels.world.camera as cam
 import minipixels.world.tilemap as tile
 import minipixels.collision.collision as col
 import minipixels.audio.audio as aud
+import std.math as math
 
 /// Represents the game config data used by the minipixels module.
 struct GameConfig
@@ -57,6 +58,16 @@ struct GameConfig
   maxFps
   /// Whether simulation updates pause while the game window lacks focus.
   pauseWhenUnfocused
+  /// Render-size policy: fixed, native, or scaled.
+  renderMode
+  /// Fraction of the native client size used by scaled rendering.
+  renderScale
+  /// Safety limit for dynamically allocated framebuffer pixels.
+  maxRenderPixels
+  /// Optional coordinate-system reference width exposed to game code.
+  designWidth
+  /// Optional coordinate-system reference height exposed to game code.
+  designHeight
 end struct
 
 /// Represents the game data used by the minipixels module.
@@ -81,6 +92,20 @@ struct Game
   window
   /// Stores the debug value associated with game.
   debug
+  /// Current framebuffer width in physical render pixels.
+  renderWidth
+  /// Current framebuffer height in physical render pixels.
+  renderHeight
+  /// Coordinate-system reference width selected by the developer.
+  designWidth
+  /// Coordinate-system reference height selected by the developer.
+  designHeight
+  /// Horizontal ratio from design coordinates to render pixels.
+  renderScaleX
+  /// Vertical ratio from design coordinates to render pixels.
+  renderScaleY
+  /// True during a frame in which the main framebuffer changed size.
+  resolutionChanged
 
   /// Performs the quit operation for the minipixels game module.
   function quit()
@@ -97,7 +122,7 @@ function createConfig(title, width, height, scale)
   if width <= 0 then width = 320 end if
   if height <= 0 then height = 180 end if
   if scale <= 0 then scale = 4 end if
-  return GameConfig(title, width, height, scale, 60, 0.25, 5, false, 120, "auto", "stretch", false, 60, true)
+  return GameConfig(title, width, height, scale, 60, 0.25, 5, false, 120, "auto", "stretch", false, 60, true, "fixed", 1.0, 33554432, width, height)
 end function
 
 /// Creates game for the minipixels module.
@@ -113,12 +138,19 @@ function createGame(cfg)
     scn.create(16),
     true,
     void,
-    cfg.debug
+    cfg.debug,
+    cfg.width,
+    cfg.height,
+    cfg.designWidth,
+    cfg.designHeight,
+    cfg.width / (cfg.designWidth * 1.0),
+    cfg.height / (cfg.designHeight * 1.0),
+    false
   )
 end function
 
 /// Performs the version operation for the minipixels module.
-function version() return "0.9.0" end function
+function version() return "0.10.0" end function
 /// Updates renderer maintained by the minipixels module.
 /// @param cfg Configuration used by the operation.
 /// @param renderer renderer value consumed by this operation.
@@ -148,6 +180,130 @@ function useFitScale(cfg) return setScaleMode(cfg, "fit") end function
 /// Performs the useIntegerScale operation for the minipixels module.
 /// @param cfg Configuration used by the operation.
 function useIntegerScale(cfg) return setScaleMode(cfg, "integer") end function
+/// Select a fixed framebuffer size independent of later window resizes.
+/// @param cfg Configuration to update.
+/// @param width Framebuffer width in pixels.
+/// @param height Framebuffer height in pixels.
+function useFixedRenderResolution(cfg, width, height)
+  if cfg is GameConfig and typeof(width) == "int" and typeof(height) == "int" and width > 0 and height > 0 then
+    cfg.width = width
+    cfg.height = height
+    cfg.renderMode = "fixed"
+  end if
+  return cfg
+end function
+/// Make the framebuffer match the current native window client size.
+/// @param cfg Configuration to update.
+function useNativeRenderResolution(cfg)
+  if cfg is GameConfig then
+    cfg.renderMode = "native"
+    cfg.renderScale = 1.0
+  end if
+  return cfg
+end function
+/// Render at a fraction or multiple of the native window client size.
+/// Values below one improve fill-rate; values above one enable supersampling.
+/// @param cfg Configuration to update.
+/// @param scale Positive native-resolution multiplier.
+function useScaledRenderResolution(cfg, scale)
+  if cfg is GameConfig and typeof(scale) != "void" and scale > 0 then
+    cfg.renderMode = "scaled"
+    cfg.renderScale = scale / 1.0
+  end if
+  return cfg
+end function
+/// Set the coordinate-system reference size exposed through Game scaling fields.
+/// Rendering APIs continue to consume framebuffer pixels unless the developer applies these ratios.
+/// @param cfg Configuration to update.
+/// @param width Design-coordinate width.
+/// @param height Design-coordinate height.
+function setDesignResolution(cfg, width, height)
+  if cfg is GameConfig and typeof(width) == "int" and typeof(height) == "int" and width > 0 and height > 0 then
+    cfg.designWidth = width
+    cfg.designHeight = height
+  end if
+  return cfg
+end function
+/// Limit dynamic framebuffer allocation to a positive number of pixels.
+/// @param cfg Configuration to update.
+/// @param pixels Maximum framebuffer pixel count.
+function setMaxRenderPixels(cfg, pixels)
+  if cfg is GameConfig and typeof(pixels) == "int" and pixels > 0 then cfg.maxRenderPixels = pixels end if
+  return cfg
+end function
+/// Calculates the framebuffer size for a native client area without allocating it.
+/// Dynamic sizes retain the client aspect ratio when maxRenderPixels applies.
+/// @param cfg Configuration containing the render-size policy.
+/// @param clientWidth Native client width in pixels.
+/// @param clientHeight Native client height in pixels.
+function renderSizeForClient(cfg, clientWidth, clientHeight)
+  width = mt.floorInt(clientWidth)
+  height = mt.floorInt(clientHeight)
+  if width < 1 then width = 1 end if
+  if height < 1 then height = 1 end if
+  if cfg.renderMode == "fixed" then
+    width = cfg.width
+    height = cfg.height
+  else if cfg.renderMode == "scaled" then
+    width = mt.floorInt(width * cfg.renderScale)
+    height = mt.floorInt(height * cfg.renderScale)
+    if width < 1 then width = 1 end if
+    if height < 1 then height = 1 end if
+  end if
+  pixels = width * height
+  if cfg.renderMode != "fixed" and cfg.maxRenderPixels > 0 and pixels > cfg.maxRenderPixels then
+    factor = math.sqrt(cfg.maxRenderPixels / (pixels * 1.0))
+    width = mt.floorInt(width * factor)
+    height = mt.floorInt(height * factor)
+    if width < 1 then width = 1 end if
+    if height < 1 then height = 1 end if
+  end if
+  result = array(2)
+  result[0] = width
+  result[1] = height
+  return result
+end function
+/// Converts a horizontal design coordinate to a framebuffer coordinate.
+/// @param game Game providing the active resolution ratios.
+/// @param value Horizontal design coordinate.
+function designToRenderX(game, value) return value * game.renderScaleX end function
+/// Converts a vertical design coordinate to a framebuffer coordinate.
+/// @param game Game providing the active resolution ratios.
+/// @param value Vertical design coordinate.
+function designToRenderY(game, value) return value * game.renderScaleY end function
+/// Converts a horizontal framebuffer coordinate to a design coordinate.
+/// @param game Game providing the active resolution ratios.
+/// @param value Horizontal framebuffer coordinate.
+function renderToDesignX(game, value) return value / game.renderScaleX end function
+/// Converts a vertical framebuffer coordinate to a design coordinate.
+/// @param game Game providing the active resolution ratios.
+/// @param value Vertical framebuffer coordinate.
+function renderToDesignY(game, value) return value / game.renderScaleY end function
+
+/// @internal
+function syncRenderResolution(game)
+  game.resolutionChanged = false
+  if typeof(game.window) == "void" then return false end if
+  clientW = win.clientWidth(game.window)
+  clientH = win.clientHeight(game.window)
+  // Minimized native windows commonly report a zero-sized client area. The
+  // backends clamp that to one for safe input math; do not thrash the canvas.
+  if game.config.renderMode != "fixed" and (clientW <= 1 or clientH <= 1) then return false end if
+  size = renderSizeForClient(game.config, clientW, clientH)
+  width = size[0]
+  height = size[1]
+  game.designWidth = game.config.designWidth
+  game.designHeight = game.config.designHeight
+  game.renderScaleX = width / (game.designWidth * 1.0)
+  game.renderScaleY = height / (game.designHeight * 1.0)
+  if width == game.canvas.width and height == game.canvas.height then return false end if
+  cv.resize(game.canvas, width, height)
+  win.setRenderSize(game.window, width, height)
+  game.renderWidth = width
+  game.renderHeight = height
+  game.resolutionChanged = true
+  return true
+end function
 /// Updates smoothing maintained by the minipixels module.
 /// @param cfg Configuration used by the operation.
 /// @param enabled enabled value consumed by this operation.
@@ -606,6 +762,7 @@ function run(cfg, initialize, update, render, shutdown)
   w = win.open(cfg.title, cfg.width, cfg.height, cfg.scale, cfg.renderer, cfg.scaleMode, cfg.smoothing)
   if typeof(w) == "error" then return w end if
   game.window = w
+  syncRenderResolution(game)
   failure = try(callIfFunction(initialize, game))
 
   lastTime = win.seconds()
@@ -618,6 +775,7 @@ function run(cfg, initialize, update, render, shutdown)
     if dt > cfg.maxFrameSeconds then dt = cfg.maxFrameSeconds end if
 
     win.pollEvents(w)
+    syncRenderResolution(game)
     win.updateInputForWindow(w, game.input)
     if game.input.escape then game.running = false end if
     if cfg.pauseWhenUnfocused and win.hasFocus(w) == false then dt = 0 end if

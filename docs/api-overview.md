@@ -18,7 +18,7 @@ The game loop uses a high-resolution monotonic clock, fixed simulation updates, 
 
 ## Renderer
 
-MiniPixels renders into a fixed-size RGBA canvas and then presents that framebuffer to the native window. On Windows the default renderer mode is `auto`: MiniPixels first tries the OpenGL/WGL presenter and falls back to GDI if GPU initialization is not available. Linux uses the X11/XImage presenter and reports a fallback reason when OpenGL is requested.
+MiniPixels renders into an RGBA canvas and then presents that framebuffer to the native window. The framebuffer can stay fixed, track native client pixels, or use a configurable fraction/multiple of the client size. On Windows the default renderer mode is `auto`: MiniPixels first tries the OpenGL/WGL presenter and falls back to GDI if GPU initialization is not available. Linux uses the X11/XImage presenter and reports a fallback reason when OpenGL is requested.
 
 ```ml
 cfg = mp.createConfig("Title", 320, 180, 4)
@@ -29,7 +29,19 @@ mp.setSmoothing(cfg, false) # nearest-neighbor pixels by default
 mp.setMaxFps(cfg, 120)      # use 0 for uncapped rendering
 ```
 
-You can also set `cfg.renderer` manually to `"auto"`, `"opengl"`, `"gpu"`, `"gdi"`, or `"cpu"`. The OpenGL path uploads the canvas's dirty rectangle and uses the GPU for scaling and swapping the window framebuffer. Canvas drawing, collisions, animation state, and frame hashes stay CPU-side and deterministic.
+Framebuffer resolution policies:
+
+```ml
+mp.useFixedRenderResolution(cfg, 640, 360) # independent of window size (default)
+mp.useNativeRenderResolution(cfg)          # follows current client pixels
+mp.useScaledRenderResolution(cfg, 0.75)    # follows 75% of each client dimension
+mp.setMaxRenderPixels(cfg, 2073600)        # retain aspect ratio and cap at 1080p pixels
+mp.setDesignResolution(cfg, 320, 180)      # optional game-coordinate reference
+```
+
+Native and scaled policies resize the existing `game.canvas` object before `initialize` and after window resize events. Pixel contents are discarded on a size change. Game code can inspect `game.renderWidth`, `game.renderHeight`, and `game.resolutionChanged`. `game.renderScaleX/Y` describe the ratio from the optional design size to render pixels, with `designToRenderX/Y` and `renderToDesignX/Y` helpers. Rendering APIs remain explicitly pixel-based rather than silently transforming coordinates.
+
+You can also set `cfg.renderer` manually to `"auto"`, `"opengl"`, `"gpu"`, `"gdi"`, or `"cpu"`. The OpenGL path uploads the canvas's dirty rectangle and uses the GPU for scaling and swapping the window framebuffer. It reallocates its backing texture only when the framebuffer crosses a power-of-two boundary. Both platforms skip unchanged presentation until the window requests repainting; the Linux XImage path additionally converts and uploads only dirty regions at native 1:1 size. Canvas drawing, collisions, animation state, and frame hashes stay CPU-side and deterministic.
 
 Presentation scale modes:
 
@@ -72,7 +84,7 @@ red = mp.rgb(255, 0, 0)
 semi = mp.rgba(255, 255, 255, 128)
 ```
 
-Canvas memory stores bytes as `R, G, B, A`. The OpenGL presenter uploads that layout directly; the GDI presenter converts it to BGRA for DIB presentation.
+Canvas memory stores bytes as `R, G, B, A`. OpenGL uploads that layout directly; GDI describes it with explicit DIB channel masks and avoids a frame-by-frame conversion.
 
 ## Assets
 

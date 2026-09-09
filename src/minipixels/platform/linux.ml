@@ -66,6 +66,7 @@ const ENTER_NOTIFY = 7
 const LEAVE_NOTIFY = 8
 const FOCUS_IN = 9
 const FOCUS_OUT = 10
+const EXPOSE = 12
 const DESTROY_NOTIFY = 17
 const CONFIGURE_NOTIFY = 22
 const CLIENT_MESSAGE = 33
@@ -112,6 +113,7 @@ struct Window
   focused
   alive
   wmDelete
+  needsPresent
 end struct
 
 /// @internal
@@ -190,7 +192,7 @@ function open(title, width, height, scale, renderer, scaleMode, smoothing)
     display, id, gc, XDefaultVisual(display, screen), XDefaultDepth(display, screen),
     0, void, width, height, clientWidth, clientHeight, scale, title, "x11", fallback,
     normalizeScaleMode(scaleMode), smoothing, bytes(192, 0), array(256, false),
-    0, 0, false, 0, true, true, wmDelete
+    0, 0, false, 0, true, true, wmDelete, true
   )
 end function
 
@@ -326,8 +328,16 @@ function processEvent(w)
   else if typ == CONFIGURE_NOTIFY then
     width = getI32(w.event, 56)
     height = getI32(w.event, 60)
-    if width > 0 then w.clientWidth = width end if
-    if height > 0 then w.clientHeight = height end if
+    if width > 0 and width != w.clientWidth then
+      w.clientWidth = width
+      w.needsPresent = true
+    end if
+    if height > 0 and height != w.clientHeight then
+      w.clientHeight = height
+      w.needsPresent = true
+    end if
+  else if typ == EXPOSE then
+    w.needsPresent = true
   else if typ == CLIENT_MESSAGE and getU64(w.event, 56) == w.wmDelete then
     w.alive = false
     windowRunning = false
@@ -353,6 +363,35 @@ end function
 function hasFocus(w)
   if w is not Window then return false end if
   return w.focused and w.alive
+end function
+
+/// Returns the current native client width.
+/// @param w Window to inspect.
+function clientWidth(w)
+  if w is not Window or w.clientWidth < 1 then return 1 end if
+  return w.clientWidth
+end function
+
+/// Returns the current native client height.
+/// @param w Window to inspect.
+function clientHeight(w)
+  if w is not Window or w.clientHeight < 1 then return 1 end if
+  return w.clientHeight
+end function
+
+/// Updates the logical source size used by presentation and pointer mapping.
+/// @param w Window to update.
+/// @param width New framebuffer width.
+/// @param height New framebuffer height.
+function setRenderSize(w, width, height)
+  if w is not Window or width < 1 or height < 1 then return false end if
+  width = mt.floorInt(width)
+  height = mt.floorInt(height)
+  if w.logicalWidth == width and w.logicalHeight == height then return false end if
+  w.logicalWidth = width
+  w.logicalHeight = height
+  w.needsPresent = true
+  return true
 end function
 
 /// Publishes retained X11 keyboard and pointer state to an input frame.
@@ -433,7 +472,24 @@ function ensureImage(w)
   if w.image != 0 then XFree(w.image) end if
   w.presentPixels = bytes(expected, 0)
   w.image = XCreateImage(w.display, w.visual, w.depth, ZPIXMAP, 0, nativeBytesPtr(w.presentPixels), w.clientWidth, w.clientHeight, 32, w.clientWidth * 4)
+  w.needsPresent = true
   return w.image != 0
+end function
+
+/// @internal
+function convertNativeRegion(w, canvas, x0, y0, x1, y1)
+  for y = y0 to y1 - 1
+    source = (y * canvas.width + x0) * 4
+    destination = (y * w.clientWidth + x0) * 4
+    for x = x0 to x1 - 1
+      w.presentPixels[destination] = canvas.pixels[source + 2]
+      w.presentPixels[destination + 1] = canvas.pixels[source + 1]
+      w.presentPixels[destination + 2] = canvas.pixels[source]
+      w.presentPixels[destination + 3] = 0
+      source = source + 4
+      destination = destination + 4
+    end for
+  end for
 end function
 
 /// @internal
@@ -505,11 +561,35 @@ end function
 /// @param canvas Source logical framebuffer.
 function present(w, canvas)
   if w is not Window or w.alive == false or ensureImage(w) == false then return false end if
+  if canvas.dirty == false then
+    if w.needsPresent == false then return true end if
+    XPutImage(w.display, w.id, w.gc, w.image, 0, 0, 0, 0, w.clientWidth, w.clientHeight)
+    XFlush(w.display)
+    w.needsPresent = false
+    return true
+  end if
   view = viewport(w, canvas.width, canvas.height)
   vx = view[0]
   vy = view[1]
   vw = view[2]
   vh = view[3]
+  nativeSize = vx == 0 and vy == 0 and vw == canvas.width and vh == canvas.height and canvas.width == w.clientWidth and canvas.height == w.clientHeight
+  if nativeSize then
+    x0 = mt.clamp(canvas.dirtyX0, 0, canvas.width)
+    y0 = mt.clamp(canvas.dirtyY0, 0, canvas.height)
+    x1 = mt.clamp(canvas.dirtyX1, 0, canvas.width)
+    y1 = mt.clamp(canvas.dirtyY1, 0, canvas.height)
+    convertNativeRegion(w, canvas, x0, y0, x1, y1)
+    if w.needsPresent then
+      XPutImage(w.display, w.id, w.gc, w.image, 0, 0, 0, 0, w.clientWidth, w.clientHeight)
+    else
+      XPutImage(w.display, w.id, w.gc, w.image, x0, y0, x0, y0, x1 - x0, y1 - y0)
+    end if
+    XFlush(w.display)
+    canvas.dirty = false
+    w.needsPresent = false
+    return true
+  end if
   factor = mt.floorInt(vw / canvas.width)
   integerFits = vx >= 0 and vy >= 0 and vx + vw <= w.clientWidth and vy + vh <= w.clientHeight
   if integerFits and factor >= 1 and vw == canvas.width * factor and vh == canvas.height * factor then
@@ -520,6 +600,7 @@ function present(w, canvas)
   XPutImage(w.display, w.id, w.gc, w.image, 0, 0, 0, 0, w.clientWidth, w.clientHeight)
   XFlush(w.display)
   canvas.dirty = false
+  w.needsPresent = false
   return true
 end function
 

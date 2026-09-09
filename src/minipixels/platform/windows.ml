@@ -9,6 +9,10 @@ import minipixels.math.types as mt
 
 /// Defines the wm destroy constant used by the minipixels platform windows module.
 const WM_DESTROY = 0x0002
+/// Defines the wm size constant used to invalidate retained presentation.
+const WM_SIZE = 0x0005
+/// Defines the wm paint constant used to invalidate retained presentation.
+const WM_PAINT = 0x000F
 /// Defines the wm close constant used by the minipixels platform windows module.
 const WM_CLOSE = 0x0010
 /// Defines the mouse-wheel message consumed by the input provider.
@@ -332,6 +336,8 @@ windowRunning = true
 registeredClassName = void
 /// Stores wheel steps received by the window callback until input polling consumes them.
 mouseWheelAccumulator = 0
+/// Whether Win32 requested repainting of the retained framebuffer.
+windowNeedsPresent = true
 /// Reusable buffer for high-resolution counter queries.
 performanceCounterBuffer = bytes(8, 0)
 /// Cached high-resolution performance-counter frequency.
@@ -385,6 +391,11 @@ struct Window
   fallbackReason
   /// Stores the viewport value associated with window.
   viewport
+  /// Resize-safe viewport values kept outside the native byte scratch buffer.
+  viewportLeft
+  viewportTop
+  viewportWidth
+  viewportHeight
   /// Stores a reusable Win32 POINT buffer for pointer polling.
   point
 end struct
@@ -450,6 +461,8 @@ end function
 function wndProc(hwnd, msg, wParam, lParam)
   global windowRunning
   global mouseWheelAccumulator
+  global windowNeedsPresent
+  if msg == WM_SIZE or msg == WM_PAINT then windowNeedsPresent = true end if
   if msg == WM_MOUSEWHEEL then
     delta = (wParam >> 16) & 0xFFFF
     if delta >= 0x8000 then delta = delta - 0x10000 end if
@@ -559,7 +572,9 @@ end function
 /// @param smoothing smoothing value consumed by this operation.
 function open(title, width, height, scale, renderer, scaleMode, smoothing)
   global windowRunning
+  global windowNeedsPresent
   windowRunning = true
+  windowNeedsPresent = true
   console = GetConsoleWindow()
   if console != 0 then ShowWindow(console, SW_HIDE) end if
   className = registerWindowClass()
@@ -573,7 +588,7 @@ function open(title, width, height, scale, renderer, scaleMode, smoothing)
   UpdateWindow(hwnd)
   SetForegroundWindow(hwnd)
   mode = normalizeRenderer(renderer)
-  w = Window(hwnd, width, height, scale, sw, sh, createBitmapInfo(width, height), bytes(48, 0), bytes(16, 0), title, className, "gdi", 0, 0, 0, width, height, bytes(4, 0), false, normalizeScaleMode(scaleMode), smoothing, "", bytes(16, 0), bytes(8, 0))
+  w = Window(hwnd, width, height, scale, sw, sh, createBitmapInfo(width, height), bytes(48, 0), bytes(16, 0), title, className, "gdi", 0, 0, 0, width, height, bytes(4, 0), false, normalizeScaleMode(scaleMode), smoothing, "", bytes(16, 0), 0, 0, width, height, bytes(8, 0))
   if mode == "auto" or mode == "opengl" then
     if initOpenGL(w) then
       w.renderer = "opengl"
@@ -748,6 +763,23 @@ function clientHeight(w)
   return clientH
 end function
 
+/// Updates the logical source size used by presentation and pointer mapping.
+/// @param w Window to update.
+/// @param width New framebuffer width.
+/// @param height New framebuffer height.
+function setRenderSize(w, width, height)
+  global windowNeedsPresent
+  if w is not Window or width < 1 or height < 1 then return false end if
+  width = mt.floorInt(width)
+  height = mt.floorInt(height)
+  if w.logicalWidth == width and w.logicalHeight == height then return false end if
+  w.logicalWidth = width
+  w.logicalHeight = height
+  w.bmi = createBitmapInfo(width, height)
+  windowNeedsPresent = true
+  return true
+end function
+
 /// Performs the minInt operation for the minipixels platform windows module.
 /// @param a a value consumed by this operation.
 /// @param b b value consumed by this operation.
@@ -767,6 +799,8 @@ end function
 /// Updates viewport for the minipixels platform windows workflow.
 /// @param w w value consumed by this operation.
 function updateViewport(w)
+  // Keep client geometry valid across minimize/maximize transitions.
+  if typeof(w.rect) != "bytes" or len(w.rect) < 16 then w.rect = bytes(16, 0) end if
   cw = clientWidth(w)
   ch = clientHeight(w)
   dx = 0
@@ -790,25 +824,33 @@ function updateViewport(w)
     dx = (cw - dw) / 2
     dy = (ch - dh) / 2
   end if
-  putU32(w.viewport, 0, dx)
-  putU32(w.viewport, 4, dy)
-  putU32(w.viewport, 8, dw)
-  putU32(w.viewport, 12, dh)
-  return w.viewport
+  dx = mt.floorInt(dx)
+  dy = mt.floorInt(dy)
+  dw = mt.floorInt(dw)
+  dh = mt.floorInt(dh)
+  if dw < 1 then dw = 1 end if
+  if dh < 1 then dh = 1 end if
+  // Plain fields avoid a native-runtime aliasing issue that invalidated the
+  // former byte buffer while handling WM_SIZE and terminated maximized games.
+  w.viewportLeft = dx
+  w.viewportTop = dy
+  w.viewportWidth = dw
+  w.viewportHeight = dh
+  return w
 end function
 
 /// Performs the viewportX operation for the minipixels platform windows module.
 /// @param w w value consumed by this operation.
-function viewportX(w) return getU32(w.viewport, 0) end function
+function viewportX(w) return w.viewportLeft end function
 /// Performs the viewportY operation for the minipixels platform windows module.
 /// @param w w value consumed by this operation.
-function viewportY(w) return getU32(w.viewport, 4) end function
+function viewportY(w) return w.viewportTop end function
 /// Performs the viewportW operation for the minipixels platform windows module.
 /// @param w w value consumed by this operation.
-function viewportW(w) return getU32(w.viewport, 8) end function
+function viewportW(w) return w.viewportWidth end function
 /// Performs the viewportH operation for the minipixels platform windows module.
 /// @param w w value consumed by this operation.
-function viewportH(w) return getU32(w.viewport, 12) end function
+function viewportH(w) return w.viewportHeight end function
 
 /// Performs the applyTextureFilter operation for the minipixels platform windows module.
 /// @param w w value consumed by this operation.
@@ -871,12 +913,31 @@ function initOpenGL(w)
   return true
 end function
 
+/// @internal
+function ensureOpenGLTexture(w, canvas)
+  requiredWidth = nextPow2(canvas.width)
+  requiredHeight = nextPow2(canvas.height)
+  if w.texWidth == requiredWidth and w.texHeight == requiredHeight then return true end if
+  w.texWidth = requiredWidth
+  w.texHeight = requiredHeight
+  w.textureData = bytes(w.texWidth * w.texHeight * 4, 0)
+  glBindTexture(GL_TEXTURE_2D, w.texture)
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w.texWidth, w.texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, w.textureData)
+  canvas.dirty = true
+  canvas.dirtyX0 = 0
+  canvas.dirtyY0 = 0
+  canvas.dirtyX1 = canvas.width
+  canvas.dirtyY1 = canvas.height
+  return true
+end function
+
 /// Performs the presentOpenGL operation for the minipixels platform windows module.
 /// @param w w value consumed by this operation.
 /// @param canvas canvas value consumed by this operation.
 function presentOpenGL(w, canvas)
   if w.gpuReady == false then return false end if
   if wglMakeCurrent(w.dc, w.glrc) == false then return false end if
+  ensureOpenGLTexture(w, canvas)
   cw = clientWidth(w)
   ch = clientHeight(w)
   updateViewport(w)
@@ -936,17 +997,25 @@ function presentGDI(w, canvas)
   StretchDIBits(dc, viewportX(w), viewportY(w), viewportW(w), viewportH(w), 0, 0, canvas.width, canvas.height, canvas.pixels, w.bmi, DIB_RGB_COLORS, SRCCOPY)
   ReleaseDC(w.hwnd, dc)
   canvas.dirty = false
+  return true
 end function
 
 /// Performs the present operation for the minipixels platform windows module.
 /// @param w w value consumed by this operation.
 /// @param canvas canvas value consumed by this operation.
 function present(w, canvas)
+  global windowNeedsPresent
+  if canvas.dirty == false and windowNeedsPresent == false then return true end if
   if w.renderer == "opengl" then
-    if presentOpenGL(w, canvas) then return end if
+    if presentOpenGL(w, canvas) then
+      windowNeedsPresent = false
+      return true
+    end if
     w.renderer = "gdi"
   end if
   presentGDI(w, canvas)
+  windowNeedsPresent = false
+  return true
 end function
 
 /// Performs the ticks operation for the minipixels platform windows module.
