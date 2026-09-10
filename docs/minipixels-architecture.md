@@ -15,7 +15,7 @@ MiniPixels is a working engine prototype, not the full future engine. It contain
 - Win32 window backend using `RegisterClassExW`, a MiniLang WNDPROC callback, `PeekMessageW`, `GetAsyncKeyState`, `StretchDIBits`, and optional OpenGL/WGL presentation with dirty-region uploads.
 - Linux X11 backend using event polling, focus-safe keyboard/mouse input, resizable XImage presentation, and portable monotonic timing.
 - Buffered, configurable keyboard and logical-pointer actions that are consumed by fixed updates.
-- Camera, parallax helpers, cached tilemap rendering with viewport culling, swept AABB/tile collisions, bitmap-font text, scene stacking, and a waveOut/ALSA-backed multi-voice PCM mixer.
+- Camera, parallax helpers, cached tilemap rendering with viewport culling, swept AABB/tile collisions, bitmap-font text, scene stacking, and a waveOut/ALSA-backed multi-voice WAV/MP3 mixer.
 - Python CLI `tools/minipixels.py` for `new`, `validate`, `generate`, `pack`, `build`, `run`, and `package`, delegating compilation to `MiniLangCompilerPy`.
 - Native MiniLang CLI `tools/minipixels_cli.ml` for `info`, `doctor`, `validate`, `generate`, and `new`.
 - Example projects covering sprites, scrolling worlds, pixel effects, Tiled import, and a jump-and-run game.
@@ -37,7 +37,7 @@ MiniPixels is a working engine prototype, not the full future engine. It contain
 - `minipixels.assets.pack`: deterministic MPX1 reader and authenticated MPX2 envelope loader.
 - `minipixels.assets.text`: packed UTF-8 catalogs and locale fallback service.
 - `minipixels.assets.png`: general non-interlaced PNG decoder plus deterministic encoder.
-- `minipixels.audio.audio`: legacy Windows PlaySoundW helpers and a buffered waveOut/ALSA PCM mixer.
+- `minipixels.audio.audio`: legacy Windows WAV helpers and a buffered waveOut/ALSA WAV/MP3 stereo mixer with streamed MP3 music.
 - `minipixels.debug.debug`: counters, overlays, and framebuffer hash.
 - `minipixels.scene.scene`: synchronous scene stack.
 
@@ -53,7 +53,7 @@ The headless path runs deterministic fixed updates and renders exactly the reque
 
 ## Asset strategy
 
-Both generators validate `minipixels.json`, write an `assets.mpx` byte stream, generate lazy MiniLang asset modules, import MiniPixels or Tiled level data, and include referenced image, audio, text, and data assets in the same container. Runtime game code does not need a JSON parser for text catalogs in release builds. Generated audio factories load WAV bytes from the same pack and create memory-backed mixer clips. The Python build driver also emits reports and compiler project manifests.
+Both generators validate `minipixels.json`, write an `assets.mpx` byte stream, generate lazy MiniLang asset modules, import MiniPixels or Tiled level data, and include referenced image, audio, text, and data assets in the same container. Runtime game code does not need a JSON parser for text catalogs in release builds. Generated audio factories retain original WAV or MP3 bytes from the same pack and create lazy mixer clips. The Python build driver also emits reports, builds/copies the native MP3 decoder bridge, and writes compiler project manifests.
 
 Protected builds wrap the complete deterministic MPX1 stream in MPX2. A fresh per-build AES-256-GCM key encrypts the index and all payloads; an ECDSA-P256-SHA256 signature authenticates the header, ciphertext, and GCM tag. The generated game module embeds only the public verification identity and a deliberately obfuscated AES key. Verification precedes decryption, and the reconstructed key is wiped after use. Signing keys remain build-only PEM secrets and may be supplied by the project key directory or CI environment.
 
@@ -73,6 +73,6 @@ The native MiniLang CLI validates manifests and generates real `assets.mpx`, `ge
 ## Risks and next steps
 
 - PNG hot-loading intentionally excludes Adam7 interlace and 16-bit samples.
-- The mixer decodes complete PCM WAV clips in memory; compressed formats and streaming music remain future work.
+- MP3 sound effects decode on first use, while MP3 music uses a per-voice source-frame buffer. WAV remains direct PCM and the final mixer output is interleaved 44.1-kHz signed-16 stereo.
 - Windows has GDI and OpenGL/WGL presentation; Linux currently uses X11/XImage. Wayland and a GPU presenter are natural next steps.
 - `nativeCallback` currently supports WNDPROC only; richer callback APIs should remain backend-internal.

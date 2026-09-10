@@ -19,6 +19,7 @@ TOOLS_DIR = Path(__file__).resolve().parent
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 from asset_security import generate_signing_key, key_id, load_signing_key, protect_pack, raw_public_key
+from build_audio_runtime import ensure_audio_runtime
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1145,6 +1146,11 @@ def build(
         suffix = ".exe" if target == "windows-x64" else ""
         output = root / "build" / f"{data.get('name', 'game')}{suffix}"
     output.parent.mkdir(parents=True, exist_ok=True)
+    audio_runtime = ensure_audio_runtime(target, output.parent)
+    if target == "linux-x64":
+        development_runtime = root / audio_runtime.name
+        if development_runtime.resolve() != audio_runtime.resolve():
+            shutil.copy2(audio_runtime, development_runtime)
     manifest_path = output.parent / "minilang.toml"
     compiler_root = compiler.parent
     if not (compiler_root / "std").is_dir() and (compiler_root.parent / "std").is_dir():

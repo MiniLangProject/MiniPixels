@@ -1,6 +1,8 @@
 # MiniPixels build artifacts
 build/
 dist/
+minipixels_audio.dll
+libminipixels_audio.so
 examples/*/build/
 .asset-work/
 examples/jump-and-run/assets/*.zip

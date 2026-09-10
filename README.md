@@ -9,7 +9,7 @@ See the [0.10.0 release notes](RELEASE_NOTES_0.10.0.md) for dynamic-resolution a
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.4 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
-MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, fixed/native/scaled framebuffers, OpenGL/WGL, GDI and XImage presentation, configurable keyboard/mouse actions, sprites and rotated render targets, signed and optionally encrypted asset packs, localized text and generated game data, scene stacks, swept tile collision, bitmap text, multi-voice PCM audio through waveOut or ALSA, headless tests, and example projects.
+MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, fixed/native/scaled framebuffers, OpenGL/WGL, GDI and XImage presentation, configurable keyboard/mouse actions, sprites and rotated render targets, signed and optionally encrypted asset packs, localized text and generated game data, scene stacks, swept tile collision, bitmap text, multi-voice WAV/MP3 audio through waveOut or ALSA, headless tests, and example projects.
 
 ![Moving Sprite](docs/images/moving-sprite.png)
 
@@ -37,6 +37,7 @@ diagnostics as failures.
 - MiniLang Compiler 1.2.4 or newer in a sibling checkout; protected MPX2 builds require the current `MiniLangCompilerPy` with `std.crypto.ecdsa_p256`
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
 - The Python packages in `requirements.txt` for protected asset builds
+- Visual Studio C++ Build Tools on Windows, or GCC on Linux, for the small MP3 decoder bridge
 
 Expected sibling layout during local development:
 
@@ -50,6 +51,8 @@ Install the build dependency once before enabling protected assets:
 ```powershell
 python -m pip install -r requirements.txt
 ```
+
+The normal `build` and `run` commands also build and copy the target-specific MP3 decoder automatically. On its first build, the helper downloads the checksum-verified `dr_mp3` single-header source at a pinned revision and caches it under `build/native-audio`.
 
 ## Quickstart
 
@@ -313,7 +316,7 @@ python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler
 python tools\minipixels.py package
 ```
 
-The Python CLI validates project JSON, writes asset, localization, constants, and level modules, emits `asset-report.json`, and invokes the MiniLang compiler. Run `security init` once to enable signed and encrypted MPX2 builds. Generated audio helpers create memory-backed WAV clips, so example builds do not need loose sound files next to the executable.
+The Python CLI validates project JSON, writes asset, localization, constants, and level modules, emits `asset-report.json`, builds the target audio bridge, and invokes the MiniLang compiler. Run `security init` once to enable signed and encrypted MPX2 builds. Generated audio helpers create memory-backed WAV/MP3 clips, so games do not need loose sound files next to the executable.
 
 Windowed Windows games built through `tools\minipixels.py build` or `run` use the GUI PE subsystem by default, so double-clicking the executable opens only the game window and no companion console. Linux builds are normal ELF executables. Use `--headless` for Windows console-subsystem builds that are meant to print test or tool output.
 
@@ -350,7 +353,7 @@ Current `kind` values:
 | Kind | Asset type | Payload |
 | --- | --- | --- |
 | `1` | `image` or `procedural` | non-interlaced PNG bytes |
-| `2` | `audio` | Original audio file bytes, usually WAV |
+| `2` | `audio` | Original WAV or MP3 file bytes |
 | `3` | `file` | Original file bytes |
 | `4` | `text` | Deterministic `MPT1` UTF-8 key/value catalog |
 | `5` | `data` | Canonical UTF-8 JSON |
@@ -409,13 +412,13 @@ mp.fillRectWorld(canvas, camera, coin.x, coin.y, 4, 4, mp.rgb(255, 220, 80))
 Input and audio:
 
 ```ml
-coin = mp.audioClip("assets\\audio\\coin.wav", "coin")
+coin = mp.audioClip("assets\\audio\\coin.mp3", "coin")
 mixer = mp.audioMixer(4)
 if mp.inputPressed(game.input, "jump") then
   mixer.playSfx(coin)
 end if
 mixer.setSfxVolume(80)
-mixer.playMusic(mp.musicClip("assets\\audio\\theme.wav", "theme"))
+mixer.playMusic(mp.musicClip("assets\\audio\\theme.mp3", "theme"))
 mixer.stopAll()
 ```
 
@@ -462,12 +465,12 @@ Implemented:
 - Cached spritesheets, animation, rotated sprites, render targets, and dirty-region GPU uploads
 - Scene stack with enter/exit/pause/resume/update/render lifecycle
 - Configurable action bindings, pointer coordinates/deltas/buttons, and wheel input
-- Multi-voice PCM WAV mixer through waveOut/ALSA with bus/clip/channel volume, pan, and looping music
+- Multi-voice WAV/MP3 mixer through waveOut/ALSA with stereo input, bus/clip/channel volume, pan, and streaming MP3 music
 - Build-time SpriteSheet metadata and `asset-report.json`
 - Build-time level JSON generation through `generated.levels`
 - Camera, scrolling, parallax bands
 - Tilemap culling, cached frames, growable layers, and swept collision
-- Headless, framehash, PNG, PCM, lifecycle, and `std.test` regression tests
+- Headless, framehash, PNG, WAV/MP3/stereo, lifecycle, and `std.test` regression tests
 - Windows and Ubuntu GitHub Actions CI for tests and example builds
 - SDK ZIP packaging with SHA256 checksum and release upload on `v*` tags
 - Version file, changelog, and first-game guide

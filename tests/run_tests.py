@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import os
+import shutil
 import subprocess
 import sys
 import importlib.util
@@ -13,6 +15,9 @@ import tempfile
 import zipfile
 import zlib
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+from build_audio_runtime import ensure_audio_runtime
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,6 +33,10 @@ TESTS = [
     "generator_tests.ml",
     "foundation_tests.ml",
 ]
+
+STEREO_MP3_FIXTURE = base64.b64decode(
+    "//OAZAAKvDNQH6eMAA2oWqx/TAACC9bbduh6Hoeh6HqNnkYEPLePWJuJuQs0zTJ2JoPQXBDGR48BAHwfB8/lHZcP8o6c5fwxwG/SGOA36Qxy7+c6fd/Jggcy5/u6f//KAMHwfB+AAQBDWD4Ft322w4Xr169ff2FhLEMCYAYBwPk+xwJYlmb7/P5R3B8/wxKe/o8/ynn+j39Hv////wfB/R71DAAECEEDAoGAQnAoBaVltJ6mKRQYGb7WDIgmKAYYiihosEGBwQLUJbhj8GOSE//zgkQuDWivTLvONAAZyRall5qgAlBXQnv4nwjQjX5NHqPUy/yWHsYl0u/+ZF4vGJdLqX/+kZLBURBX/gqIgqCoiPHf/yoiCoaLf//+1VpaEgaAHAAQggggYEAgESf7//2VPr9X1ppomSCwUBLzSDLjANIDEei5QBm47mAGjGaiBDnDnfkBHNGVJr/IsQIxLpM/+ZF4vIl0unvywVBURBX/gqIgqCoiCp3/8qIgqCoied///2qtLQkDSoAiFbff/7//x3cdoZCAXAgcDgCJDIIy//OCRBcJVCVCn+4IARbIejr/3jAAP4qcyILysCRprU/ShVxMkDDGnXd/5cx/7f55KFUK6DlkX/7ke2z//px8UbS7cSoWXf//TJgAAAKw2bE2+fv/7QUdy+rINADDgAQFAtMFQBURhOmHss4fjinZl8jZGPyD0YIICxgQAhmBgAmHAEl5kkr7gFGukv31/fv1O9/+7J07f+r9n/U/6vJfq///9roby33a7bf+GFh2xwIRUDzB8EzCwTDFgGjsgfDF0JxgBEFFNJLlu+cqWpt/d+r/84JELQi4KTw/rogBEXBegv9bGAJXaK/Z/blafv7//Lfu3Ru7+jRot++r9b+qEMAACf3e+7f6///W6enwqYytrbvAwCMewDs4UyIGIhdpcH3gxB9mql5wWzPp0x1ien/+19X//3/9t/v6XdGzfo+ltv4oytrYl6UgcMQ4lCwJMTwZdZl0xmHBIZ4ZJoYKBZZFF9AyaNBBMw4hQOWHE/HgOWQJ0iYGdBAFJQu7ldE3BvEGqRkvPsm4lIXKRYXN+m9yAk0QIomX999yaLJwyOmBl//zgmRdD6TZRgDOUAAgkR7Kf56wIv/+ZmBwzMFA4z/8uGAcMhg0Z//8waMmHnSrP//+LLYLZvYNCGQFAFQaDUbAcDgCbEAEUPlgBBUKFxgnAEmGCcoYR4LpoIovxALABhwUABB1MNAAcwPACULUMgNzhLgMPQIQRAaA2xGTAwDgAIKQQOOKvNFp/3pukjS+xufZNakl/5uAzQfCooLM+9MeEAcEYQ//g4CYYAhkw///oMmDQbALAlUKRtwA/hbiFM5bS4pAE0AJhMWQ5jqUUMvo//OCZBkK9F02D+eYABOQbkAd2RgAkohq2SkTUyYiujKU0Qo0JRatIgFJ5xq8ka4KvsKgtxKDQNPqBo9lgaqPCJ8RKPVHhFiJR6o8nEXUe4i6j3EQcjwBBEY5QGOYGYA5kApyGa4ctBpFqhZUmMisptCnRUxUCTGUGZdTv6/t6mBYGg6JQ3wVfrOyzwVPawWBo9lg7wafESj1R4RYiUeqPJxETEFNRTMuMTAwqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqo="
+)
 
 
 def output_path(name: str, target: str) -> Path:
@@ -164,6 +173,7 @@ def create_asset_pack_fixture() -> None:
         + pcm
     )
     (ROOT / "build" / "tests" / "tone_valid.wav").write_bytes(wav)
+    (ROOT / "build" / "tests" / "tone_stereo.mp3").write_bytes(STEREO_MP3_FIXTURE)
     mod.write_asset_pack(
         {
             "assets": [
@@ -590,6 +600,10 @@ def main(argv: list[str] | None = None) -> int:
     run_python_tests()
     build = ROOT / "build" / "tests"
     build.mkdir(parents=True, exist_ok=True)
+    runtime = ensure_audio_runtime(target, build)
+    root_runtime = ROOT / runtime.name
+    if root_runtime.resolve() != runtime.resolve():
+        shutil.copy2(runtime, root_runtime)
     create_asset_pack_fixture()
     protected_project = create_protected_asset_fixture()
     for test in TESTS:

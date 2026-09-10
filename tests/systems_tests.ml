@@ -140,6 +140,8 @@ function main(args)
 #endif
   a.assertTrue(mp.audioSupportsMultipleSfx(), "PCM backend reports multi-sfx mixing")
   a.assertTrue(mp.audioSupportsVolumeControl(), "PCM backend reports volume control")
+  a.assertTrue(mp.audioSupportsMp3(), "audio backend reports MP3 decoding")
+  a.assertTrue(mp.audioSupportsStereo(), "audio backend reports stereo mixing")
   clip = mp.audioClip("missing.wav", "missing")
   clip.setVolume(0)
   a.assertFalse(mp.playAudio(audio, clip), "silent clip skips playback")

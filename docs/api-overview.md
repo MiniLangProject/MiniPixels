@@ -235,18 +235,18 @@ mp.playMusic("assets\\audio\\theme.wav")
 mp.stopSound()
 ```
 
-Games get a lazily opened PCM mixer (waveOut on Windows, ALSA on Linux) with independent SFX voices and a dedicated music voice:
+Games get a lazily opened PCM mixer (waveOut on Windows, ALSA on Linux) with independent SFX voices and a dedicated music voice. WAV and MP3 can both be mono or stereo:
 
 ```ml
 game.audio.setMasterVolume(90)
 game.audio.setSfxVolume(75)
-coin = mp.audioClip("assets\\audio\\coin.wav", "coin")
+coin = mp.audioClip("assets\\audio\\coin.mp3", "coin")
 mp.playAudio(game.audio, coin)
-game.audio.playMusic(mp.musicClip("assets\\audio\\theme.wav", "theme"))
+game.audio.playMusic(mp.musicClip("assets\\audio\\theme.mp3", "theme"))
 game.audio.mute()
 ```
 
-Generated packed-audio helpers return memory-backed clips, so WAV files can stay inside `assets.mpx`:
+Generated packed-audio helpers retain the original compressed bytes, so WAV and MP3 files can stay inside `assets.mpx`:
 
 ```ml
 coin = gen.audio_coin_sfx()
@@ -258,14 +258,14 @@ Standalone mixers are also available:
 ```ml
 mixer = mp.audioMixer(4)
 jump = mp.audioClip("assets\\audio\\jump.wav", "jump")
-theme = mp.musicClip("assets\\audio\\theme.wav", "theme")
+theme = mp.musicClip("assets\\audio\\theme.mp3", "theme")
 mixer.playSfx(jump)
 mixer.playMusic(theme)
 mixer.setChannel(0, 75, -30)
 mixer.stopAll()
 ```
 
-PCM WAV input supports mono/stereo 8/16/24/32-bit samples, nearest-rate conversion to 44.1 kHz stereo, looping memory-backed music, master/bus/clip/channel volume, and pan. `mp.audioBackend()` reports `waveout-pcm`; capability helpers report multi-SFX and volume support.
+PCM WAV input supports mono/stereo 8/16/24/32-bit samples. MP3 input is decoded lazily to signed 16-bit PCM for sound effects and incrementally for the dedicated music voice, so packed music remains compressed in memory. Both formats preserve independent left/right channels and use nearest-rate conversion to 44.1 kHz stereo, looping, master/bus/clip/channel volume, and pan. `mp.audioSupportsMp3()` and `mp.audioSupportsStereo()` expose the new capabilities. The legacy `playSound*` helpers remain WAV-only.
 
 ## Releases
 

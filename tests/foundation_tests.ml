@@ -201,6 +201,41 @@ function pcmMixerPreparesAndMixes()
   test.assertTrue(mixer.setChannel(0, 150, -200))
   test.assertEqual(mixer.channels[0].volume, 100)
   test.assertEqual(mixer.channels[0].pan, -100)
+
+  mp3 = audio.clip("build/tests/tone_stereo.mp3", "stereo-mp3")
+  test.assertTrue(audio.prepareClip(mp3), "MP3 sound effect decodes")
+  test.assertEqual(mp3.codec, "mp3")
+  test.assertEqual(mp3.channels, 2, "MP3 stereo channels are preserved")
+  test.assertEqual(mp3.bitsPerSample, 16)
+  test.assertTrue(mp3.frameCount > 0)
+  test.assertType(mp3.sampleData, "bytes")
+  differentSides = false
+  lastFrame = mp3.frameCount - 1
+  if lastFrame > 2000 then lastFrame = 2000 end if
+  for frame = 0 to lastFrame
+    if audio.sampleAt(mp3, frame, 0) != audio.sampleAt(mp3, frame, 1) then differentSides = true end if
+  end for
+  test.assertTrue(differentSides, "stereo MP3 keeps independent left and right samples")
+
+  music = audio.musicClip("build/tests/tone_stereo.mp3", "streaming-mp3")
+  test.assertTrue(audio.prepareClip(music), "streaming MP3 metadata prepares")
+  test.assertType(music.sampleData, "void", "streaming music stays compressed")
+  streamingMixer = audio.mixer(1)
+  streamingVoice = streamingMixer.musicChannel
+  streamingVoice.clip = music
+  streamingVoice.playing = true
+  streamingVoice = audio.openVoiceDecoder(streamingVoice)
+  streamingMixer.musicChannel = streamingVoice
+  streamed = bytes(streamingMixer.bufferFrames * 4, 0)
+  audio.mixBuffer(streamingMixer, streamed)
+  audio.mixBuffer(streamingMixer, streamed)
+  test.assertTrue(streamingMixer.musicChannel.decoder != 0, "music owns a live streaming decoder")
+  streamedNonzero = false
+  for index = 0 to len(streamed) - 1
+    if streamed[index] != 0 then streamedNonzero = true end if
+  end for
+  test.assertTrue(streamedNonzero, "streamed MP3 samples reach the mixer")
+  test.assertTrue(audio.closeMixer(streamingMixer))
 end function
 
 function compilerOptimizedMathAndTiming()

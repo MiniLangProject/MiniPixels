@@ -62,7 +62,7 @@ Asset types:
 | --- | --- | --- | --- |
 | `image` | non-interlaced PNG image asset | stores deterministic RGBA PNG payload and generates lazy loader functions | stores source PNG payload and generates lazy loader functions |
 | `procedural` | generated checker/player/tile sprite data from manifest fields | renders a PNG payload into `assets.mpx` and generates a loader | renders a deterministic PNG payload and generates a loader |
-| `audio` | runtime audio file, usually PCM WAV | stores payload and generates a memory-clip helper | stores payload and generates a memory-clip helper |
+| `audio` | runtime PCM WAV or MP3 file | stores original payload and generates a lazy memory-clip helper | stores original payload and generates a lazy memory-clip helper |
 | `file` | runtime data file | stores payload and generates pack access | stores payload and generates pack access |
 | `text` | UTF-8 JSON translation catalog | validates keys/placeholders, encodes MPT1, and generates localization helpers | encodes MPT1 and generates a catalog helper |
 | `data` | structured runtime JSON data | canonicalizes and stores UTF-8 JSON in the pack | stores UTF-8 JSON in the pack |

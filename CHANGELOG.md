@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added mono/stereo MP3 support backed by a checksum-pinned `dr_mp3` bridge for Windows and Linux; sound effects decode lazily and music streams from compressed file or MPX bytes.
+- Added automatic target-native audio bridge builds/copying, `musicClipFromBytes`, MP3/stereo capability queries, and stereo/streaming regression coverage.
+
 ## 0.10.0
 
 - Added arbitrary fixed, native-client, and fractional/multiple dynamic render resolutions with resize-safe Canvas storage, allocation caps, design-coordinate ratios, and per-frame resize notification.

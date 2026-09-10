@@ -666,6 +666,10 @@ function audioClipFromBytes(data, name) return aud.clipFromBytes(data, name) end
 /// @param path Path of the file or directory used by the operation.
 /// @param name Name of the affected item.
 function musicClip(path, name) return aud.musicClip(path, name) end function
+/// Creates a streaming-capable music clip from complete WAV or MP3 bytes.
+/// @param data Complete audio file bytes.
+/// @param name Stable clip name.
+function musicClipFromBytes(data, name) return aud.musicClipFromBytes(data, name) end function
 /// Performs the playAudio operation for the minipixels module.
 /// @param audio audio value consumed by this operation.
 /// @param clip clip value consumed by this operation.
@@ -690,6 +694,10 @@ function audioBackend() return aud.backendName() end function
 function audioSupportsMultipleSfx() return aud.supportsMultipleSfx() end function
 /// Performs the audioSupportsVolumeControl operation for the minipixels module.
 function audioSupportsVolumeControl() return aud.supportsVolumeControl() end function
+/// Returns whether the advanced mixer supports MP3 input.
+function audioSupportsMp3() return aud.supportsMp3() end function
+/// Returns whether the advanced mixer preserves stereo input.
+function audioSupportsStereo() return aud.supportsStereo() end function
 /// Performs the frameHash operation for the minipixels module.
 /// @param canvas canvas value consumed by this operation.
 function frameHash(canvas) return dbg.captureHash(canvas) end function

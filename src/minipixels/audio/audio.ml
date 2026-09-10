@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-//! Provides legacy sound playback and a buffered multi-voice PCM mixer.
+//! Provides legacy WAV playback and a buffered multi-voice WAV/MP3 mixer.
 
 package minipixels.audio.audio
 
@@ -9,6 +9,37 @@ import std.fs as fs
 import minipixels.math.types as mt
 
 #if TARGET_OS == "windows"
+/// Opens an in-memory MP3 decoder retained by the native audio bridge.
+/// @param data Complete MP3 bytes retained for the lifetime of the decoder.
+/// @param size Byte length of the MP3 source.
+/// @returns Native decoder handle, or zero when the input is unsupported.
+extern function mpAudioMp3Open(data as bytes, size as u64) from "minipixels_audio.dll" returns ptr
+/// Returns the decoded source channel count.
+/// @param handle Open native MP3 decoder.
+/// @returns One for mono or two for stereo.
+extern function mpAudioMp3Channels(handle as ptr) from "minipixels_audio.dll" returns i32
+/// Returns the decoded source sample rate.
+/// @param handle Open native MP3 decoder.
+/// @returns Source frames per second.
+extern function mpAudioMp3SampleRate(handle as ptr) from "minipixels_audio.dll" returns i32
+/// Returns the decoded PCM frame count.
+/// @param handle Open native MP3 decoder.
+/// @returns Total interleaved source frames.
+extern function mpAudioMp3FrameCount(handle as ptr) from "minipixels_audio.dll" returns u64
+/// Decodes sequential signed-16 PCM frames.
+/// @param handle Open native MP3 decoder.
+/// @param output Destination byte buffer sized for frames times block alignment.
+/// @param frames Maximum source frames to decode.
+/// @returns Number of decoded frames written.
+extern function mpAudioMp3Read(handle as ptr, output as bytes, frames as u64) from "minipixels_audio.dll" returns u64
+/// Seeks an MP3 decoder to an absolute PCM frame.
+/// @param handle Open native MP3 decoder.
+/// @param frame Zero-based source frame.
+/// @returns One on success, otherwise zero.
+extern function mpAudioMp3Seek(handle as ptr, frame as u64) from "minipixels_audio.dll" returns i32
+/// Releases an MP3 decoder handle.
+/// @param handle Open native MP3 decoder.
+extern function mpAudioMp3Close(handle as ptr) from "minipixels_audio.dll" returns void
 /// Invokes the legacy PlaySoundW file entry point.
 /// @param path UTF-16 WAV file path.
 /// @param module Optional resource module handle.
@@ -57,6 +88,14 @@ extern function waveOutReset(handle as ptr) from "winmm.dll" returns u32
 /// @returns Multimedia-system result code.
 extern function waveOutClose(handle as ptr) from "winmm.dll" returns u32
 #else
+/// Opens an in-memory MP3 decoder retained by the native audio bridge.
+extern function mpAudioMp3Open(data as bytes, size as u64) from "./libminipixels_audio.so" returns ptr
+extern function mpAudioMp3Channels(handle as ptr) from "./libminipixels_audio.so" returns i32
+extern function mpAudioMp3SampleRate(handle as ptr) from "./libminipixels_audio.so" returns i32
+extern function mpAudioMp3FrameCount(handle as ptr) from "./libminipixels_audio.so" returns u64
+extern function mpAudioMp3Read(handle as ptr, output as bytes, frames as u64) from "./libminipixels_audio.so" returns u64
+extern function mpAudioMp3Seek(handle as ptr, frame as u64) from "./libminipixels_audio.so" returns i32
+extern function mpAudioMp3Close(handle as ptr) from "./libminipixels_audio.so" returns void
 /// Opens an ALSA PCM stream.
 extern function snd_pcm_open(handle as bytes, name as cstr, stream as int, mode as int) from "libasound.so.2" returns i32
 /// Configures a simple interleaved PCM stream.
@@ -113,6 +152,10 @@ const MIXER_SAMPLE_RATE = 44100
 const MIXER_BUFFER_FRAMES = 1024
 /// Number of buffers retained in the output queue.
 const MIXER_BUFFER_COUNT = 3
+/// Number of decoded source frames retained by one streaming MP3 voice.
+const MP3_STREAM_FRAMES = 4096
+/// Safety limit for complete sound-effect decoding.
+const MAX_DECODED_AUDIO_BYTES = 536870912
 
 /// Represents legacy state used by direct PlaySound-compatible helpers.
 struct AudioState
@@ -168,7 +211,7 @@ struct AudioState
   end function
 end struct
 
-/// Represents a WAV clip and its lazily parsed PCM payload.
+/// Represents a WAV or MP3 clip and its lazily prepared payload.
 struct AudioClip
   /// Optional source path.
   path
@@ -178,13 +221,13 @@ struct AudioClip
   volume
   /// Whether playback loops after the final frame.
   looping
-  /// Original WAV file bytes, when loaded in memory.
+  /// Original WAV or MP3 file bytes, when loaded in memory.
   data
-  /// Whether WAV parsing has been attempted.
+  /// Whether format preparation has been attempted.
   prepared
   /// Whether the parsed format is supported.
   valid
-  /// WAV format identifier.
+  /// Source format identifier.
   formatTag
   /// Source channel count.
   channels
@@ -198,6 +241,10 @@ struct AudioClip
   sampleData
   /// Number of source sample frames.
   frameCount
+  /// Normalized source codec name (`wav` or `mp3`).
+  codec
+  /// Whether an MP3 should be decoded incrementally while playing.
+  streaming
 
   /// Sets clip volume.
   /// @param value Percentage from 0 through 100.
@@ -230,6 +277,14 @@ struct AudioChannel
   pan
   /// Fractional source-frame cursor.
   cursor
+  /// Native MP3 decoder handle, or zero for memory PCM.
+  decoder
+  /// Reusable interleaved signed-16 streaming buffer.
+  streamData
+  /// Absolute source frame represented by the first buffered frame.
+  streamStart
+  /// Number of valid source frames in the streaming buffer.
+  streamFrames
 end struct
 
 /// Represents a software PCM mixer backed by WinMM waveOut or ALSA.
@@ -300,12 +355,12 @@ struct AudioMixer
     return minipixels.audio.audio.refreshMixer(this)
   end function
   /// Starts a sound-effect voice.
-  /// @param clip PCM WAV clip.
+  /// @param clip WAV or MP3 clip.
   function playSfx(clip)
     return minipixels.audio.audio.mixerPlaySfx(this, clip)
   end function
   /// Starts or replaces the dedicated music voice.
-  /// @param clip PCM WAV clip.
+  /// @param clip WAV or MP3 clip.
   function playMusic(clip)
     return minipixels.audio.audio.mixerPlayMusic(this, clip)
   end function
@@ -359,36 +414,47 @@ function create()
 end function
 
 /// Creates a file-backed audio clip.
-/// @param path WAV file path.
+/// @param path WAV or MP3 file path.
 /// @param name Stable clip name.
 function clip(path, name)
   if typeof(path) != "string" then path = "" end if
   if typeof(name) != "string" then name = path end if
-  return AudioClip(path, name, 100, false, void, false, false, 0, 0, 0, 0, 0, void, 0)
+  return AudioClip(path, name, 100, false, void, false, false, 0, 0, 0, 0, 0, void, 0, "", false)
 end function
 
-/// Creates an in-memory WAV audio clip.
-/// @param data Complete WAV file bytes.
+/// Creates an in-memory WAV or MP3 audio clip.
+/// @param data Complete WAV or MP3 file bytes.
 /// @param name Stable clip name.
 function clipFromBytes(data, name)
   if typeof(name) != "string" then name = "memory" end if
   if typeof(data) != "bytes" then data = void end if
-  return AudioClip("", name, 100, false, data, false, false, 0, 0, 0, 0, 0, void, 0)
+  return AudioClip("", name, 100, false, data, false, false, 0, 0, 0, 0, 0, void, 0, "", false)
 end function
 
-/// Creates a looping file-backed music clip.
-/// @param path WAV file path.
+/// Creates a looping file-backed music clip. MP3 data streams while playing.
+/// @param path WAV or MP3 file path.
 /// @param name Stable clip name.
 function musicClip(path, name)
   value = clip(path, name)
   value.looping = true
+  value.streaming = true
+  return value
+end function
+
+/// Creates a looping in-memory music clip. MP3 data streams while playing.
+/// @param data Complete WAV or MP3 file bytes.
+/// @param name Stable clip name.
+function musicClipFromBytes(data, name)
+  value = clipFromBytes(data, name)
+  value.looping = true
+  value.streaming = true
   return value
 end function
 
 /// Creates an inactive mixer channel.
 /// @param id Stable channel identifier.
 function channel(id)
-  return AudioChannel(id, void, false, 100, 0, 0.0)
+  return AudioChannel(id, void, false, 100, 0, 0.0, 0, void, 0, 0)
 end function
 
 /// Creates a lazily opened multi-voice PCM mixer.
@@ -439,6 +505,16 @@ end function
 
 /// Returns whether the mixer applies per-bus, per-channel, and per-clip volume.
 function supportsVolumeControl()
+  return true
+end function
+
+/// Returns whether the advanced mixer can decode MP3 clips.
+function supportsMp3()
+  return true
+end function
+
+/// Returns whether independent left/right source channels are preserved.
+function supportsStereo()
   return true
 end function
 
@@ -607,18 +683,58 @@ function chunkIs(data, offset, a, b, c, d)
   return data[offset] == a and data[offset + 1] == b and data[offset + 2] == c and data[offset + 3] == d
 end function
 
-/// Loads and parses a PCM WAV clip on first use.
+/// Returns whether bytes begin with an ID3 tag or MPEG audio frame sync.
+/// @param data Complete candidate audio bytes.
+function isMp3(data)
+  if not hasRange(data, 0, 2) then return false end if
+  if hasRange(data, 0, 3) and data[0] == 73 and data[1] == 68 and data[2] == 51 then return true end if
+  return data[0] == 255 and (data[1] & 224) == 224
+end function
+
+/// Reads source metadata from the native MP3 decoder and optionally decodes all PCM.
 /// @param value Audio clip to prepare.
-function prepareClip(value)
-  if value.prepared then return value.valid end if
-  value.prepared = true
-  data = value.data
-  if typeof(data) != "bytes" then
-    if typeof(value.path) != "string" or len(value.path) <= 0 then return false end if
-    data = try(fs.readAllBytes(value.path))
-    if typeof(data) == "error" then return false end if
-    value.data = data
+/// @param data Complete MP3 file bytes.
+function prepareMp3(value, data)
+  decoder = mpAudioMp3Open(data, len(data))
+  if decoder == 0 then return false end if
+  value.channels = mpAudioMp3Channels(decoder)
+  value.sampleRate = mpAudioMp3SampleRate(decoder)
+  value.frameCount = mpAudioMp3FrameCount(decoder)
+  value.formatTag = 85
+  value.bitsPerSample = 16
+  value.blockAlign = value.channels * 2
+  value.codec = "mp3"
+  if value.channels < 1 or value.channels > 2 or value.sampleRate <= 0 or value.frameCount <= 0 then
+    mpAudioMp3Close(decoder)
+    return false
   end if
+  if value.streaming then
+    mpAudioMp3Close(decoder)
+    value.valid = true
+    return true
+  end if
+  decodedBytes = value.frameCount * value.blockAlign
+  if decodedBytes <= 0 or decodedBytes > MAX_DECODED_AUDIO_BYTES then
+    mpAudioMp3Close(decoder)
+    return false
+  end if
+  value.sampleData = bytes(decodedBytes, 0)
+  frames = mpAudioMp3Read(decoder, value.sampleData, value.frameCount)
+  mpAudioMp3Close(decoder)
+  if frames <= 0 then
+    value.sampleData = void
+    return false
+  end if
+  value.frameCount = frames
+  if frames * value.blockAlign < len(value.sampleData) then value.sampleData = slice(value.sampleData, 0, frames * value.blockAlign) end if
+  value.valid = true
+  return true
+end function
+
+/// Parses an uncompressed PCM WAV payload.
+/// @param value Audio clip to prepare.
+/// @param data Complete WAV file bytes.
+function prepareWav(value, data)
   if not hasRange(data, 0, 12) then return false end if
   if not chunkIs(data, 0, 82, 73, 70, 70) or not chunkIs(data, 8, 87, 65, 86, 69) then return false end if
   formatFound = false
@@ -655,8 +771,25 @@ function prepareClip(value)
   if value.blockAlign != expectedBlockAlign or sampleSize % value.blockAlign != 0 then return false end if
   value.sampleData = slice(data, sampleOffset, sampleSize)
   value.frameCount = sampleSize / value.blockAlign
+  value.codec = "wav"
   value.valid = value.frameCount > 0
   return value.valid
+end function
+
+/// Loads and prepares a WAV or MP3 clip on first use.
+/// @param value Audio clip to prepare.
+function prepareClip(value)
+  if value.prepared then return value.valid end if
+  value.prepared = true
+  data = value.data
+  if typeof(data) != "bytes" then
+    if typeof(value.path) != "string" or len(value.path) <= 0 then return false end if
+    data = try(fs.readAllBytes(value.path))
+    if typeof(data) == "error" then return false end if
+    value.data = data
+  end if
+  if isMp3(data) then return prepareMp3(value, data) end if
+  return prepareWav(value, data)
 end function
 
 /// Reads one source sample and converts it to signed 16-bit amplitude.
@@ -697,6 +830,68 @@ function chooseChannel(value)
   return index
 end function
 
+/// Releases the decoder and buffered data owned by one mixer voice.
+/// @param voice Voice to reset.
+function closeVoiceDecoder(voice)
+  if voice.decoder != 0 then mpAudioMp3Close(voice.decoder) end if
+  voice.decoder = 0
+  voice.streamData = void
+  voice.streamStart = 0
+  voice.streamFrames = 0
+  return voice
+end function
+
+/// Opens an independent streaming decoder for one MP3 voice.
+/// @param voice Destination voice.
+function openVoiceDecoder(voice)
+  voice = closeVoiceDecoder(voice)
+  source = voice.clip
+  if source is not AudioClip or source.codec != "mp3" or not source.streaming then return voice end if
+  voice.decoder = mpAudioMp3Open(source.data, len(source.data))
+  if voice.decoder == 0 then
+    voice.playing = false
+    return voice
+  end if
+  voice.streamData = bytes(MP3_STREAM_FRAMES * source.blockAlign, 0)
+  return voice
+end function
+
+/// Refills a streaming voice so it contains the requested source frame.
+/// @param voice Streaming voice to advance.
+/// @param sourceFrame Absolute source frame needed by the mixer.
+function refillVoiceStream(voice, sourceFrame)
+  source = voice.clip
+  while voice.playing and (voice.streamFrames <= 0 or sourceFrame < voice.streamStart or sourceFrame >= voice.streamStart + voice.streamFrames)
+    if voice.streamFrames > 0 then voice.streamStart = voice.streamStart + voice.streamFrames end if
+    voice.streamFrames = mpAudioMp3Read(voice.decoder, voice.streamData, MP3_STREAM_FRAMES)
+    if voice.streamFrames <= 0 then
+      if source.looping and mpAudioMp3Seek(voice.decoder, 0) != 0 then
+        voice.cursor = voice.cursor % source.frameCount
+        sourceFrame = mt.floorInt(voice.cursor)
+        voice.streamStart = 0
+        voice.streamFrames = mpAudioMp3Read(voice.decoder, voice.streamData, MP3_STREAM_FRAMES)
+      else
+        voice.playing = false
+      end if
+    end if
+    if voice.streamFrames <= 0 then voice.playing = false end if
+  end while
+  return voice
+end function
+
+/// Reads one signed-16 sample from a streaming MP3 buffer.
+/// @param voice Prepared streaming voice.
+/// @param sourceFrame Absolute source frame.
+/// @param side Destination side, zero for left and one for right.
+function streamSampleAt(voice, sourceFrame, side)
+  sourceChannel = side
+  if voice.clip.channels == 1 then sourceChannel = 0 end if
+  offset = ((sourceFrame - voice.streamStart) * voice.clip.blockAlign) + (sourceChannel * 2)
+  sample = voice.streamData[offset] + (voice.streamData[offset + 1] << 8)
+  if sample >= 32768 then sample = sample - 65536 end if
+  return sample
+end function
+
 /// Accumulates one voice into reusable stereo mix arrays and returns its new state.
 /// @param value Destination mixer.
 /// @param voice Voice to advance.
@@ -717,18 +912,33 @@ function mixVoice(value, voice, busVolume)
       if source.looping then
         voice.cursor = voice.cursor % source.frameCount
         sourceFrame = mt.floorInt(voice.cursor)
+        if voice.decoder != 0 then
+          mpAudioMp3Seek(voice.decoder, sourceFrame)
+          voice.streamStart = sourceFrame
+          voice.streamFrames = 0
+        end if
       else
         voice.playing = false
         break
       end if
     end if
-    left = sampleAt(source, sourceFrame, 0)
-    right = sampleAt(source, sourceFrame, 1)
+    left = 0
+    right = 0
+    if voice.decoder != 0 then
+      voice = refillVoiceStream(voice, sourceFrame)
+      if not voice.playing then break end if
+      left = streamSampleAt(voice, sourceFrame, 0)
+      right = streamSampleAt(voice, sourceFrame, 1)
+    else
+      left = sampleAt(source, sourceFrame, 0)
+      right = sampleAt(source, sourceFrame, 1)
+    end if
     value.mixLeft[frame] = value.mixLeft[frame] + ((left * leftGain) / 100)
     value.mixRight[frame] = value.mixRight[frame] + ((right * rightGain) / 100)
     voice.cursor = voice.cursor + (source.sampleRate / value.sampleRate)
     frame = frame + 1
   end while
+  if not voice.playing then voice = closeVoiceDecoder(voice) end if
   return voice
 end function
 
@@ -837,14 +1047,20 @@ function mixerPlaySfx(value, source)
   if effectiveClipVolume(value.audio, value.audio.sfxVolume, source.volume) <= 0 then return false end if
   if prepareClip(source) == false then return false end if
   index = chooseChannel(value)
-  voice = value.channels[index]
+  voice = closeVoiceDecoder(value.channels[index])
   voice.clip = source
   voice.playing = true
   voice.volume = 100
   voice.pan = 0
   voice.cursor = 0.0
+  voice = openVoiceDecoder(voice)
+  if not voice.playing then
+    value.channels[index] = voice
+    return false
+  end if
   value.channels[index] = voice
   if ensureBackend(value) == false then
+    voice = closeVoiceDecoder(voice)
     voice.playing = false
     value.channels[index] = voice
     return false
@@ -858,17 +1074,25 @@ end function
 function mixerPlayMusic(value, source)
   if source is not AudioClip then return false end if
   if effectiveClipVolume(value.audio, value.audio.musicVolume, source.volume) <= 0 then return false end if
+  source.streaming = true
   if prepareClip(source) == false then return false end if
   source.looping = true
-  voice = value.musicChannel
+  voice = closeVoiceDecoder(value.musicChannel)
   voice.clip = source
   voice.playing = true
   voice.volume = 100
   voice.pan = 0
   voice.cursor = 0.0
+  voice = openVoiceDecoder(voice)
+  if not voice.playing then
+    value.musicChannel = voice
+    value.music = void
+    return false
+  end if
   value.musicChannel = voice
   value.music = source
   if ensureBackend(value) == false then
+    voice = closeVoiceDecoder(voice)
     voice.playing = false
     value.musicChannel = voice
     value.music = void
@@ -929,12 +1153,13 @@ end function
 /// @param value Mixer to stop.
 function mixerStopAll(value)
   for index = 0 to value.channelCount - 1
-    voice = value.channels[index]
+    voice = closeVoiceDecoder(value.channels[index])
     voice.playing = false
     voice.clip = void
     voice.cursor = 0.0
     value.channels[index] = voice
   end for
+  value.musicChannel = closeVoiceDecoder(value.musicChannel)
   value.musicChannel.playing = false
   value.musicChannel.clip = void
   value.musicChannel.cursor = 0.0
@@ -956,7 +1181,7 @@ end function
 /// @param id Zero-based channel identifier.
 function stopChannel(value, id)
   if typeof(id) != "int" or id < 0 or id >= value.channelCount then return false end if
-  voice = value.channels[id]
+  voice = closeVoiceDecoder(value.channels[id])
   voice.playing = false
   voice.clip = void
   value.channels[id] = voice
@@ -980,8 +1205,13 @@ end function
 /// Releases retained buffers and closes the native PCM output device.
 /// @param value Mixer to close.
 function closeMixer(value)
-  if value is not AudioMixer or value.handle == 0 then
-    if value is AudioMixer then value.ready = false end if
+  if value is not AudioMixer then return true end if
+  for index = 0 to value.channelCount - 1
+    value.channels[index] = closeVoiceDecoder(value.channels[index])
+  end for
+  value.musicChannel = closeVoiceDecoder(value.musicChannel)
+  if value.handle == 0 then
+    value.ready = false
     return true
   end if
 #if TARGET_OS == "windows"
