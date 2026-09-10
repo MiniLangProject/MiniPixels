@@ -1299,7 +1299,7 @@ Performs the present operation for the minipixels platform windows module.
 | `canvas` | `dynamic` | — | canvas value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1006)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1015)
 
 <a id="function-function-minipixels-platform-windows-presentgdi-function-presentgdi-w-canvas-src-minipixels-platform-windows-ml-1093617233"></a>
 ### presentGDI
@@ -1316,7 +1316,7 @@ Performs the presentGDI operation for the minipixels platform windows module.
 | `canvas` | `dynamic` | — | canvas value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L990)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L994)
 
 <a id="function-function-minipixels-platform-windows-presentopengl-function-presentopengl-w-canvas-src-minipixels-platform-windows-ml-1644844221"></a>
 ### presentOpenGL
@@ -1559,7 +1559,7 @@ function seconds()
 Returns a high-resolution monotonic time value in seconds.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1027)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1042)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-setforegroundwindow-extern-function-setforegroundwindow-hwnd-as-ptr-from-user32-dll-returns-bool-src-minipixels-platform-windows-ml-1099224625"></a>
 ### SetForegroundWindow
@@ -1721,7 +1721,7 @@ Performs the sleepMs operation for the minipixels platform windows module.
 | `ms` | `dynamic` | — | ms value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1057)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1072)
 
 <a id="constant-constant-minipixels-platform-windows-srccopy-const-srccopy-13369376-src-minipixels-platform-windows-ml-1695044999"></a>
 ### SRCCOPY
@@ -1805,7 +1805,7 @@ function ticks()
 Performs the ticks operation for the minipixels platform windows module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1022)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1037)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-translatemessage-extern-function-translatemessage-msg-as-bytes-from-user32-dll-returns-bool-src-minipixels-platform-windows-ml-34241778"></a>
 ### TranslateMessage
@@ -1987,7 +1987,7 @@ Waits until a high-resolution deadline while leaving time for other threads.
 | `deadline` | `dynamic` | — | Absolute value previously obtained from seconds(). |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1042)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1057)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-wglcreatecontext-extern-function-wglcreatecontext-dc-as-ptr-from-opengl32-dll-returns-ptr-src-minipixels-platform-windows-ml-1832064209"></a>
 ### wglCreateContext

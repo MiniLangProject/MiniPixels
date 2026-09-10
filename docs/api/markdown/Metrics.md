@@ -8,19 +8,19 @@ Static metrics are calculated from target-specific preprocessed MiniLang files i
 
 | Metric | Value |
 | --- | ---: |
-| Blank lines | 791 |
-| Clone groups | 13 |
-| Cognitive complexity | 2120 (maximum per function: 113) |
-| Comment lines | 2834 |
-| Cyclomatic complexity | 2148 (average: 3.25, maximum: 43) |
-| Documentation coverage | 97.77% (2674 of 2735 documentation items) |
-| Duplicated lines | 86 (1.3%) |
-| Files | 25 |
-| Functions | 661 |
-| Maintainability index | 5.77 / 100 |
-| Physical lines | 10221 |
-| Source lines | 6596 |
-| Statements | 4880 |
+| Blank lines | 898 |
+| Clone groups | 15 |
+| Cognitive complexity | 2205 (maximum per function: 113) |
+| Comment lines | 3015 |
+| Cyclomatic complexity | 2267 (average: 3.24, maximum: 43) |
+| Documentation coverage | 97.56% (2802 of 2872 documentation items) |
+| Duplicated lines | 100 (1.44%) |
+| Files | 26 |
+| Functions | 700 |
+| Maintainability index | 5.84 / 100 |
+| Physical lines | 10872 |
+| Source lines | 6959 |
+| Statements | 5126 |
 
 ## Documentation coverage
 
@@ -28,41 +28,42 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 
 | Category | Documented | Total | Coverage |
 | --- | ---: | ---: | ---: |
-| API declarations | 742 | 742 | 100% |
-| Constants | 59 | 84 | 70.24% |
+| API declarations | 784 | 784 | 100% |
+| Constants | 61 | 86 | 70.93% |
 | Enum variants | 0 | 0 | 100% |
-| Fields | 337 | 372 | 90.59% |
-| Globals | 9 | 10 | 90% |
-| Overall | 2674 | 2735 | 97.77% |
-| Parameters | 1527 | 1527 | 100% |
+| Fields | 343 | 381 | 90.03% |
+| Globals | 9 | 16 | 56.25% |
+| Overall | 2802 | 2872 | 97.56% |
+| Parameters | 1605 | 1605 | 100% |
 
 ## Halstead metrics
 
 | Distinct operators | Distinct operands | Total operators | Total operands | Vocabulary | Length | Volume | Difficulty | Effort | Estimated defects |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 52 | 2349 | 29813 | 23002 | 2401 | 52815 | 593081.8 | 254.6 | 150997768.05 | 197.69 |
+| 52 | 2433 | 31506 | 24338 | 2485 | 55844 | 629866.16 | 260.09 | 163819049.31 | 209.96 |
 
 ## Files
 
 | File | SLOC | Functions | Cyclomatic total / avg / max | Cognitive total / max | Duplication | Halstead volume | MI |
 | --- | ---: | ---: | --- | --- | --- | ---: | ---: |
-| [`src/minipixels.ml`](File-src-minipixels-ml-1730909391.md) | 394 | 105 | 198 / 1.89 / 27 | 120 / 44 | 0 (0%) | 35021.51 | 0 |
+| [`src/minipixels.ml`](File-src-minipixels-ml-1730909391.md) | 397 | 108 | 201 / 1.86 / 27 | 120 / 44 | 0 (0%) | 35458.04 | 0 |
 | [`src/minipixels/animation/animation.ml`](File-src-minipixels-animation-animation-ml-2065983051.md) | 108 | 17 | 36 / 2.12 / 10 | 27 / 16 | 0 (0%) | 4060.52 | 25.53 |
 | [`src/minipixels/assets/assets.ml`](File-src-minipixels-assets-assets-ml-652120143.md) | 122 | 16 | 36 / 2.25 / 5 | 21 / 4 | 0 (0%) | 5376.9 | 23.52 |
 | [`src/minipixels/assets/pack.ml`](File-src-minipixels-assets-pack-ml-1157891367.md) | 177 | 13 | 66 / 5.08 / 26 | 62 / 25 | 0 (0%) | 11164.07 | 13.74 |
 | [`src/minipixels/assets/png.ml`](File-src-minipixels-assets-png-ml-1155821131.md) | 561 | 30 | 208 / 6.93 / 41 | 337 / 84 | 0 (0%) | 41354.1 | 0 |
 | [`src/minipixels/assets/text.ml`](File-src-minipixels-assets-text-ml-1300721413.md) | 104 | 12 | 42 / 3.5 / 16 | 37 / 19 | 0 (0%) | 5742.3 | 24.03 |
-| [`src/minipixels/audio/audio.ml`](File-src-minipixels-audio-audio-ml-660527635.md) | 598 | 69 | 194 / 2.81 / 29 | 152 / 35 | 0 (0%) | 36112.66 | 0 |
+| [`src/minipixels/audio/audio.ml`](File-src-minipixels-audio-audio-ml-660527635.md) | 754 | 79 | 242 / 3.06 / 24 | 200 / 28 | 14 (1.86%) | 46431.66 | 0 |
 | [`src/minipixels/collision/collision.ml`](File-src-minipixels-collision-collision-ml-1544745439.md) | 67 | 7 | 19 / 2.71 / 8 | 17 / 12 | 0 (0%) | 3296.15 | 32.98 |
 | [`src/minipixels/core/time.ml`](File-src-minipixels-core-time-ml-1360759889.md) | 41 | 4 | 8 / 2 / 4 | 4 / 3 | 0 (0%) | 1201.07 | 42.18 |
 | [`src/minipixels/debug/debug.ml`](File-src-minipixels-debug-debug-ml-1202344879.md) | 47 | 4 | 16 / 4 / 10 | 13 / 9 | 0 (0%) | 4365.48 | 35.89 |
-| [`src/minipixels/graphics/canvas.ml`](File-src-minipixels-graphics-canvas-ml-370061960.md) | 593 | 55 | 184 / 3.35 / 21 | 197 / 33 | 18 (3.04%) | 45425.95 | 0 |
+| [`src/minipixels/graphics/canvas.ml`](File-src-minipixels-graphics-canvas-ml-370061960.md) | 611 | 57 | 185 / 3.25 / 21 | 188 / 33 | 18 (2.95%) | 45969.7 | 0 |
 | [`src/minipixels/graphics/font.ml`](File-src-minipixels-graphics-font-ml-906525775.md) | 88 | 5 | 58 / 11.6 / 43 | 59 / 42 | 0 (0%) | 5226.68 | 23.75 |
+| [`src/minipixels/graphics/gpu.ml`](File-src-minipixels-graphics-gpu-ml-159526452.md) | 177 | 24 | 57 / 2.38 / 8 | 36 / 7 | 0 (0%) | 13116.5 | 14.46 |
 | [`src/minipixels/graphics/sprite.ml`](File-src-minipixels-graphics-sprite-ml-1992064667.md) | 138 | 13 | 46 / 3.54 / 12 | 35 / 11 | 0 (0%) | 7279.86 | 20.09 |
 | [`src/minipixels/input/input.ml`](File-src-minipixels-input-input-ml-1476207415.md) | 283 | 27 | 69 / 2.56 / 11 | 45 / 10 | 0 (0%) | 13982.41 | 8.21 |
 | [`src/minipixels/math/types.ml`](File-src-minipixels-math-types-ml-311947336.md) | 242 | 48 | 72 / 1.5 / 5 | 25 / 4 | 0 (0%) | 12140.72 | 9.72 |
 | [`src/minipixels/platform/linux.ml`](File-src-minipixels-platform-linux-ml-1856075630.md) | 504 | 33 | 170 / 5.15 / 27 | 164 / 32 | 13 (2.58%) | 36596.86 | 0 |
-| [`src/minipixels/platform/windows.ml`](File-src-minipixels-platform-windows-ml-1027159307.md) | 618 | 47 | 133 / 2.83 / 9 | 101 / 13 | 13 (2.1%) | 39600.32 | 0 |
+| [`src/minipixels/platform/windows.ml`](File-src-minipixels-platform-windows-ml-1027159307.md) | 627 | 47 | 143 / 3.04 / 9 | 111 / 13 | 13 (2.07%) | 40434.69 | 0 |
 | [`src/minipixels/scene/scene.ml`](File-src-minipixels-scene-scene-ml-552680371.md) | 199 | 24 | 66 / 2.75 / 9 | 49 / 12 | 0 (0%) | 10519.19 | 12.81 |
 | [`src/minipixels/tools/fsutil.ml`](File-src-minipixels-tools-fsutil-ml-605704885.md) | 61 | 7 | 34 / 4.86 / 7 | 31 / 7 | 8 (13.11%) | 3453.67 | 31.71 |
 | [`src/minipixels/tools/generator.ml`](File-src-minipixels-tools-generator-ml-920573533.md) | 822 | 51 | 220 / 4.31 / 35 | 324 / 113 | 12 (1.46%) | 60187.9 | 0 |
@@ -168,87 +169,99 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.assets.text.TextCatalog.get`](Type-minipixels-assets-text-textcatalog-27174823.md#method-method-minipixels-assets-text-textcatalog-get-function-get-name-src-minipixels-assets-text-ml-257041394) | `src/minipixels/assets/text.ml:21` | 3 | 1 | 1 | 0 | 0 | 53.15 | 77.38 |
 | [`minipixels.assets.text.TextCatalog.has`](Type-minipixels-assets-text-textcatalog-27174823.md#method-method-minipixels-assets-text-textcatalog-has-function-has-name-src-minipixels-assets-text-ml-1919479322) | `src/minipixels/assets/text.ml:27` | 3 | 1 | 1 | 0 | 0 | 53.15 | 77.38 |
 | [`minipixels.assets.text.textError`](File-src-minipixels-assets-text-ml-1300721413.md#function-function-minipixels-assets-text-texterror-function-texterror-message-src-minipixels-assets-text-ml-1809914603) | `src/minipixels/assets/text.ml:100` | 3 | 1 | 1 | 0 | 0 | 46.51 | 77.78 |
-| [`minipixels.audio.audio.AudioClip.play`](Type-minipixels-audio-audio-audioclip-2035849473.md#method-method-minipixels-audio-audio-audioclip-play-function-play-audio-src-minipixels-audio-audio-ml-1822210437) | `src/minipixels/audio/audio.ml:214` | 3 | 1 | 1 | 0 | 0 | 71.7 | 76.47 |
-| [`minipixels.audio.audio.AudioClip.setLooping`](Type-minipixels-audio-audio-audioclip-2035849473.md#method-method-minipixels-audio-audio-audioclip-setlooping-function-setlooping-value-src-minipixels-audio-audio-ml-1044269888) | `src/minipixels/audio/audio.ml:209` | 3 | 1 | 1 | 0 | 0 | 50.19 | 77.55 |
-| [`minipixels.audio.audio.AudioClip.setVolume`](Type-minipixels-audio-audio-audioclip-2035849473.md#method-method-minipixels-audio-audio-audioclip-setvolume-function-setvolume-value-src-minipixels-audio-audio-ml-232371152) | `src/minipixels/audio/audio.ml:204` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
-| [`minipixels.audio.audio.AudioMixer.close`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-close-function-close-src-minipixels-audio-audio-ml-1133851762) | `src/minipixels/audio/audio.ml:333` | 3 | 1 | 1 | 0 | 0 | 58.81 | 77.07 |
-| [`minipixels.audio.audio.AudioMixer.mute`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-mute-function-mute-src-minipixels-audio-audio-ml-587003342) | `src/minipixels/audio/audio.ml:293` | 4 | 2 | 1 | 0 | 0 | 91.38 | 73 |
-| [`minipixels.audio.audio.AudioMixer.playMusic`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-playmusic-function-playmusic-clip-src-minipixels-audio-audio-ml-1170273894) | `src/minipixels/audio/audio.ml:309` | 3 | 1 | 1 | 0 | 0 | 74.01 | 76.37 |
-| [`minipixels.audio.audio.AudioMixer.playSfx`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-playsfx-function-playsfx-clip-src-minipixels-audio-audio-ml-869959498) | `src/minipixels/audio/audio.ml:304` | 3 | 1 | 1 | 0 | 0 | 74.01 | 76.37 |
-| [`minipixels.audio.audio.AudioMixer.setChannel`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-setchannel-function-setchannel-id-volume-pan-src-minipixels-audio-audio-ml-654725674) | `src/minipixels/audio/audio.ml:329` | 3 | 1 | 1 | 0 | 0 | 106.61 | 75.26 |
-| [`minipixels.audio.audio.AudioMixer.setMasterVolume`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-setmastervolume-function-setmastervolume-value-src-minipixels-audio-audio-ml-195509011) | `src/minipixels/audio/audio.ml:276` | 4 | 2 | 1 | 0 | 0 | 93.21 | 72.94 |
-| [`minipixels.audio.audio.AudioMixer.setMusicVolume`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-setmusicvolume-function-setmusicvolume-value-src-minipixels-audio-audio-ml-987640579) | `src/minipixels/audio/audio.ml:288` | 4 | 2 | 1 | 0 | 0 | 93.21 | 72.94 |
-| [`minipixels.audio.audio.AudioMixer.setSfxVolume`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-setsfxvolume-function-setsfxvolume-value-src-minipixels-audio-audio-ml-1926371943) | `src/minipixels/audio/audio.ml:282` | 4 | 2 | 1 | 0 | 0 | 93.21 | 72.94 |
-| [`minipixels.audio.audio.AudioMixer.stopAll`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-stopall-function-stopall-src-minipixels-audio-audio-ml-2353796) | `src/minipixels/audio/audio.ml:317` | 3 | 1 | 1 | 0 | 0 | 58.81 | 77.07 |
-| [`minipixels.audio.audio.AudioMixer.stopChannel`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-stopchannel-function-stopchannel-id-src-minipixels-audio-audio-ml-549842483) | `src/minipixels/audio/audio.ml:322` | 3 | 1 | 1 | 0 | 0 | 71.7 | 76.47 |
-| [`minipixels.audio.audio.AudioMixer.unmute`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-unmute-function-unmute-src-minipixels-audio-audio-ml-1780619714) | `src/minipixels/audio/audio.ml:298` | 4 | 2 | 1 | 0 | 0 | 91.38 | 73 |
-| [`minipixels.audio.audio.AudioMixer.update`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-update-function-update-src-minipixels-audio-audio-ml-701288054) | `src/minipixels/audio/audio.ml:313` | 3 | 1 | 1 | 0 | 0 | 58.81 | 77.07 |
-| [`minipixels.audio.audio.AudioState.mute`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-mute-function-mute-src-minipixels-audio-audio-ml-1822477818) | `src/minipixels/audio/audio.ml:146` | 4 | 2 | 1 | 0 | 0 | 79.95 | 73.41 |
-| [`minipixels.audio.audio.AudioState.playMusic`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-playmusic-function-playmusic-path-src-minipixels-audio-audio-ml-2020149201) | `src/minipixels/audio/audio.ml:161` | 3 | 1 | 1 | 0 | 0 | 74.01 | 76.37 |
-| [`minipixels.audio.audio.AudioState.playSfx`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-playsfx-function-playsfx-path-src-minipixels-audio-audio-ml-1714481429) | `src/minipixels/audio/audio.ml:156` | 3 | 1 | 1 | 0 | 0 | 71.7 | 76.47 |
-| [`minipixels.audio.audio.AudioState.setMasterVolume`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-setmastervolume-function-setmastervolume-value-src-minipixels-audio-audio-ml-37365463) | `src/minipixels/audio/audio.ml:132` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
-| [`minipixels.audio.audio.AudioState.setMusicVolume`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-setmusicvolume-function-setmusicvolume-value-src-minipixels-audio-audio-ml-331730887) | `src/minipixels/audio/audio.ml:142` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
-| [`minipixels.audio.audio.AudioState.setSfxVolume`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-setsfxvolume-function-setsfxvolume-value-src-minipixels-audio-audio-ml-8602475) | `src/minipixels/audio/audio.ml:137` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
-| [`minipixels.audio.audio.AudioState.stop`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-stop-function-stop-src-minipixels-audio-audio-ml-1667517674) | `src/minipixels/audio/audio.ml:165` | 4 | 2 | 1 | 0 | 0 | 79.95 | 73.41 |
-| [`minipixels.audio.audio.AudioState.unmute`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-unmute-function-unmute-src-minipixels-audio-audio-ml-40986830) | `src/minipixels/audio/audio.ml:151` | 3 | 1 | 1 | 0 | 0 | 36.54 | 78.52 |
-| [`minipixels.audio.audio.backendName`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-backendname-function-backendname-src-minipixels-audio-audio-ml-410717894) | `src/minipixels/audio/audio.ml:427` | 3 | 1 | 1 | 0 | 0 | 22.46 | 80 |
-| [`minipixels.audio.audio.channel`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-channel-function-channel-id-src-minipixels-audio-audio-ml-1513742897) | `src/minipixels/audio/audio.ml:390` | 3 | 1 | 1 | 0 | 0 | 83.76 | 75.99 |
-| [`minipixels.audio.audio.chooseChannel`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-choosechannel-function-choosechannel-value-src-minipixels-audio-audio-ml-132341089) | `src/minipixels/audio/audio.ml:691` | 8 | 6 | 3 | 3 | 2 | 271.03 | 62.86 |
-| [`minipixels.audio.audio.chunkIs`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-chunkis-function-chunkis-data-offset-a-b-c-d-src-minipixels-audio-audio-ml-1791883403) | `src/minipixels/audio/audio.ml:605` | 4 | 3 | 2 | 1 | 1 | 313.82 | 69.12 |
-| [`minipixels.audio.audio.clip`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-clip-function-clip-path-name-src-minipixels-audio-audio-ml-1063573672) | `src/minipixels/audio/audio.ml:364` | 5 | 5 | 3 | 2 | 1 | 289.89 | 67.11 |
-| [`minipixels.audio.audio.clipFromBytes`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-clipfrombytes-function-clipfrombytes-data-name-src-minipixels-audio-audio-ml-1031187923) | `src/minipixels/audio/audio.ml:373` | 5 | 5 | 3 | 2 | 1 | 298.56 | 67.02 |
-| [`minipixels.audio.audio.close`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-close-function-close-audio-src-minipixels-audio-audio-ml-57250972) | `src/minipixels/audio/audio.ml:1020` | 4 | 3 | 2 | 1 | 1 | 77.71 | 73.36 |
-| [`minipixels.audio.audio.closeMixer`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-closemixer-function-closemixer-value-src-minipixels-audio-audio-ml-1464048709) | `src/minipixels/audio/audio.ml:982` | 19 | 16 | 7 | 8 | 2 | 620.12 | 51.61 |
-| [`minipixels.audio.audio.create`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-create-function-create-src-minipixels-audio-audio-ml-1139740796) | `src/minipixels/audio/audio.ml:357` | 3 | 1 | 1 | 0 | 0 | 65.73 | 76.73 |
-| [`minipixels.audio.audio.effectiveClipVolume`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-effectiveclipvolume-function-effectiveclipvolume-audio-channelvolume-clipvolume-src-minipixels-audio-audio-ml-76886695) | `src/minipixels/audio/audio.ml:422` | 3 | 1 | 1 | 0 | 0 | 105.49 | 75.29 |
-| [`minipixels.audio.audio.effectiveVolume`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-effectivevolume-function-effectivevolume-audio-channelvolume-src-minipixels-audio-audio-ml-4040267) | `src/minipixels/audio/audio.ml:413` | 4 | 3 | 2 | 1 | 1 | 144.43 | 71.48 |
-| [`minipixels.audio.audio.ensureBackend`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-ensurebackend-function-ensurebackend-value-src-minipixels-audio-audio-ml-1066765565) | `src/minipixels/audio/audio.ml:780` | 34 | 29 | 6 | 7 | 2 | 1225.77 | 44.16 |
-| [`minipixels.audio.audio.getU32`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-getu32-function-getu32-buffer-offset-src-minipixels-audio-audio-ml-2062268999) | `src/minipixels/audio/audio.ml:579` | 3 | 1 | 1 | 0 | 0 | 199.65 | 73.35 |
-| [`minipixels.audio.audio.getU64`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-getu64-function-getu64-buffer-offset-src-minipixels-audio-audio-ml-876331771) | `src/minipixels/audio/audio.ml:586` | 3 | 1 | 1 | 0 | 0 | 110.41 | 75.15 |
-| [`minipixels.audio.audio.hasRange`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-hasrange-function-hasrange-data-offset-size-src-minipixels-audio-audio-ml-308052286) | `src/minipixels/audio/audio.ml:594` | 3 | 1 | 1 | 0 | 0 | 148.68 | 74.25 |
-| [`minipixels.audio.audio.mixBuffer`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-mixbuffer-function-mixbuffer-value-output-src-minipixels-audio-audio-ml-1839013514) | `src/minipixels/audio/audio.ml:738` | 26 | 24 | 9 | 12 | 2 | 1522.38 | 45.64 |
-| [`minipixels.audio.audio.mixer`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-mixer-function-mixer-maxchannels-src-minipixels-audio-audio-ml-1382070998) | `src/minipixels/audio/audio.ml:396` | 13 | 7 | 4 | 3 | 1 | 645.5 | 55.49 |
-| [`minipixels.audio.audio.mixerPlayMusic`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-mixerplaymusic-function-mixerplaymusic-value-source-src-minipixels-audio-audio-ml-23262282) | `src/minipixels/audio/audio.ml:858` | 21 | 21 | 5 | 4 | 1 | 676.98 | 50.66 |
-| [`minipixels.audio.audio.mixerPlaySfx`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-mixerplaysfx-function-mixerplaysfx-value-source-src-minipixels-audio-audio-ml-2069513338) | `src/minipixels/audio/audio.ml:835` | 19 | 19 | 5 | 4 | 1 | 681.82 | 51.59 |
-| [`minipixels.audio.audio.mixerStopAll`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-mixerstopall-function-mixerstopall-value-src-minipixels-audio-audio-ml-320772273) | `src/minipixels/audio/audio.ml:930` | 18 | 14 | 3 | 2 | 1 | 487.28 | 53.39 |
-| [`minipixels.audio.audio.mixVoice`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-mixvoice-function-mixvoice-value-voice-busvolume-src-minipixels-audio-audio-ml-1921813683) | `src/minipixels/audio/audio.ml:704` | 30 | 27 | 9 | 11 | 3 | 1601.68 | 44.13 |
-| [`minipixels.audio.audio.musicClip`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-musicclip-function-musicclip-path-name-src-minipixels-audio-audio-ml-2047326674) | `src/minipixels/audio/audio.ml:382` | 5 | 3 | 1 | 0 | 0 | 93.77 | 70.81 |
-| [`minipixels.audio.audio.normalizePan`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-normalizepan-function-normalizepan-value-src-minipixels-audio-audio-ml-208173369) | `src/minipixels/audio/audio.ml:349` | 6 | 7 | 4 | 3 | 1 | 167.59 | 66.91 |
-| [`minipixels.audio.audio.normalizeVolume`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-normalizevolume-function-normalizevolume-value-src-minipixels-audio-audio-ml-1136828683) | `src/minipixels/audio/audio.ml:340` | 6 | 7 | 4 | 3 | 1 | 163.5 | 66.99 |
-| [`minipixels.audio.audio.playClip`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playclip-function-playclip-audio-value-src-minipixels-audio-audio-ml-1317191505) | `src/minipixels/audio/audio.ml:539` | 15 | 16 | 8 | 10 | 2 | 666.46 | 53.5 |
-| [`minipixels.audio.audio.playMusic`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playmusic-function-playmusic-path-src-minipixels-audio-audio-ml-1533567019) | `src/minipixels/audio/audio.ml:511` | 3 | 1 | 1 | 0 | 0 | 36 | 78.56 |
-| [`minipixels.audio.audio.playMusicWithState`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playmusicwithstate-function-playmusicwithstate-audio-path-src-minipixels-audio-audio-ml-1696997549) | `src/minipixels/audio/audio.ml:528` | 7 | 8 | 4 | 3 | 1 | 313.82 | 63.55 |
-| [`minipixels.audio.audio.playSfx`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playsfx-function-playsfx-audio-path-src-minipixels-audio-audio-ml-696113711) | `src/minipixels/audio/audio.ml:518` | 6 | 7 | 4 | 3 | 1 | 283.28 | 65.32 |
-| [`minipixels.audio.audio.playSound`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playsound-function-playsound-path-src-minipixels-audio-audio-ml-222199423) | `src/minipixels/audio/audio.ml:447` | 4 | 3 | 2 | 1 | 1 | 138.3 | 71.61 |
-| [`minipixels.audio.audio.playSoundBytes`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playsoundbytes-function-playsoundbytes-data-src-minipixels-audio-audio-ml-253944656) | `src/minipixels/audio/audio.ml:480` | 4 | 3 | 3 | 2 | 1 | 192.57 | 70.47 |
-| [`minipixels.audio.audio.playSoundBytesSync`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playsoundbytessync-function-playsoundbytessync-data-src-minipixels-audio-audio-ml-2100117544) | `src/minipixels/audio/audio.ml:491` | 4 | 3 | 3 | 2 | 1 | 192.57 | 70.47 |
-| [`minipixels.audio.audio.playSoundLoop`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playsoundloop-function-playsoundloop-path-src-minipixels-audio-audio-ml-792422107) | `src/minipixels/audio/audio.ml:469` | 4 | 3 | 2 | 1 | 1 | 149.34 | 71.37 |
-| [`minipixels.audio.audio.playSoundSync`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playsoundsync-function-playsoundsync-path-src-minipixels-audio-audio-ml-1212590181) | `src/minipixels/audio/audio.ml:458` | 4 | 3 | 2 | 1 | 1 | 138.3 | 71.61 |
-| [`minipixels.audio.audio.prepareClip`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-prepareclip-function-prepareclip-value-src-minipixels-audio-audio-ml-1136745543) | `src/minipixels/audio/audio.ml:612` | 49 | 56 | 29 | 35 | 3 | 3198.29 | 34.69 |
-| [`minipixels.audio.audio.prepareMixerFormat`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-preparemixerformat-function-preparemixerformat-value-src-minipixels-audio-audio-ml-1534543109) | `src/minipixels/audio/audio.ml:767` | 10 | 8 | 1 | 0 | 0 | 398.07 | 59.85 |
-| [`minipixels.audio.audio.putU32`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-putu32-function-putu32-buffer-offset-value-src-minipixels-audio-audio-ml-1424367900) | `src/minipixels/audio/audio.ml:559` | 7 | 6 | 2 | 1 | 1 | 347.11 | 63.51 |
-| [`minipixels.audio.audio.putU64`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-putu64-function-putu64-buffer-offset-value-src-minipixels-audio-audio-ml-1896812244) | `src/minipixels/audio/audio.ml:571` | 4 | 2 | 1 | 0 | 0 | 148 | 71.54 |
-| [`minipixels.audio.audio.refreshMixer`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-refreshmixer-function-refreshmixer-value-src-minipixels-audio-audio-ml-2084548497) | `src/minipixels/audio/audio.ml:924` | 3 | 1 | 1 | 0 | 0 | 34.87 | 78.66 |
-| [`minipixels.audio.audio.sampleAt`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-sampleat-function-sampleat-value-frame-side-src-minipixels-audio-audio-ml-2062631707) | `src/minipixels/audio/audio.ml:666` | 22 | 24 | 10 | 11 | 2 | 1156.99 | 47.92 |
-| [`minipixels.audio.audio.setChannel`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-setchannel-function-setchannel-value-id-volume-pan-src-minipixels-audio-audio-ml-713064651) | `src/minipixels/audio/audio.ml:971` | 8 | 7 | 4 | 3 | 1 | 356.7 | 61.89 |
-| [`minipixels.audio.audio.stopChannel`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-stopchannel-function-stopchannel-value-id-src-minipixels-audio-audio-ml-887401248) | `src/minipixels/audio/audio.ml:957` | 8 | 7 | 4 | 3 | 1 | 289.51 | 62.53 |
-| [`minipixels.audio.audio.stopSound`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-stopsound-function-stopsound-src-minipixels-audio-audio-ml-2145337042) | `src/minipixels/audio/audio.ml:501` | 3 | 1 | 1 | 0 | 0 | 51.89 | 77.45 |
-| [`minipixels.audio.audio.supportsMultipleSfx`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-supportsmultiplesfx-function-supportsmultiplesfx-src-minipixels-audio-audio-ml-886731190) | `src/minipixels/audio/audio.ml:436` | 3 | 1 | 1 | 0 | 0 | 22.46 | 80 |
-| [`minipixels.audio.audio.supportsVolumeControl`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-supportsvolumecontrol-function-supportsvolumecontrol-src-minipixels-audio-audio-ml-956723918) | `src/minipixels/audio/audio.ml:441` | 3 | 1 | 1 | 0 | 0 | 22.46 | 80 |
-| [`minipixels.audio.audio.update`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-update-function-update-audio-src-minipixels-audio-audio-ml-563201104) | `src/minipixels/audio/audio.ml:1013` | 4 | 3 | 2 | 1 | 1 | 77.71 | 73.36 |
-| [`minipixels.audio.audio.updateMixer`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-updatemixer-function-updatemixer-value-src-minipixels-audio-audio-ml-1939388709) | `src/minipixels/audio/audio.ml:882` | 17 | 13 | 6 | 8 | 3 | 571.15 | 53.05 |
-| [`minipixels.audioBackend`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiobackend-function-audiobackend-src-minipixels-ml-1835271036) | `src/minipixels.ml:688` | 1 | 1 | 1 | 0 | 0 | 38.04 | 88.8 |
+| [`minipixels.audio.audio.AudioClip.play`](Type-minipixels-audio-audio-audioclip-2035849473.md#method-method-minipixels-audio-audio-audioclip-play-function-play-audio-src-minipixels-audio-audio-ml-1822210437) | `src/minipixels/audio/audio.ml:261` | 3 | 1 | 1 | 0 | 0 | 71.7 | 76.47 |
+| [`minipixels.audio.audio.AudioClip.setLooping`](Type-minipixels-audio-audio-audioclip-2035849473.md#method-method-minipixels-audio-audio-audioclip-setlooping-function-setlooping-value-src-minipixels-audio-audio-ml-1044269888) | `src/minipixels/audio/audio.ml:256` | 3 | 1 | 1 | 0 | 0 | 50.19 | 77.55 |
+| [`minipixels.audio.audio.AudioClip.setVolume`](Type-minipixels-audio-audio-audioclip-2035849473.md#method-method-minipixels-audio-audio-audioclip-setvolume-function-setvolume-value-src-minipixels-audio-audio-ml-232371152) | `src/minipixels/audio/audio.ml:251` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
+| [`minipixels.audio.audio.AudioMixer.close`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-close-function-close-src-minipixels-audio-audio-ml-1133851762) | `src/minipixels/audio/audio.ml:388` | 3 | 1 | 1 | 0 | 0 | 58.81 | 77.07 |
+| [`minipixels.audio.audio.AudioMixer.mute`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-mute-function-mute-src-minipixels-audio-audio-ml-587003342) | `src/minipixels/audio/audio.ml:348` | 4 | 2 | 1 | 0 | 0 | 91.38 | 73 |
+| [`minipixels.audio.audio.AudioMixer.playMusic`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-playmusic-function-playmusic-clip-src-minipixels-audio-audio-ml-1170273894) | `src/minipixels/audio/audio.ml:364` | 3 | 1 | 1 | 0 | 0 | 74.01 | 76.37 |
+| [`minipixels.audio.audio.AudioMixer.playSfx`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-playsfx-function-playsfx-clip-src-minipixels-audio-audio-ml-869959498) | `src/minipixels/audio/audio.ml:359` | 3 | 1 | 1 | 0 | 0 | 74.01 | 76.37 |
+| [`minipixels.audio.audio.AudioMixer.setChannel`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-setchannel-function-setchannel-id-volume-pan-src-minipixels-audio-audio-ml-654725674) | `src/minipixels/audio/audio.ml:384` | 3 | 1 | 1 | 0 | 0 | 106.61 | 75.26 |
+| [`minipixels.audio.audio.AudioMixer.setMasterVolume`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-setmastervolume-function-setmastervolume-value-src-minipixels-audio-audio-ml-195509011) | `src/minipixels/audio/audio.ml:331` | 4 | 2 | 1 | 0 | 0 | 93.21 | 72.94 |
+| [`minipixels.audio.audio.AudioMixer.setMusicVolume`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-setmusicvolume-function-setmusicvolume-value-src-minipixels-audio-audio-ml-987640579) | `src/minipixels/audio/audio.ml:343` | 4 | 2 | 1 | 0 | 0 | 93.21 | 72.94 |
+| [`minipixels.audio.audio.AudioMixer.setSfxVolume`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-setsfxvolume-function-setsfxvolume-value-src-minipixels-audio-audio-ml-1926371943) | `src/minipixels/audio/audio.ml:337` | 4 | 2 | 1 | 0 | 0 | 93.21 | 72.94 |
+| [`minipixels.audio.audio.AudioMixer.stopAll`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-stopall-function-stopall-src-minipixels-audio-audio-ml-2353796) | `src/minipixels/audio/audio.ml:372` | 3 | 1 | 1 | 0 | 0 | 58.81 | 77.07 |
+| [`minipixels.audio.audio.AudioMixer.stopChannel`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-stopchannel-function-stopchannel-id-src-minipixels-audio-audio-ml-549842483) | `src/minipixels/audio/audio.ml:377` | 3 | 1 | 1 | 0 | 0 | 71.7 | 76.47 |
+| [`minipixels.audio.audio.AudioMixer.unmute`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-unmute-function-unmute-src-minipixels-audio-audio-ml-1780619714) | `src/minipixels/audio/audio.ml:353` | 4 | 2 | 1 | 0 | 0 | 91.38 | 73 |
+| [`minipixels.audio.audio.AudioMixer.update`](Type-minipixels-audio-audio-audiomixer-583677548.md#method-method-minipixels-audio-audio-audiomixer-update-function-update-src-minipixels-audio-audio-ml-701288054) | `src/minipixels/audio/audio.ml:368` | 3 | 1 | 1 | 0 | 0 | 58.81 | 77.07 |
+| [`minipixels.audio.audio.AudioState.mute`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-mute-function-mute-src-minipixels-audio-audio-ml-1822477818) | `src/minipixels/audio/audio.ml:189` | 4 | 2 | 1 | 0 | 0 | 79.95 | 73.41 |
+| [`minipixels.audio.audio.AudioState.playMusic`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-playmusic-function-playmusic-path-src-minipixels-audio-audio-ml-2020149201) | `src/minipixels/audio/audio.ml:204` | 3 | 1 | 1 | 0 | 0 | 74.01 | 76.37 |
+| [`minipixels.audio.audio.AudioState.playSfx`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-playsfx-function-playsfx-path-src-minipixels-audio-audio-ml-1714481429) | `src/minipixels/audio/audio.ml:199` | 3 | 1 | 1 | 0 | 0 | 71.7 | 76.47 |
+| [`minipixels.audio.audio.AudioState.setMasterVolume`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-setmastervolume-function-setmastervolume-value-src-minipixels-audio-audio-ml-37365463) | `src/minipixels/audio/audio.ml:175` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
+| [`minipixels.audio.audio.AudioState.setMusicVolume`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-setmusicvolume-function-setmusicvolume-value-src-minipixels-audio-audio-ml-331730887) | `src/minipixels/audio/audio.ml:185` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
+| [`minipixels.audio.audio.AudioState.setSfxVolume`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-setsfxvolume-function-setsfxvolume-value-src-minipixels-audio-audio-ml-8602475) | `src/minipixels/audio/audio.ml:180` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
+| [`minipixels.audio.audio.AudioState.stop`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-stop-function-stop-src-minipixels-audio-audio-ml-1667517674) | `src/minipixels/audio/audio.ml:208` | 4 | 2 | 1 | 0 | 0 | 79.95 | 73.41 |
+| [`minipixels.audio.audio.AudioState.unmute`](Type-minipixels-audio-audio-audiostate-1754318248.md#method-method-minipixels-audio-audio-audiostate-unmute-function-unmute-src-minipixels-audio-audio-ml-40986830) | `src/minipixels/audio/audio.ml:194` | 3 | 1 | 1 | 0 | 0 | 36.54 | 78.52 |
+| [`minipixels.audio.audio.backendName`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-backendname-function-backendname-src-minipixels-audio-audio-ml-410717894) | `src/minipixels/audio/audio.ml:493` | 3 | 1 | 1 | 0 | 0 | 22.46 | 80 |
+| [`minipixels.audio.audio.channel`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-channel-function-channel-id-src-minipixels-audio-audio-ml-1513742897) | `src/minipixels/audio/audio.ml:456` | 3 | 1 | 1 | 0 | 0 | 114.22 | 75.05 |
+| [`minipixels.audio.audio.chooseChannel`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-choosechannel-function-choosechannel-value-src-minipixels-audio-audio-ml-132341089) | `src/minipixels/audio/audio.ml:824` | 8 | 6 | 3 | 3 | 2 | 271.03 | 62.86 |
+| [`minipixels.audio.audio.chunkIs`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-chunkis-function-chunkis-data-offset-a-b-c-d-src-minipixels-audio-audio-ml-1791883403) | `src/minipixels/audio/audio.ml:681` | 4 | 3 | 2 | 1 | 1 | 313.82 | 69.12 |
+| [`minipixels.audio.audio.clip`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-clip-function-clip-path-name-src-minipixels-audio-audio-ml-1063573672) | `src/minipixels/audio/audio.ml:419` | 5 | 5 | 3 | 2 | 1 | 307.46 | 66.93 |
+| [`minipixels.audio.audio.clipFromBytes`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-clipfrombytes-function-clipfrombytes-data-name-src-minipixels-audio-audio-ml-1031187923) | `src/minipixels/audio/audio.ml:428` | 5 | 5 | 3 | 2 | 1 | 316.65 | 66.84 |
+| [`minipixels.audio.audio.close`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-close-function-close-audio-src-minipixels-audio-audio-ml-57250972) | `src/minipixels/audio/audio.ml:1250` | 4 | 3 | 2 | 1 | 1 | 77.71 | 73.36 |
+| [`minipixels.audio.audio.closeMixer`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-closemixer-function-closemixer-value-src-minipixels-audio-audio-ml-1464048709) | `src/minipixels/audio/audio.ml:1207` | 24 | 20 | 7 | 7 | 2 | 829.27 | 48.51 |
+| [`minipixels.audio.audio.closeVoiceDecoder`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-closevoicedecoder-function-closevoicedecoder-voice-src-minipixels-audio-audio-ml-1105898744) | `src/minipixels/audio/audio.ml:835` | 8 | 7 | 2 | 1 | 1 | 186.91 | 64.13 |
+| [`minipixels.audio.audio.create`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-create-function-create-src-minipixels-audio-audio-ml-1139740796) | `src/minipixels/audio/audio.ml:412` | 3 | 1 | 1 | 0 | 0 | 65.73 | 76.73 |
+| [`minipixels.audio.audio.effectiveClipVolume`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-effectiveclipvolume-function-effectiveclipvolume-audio-channelvolume-clipvolume-src-minipixels-audio-audio-ml-76886695) | `src/minipixels/audio/audio.ml:488` | 3 | 1 | 1 | 0 | 0 | 105.49 | 75.29 |
+| [`minipixels.audio.audio.effectiveVolume`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-effectivevolume-function-effectivevolume-audio-channelvolume-src-minipixels-audio-audio-ml-4040267) | `src/minipixels/audio/audio.ml:479` | 4 | 3 | 2 | 1 | 1 | 144.43 | 71.48 |
+| [`minipixels.audio.audio.ensureBackend`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-ensurebackend-function-ensurebackend-value-src-minipixels-audio-audio-ml-1066765565) | `src/minipixels/audio/audio.ml:990` | 34 | 29 | 6 | 7 | 2 | 1225.77 | 44.16 |
+| [`minipixels.audio.audio.getU32`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-getu32-function-getu32-buffer-offset-src-minipixels-audio-audio-ml-2062268999) | `src/minipixels/audio/audio.ml:655` | 3 | 1 | 1 | 0 | 0 | 199.65 | 73.35 |
+| [`minipixels.audio.audio.getU64`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-getu64-function-getu64-buffer-offset-src-minipixels-audio-audio-ml-876331771) | `src/minipixels/audio/audio.ml:662` | 3 | 1 | 1 | 0 | 0 | 110.41 | 75.15 |
+| [`minipixels.audio.audio.hasRange`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-hasrange-function-hasrange-data-offset-size-src-minipixels-audio-audio-ml-308052286) | `src/minipixels/audio/audio.ml:670` | 3 | 1 | 1 | 0 | 0 | 148.68 | 74.25 |
+| [`minipixels.audio.audio.isMp3`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-ismp3-function-ismp3-data-src-minipixels-audio-audio-ml-1800060296) | `src/minipixels/audio/audio.ml:688` | 5 | 5 | 6 | 5 | 1 | 360.55 | 66.04 |
+| [`minipixels.audio.audio.mixBuffer`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-mixbuffer-function-mixbuffer-value-output-src-minipixels-audio-audio-ml-1839013514) | `src/minipixels/audio/audio.ml:948` | 26 | 24 | 9 | 12 | 2 | 1522.38 | 45.64 |
+| [`minipixels.audio.audio.mixer`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-mixer-function-mixer-maxchannels-src-minipixels-audio-audio-ml-1382070998) | `src/minipixels/audio/audio.ml:462` | 13 | 7 | 4 | 3 | 1 | 645.5 | 55.49 |
+| [`minipixels.audio.audio.mixerPlayMusic`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-mixerplaymusic-function-mixerplaymusic-value-source-src-minipixels-audio-audio-ml-23262282) | `src/minipixels/audio/audio.ml:1074` | 29 | 28 | 6 | 5 | 1 | 905.43 | 46.59 |
+| [`minipixels.audio.audio.mixerPlaySfx`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-mixerplaysfx-function-mixerplaysfx-value-source-src-minipixels-audio-audio-ml-2069513338) | `src/minipixels/audio/audio.ml:1045` | 25 | 24 | 6 | 5 | 1 | 867.92 | 48.12 |
+| [`minipixels.audio.audio.mixerStopAll`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-mixerstopall-function-mixerstopall-value-src-minipixels-audio-audio-ml-320772273) | `src/minipixels/audio/audio.ml:1154` | 19 | 15 | 3 | 2 | 1 | 558.35 | 52.47 |
+| [`minipixels.audio.audio.mixVoice`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-mixvoice-function-mixvoice-value-voice-busvolume-src-minipixels-audio-audio-ml-1921813683) | `src/minipixels/audio/audio.ml:899` | 45 | 41 | 13 | 21 | 4 | 2224.93 | 38.75 |
+| [`minipixels.audio.audio.musicClip`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-musicclip-function-musicclip-path-name-src-minipixels-audio-audio-ml-2047326674) | `src/minipixels/audio/audio.ml:437` | 6 | 4 | 1 | 0 | 0 | 116 | 68.44 |
+| [`minipixels.audio.audio.musicClipFromBytes`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-musicclipfrombytes-function-musicclipfrombytes-data-name-src-minipixels-audio-audio-ml-56868737) | `src/minipixels/audio/audio.ml:447` | 6 | 4 | 1 | 0 | 0 | 116 | 68.44 |
+| [`minipixels.audio.audio.normalizePan`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-normalizepan-function-normalizepan-value-src-minipixels-audio-audio-ml-208173369) | `src/minipixels/audio/audio.ml:404` | 6 | 7 | 4 | 3 | 1 | 167.59 | 66.91 |
+| [`minipixels.audio.audio.normalizeVolume`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-normalizevolume-function-normalizevolume-value-src-minipixels-audio-audio-ml-1136828683) | `src/minipixels/audio/audio.ml:395` | 6 | 7 | 4 | 3 | 1 | 163.5 | 66.99 |
+| [`minipixels.audio.audio.openVoiceDecoder`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-openvoicedecoder-function-openvoicedecoder-voice-src-minipixels-audio-audio-ml-587609116) | `src/minipixels/audio/audio.ml:846` | 12 | 10 | 5 | 4 | 1 | 454.95 | 57.18 |
+| [`minipixels.audio.audio.playClip`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playclip-function-playclip-audio-value-src-minipixels-audio-audio-ml-1317191505) | `src/minipixels/audio/audio.ml:615` | 15 | 16 | 8 | 10 | 2 | 666.46 | 53.5 |
+| [`minipixels.audio.audio.playMusic`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playmusic-function-playmusic-path-src-minipixels-audio-audio-ml-1533567019) | `src/minipixels/audio/audio.ml:587` | 3 | 1 | 1 | 0 | 0 | 36 | 78.56 |
+| [`minipixels.audio.audio.playMusicWithState`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playmusicwithstate-function-playmusicwithstate-audio-path-src-minipixels-audio-audio-ml-1696997549) | `src/minipixels/audio/audio.ml:604` | 7 | 8 | 4 | 3 | 1 | 313.82 | 63.55 |
+| [`minipixels.audio.audio.playSfx`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playsfx-function-playsfx-audio-path-src-minipixels-audio-audio-ml-696113711) | `src/minipixels/audio/audio.ml:594` | 6 | 7 | 4 | 3 | 1 | 283.28 | 65.32 |
+| [`minipixels.audio.audio.playSound`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playsound-function-playsound-path-src-minipixels-audio-audio-ml-222199423) | `src/minipixels/audio/audio.ml:523` | 4 | 3 | 2 | 1 | 1 | 138.3 | 71.61 |
+| [`minipixels.audio.audio.playSoundBytes`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playsoundbytes-function-playsoundbytes-data-src-minipixels-audio-audio-ml-253944656) | `src/minipixels/audio/audio.ml:556` | 4 | 3 | 3 | 2 | 1 | 192.57 | 70.47 |
+| [`minipixels.audio.audio.playSoundBytesSync`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playsoundbytessync-function-playsoundbytessync-data-src-minipixels-audio-audio-ml-2100117544) | `src/minipixels/audio/audio.ml:567` | 4 | 3 | 3 | 2 | 1 | 192.57 | 70.47 |
+| [`minipixels.audio.audio.playSoundLoop`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playsoundloop-function-playsoundloop-path-src-minipixels-audio-audio-ml-792422107) | `src/minipixels/audio/audio.ml:545` | 4 | 3 | 2 | 1 | 1 | 149.34 | 71.37 |
+| [`minipixels.audio.audio.playSoundSync`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-playsoundsync-function-playsoundsync-path-src-minipixels-audio-audio-ml-1212590181) | `src/minipixels/audio/audio.ml:534` | 4 | 3 | 2 | 1 | 1 | 138.3 | 71.61 |
+| [`minipixels.audio.audio.prepareClip`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-prepareclip-function-prepareclip-value-src-minipixels-audio-audio-ml-1136745543) | `src/minipixels/audio/audio.ml:781` | 13 | 14 | 7 | 8 | 2 | 574.88 | 55.44 |
+| [`minipixels.audio.audio.prepareMixerFormat`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-preparemixerformat-function-preparemixerformat-value-src-minipixels-audio-audio-ml-1534543109) | `src/minipixels/audio/audio.ml:977` | 10 | 8 | 1 | 0 | 0 | 398.07 | 59.85 |
+| [`minipixels.audio.audio.prepareMp3`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-preparemp3-function-preparemp3-value-data-src-minipixels-audio-audio-ml-610412273) | `src/minipixels/audio/audio.ml:697` | 36 | 32 | 11 | 10 | 1 | 1372.73 | 42.6 |
+| [`minipixels.audio.audio.prepareWav`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-preparewav-function-preparewav-value-data-src-minipixels-audio-audio-ml-758943945) | `src/minipixels/audio/audio.ml:737` | 41 | 46 | 24 | 28 | 3 | 2652.44 | 37.62 |
+| [`minipixels.audio.audio.putU32`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-putu32-function-putu32-buffer-offset-value-src-minipixels-audio-audio-ml-1424367900) | `src/minipixels/audio/audio.ml:635` | 7 | 6 | 2 | 1 | 1 | 347.11 | 63.51 |
+| [`minipixels.audio.audio.putU64`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-putu64-function-putu64-buffer-offset-value-src-minipixels-audio-audio-ml-1896812244) | `src/minipixels/audio/audio.ml:647` | 4 | 2 | 1 | 0 | 0 | 148 | 71.54 |
+| [`minipixels.audio.audio.refillVoiceStream`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-refillvoicestream-function-refillvoicestream-voice-sourceframe-src-minipixels-audio-audio-ml-459232312) | `src/minipixels/audio/audio.ml:862` | 19 | 15 | 10 | 14 | 3 | 916.14 | 50.02 |
+| [`minipixels.audio.audio.refreshMixer`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-refreshmixer-function-refreshmixer-value-src-minipixels-audio-audio-ml-2084548497) | `src/minipixels/audio/audio.ml:1148` | 3 | 1 | 1 | 0 | 0 | 34.87 | 78.66 |
+| [`minipixels.audio.audio.sampleAt`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-sampleat-function-sampleat-value-frame-side-src-minipixels-audio-audio-ml-2062631707) | `src/minipixels/audio/audio.ml:799` | 22 | 24 | 10 | 11 | 2 | 1156.99 | 47.92 |
+| [`minipixels.audio.audio.setChannel`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-setchannel-function-setchannel-value-id-volume-pan-src-minipixels-audio-audio-ml-713064651) | `src/minipixels/audio/audio.ml:1196` | 8 | 7 | 4 | 3 | 1 | 356.7 | 61.89 |
+| [`minipixels.audio.audio.stopChannel`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-stopchannel-function-stopchannel-value-id-src-minipixels-audio-audio-ml-887401248) | `src/minipixels/audio/audio.ml:1182` | 8 | 7 | 4 | 3 | 1 | 307.16 | 62.35 |
+| [`minipixels.audio.audio.stopSound`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-stopsound-function-stopsound-src-minipixels-audio-audio-ml-2145337042) | `src/minipixels/audio/audio.ml:577` | 3 | 1 | 1 | 0 | 0 | 51.89 | 77.45 |
+| [`minipixels.audio.audio.streamSampleAt`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-streamsampleat-function-streamsampleat-voice-sourceframe-side-src-minipixels-audio-audio-ml-1970526897) | `src/minipixels/audio/audio.ml:886` | 8 | 8 | 3 | 2 | 1 | 444.61 | 61.36 |
+| [`minipixels.audio.audio.supportsMp3`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-supportsmp3-function-supportsmp3-src-minipixels-audio-audio-ml-269965156) | `src/minipixels/audio/audio.ml:512` | 3 | 1 | 1 | 0 | 0 | 22.46 | 80 |
+| [`minipixels.audio.audio.supportsMultipleSfx`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-supportsmultiplesfx-function-supportsmultiplesfx-src-minipixels-audio-audio-ml-886731190) | `src/minipixels/audio/audio.ml:502` | 3 | 1 | 1 | 0 | 0 | 22.46 | 80 |
+| [`minipixels.audio.audio.supportsStereo`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-supportsstereo-function-supportsstereo-src-minipixels-audio-audio-ml-2127612104) | `src/minipixels/audio/audio.ml:517` | 3 | 1 | 1 | 0 | 0 | 22.46 | 80 |
+| [`minipixels.audio.audio.supportsVolumeControl`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-supportsvolumecontrol-function-supportsvolumecontrol-src-minipixels-audio-audio-ml-956723918) | `src/minipixels/audio/audio.ml:507` | 3 | 1 | 1 | 0 | 0 | 22.46 | 80 |
+| [`minipixels.audio.audio.update`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-update-function-update-audio-src-minipixels-audio-audio-ml-563201104) | `src/minipixels/audio/audio.ml:1243` | 4 | 3 | 2 | 1 | 1 | 77.71 | 73.36 |
+| [`minipixels.audio.audio.updateMixer`](File-src-minipixels-audio-audio-ml-660527635.md#function-function-minipixels-audio-audio-updatemixer-function-updatemixer-value-src-minipixels-audio-audio-ml-1939388709) | `src/minipixels/audio/audio.ml:1106` | 17 | 13 | 6 | 8 | 3 | 571.15 | 53.05 |
+| [`minipixels.audioBackend`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiobackend-function-audiobackend-src-minipixels-ml-1835271036) | `src/minipixels.ml:692` | 1 | 1 | 1 | 0 | 0 | 38.04 | 88.8 |
 | [`minipixels.audioClip`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audioclip-function-audioclip-path-name-src-minipixels-ml-515413188) | `src/minipixels.ml:660` | 1 | 1 | 1 | 0 | 0 | 64.53 | 87.19 |
 | [`minipixels.audioClipFromBytes`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audioclipfrombytes-function-audioclipfrombytes-data-name-src-minipixels-ml-1400301461) | `src/minipixels.ml:664` | 1 | 1 | 1 | 0 | 0 | 64.53 | 87.19 |
-| [`minipixels.audioMixer`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiomixer-function-audiomixer-maxchannels-src-minipixels-ml-246446996) | `src/minipixels.ml:675` | 1 | 1 | 1 | 0 | 0 | 46.51 | 88.19 |
+| [`minipixels.audioMixer`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiomixer-function-audiomixer-maxchannels-src-minipixels-ml-246446996) | `src/minipixels.ml:679` | 1 | 1 | 1 | 0 | 0 | 46.51 | 88.19 |
 | [`minipixels.audioState`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiostate-function-audiostate-src-minipixels-ml-872649788) | `src/minipixels.ml:648` | 1 | 1 | 1 | 0 | 0 | 38.04 | 88.8 |
-| [`minipixels.audioSupportsMultipleSfx`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiosupportsmultiplesfx-function-audiosupportsmultiplesfx-src-minipixels-ml-155152452) | `src/minipixels.ml:690` | 1 | 1 | 1 | 0 | 0 | 38.04 | 88.8 |
-| [`minipixels.audioSupportsVolumeControl`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiosupportsvolumecontrol-function-audiosupportsvolumecontrol-src-minipixels-ml-442255824) | `src/minipixels.ml:692` | 1 | 1 | 1 | 0 | 0 | 38.04 | 88.8 |
+| [`minipixels.audioSupportsMp3`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiosupportsmp3-function-audiosupportsmp3-src-minipixels-ml-658236408) | `src/minipixels.ml:698` | 1 | 1 | 1 | 0 | 0 | 38.04 | 88.8 |
+| [`minipixels.audioSupportsMultipleSfx`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiosupportsmultiplesfx-function-audiosupportsmultiplesfx-src-minipixels-ml-155152452) | `src/minipixels.ml:694` | 1 | 1 | 1 | 0 | 0 | 38.04 | 88.8 |
+| [`minipixels.audioSupportsStereo`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiosupportsstereo-function-audiosupportsstereo-src-minipixels-ml-2076042780) | `src/minipixels.ml:700` | 1 | 1 | 1 | 0 | 0 | 38.04 | 88.8 |
+| [`minipixels.audioSupportsVolumeControl`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-audiosupportsvolumecontrol-function-audiosupportsvolumecontrol-src-minipixels-ml-442255824) | `src/minipixels.ml:696` | 1 | 1 | 1 | 0 | 0 | 38.04 | 88.8 |
 | [`minipixels.bindKey`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-bindkey-function-bindkey-input-action-key-src-minipixels-ml-929736471) | `src/minipixels.ml:603` | 1 | 1 | 1 | 0 | 0 | 97.67 | 85.93 |
 | [`minipixels.bindKeys`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-bindkeys-function-bindkeys-input-action-primary-secondary-src-minipixels-ml-2127378948) | `src/minipixels.ml:609` | 1 | 1 | 1 | 0 | 0 | 96.21 | 85.98 |
-| [`minipixels.callIfFunction`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-calliffunction-function-calliffunction-fn-a-src-minipixels-ml-1622940695) | `src/minipixels.ml:700` | 3 | 2 | 2 | 1 | 1 | 91.38 | 75.59 |
-| [`minipixels.callRender`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-callrender-function-callrender-fn-game-canvas-src-minipixels-ml-417238454) | `src/minipixels.ml:716` | 3 | 2 | 2 | 1 | 1 | 109.39 | 75.05 |
-| [`minipixels.callUpdate`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-callupdate-function-callupdate-fn-game-dt-src-minipixels-ml-623549234) | `src/minipixels.ml:708` | 3 | 2 | 2 | 1 | 1 | 109.39 | 75.05 |
+| [`minipixels.callIfFunction`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-calliffunction-function-calliffunction-fn-a-src-minipixels-ml-1622940695) | `src/minipixels.ml:708` | 3 | 2 | 2 | 1 | 1 | 91.38 | 75.59 |
+| [`minipixels.callRender`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-callrender-function-callrender-fn-game-canvas-src-minipixels-ml-417238454) | `src/minipixels.ml:724` | 3 | 2 | 2 | 1 | 1 | 109.39 | 75.05 |
+| [`minipixels.callUpdate`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-callupdate-function-callupdate-fn-game-dt-src-minipixels-ml-623549234) | `src/minipixels.ml:716` | 3 | 2 | 2 | 1 | 1 | 109.39 | 75.05 |
 | [`minipixels.camera`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-camera-function-camera-width-height-src-minipixels-ml-1194025291) | `src/minipixels.ml:476` | 1 | 1 | 1 | 0 | 0 | 64.53 | 87.19 |
 | [`minipixels.changeScene`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-changescene-function-changescene-game-name-src-minipixels-ml-204458343) | `src/minipixels.ml:543` | 1 | 1 | 1 | 0 | 0 | 81.41 | 86.49 |
 | [`minipixels.clearAssetPackCache`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-clearassetpackcache-function-clearassetpackcache-assetpack-src-minipixels-ml-935534221) | `src/minipixels.ml:463` | 1 | 1 | 1 | 0 | 0 | 46.51 | 88.19 |
@@ -279,12 +292,14 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.drawText`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-drawtext-function-drawtext-canvas-text-x-y-scale-color-src-minipixels-ml-520545259) | `src/minipixels.ml:621` | 1 | 1 | 1 | 0 | 0 | 132.83 | 85 |
 | [`minipixels.drawTextCentered`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-drawtextcentered-function-drawtextcentered-canvas-text-y-scale-color-src-minipixels-ml-1797824963) | `src/minipixels.ml:628` | 1 | 1 | 1 | 0 | 0 | 114.22 | 85.46 |
 | [`minipixels.fillRectWorld`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-fillrectworld-function-fillrectworld-canvas-camera-x-y-w-h-color-src-minipixels-ml-1539538118) | `src/minipixels.ml:559` | 1 | 1 | 1 | 0 | 0 | 152 | 84.59 |
-| [`minipixels.frameHash`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-framehash-function-framehash-canvas-src-minipixels-ml-1907773514) | `src/minipixels.ml:695` | 1 | 1 | 1 | 0 | 0 | 46.51 | 88.19 |
+| [`minipixels.frameHash`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-framehash-function-framehash-canvas-src-minipixels-ml-1907773514) | `src/minipixels.ml:703` | 1 | 1 | 1 | 0 | 0 | 46.51 | 88.19 |
 | [`minipixels.Game.quit`](Type-minipixels-game-1761105865.md#method-method-minipixels-game-quit-function-quit-src-minipixels-ml-1528183005) | `src/minipixels.ml:111` | 3 | 1 | 1 | 0 | 0 | 36.54 | 78.52 |
+| [`minipixels.graphics.canvas.blendOpaqueSpriteRow`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blendopaquespriterow-function-blendopaquespriterow-destination-as-bytes-source-as-bytes-di-as-int-si-as-int-count-as-int-returns-bool-src-minipixels-graphics-canvas-ml-1753098185) | `src/minipixels/graphics/canvas.ml:671` | 23 | 18 | 4 | 5 | 2 | 1235.67 | 48.11 |
 | [`minipixels.graphics.canvas.blendPixel`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blendpixel-function-blendpixel-c-x-y-color-src-minipixels-graphics-canvas-ml-1273688265) | `src/minipixels/graphics/canvas.ml:410` | 7 | 4 | 2 | 1 | 1 | 289.51 | 64.06 |
 | [`minipixels.graphics.canvas.blendPixelRaw`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blendpixelraw-function-blendpixelraw-c-x-y-color-src-minipixels-graphics-canvas-ml-1904491027) | `src/minipixels/graphics/canvas.ml:381` | 11 | 10 | 5 | 4 | 1 | 846.49 | 56.11 |
-| [`minipixels.graphics.canvas.blitImage`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blitimage-function-blitimage-c-img-x-y-src-minipixels-graphics-canvas-ml-991305047) | `src/minipixels/graphics/canvas.ml:608` | 3 | 1 | 1 | 0 | 0 | 144 | 74.34 |
-| [`minipixels.graphics.canvas.blitRegion`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blitregion-function-blitregion-c-img-sx-sy-sw-sh-x-y-src-minipixels-graphics-canvas-ml-165924677) | `src/minipixels/graphics/canvas.ml:621` | 4 | 2 | 1 | 0 | 0 | 360.55 | 68.83 |
+| [`minipixels.graphics.canvas.blendTransparentSpriteRow`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blendtransparentspriterow-function-blendtransparentspriterow-destination-as-bytes-source-as-bytes-di-as-int-si-as-int-count-as-int-returns-bool-src-minipixels-graphics-canvas-ml-1352210493) | `src/minipixels/graphics/canvas.ml:696` | 26 | 20 | 5 | 7 | 3 | 1386.83 | 46.46 |
+| [`minipixels.graphics.canvas.blitImage`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blitimage-function-blitimage-c-img-x-y-src-minipixels-graphics-canvas-ml-991305047) | `src/minipixels/graphics/canvas.ml:607` | 3 | 1 | 1 | 0 | 0 | 144 | 74.34 |
+| [`minipixels.graphics.canvas.blitRegion`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blitregion-function-blitregion-c-img-sx-sy-sw-sh-x-y-src-minipixels-graphics-canvas-ml-165924677) | `src/minipixels/graphics/canvas.ml:620` | 4 | 2 | 1 | 0 | 0 | 360.55 | 68.83 |
 | [`minipixels.graphics.canvas.Canvas.beginCamera`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-begincamera-function-begincamera-camera-src-minipixels-graphics-canvas-ml-187269402) | `src/minipixels/graphics/canvas.ml:226` | 4 | 2 | 1 | 0 | 0 | 77.71 | 73.5 |
 | [`minipixels.graphics.canvas.Canvas.blit`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-blit-function-blit-image-x-y-src-minipixels-graphics-canvas-ml-1673562235) | `src/minipixels/graphics/canvas.ml:115` | 3 | 1 | 1 | 0 | 0 | 112 | 75.11 |
 | [`minipixels.graphics.canvas.Canvas.blitRegion`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-blitregion-function-blitregion-image-sx-sy-sw-sh-x-y-src-minipixels-graphics-canvas-ml-766058417) | `src/minipixels/graphics/canvas.ml:127` | 3 | 1 | 1 | 0 | 0 | 186.91 | 73.55 |
@@ -309,38 +324,62 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.graphics.canvas.Canvas.setPixel`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-setpixel-function-setpixel-x-y-color-src-minipixels-graphics-canvas-ml-1492748631) | `src/minipixels/graphics/canvas.ml:52` | 3 | 1 | 1 | 0 | 0 | 109.39 | 75.18 |
 | [`minipixels.graphics.canvas.clearCanvas`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-clearcanvas-function-clearcanvas-c-color-src-minipixels-graphics-canvas-ml-2094788080) | `src/minipixels/graphics/canvas.ml:333` | 23 | 20 | 4 | 6 | 3 | 938.73 | 48.94 |
 | [`minipixels.graphics.canvas.create`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-create-function-create-width-height-src-minipixels-graphics-canvas-ml-1074773335) | `src/minipixels/graphics/canvas.ml:248` | 5 | 3 | 1 | 0 | 0 | 307.6 | 67.2 |
-| [`minipixels.graphics.canvas.drawCanvas`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawcanvas-function-drawcanvas-destination-source-x-y-src-minipixels-graphics-canvas-ml-1518492604) | `src/minipixels/graphics/canvas.ml:889` | 3 | 1 | 1 | 0 | 0 | 98.99 | 75.48 |
-| [`minipixels.graphics.canvas.drawCircle`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawcircle-function-drawcircle-c-cx-cy-r-color-src-minipixels-graphics-canvas-ml-2045286387) | `src/minipixels/graphics/canvas.ml:549` | 23 | 18 | 3 | 3 | 2 | 937.22 | 49.08 |
-| [`minipixels.graphics.canvas.drawLine`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawline-function-drawline-c-x1-y1-x2-y2-color-src-minipixels-graphics-canvas-ml-379303362) | `src/minipixels/graphics/canvas.ml:515` | 27 | 25 | 8 | 10 | 2 | 953.64 | 46.84 |
+| [`minipixels.graphics.canvas.drawCanvas`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawcanvas-function-drawcanvas-destination-source-x-y-src-minipixels-graphics-canvas-ml-1518492604) | `src/minipixels/graphics/canvas.ml:911` | 3 | 1 | 1 | 0 | 0 | 98.99 | 75.48 |
+| [`minipixels.graphics.canvas.drawCircle`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawcircle-function-drawcircle-c-cx-cy-r-color-src-minipixels-graphics-canvas-ml-2045286387) | `src/minipixels/graphics/canvas.ml:548` | 23 | 18 | 3 | 3 | 2 | 937.22 | 49.08 |
+| [`minipixels.graphics.canvas.drawLine`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawline-function-drawline-c-x1-y1-x2-y2-color-src-minipixels-graphics-canvas-ml-379303362) | `src/minipixels/graphics/canvas.ml:514` | 27 | 25 | 8 | 10 | 2 | 953.64 | 46.84 |
 | [`minipixels.graphics.canvas.drawPixelFast`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawpixelfast-function-drawpixelfast-c-x-y-color-src-minipixels-graphics-canvas-ml-1181598113) | `src/minipixels/graphics/canvas.ml:423` | 14 | 13 | 7 | 6 | 1 | 739.34 | 53.97 |
-| [`minipixels.graphics.canvas.drawRect`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawrect-function-drawrect-c-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1392056414) | `src/minipixels/graphics/canvas.ml:501` | 6 | 4 | 1 | 0 | 0 | 420 | 64.52 |
-| [`minipixels.graphics.canvas.drawRectWorld`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawrectworld-function-drawrectworld-c-camera-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1655626413) | `src/minipixels/graphics/canvas.ml:927` | 3 | 1 | 1 | 0 | 0 | 179.85 | 73.67 |
-| [`minipixels.graphics.canvas.drawSprite`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawsprite-function-drawsprite-c-spr-x-y-src-minipixels-graphics-canvas-ml-1771831875) | `src/minipixels/graphics/canvas.ml:631` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
-| [`minipixels.graphics.canvas.drawSpriteEx`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriteex-function-drawspriteex-c-spr-x-y-flipx-flipy-scale-tint-src-minipixels-graphics-canvas-ml-1977777057) | `src/minipixels/graphics/canvas.ml:742` | 37 | 33 | 20 | 32 | 4 | 2260.6 | 39.61 |
-| [`minipixels.graphics.canvas.drawSpriteFast1x`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspritefast1x-function-drawspritefast1x-c-spr-x-y-src-minipixels-graphics-canvas-ml-1613156323) | `src/minipixels/graphics/canvas.ml:676` | 55 | 46 | 11 | 25 | 6 | 4283.36 | 35.13 |
-| [`minipixels.graphics.canvas.drawSpriteRotated`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriterotated-function-drawspriterotated-c-spr-x-y-radians-scale-tint-src-minipixels-graphics-canvas-ml-840764200) | `src/minipixels/graphics/canvas.ml:830` | 53 | 57 | 21 | 33 | 4 | 3914.59 | 34.41 |
-| [`minipixels.graphics.canvas.drawSpriteScaled`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspritescaled-function-drawspritescaled-c-spr-x-y-scale-tint-src-minipixels-graphics-canvas-ml-841362936) | `src/minipixels/graphics/canvas.ml:788` | 33 | 37 | 13 | 17 | 3 | 2538.47 | 41.29 |
-| [`minipixels.graphics.canvas.drawSpriteWorld`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriteworld-function-drawspriteworld-c-camera-spr-x-y-src-minipixels-graphics-canvas-ml-758119470) | `src/minipixels/graphics/canvas.ml:937` | 3 | 1 | 1 | 0 | 0 | 140.65 | 74.42 |
-| [`minipixels.graphics.canvas.drawSpriteWorldEx`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriteworldex-function-drawspriteworldex-c-camera-spr-x-y-flipx-flipy-scale-tint-src-minipixels-graphics-canvas-ml-273018892) | `src/minipixels/graphics/canvas.ml:951` | 3 | 1 | 1 | 0 | 0 | 220.89 | 73.04 |
-| [`minipixels.graphics.canvas.fillCircle`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillcircle-function-fillcircle-c-cx-cy-r-color-src-minipixels-graphics-canvas-ml-108867707) | `src/minipixels/graphics/canvas.ml:579` | 23 | 20 | 7 | 11 | 3 | 1074.46 | 48.13 |
-| [`minipixels.graphics.canvas.fillRect`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillrect-function-fillrect-c-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1196303130) | `src/minipixels/graphics/canvas.ml:445` | 48 | 43 | 12 | 18 | 3 | 2445.58 | 37.99 |
-| [`minipixels.graphics.canvas.fillRectWorld`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillrectworld-function-fillrectworld-c-camera-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1749998495) | `src/minipixels/graphics/canvas.ml:915` | 3 | 1 | 1 | 0 | 0 | 179.85 | 73.67 |
-| [`minipixels.graphics.canvas.fillScaledPixel`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillscaledpixel-function-fillscaledpixel-c-x-y-scale-color-src-minipixels-graphics-canvas-ml-1949563361) | `src/minipixels/graphics/canvas.ml:641` | 29 | 25 | 7 | 9 | 3 | 1259.8 | 45.45 |
+| [`minipixels.graphics.canvas.drawRect`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawrect-function-drawrect-c-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1392056414) | `src/minipixels/graphics/canvas.ml:500` | 6 | 4 | 1 | 0 | 0 | 420 | 64.52 |
+| [`minipixels.graphics.canvas.drawRectWorld`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawrectworld-function-drawrectworld-c-camera-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1655626413) | `src/minipixels/graphics/canvas.ml:949` | 3 | 1 | 1 | 0 | 0 | 179.85 | 73.67 |
+| [`minipixels.graphics.canvas.drawSprite`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawsprite-function-drawsprite-c-spr-x-y-src-minipixels-graphics-canvas-ml-1771831875) | `src/minipixels/graphics/canvas.ml:630` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
+| [`minipixels.graphics.canvas.drawSpriteEx`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriteex-function-drawspriteex-c-spr-x-y-flipx-flipy-scale-tint-src-minipixels-graphics-canvas-ml-1977777057) | `src/minipixels/graphics/canvas.ml:765` | 36 | 31 | 18 | 30 | 4 | 2082 | 40.39 |
+| [`minipixels.graphics.canvas.drawSpriteFast1x`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspritefast1x-function-drawspritefast1x-c-spr-x-y-src-minipixels-graphics-canvas-ml-1613156323) | `src/minipixels/graphics/canvas.ml:726` | 26 | 21 | 6 | 7 | 2 | 1573.32 | 45.94 |
+| [`minipixels.graphics.canvas.drawSpriteRotated`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriterotated-function-drawspriterotated-c-spr-x-y-radians-scale-tint-src-minipixels-graphics-canvas-ml-840764200) | `src/minipixels/graphics/canvas.ml:852` | 53 | 57 | 21 | 33 | 4 | 3914.59 | 34.41 |
+| [`minipixels.graphics.canvas.drawSpriteScaled`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspritescaled-function-drawspritescaled-c-spr-x-y-scale-tint-src-minipixels-graphics-canvas-ml-841362936) | `src/minipixels/graphics/canvas.ml:810` | 33 | 37 | 13 | 17 | 3 | 2538.47 | 41.29 |
+| [`minipixels.graphics.canvas.drawSpriteWorld`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriteworld-function-drawspriteworld-c-camera-spr-x-y-src-minipixels-graphics-canvas-ml-758119470) | `src/minipixels/graphics/canvas.ml:959` | 3 | 1 | 1 | 0 | 0 | 140.65 | 74.42 |
+| [`minipixels.graphics.canvas.drawSpriteWorldEx`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriteworldex-function-drawspriteworldex-c-camera-spr-x-y-flipx-flipy-scale-tint-src-minipixels-graphics-canvas-ml-273018892) | `src/minipixels/graphics/canvas.ml:973` | 3 | 1 | 1 | 0 | 0 | 220.89 | 73.04 |
+| [`minipixels.graphics.canvas.fillCircle`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillcircle-function-fillcircle-c-cx-cy-r-color-src-minipixels-graphics-canvas-ml-108867707) | `src/minipixels/graphics/canvas.ml:578` | 23 | 20 | 7 | 11 | 3 | 1074.46 | 48.13 |
+| [`minipixels.graphics.canvas.fillRect`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillrect-function-fillrect-c-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1196303130) | `src/minipixels/graphics/canvas.ml:445` | 47 | 41 | 11 | 17 | 3 | 2335.44 | 38.46 |
+| [`minipixels.graphics.canvas.fillRectWorld`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillrectworld-function-fillrectworld-c-camera-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1749998495) | `src/minipixels/graphics/canvas.ml:937` | 3 | 1 | 1 | 0 | 0 | 179.85 | 73.67 |
+| [`minipixels.graphics.canvas.fillScaledPixel`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillscaledpixel-function-fillscaledpixel-c-x-y-scale-color-src-minipixels-graphics-canvas-ml-1949563361) | `src/minipixels/graphics/canvas.ml:640` | 29 | 25 | 7 | 9 | 3 | 1259.8 | 45.45 |
 | [`minipixels.graphics.canvas.getPixel`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-getpixel-function-getpixel-c-x-y-src-minipixels-graphics-canvas-ml-113781492) | `src/minipixels/graphics/canvas.ml:397` | 7 | 6 | 5 | 4 | 1 | 559.09 | 61.65 |
-| [`minipixels.graphics.canvas.hash`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-hash-function-hash-c-src-minipixels-graphics-canvas-ml-1715757429) | `src/minipixels/graphics/canvas.ml:957` | 8 | 5 | 2 | 1 | 1 | 153.73 | 64.72 |
+| [`minipixels.graphics.canvas.hash`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-hash-function-hash-c-src-minipixels-graphics-canvas-ml-1715757429) | `src/minipixels/graphics/canvas.ml:979` | 8 | 5 | 2 | 1 | 1 | 153.73 | 64.72 |
 | [`minipixels.graphics.canvas.index`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-index-inline-function-index-c-x-y-src-minipixels-graphics-canvas-ml-859928981) | `src/minipixels/graphics/canvas.ml:326` | 3 | 1 | 1 | 0 | 0 | 104 | 75.33 |
 | [`minipixels.graphics.canvas.markDirty`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-markdirty-function-markdirty-c-x-y-w-h-src-minipixels-graphics-canvas-ml-540302783) | `src/minipixels/graphics/canvas.ml:284` | 19 | 21 | 8 | 7 | 1 | 1046.51 | 49.89 |
 | [`minipixels.graphics.canvas.resetDirty`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-resetdirty-function-resetdirty-c-src-minipixels-graphics-canvas-ml-2031001549) | `src/minipixels/graphics/canvas.ml:306` | 7 | 5 | 1 | 0 | 0 | 125.02 | 66.75 |
 | [`minipixels.graphics.canvas.resetStats`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-resetstats-function-resetstats-c-src-minipixels-graphics-canvas-ml-1731332189) | `src/minipixels/graphics/canvas.ml:316` | 5 | 3 | 1 | 0 | 0 | 78.87 | 71.34 |
 | [`minipixels.graphics.canvas.resize`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-resize-function-resize-c-width-height-src-minipixels-graphics-canvas-ml-1088691982) | `src/minipixels/graphics/canvas.ml:259` | 18 | 19 | 6 | 5 | 1 | 750.39 | 51.68 |
-| [`minipixels.graphics.canvas.screenX`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-screenx-function-screenx-camera-x-src-minipixels-graphics-canvas-ml-1707190397) | `src/minipixels/graphics/canvas.ml:896` | 3 | 1 | 1 | 0 | 0 | 51.89 | 77.45 |
-| [`minipixels.graphics.canvas.screenY`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-screeny-function-screeny-camera-y-src-minipixels-graphics-canvas-ml-963577846) | `src/minipixels/graphics/canvas.ml:903` | 3 | 1 | 1 | 0 | 0 | 51.89 | 77.45 |
+| [`minipixels.graphics.canvas.screenX`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-screenx-function-screenx-camera-x-src-minipixels-graphics-canvas-ml-1707190397) | `src/minipixels/graphics/canvas.ml:918` | 3 | 1 | 1 | 0 | 0 | 51.89 | 77.45 |
+| [`minipixels.graphics.canvas.screenY`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-screeny-function-screeny-camera-y-src-minipixels-graphics-canvas-ml-963577846) | `src/minipixels/graphics/canvas.ml:925` | 3 | 1 | 1 | 0 | 0 | 51.89 | 77.45 |
 | [`minipixels.graphics.canvas.setPixel`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-setpixel-function-setpixel-c-x-y-color-src-minipixels-graphics-canvas-ml-1444983993) | `src/minipixels/graphics/canvas.ml:362` | 13 | 13 | 6 | 5 | 1 | 895.17 | 54.22 |
 | [`minipixels.graphics.font.drawGlyph`](File-src-minipixels-graphics-font-ml-906525775.md#function-function-minipixels-graphics-font-drawglyph-function-drawglyph-canvas-ch-x-y-scale-color-src-minipixels-graphics-font-ml-725828193) | `src/minipixels/graphics/font.ml:73` | 25 | 20 | 8 | 13 | 4 | 966.62 | 47.53 |
 | [`minipixels.graphics.font.drawText`](File-src-minipixels-graphics-font-ml-906525775.md#function-function-minipixels-graphics-font-drawtext-function-drawtext-canvas-text-x-y-scale-color-src-minipixels-graphics-font-ml-1630535549) | `src/minipixels/graphics/font.ml:106` | 8 | 6 | 3 | 2 | 1 | 285.29 | 62.7 |
 | [`minipixels.graphics.font.drawTextCentered`](File-src-minipixels-graphics-font-ml-906525775.md#function-function-minipixels-graphics-font-drawtextcentered-function-drawtextcentered-canvas-text-y-scale-color-src-minipixels-graphics-font-ml-1722252689) | `src/minipixels/graphics/font.ml:121` | 3 | 1 | 1 | 0 | 0 | 175.14 | 73.75 |
 | [`minipixels.graphics.font.glyphBits`](File-src-minipixels-graphics-font-ml-906525775.md#function-function-minipixels-graphics-font-glyphbits-function-glyphbits-ch-src-minipixels-graphics-font-ml-1627811811) | `src/minipixels/graphics/font.ml:11` | 45 | 85 | 43 | 42 | 1 | 2542.53 | 34.31 |
 | [`minipixels.graphics.font.textWidth`](File-src-minipixels-graphics-font-ml-906525775.md#function-function-minipixels-graphics-font-textwidth-function-textwidth-text-scale-src-minipixels-graphics-font-ml-141266891) | `src/minipixels/graphics/font.ml:60` | 5 | 5 | 3 | 2 | 1 | 195.4 | 68.31 |
+| [`minipixels.graphics.gpu.begin`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-begin-function-begin-window-returns-bool-src-minipixels-graphics-gpu-ml-1898668671) | `src/minipixels/graphics/gpu.ml:260` | 6 | 5 | 3 | 2 | 1 | 142.7 | 67.54 |
+| [`minipixels.graphics.gpu.create`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-create-function-create-window-width-height-vsync-src-minipixels-graphics-gpu-ml-504824184) | `src/minipixels/graphics/gpu.ml:241` | 15 | 16 | 7 | 6 | 1 | 678.28 | 53.58 |
+| [`minipixels.graphics.gpu.drawCalls`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-drawcalls-function-drawcalls-returns-int-src-minipixels-graphics-gpu-ml-1474591396) | `src/minipixels/graphics/gpu.ml:305` | 4 | 3 | 2 | 1 | 1 | 76.15 | 73.42 |
+| [`minipixels.graphics.gpu.drawRegion`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-drawregion-function-drawregion-c-image-sx-sy-sw-sh-x-y-dw-dh-tint-src-minipixels-graphics-gpu-ml-1741238635) | `src/minipixels/graphics/gpu.ml:102` | 7 | 8 | 8 | 7 | 1 | 671.94 | 60.69 |
+| [`minipixels.graphics.gpu.finish`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-finish-function-finish-window-returns-bool-src-minipixels-graphics-gpu-ml-532089685) | `src/minipixels/graphics/gpu.ml:270` | 5 | 4 | 3 | 2 | 1 | 322.09 | 66.79 |
+| [`minipixels.graphics.gpu.GpuCanvas.blitRegion`](Type-minipixels-graphics-gpu-gpucanvas-1207336338.md#method-method-minipixels-graphics-gpu-gpucanvas-blitregion-function-blitregion-image-sx-sy-sw-sh-x-y-src-minipixels-graphics-gpu-ml-661449327) | `src/minipixels/graphics/gpu.ml:174` | 3 | 1 | 1 | 0 | 0 | 172 | 73.8 |
+| [`minipixels.graphics.gpu.GpuCanvas.clear`](Type-minipixels-graphics-gpu-gpucanvas-1207336338.md#method-method-minipixels-graphics-gpu-gpucanvas-clear-function-clear-color-src-minipixels-graphics-gpu-ml-274484978) | `src/minipixels/graphics/gpu.ml:118` | 3 | 1 | 1 | 0 | 0 | 30.88 | 79.03 |
+| [`minipixels.graphics.gpu.GpuCanvas.drawCanvas`](Type-minipixels-graphics-gpu-gpucanvas-1207336338.md#method-method-minipixels-graphics-gpu-gpucanvas-drawcanvas-function-drawcanvas-source-x-y-src-minipixels-graphics-gpu-ml-808238395) | `src/minipixels/graphics/gpu.ml:162` | 3 | 1 | 1 | 0 | 0 | 183.94 | 73.6 |
+| [`minipixels.graphics.gpu.GpuCanvas.drawLight`](Type-minipixels-graphics-gpu-gpucanvas-1207336338.md#method-method-minipixels-graphics-gpu-gpucanvas-drawlight-function-drawlight-x-y-radiusx-radiusy-red-green-blue-returns-bool-src-minipixels-graphics-gpu-ml-1222912900) | `src/minipixels/graphics/gpu.ml:229` | 5 | 4 | 2 | 1 | 1 | 332.84 | 66.82 |
+| [`minipixels.graphics.gpu.GpuCanvas.drawLine`](Type-minipixels-graphics-gpu-gpucanvas-1207336338.md#method-method-minipixels-graphics-gpu-gpucanvas-drawline-function-drawline-x0-y0-x1-y1-color-src-minipixels-graphics-gpu-ml-331511308) | `src/minipixels/graphics/gpu.ml:207` | 3 | 1 | 1 | 0 | 0 | 183.62 | 73.61 |
+| [`minipixels.graphics.gpu.GpuCanvas.drawRect`](Type-minipixels-graphics-gpu-gpucanvas-1207336338.md#method-method-minipixels-graphics-gpu-gpucanvas-drawrect-function-drawrect-x-y-w-h-color-src-minipixels-graphics-gpu-ml-140781264) | `src/minipixels/graphics/gpu.ml:194` | 6 | 4 | 1 | 0 | 0 | 362.78 | 64.97 |
+| [`minipixels.graphics.gpu.GpuCanvas.drawSprite`](Type-minipixels-graphics-gpu-gpucanvas-1207336338.md#method-method-minipixels-graphics-gpu-gpucanvas-drawsprite-function-drawsprite-spr-x-y-src-minipixels-graphics-gpu-ml-951683967) | `src/minipixels/graphics/gpu.ml:144` | 3 | 1 | 1 | 0 | 0 | 250.36 | 72.66 |
+| [`minipixels.graphics.gpu.GpuCanvas.drawSpriteScaled`](Type-minipixels-graphics-gpu-gpucanvas-1207336338.md#method-method-minipixels-graphics-gpu-gpucanvas-drawspritescaled-function-drawspritescaled-spr-x-y-scale-tint-src-minipixels-graphics-gpu-ml-1627954726) | `src/minipixels/graphics/gpu.ml:154` | 3 | 1 | 1 | 0 | 0 | 312.13 | 71.99 |
+| [`minipixels.graphics.gpu.GpuCanvas.fillCircle`](Type-minipixels-graphics-gpu-gpucanvas-1207336338.md#method-method-minipixels-graphics-gpu-gpucanvas-fillcircle-function-fillcircle-x-y-r-color-src-minipixels-graphics-gpu-ml-118501783) | `src/minipixels/graphics/gpu.ml:216` | 3 | 1 | 1 | 0 | 0 | 144.68 | 74.33 |
+| [`minipixels.graphics.gpu.GpuCanvas.fillRect`](Type-minipixels-graphics-gpu-gpucanvas-1207336338.md#method-method-minipixels-graphics-gpu-gpucanvas-fillrect-function-fillrect-x-y-w-h-color-src-minipixels-graphics-gpu-ml-612314980) | `src/minipixels/graphics/gpu.ml:184` | 3 | 1 | 1 | 0 | 0 | 183.62 | 73.61 |
+| [`minipixels.graphics.gpu.GpuCanvas.resize`](Type-minipixels-graphics-gpu-gpucanvas-1207336338.md#method-method-minipixels-graphics-gpu-gpucanvas-resize-function-resize-width-height-returns-bool-src-minipixels-graphics-gpu-ml-285495381) | `src/minipixels/graphics/gpu.ml:126` | 13 | 13 | 4 | 3 | 1 | 430 | 56.72 |
+| [`minipixels.graphics.gpu.invalidate`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-invalidate-function-invalidate-image-src-minipixels-graphics-gpu-ml-1250890709) | `src/minipixels/graphics/gpu.ml:97` | 3 | 2 | 2 | 1 | 1 | 120 | 74.76 |
+| [`minipixels.graphics.gpu.printInfo`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-printinfo-function-printinfo-src-minipixels-graphics-gpu-ml-664747454) | `src/minipixels/graphics/gpu.ml:292` | 3 | 2 | 2 | 1 | 1 | 44.38 | 77.79 |
+| [`minipixels.graphics.gpu.readback`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-readback-function-readback-destination-returns-bool-src-minipixels-graphics-gpu-ml-1042282877) | `src/minipixels/graphics/gpu.ml:279` | 11 | 10 | 4 | 3 | 1 | 368.24 | 58.78 |
+| [`minipixels.graphics.gpu.resetTextures`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-resettextures-function-resettextures-src-minipixels-graphics-gpu-ml-2066754726) | `src/minipixels/graphics/gpu.ml:68` | 7 | 6 | 2 | 1 | 1 | 123.19 | 66.66 |
+| [`minipixels.graphics.gpu.shutdown`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-shutdown-function-shutdown-src-minipixels-graphics-gpu-ml-959613120) | `src/minipixels/graphics/gpu.ml:311` | 10 | 9 | 2 | 1 | 1 | 209.59 | 61.66 |
+| [`minipixels.graphics.gpu.supported`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-supported-function-supported-returns-bool-src-minipixels-graphics-gpu-ml-2140388001) | `src/minipixels/graphics/gpu.ml:63` | 3 | 1 | 1 | 0 | 0 | 31.7 | 78.95 |
+| [`minipixels.graphics.gpu.texture`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-texture-function-texture-image-src-minipixels-graphics-gpu-ml-1711808915) | `src/minipixels/graphics/gpu.ml:77` | 16 | 11 | 4 | 6 | 3 | 523.25 | 54.16 |
+| [`minipixels.graphics.gpu.uploadBytes`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-uploadbytes-function-uploadbytes-returns-int-src-minipixels-graphics-gpu-ml-348491374) | `src/minipixels/graphics/gpu.ml:298` | 4 | 3 | 2 | 1 | 1 | 76.15 | 73.42 |
 | [`minipixels.graphics.sprite.cacheFrames`](File-src-minipixels-graphics-sprite-ml-1992064667.md#function-function-minipixels-graphics-sprite-cacheframes-function-cacheframes-sheet-src-minipixels-graphics-sprite-ml-1688415125) | `src/minipixels/graphics/sprite.ml:230` | 7 | 5 | 3 | 2 | 1 | 166.91 | 65.6 |
 | [`minipixels.graphics.sprite.Image.getPixel`](Type-minipixels-graphics-sprite-image-712579706.md#method-method-minipixels-graphics-sprite-image-getpixel-function-getpixel-x-y-src-minipixels-graphics-sprite-ml-1990116619) | `src/minipixels/graphics/sprite.ml:25` | 3 | 1 | 1 | 0 | 0 | 93.77 | 75.65 |
 | [`minipixels.graphics.sprite.imageGetPixel`](File-src-minipixels-graphics-sprite-ml-1992064667.md#function-function-minipixels-graphics-sprite-imagegetpixel-function-imagegetpixel-img-x-y-src-minipixels-graphics-sprite-ml-595135794) | `src/minipixels/graphics/sprite.ml:147` | 12 | 14 | 12 | 11 | 1 | 856.24 | 54.31 |
@@ -440,10 +479,11 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.math.types.vector2Multiply`](File-src-minipixels-math-types-ml-311947336.md#function-function-minipixels-math-types-vector2multiply-function-vector2multiply-a-s-src-minipixels-math-types-ml-501697406) | `src/minipixels/math/types.ml:295` | 3 | 1 | 1 | 0 | 0 | 91.38 | 75.73 |
 | [`minipixels.math.types.vector2Normalize`](File-src-minipixels-math-types-ml-311947336.md#function-function-minipixels-math-types-vector2normalize-function-vector2normalize-a-src-minipixels-math-types-ml-1235573287) | `src/minipixels/math/types.ml:307` | 5 | 4 | 2 | 1 | 1 | 181.52 | 68.67 |
 | [`minipixels.math.types.vector2Subtract`](File-src-minipixels-math-types-ml-311947336.md#function-function-minipixels-math-types-vector2subtract-function-vector2subtract-a-b-src-minipixels-math-types-ml-1097010229) | `src/minipixels/math/types.ml:288` | 3 | 1 | 1 | 0 | 0 | 106.61 | 75.26 |
-| [`minipixels.mixerPlayMusic`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-mixerplaymusic-function-mixerplaymusic-mixer-clip-src-minipixels-ml-680020851) | `src/minipixels.ml:683` | 1 | 1 | 1 | 0 | 0 | 62.27 | 87.3 |
-| [`minipixels.mixerPlaySfx`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-mixerplaysfx-function-mixerplaysfx-mixer-clip-src-minipixels-ml-1261022307) | `src/minipixels.ml:679` | 1 | 1 | 1 | 0 | 0 | 62.27 | 87.3 |
-| [`minipixels.mixerStopAll`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-mixerstopall-function-mixerstopall-mixer-src-minipixels-ml-1666561493) | `src/minipixels.ml:686` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.mixerPlayMusic`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-mixerplaymusic-function-mixerplaymusic-mixer-clip-src-minipixels-ml-680020851) | `src/minipixels.ml:687` | 1 | 1 | 1 | 0 | 0 | 62.27 | 87.3 |
+| [`minipixels.mixerPlaySfx`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-mixerplaysfx-function-mixerplaysfx-mixer-clip-src-minipixels-ml-1261022307) | `src/minipixels.ml:683` | 1 | 1 | 1 | 0 | 0 | 62.27 | 87.3 |
+| [`minipixels.mixerStopAll`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-mixerstopall-function-mixerstopall-mixer-src-minipixels-ml-1666561493) | `src/minipixels.ml:690` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
 | [`minipixels.musicClip`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-musicclip-function-musicclip-path-name-src-minipixels-ml-1876241718) | `src/minipixels.ml:668` | 1 | 1 | 1 | 0 | 0 | 62.27 | 87.3 |
+| [`minipixels.musicClipFromBytes`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-musicclipfrombytes-function-musicclipfrombytes-data-name-src-minipixels-ml-1447723125) | `src/minipixels.ml:672` | 1 | 1 | 1 | 0 | 0 | 62.27 | 87.3 |
 | [`minipixels.openAssetPack`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-openassetpack-function-openassetpack-path-src-minipixels-ml-1608444883) | `src/minipixels.ml:422` | 1 | 1 | 1 | 0 | 0 | 46.51 | 88.19 |
 | [`minipixels.openProtectedAssetPack`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-openprotectedassetpack-function-openprotectedassetpack-path-key-publickey-keyid-src-minipixels-ml-1253388718) | `src/minipixels.ml:429` | 1 | 1 | 1 | 0 | 0 | 98.99 | 85.89 |
 | [`minipixels.platform.linux.clearKeyStates`](File-src-minipixels-platform-linux-ml-1856075630.md#function-function-minipixels-platform-linux-clearkeystates-function-clearkeystates-w-src-minipixels-platform-linux-ml-1514843137) | `src/minipixels/platform/linux.ml:288` | 5 | 2 | 2 | 1 | 1 | 127.44 | 69.74 |
@@ -492,7 +532,7 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.platform.windows.getU64`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-getu64-function-getu64-buf-off-src-minipixels-platform-windows-ml-2042778668) | `src/minipixels/platform/windows.ml:452` | 3 | 1 | 1 | 0 | 0 | 110.41 | 75.15 |
 | [`minipixels.platform.windows.hasFocus`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-hasfocus-function-hasfocus-w-src-minipixels-platform-windows-ml-23980893) | `src/minipixels/platform/windows.ml:674` | 4 | 3 | 2 | 1 | 1 | 102.19 | 72.53 |
 | [`minipixels.platform.windows.initOpenGL`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-initopengl-function-initopengl-w-src-minipixels-platform-windows-ml-560913305) | `src/minipixels/platform/windows.ml:866` | 49 | 43 | 7 | 6 | 1 | 1817.74 | 39.37 |
-| [`minipixels.platform.windows.isGpuRenderer`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-isgpurenderer-function-isgpurenderer-w-src-minipixels-platform-windows-ml-1839018755) | `src/minipixels/platform/windows.ml:637` | 4 | 3 | 2 | 1 | 1 | 94.01 | 72.78 |
+| [`minipixels.platform.windows.isGpuRenderer`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-isgpurenderer-function-isgpurenderer-w-src-minipixels-platform-windows-ml-1839018755) | `src/minipixels/platform/windows.ml:637` | 4 | 3 | 2 | 1 | 1 | 123.19 | 71.96 |
 | [`minipixels.platform.windows.keyDown`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-keydown-function-keydown-vk-src-minipixels-platform-windows-ml-531259703) | `src/minipixels/platform/windows.ml:668` | 3 | 1 | 1 | 0 | 0 | 46.51 | 77.78 |
 | [`minipixels.platform.windows.maxInt`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-maxint-function-maxint-a-b-src-minipixels-platform-windows-ml-1767531073) | `src/minipixels/platform/windows.ml:794` | 4 | 3 | 2 | 1 | 1 | 71.7 | 73.61 |
 | [`minipixels.platform.windows.minInt`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-minint-function-minint-a-b-src-minipixels-platform-windows-ml-341836797) | `src/minipixels/platform/windows.ml:786` | 4 | 3 | 2 | 1 | 1 | 71.7 | 73.61 |
@@ -501,9 +541,9 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.platform.windows.normalizeScaleMode`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-normalizescalemode-function-normalizescalemode-scalemode-src-minipixels-platform-windows-ml-943866925) | `src/minipixels/platform/windows.ml:558` | 6 | 7 | 4 | 3 | 1 | 137.06 | 67.52 |
 | [`minipixels.platform.windows.open`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-open-function-open-title-width-height-scale-renderer-scalemode-smoothing-src-minipixels-platform-windows-ml-682059839) | `src/minipixels/platform/windows.ml:573` | 29 | 24 | 6 | 6 | 2 | 1635.83 | 44.79 |
 | [`minipixels.platform.windows.pollEvents`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-pollevents-function-pollevents-w-src-minipixels-platform-windows-ml-932426681) | `src/minipixels/platform/windows.ml:659` | 6 | 3 | 2 | 1 | 1 | 140.65 | 67.72 |
-| [`minipixels.platform.windows.present`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-present-function-present-w-canvas-src-minipixels-platform-windows-ml-2143358207) | `src/minipixels/platform/windows.ml:1006` | 14 | 11 | 5 | 5 | 2 | 306.49 | 56.92 |
-| [`minipixels.platform.windows.presentGDI`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-presentgdi-function-presentgdi-w-canvas-src-minipixels-platform-windows-ml-1093617233) | `src/minipixels/platform/windows.ml:990` | 12 | 10 | 1 | 0 | 0 | 613.11 | 56.81 |
-| [`minipixels.platform.windows.presentOpenGL`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-presentopengl-function-presentopengl-w-canvas-src-minipixels-platform-windows-ml-1644844221) | `src/minipixels/platform/windows.ml:937` | 49 | 48 | 4 | 3 | 1 | 2159.47 | 39.24 |
+| [`minipixels.platform.windows.present`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-present-function-present-w-canvas-src-minipixels-platform-windows-ml-2143358207) | `src/minipixels/platform/windows.ml:1015` | 18 | 14 | 6 | 6 | 2 | 408.63 | 53.53 |
+| [`minipixels.platform.windows.presentGDI`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-presentgdi-function-presentgdi-w-canvas-src-minipixels-platform-windows-ml-1093617233) | `src/minipixels/platform/windows.ml:994` | 15 | 12 | 6 | 5 | 1 | 845.1 | 53.04 |
+| [`minipixels.platform.windows.presentOpenGL`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-presentopengl-function-presentopengl-w-canvas-src-minipixels-platform-windows-ml-1644844221) | `src/minipixels/platform/windows.ml:937` | 51 | 49 | 8 | 7 | 1 | 2365.8 | 38.05 |
 | [`minipixels.platform.windows.putI32`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-puti32-function-puti32-buf-off-v-src-minipixels-platform-windows-ml-2002961072) | `src/minipixels/platform/windows.ml:419` | 3 | 1 | 1 | 0 | 0 | 63.12 | 76.85 |
 | [`minipixels.platform.windows.putU32`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-putu32-function-putu32-buf-off-v-src-minipixels-platform-windows-ml-1021775528) | `src/minipixels/platform/windows.ml:407` | 7 | 6 | 2 | 1 | 1 | 347.11 | 63.51 |
 | [`minipixels.platform.windows.putU64`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-putu64-function-putu64-buf-off-v-src-minipixels-platform-windows-ml-847442640) | `src/minipixels/platform/windows.ml:427` | 5 | 4 | 2 | 1 | 1 | 206.44 | 68.28 |
@@ -511,11 +551,11 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.platform.windows.rendererFallbackReason`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-rendererfallbackreason-function-rendererfallbackreason-w-src-minipixels-platform-windows-ml-570595189) | `src/minipixels/platform/windows.ml:644` | 4 | 3 | 2 | 1 | 1 | 82.04 | 73.2 |
 | [`minipixels.platform.windows.rendererName`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-renderername-function-renderername-w-src-minipixels-platform-windows-ml-969738357) | `src/minipixels/platform/windows.ml:630` | 4 | 3 | 2 | 1 | 1 | 82.04 | 73.2 |
 | [`minipixels.platform.windows.running`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-running-function-running-src-minipixels-platform-windows-ml-1269548420) | `src/minipixels/platform/windows.ml:604` | 4 | 2 | 1 | 0 | 0 | 30 | 76.39 |
-| [`minipixels.platform.windows.seconds`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-seconds-function-seconds-src-minipixels-platform-windows-ml-1238233208) | `src/minipixels/platform/windows.ml:1027` | 12 | 10 | 5 | 5 | 2 | 321.17 | 58.23 |
+| [`minipixels.platform.windows.seconds`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-seconds-function-seconds-src-minipixels-platform-windows-ml-1238233208) | `src/minipixels/platform/windows.ml:1042` | 12 | 10 | 5 | 5 | 2 | 321.17 | 58.23 |
 | [`minipixels.platform.windows.setRenderSize`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-setrendersize-function-setrendersize-w-width-height-src-minipixels-platform-windows-ml-1700798220) | `src/minipixels/platform/windows.ml:770` | 12 | 12 | 6 | 5 | 1 | 445 | 57.11 |
 | [`minipixels.platform.windows.setTitle`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-settitle-function-settitle-w-title-src-minipixels-platform-windows-ml-650917391) | `src/minipixels/platform/windows.ml:652` | 4 | 3 | 2 | 1 | 1 | 116.76 | 72.12 |
-| [`minipixels.platform.windows.sleepMs`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-sleepms-function-sleepms-ms-src-minipixels-platform-windows-ml-470961608) | `src/minipixels/platform/windows.ml:1057` | 3 | 1 | 1 | 0 | 0 | 30.88 | 79.03 |
-| [`minipixels.platform.windows.ticks`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-ticks-function-ticks-src-minipixels-platform-windows-ml-373459234) | `src/minipixels/platform/windows.ml:1022` | 3 | 1 | 1 | 0 | 0 | 28.07 | 79.32 |
+| [`minipixels.platform.windows.sleepMs`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-sleepms-function-sleepms-ms-src-minipixels-platform-windows-ml-470961608) | `src/minipixels/platform/windows.ml:1072` | 3 | 1 | 1 | 0 | 0 | 30.88 | 79.03 |
+| [`minipixels.platform.windows.ticks`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-ticks-function-ticks-src-minipixels-platform-windows-ml-373459234) | `src/minipixels/platform/windows.ml:1037` | 3 | 1 | 1 | 0 | 0 | 28.07 | 79.32 |
 | [`minipixels.platform.windows.updateInput`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-updateinput-function-updateinput-input-src-minipixels-platform-windows-ml-273120734) | `src/minipixels/platform/windows.ml:707` | 4 | 2 | 1 | 0 | 0 | 59.79 | 74.29 |
 | [`minipixels.platform.windows.updateInputForWindow`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-updateinputforwindow-function-updateinputforwindow-w-input-src-minipixels-platform-windows-ml-991970669) | `src/minipixels/platform/windows.ml:682` | 22 | 20 | 9 | 13 | 3 | 899.18 | 48.82 |
 | [`minipixels.platform.windows.updatePointerForWindow`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-updatepointerforwindow-function-updatepointerforwindow-w-input-src-minipixels-platform-windows-ml-1648106125) | `src/minipixels/platform/windows.ml:723` | 20 | 22 | 5 | 4 | 1 | 1237.23 | 49.29 |
@@ -524,9 +564,9 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.platform.windows.viewportW`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-viewportw-function-viewportw-w-src-minipixels-platform-windows-ml-1163597675) | `src/minipixels/platform/windows.ml:850` | 1 | 1 | 1 | 0 | 0 | 34.87 | 89.07 |
 | [`minipixels.platform.windows.viewportX`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-viewportx-function-viewportx-w-src-minipixels-platform-windows-ml-547076125) | `src/minipixels/platform/windows.ml:844` | 1 | 1 | 1 | 0 | 0 | 34.87 | 89.07 |
 | [`minipixels.platform.windows.viewportY`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-viewporty-function-viewporty-w-src-minipixels-platform-windows-ml-1491031159) | `src/minipixels/platform/windows.ml:847` | 1 | 1 | 1 | 0 | 0 | 34.87 | 89.07 |
-| [`minipixels.platform.windows.waitUntil`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-waituntil-function-waituntil-deadline-src-minipixels-platform-windows-ml-1646201760) | `src/minipixels/platform/windows.ml:1042` | 12 | 7 | 3 | 3 | 2 | 255.41 | 59.2 |
+| [`minipixels.platform.windows.waitUntil`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-waituntil-function-waituntil-deadline-src-minipixels-platform-windows-ml-1646201760) | `src/minipixels/platform/windows.ml:1057` | 12 | 7 | 3 | 3 | 2 | 255.41 | 59.2 |
 | [`minipixels.platform.windows.wndProc`](File-src-minipixels-platform-windows-ml-1027159307.md#function-function-minipixels-platform-windows-wndproc-function-wndproc-hwnd-msg-wparam-lparam-src-minipixels-platform-windows-ml-10300301) | `src/minipixels/platform/windows.ml:461` | 23 | 20 | 7 | 7 | 2 | 624.02 | 49.78 |
-| [`minipixels.playAudio`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-playaudio-function-playaudio-audio-clip-src-minipixels-ml-1404017418) | `src/minipixels.ml:672` | 1 | 1 | 1 | 0 | 0 | 64.53 | 87.19 |
+| [`minipixels.playAudio`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-playaudio-function-playaudio-audio-clip-src-minipixels-ml-1404017418) | `src/minipixels.ml:676` | 1 | 1 | 1 | 0 | 0 | 64.53 | 87.19 |
 | [`minipixels.playMusic`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-playmusic-function-playmusic-path-src-minipixels-ml-497976999) | `src/minipixels.ml:644` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
 | [`minipixels.playMusicWithState`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-playmusicwithstate-function-playmusicwithstate-audio-path-src-minipixels-ml-57082401) | `src/minipixels.ml:656` | 1 | 1 | 1 | 0 | 0 | 62.27 | 87.3 |
 | [`minipixels.playSfx`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-playsfx-function-playsfx-audio-path-src-minipixels-ml-1629492027) | `src/minipixels.ml:652` | 1 | 1 | 1 | 0 | 0 | 62.27 | 87.3 |
@@ -547,8 +587,8 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.renderToDesignY`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-rendertodesigny-function-rendertodesigny-game-value-src-minipixels-ml-1696177351) | `src/minipixels.ml:281` | 1 | 1 | 1 | 0 | 0 | 53.77 | 87.75 |
 | [`minipixels.rgb`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-rgb-function-rgb-r-g-b-src-minipixels-ml-1814822953) | `src/minipixels.ml:354` | 1 | 1 | 1 | 0 | 0 | 78.87 | 86.58 |
 | [`minipixels.rgba`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-rgba-function-rgba-r-g-b-a-src-minipixels-ml-66620594) | `src/minipixels.ml:360` | 1 | 1 | 1 | 0 | 0 | 96.21 | 85.98 |
-| [`minipixels.run`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-run-function-run-cfg-initialize-update-render-shutdown-src-minipixels-ml-1457808081) | `src/minipixels.ml:760` | 64 | 70 | 27 | 44 | 3 | 4480.54 | 31.4 |
-| [`minipixels.runHeadless`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-runheadless-function-runheadless-cfg-initialize-update-render-shutdown-src-minipixels-ml-1345190063) | `src/minipixels.ml:726` | 27 | 31 | 13 | 16 | 2 | 1921.42 | 44.04 |
+| [`minipixels.run`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-run-function-run-cfg-initialize-update-render-shutdown-src-minipixels-ml-1457808081) | `src/minipixels.ml:768` | 64 | 70 | 27 | 44 | 3 | 4480.54 | 31.4 |
+| [`minipixels.runHeadless`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-runheadless-function-runheadless-cfg-initialize-update-render-shutdown-src-minipixels-ml-1345190063) | `src/minipixels.ml:734` | 27 | 31 | 13 | 16 | 2 | 1921.42 | 44.04 |
 | [`minipixels.saveCanvasPng`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-savecanvaspng-function-savecanvaspng-canvas-path-src-minipixels-ml-94977153) | `src/minipixels.ml:456` | 1 | 1 | 1 | 0 | 0 | 109.39 | 85.59 |
 | [`minipixels.scene`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-scene-function-scene-name-state-void-onenter-void-onexit-void-update-void-render-void-onpause-void-onresume-void-renderbelow-false-src-minipixels-ml-2042563506) | `src/minipixels.ml:530` | 3 | 1 | 1 | 0 | 0 | 272.32 | 72.41 |
 | [`minipixels.scene.scene.callLifecycle`](File-src-minipixels-scene-scene-ml-552680371.md#function-function-minipixels-scene-scene-calllifecycle-function-calllifecycle-callback-game-value-src-minipixels-scene-scene-ml-1529096808) | `src/minipixels/scene/scene.ml:176` | 3 | 2 | 2 | 1 | 1 | 109.39 | 75.05 |
@@ -742,10 +782,40 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 
 A clone group is an exact sequence of 6 normalized, contiguous code lines found more than once. Comments and formatting whitespace are ignored. Duplicated-line totals count overlapping windows only once.
 
-Found 13 clone group(s). At most 13 groups are shown.
+Found 15 clone group(s). At most 15 groups are shown.
 
 <details>
 <summary>Clone 1 — 2 occurrences</summary>
+
+    voice . clip = source
+    voice . playing = true
+    voice . volume = 100
+    voice . pan = 0
+    voice . cursor = 0.0
+    voice = openVoiceDecoder ( voice )
+
+- [`src/minipixels/audio/audio.ml:1051`](File-src-minipixels-audio-audio-ml-660527635.md)
+- [`src/minipixels/audio/audio.ml:1081`](File-src-minipixels-audio-audio-ml-660527635.md)
+
+</details>
+
+<details>
+<summary>Clone 2 — 2 occurrences</summary>
+
+    voice . playing = true
+    voice . volume = 100
+    voice . pan = 0
+    voice . cursor = 0.0
+    voice = openVoiceDecoder ( voice )
+    if not voice . playing then
+
+- [`src/minipixels/audio/audio.ml:1052`](File-src-minipixels-audio-audio-ml-660527635.md)
+- [`src/minipixels/audio/audio.ml:1082`](File-src-minipixels-audio-audio-ml-660527635.md)
+
+</details>
+
+<details>
+<summary>Clone 3 — 2 occurrences</summary>
 
     xx = xx + 1
     end while
@@ -754,13 +824,13 @@ Found 13 clone group(s). At most 13 groups are shown.
     markDirty ( c , x0 , y0 , x1 - x0 , y1 - y0 )
     if spr . image . opaque == false or mt . colorA ( tint ) < 255 then c . imageView . opaque = false end if
 
-- [`src/minipixels/graphics/canvas.ml:812`](File-src-minipixels-graphics-canvas-ml-370061960.md)
-- [`src/minipixels/graphics/canvas.ml:874`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:834`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:896`](File-src-minipixels-graphics-canvas-ml-370061960.md)
 
 </details>
 
 <details>
-<summary>Clone 2 — 2 occurrences</summary>
+<summary>Clone 4 — 2 occurrences</summary>
 
     end while
     yy = yy + 1
@@ -769,13 +839,13 @@ Found 13 clone group(s). At most 13 groups are shown.
     if spr . image . opaque == false or mt . colorA ( tint ) < 255 then c . imageView . opaque = false end if
     c . spriteCount = c . spriteCount + 1
 
-- [`src/minipixels/graphics/canvas.ml:813`](File-src-minipixels-graphics-canvas-ml-370061960.md)
-- [`src/minipixels/graphics/canvas.ml:875`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:835`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:897`](File-src-minipixels-graphics-canvas-ml-370061960.md)
 
 </details>
 
 <details>
-<summary>Clone 3 — 2 occurrences</summary>
+<summary>Clone 5 — 2 occurrences</summary>
 
     yy = yy + 1
     end while
@@ -784,13 +854,13 @@ Found 13 clone group(s). At most 13 groups are shown.
     c . spriteCount = c . spriteCount + 1
     c . drawCalls = c . drawCalls + 1
 
-- [`src/minipixels/graphics/canvas.ml:814`](File-src-minipixels-graphics-canvas-ml-370061960.md)
-- [`src/minipixels/graphics/canvas.ml:876`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:836`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:898`](File-src-minipixels-graphics-canvas-ml-370061960.md)
 
 </details>
 
 <details>
-<summary>Clone 4 — 2 occurrences</summary>
+<summary>Clone 6 — 2 occurrences</summary>
 
     end while
     markDirty ( c , x0 , y0 , x1 - x0 , y1 - y0 )
@@ -799,13 +869,13 @@ Found 13 clone group(s). At most 13 groups are shown.
     c . drawCalls = c . drawCalls + 1
     end function
 
-- [`src/minipixels/graphics/canvas.ml:815`](File-src-minipixels-graphics-canvas-ml-370061960.md)
-- [`src/minipixels/graphics/canvas.ml:877`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:837`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:899`](File-src-minipixels-graphics-canvas-ml-370061960.md)
 
 </details>
 
 <details>
-<summary>Clone 5 — 2 occurrences</summary>
+<summary>Clone 7 — 2 occurrences</summary>
 
     if w is not Window or width < 1 or height < 1 then return false end if
     width = mt . floorInt ( width )
@@ -820,7 +890,7 @@ Found 13 clone group(s). At most 13 groups are shown.
 </details>
 
 <details>
-<summary>Clone 6 — 2 occurrences</summary>
+<summary>Clone 8 — 2 occurrences</summary>
 
     return
     end if
@@ -835,7 +905,7 @@ Found 13 clone group(s). At most 13 groups are shown.
 </details>
 
 <details>
-<summary>Clone 7 — 2 occurrences</summary>
+<summary>Clone 9 — 2 occurrences</summary>
 
     end if
     if input . actionCount > 0 then
@@ -850,7 +920,7 @@ Found 13 clone group(s). At most 13 groups are shown.
 </details>
 
 <details>
-<summary>Clone 8 — 2 occurrences</summary>
+<summary>Clone 10 — 2 occurrences</summary>
 
     function dirname ( path )
     lastSlash = str . lastIndexOf ( path , "\\" )
@@ -865,7 +935,7 @@ Found 13 clone group(s). At most 13 groups are shown.
 </details>
 
 <details>
-<summary>Clone 9 — 2 occurrences</summary>
+<summary>Clone 11 — 2 occurrences</summary>
 
     lastSlash = str . lastIndexOf ( path , "\\" )
     lastForward = str . lastIndexOf ( path , "/" )
@@ -880,7 +950,7 @@ Found 13 clone group(s). At most 13 groups are shown.
 </details>
 
 <details>
-<summary>Clone 10 — 2 occurrences</summary>
+<summary>Clone 12 — 2 occurrences</summary>
 
     lastForward = str . lastIndexOf ( path , "/" )
     last = maxInt ( lastSlash , lastForward )
@@ -895,7 +965,7 @@ Found 13 clone group(s). At most 13 groups are shown.
 </details>
 
 <details>
-<summary>Clone 11 — 2 occurrences</summary>
+<summary>Clone 13 — 2 occurrences</summary>
 
     end for
     code . appendLine ( "  return " + fallback )
@@ -910,7 +980,7 @@ Found 13 clone group(s). At most 13 groups are shown.
 </details>
 
 <details>
-<summary>Clone 12 — 2 occurrences</summary>
+<summary>Clone 14 — 2 occurrences</summary>
 
     return
     end if
@@ -925,7 +995,7 @@ Found 13 clone group(s). At most 13 groups are shown.
 </details>
 
 <details>
-<summary>Clone 13 — 2 occurrences</summary>
+<summary>Clone 15 — 2 occurrences</summary>
 
     end if
     p . pos = p . pos + 1

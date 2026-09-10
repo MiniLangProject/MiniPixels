@@ -4,18 +4,19 @@
 
 | File | Package | Reachable | Symbols |
 | --- | --- | --- | ---: |
-| [src/minipixels.ml](File-src-minipixels-ml-1730909391.md) | `minipixels` | yes | 143 |
+| [src/minipixels.ml](File-src-minipixels-ml-1730909391.md) | `minipixels` | yes | 146 |
 | [src/minipixels/animation/animation.ml](File-src-minipixels-animation-animation-ml-2065983051.md) | `minipixels.animation.animation` | yes | 28 |
 | [src/minipixels/assets/assets.ml](File-src-minipixels-assets-assets-ml-652120143.md) | `minipixels.assets.assets` | yes | 24 |
 | [src/minipixels/assets/pack.ml](File-src-minipixels-assets-pack-ml-1157891367.md) | `minipixels.assets.pack` | yes | 25 |
 | [src/minipixels/assets/png.ml](File-src-minipixels-assets-png-ml-1155821131.md) | `minipixels.assets.png` | yes | 45 |
 | [src/minipixels/assets/text.ml](File-src-minipixels-assets-text-ml-1300721413.md) | `minipixels.assets.text` | yes | 20 |
-| [src/minipixels/audio/audio.ml](File-src-minipixels-audio-audio-ml-660527635.md) | `minipixels.audio.audio` | yes | 143 |
+| [src/minipixels/audio/audio.ml](File-src-minipixels-audio-audio-ml-660527635.md) | `minipixels.audio.audio` | yes | 168 |
 | [src/minipixels/collision/collision.ml](File-src-minipixels-collision-collision-ml-1544745439.md) | `minipixels.collision.collision` | yes | 14 |
 | [src/minipixels/core/time.ml](File-src-minipixels-core-time-ml-1360759889.md) | `minipixels.core.time` | yes | 16 |
 | [src/minipixels/debug/debug.ml](File-src-minipixels-debug-debug-ml-1202344879.md) | `minipixels.debug.debug` | yes | 5 |
-| [src/minipixels/graphics/canvas.ml](File-src-minipixels-graphics-canvas-ml-370061960.md) | `minipixels.graphics.canvas` | yes | 70 |
+| [src/minipixels/graphics/canvas.ml](File-src-minipixels-graphics-canvas-ml-370061960.md) | `minipixels.graphics.canvas` | yes | 72 |
 | [src/minipixels/graphics/font.ml](File-src-minipixels-graphics-font-ml-906525775.md) | `minipixels.graphics.font` | yes | 5 |
+| [src/minipixels/graphics/gpu.ml](File-src-minipixels-graphics-gpu-ml-159526452.md) | `minipixels.graphics.gpu` | no | 54 |
 | [src/minipixels/graphics/sprite.ml](File-src-minipixels-graphics-sprite-ml-1992064667.md) | `minipixels.graphics.sprite` | yes | 37 |
 | [src/minipixels/input/input.ml](File-src-minipixels-input-input-ml-1476207415.md) | `minipixels.input.input` | yes | 67 |
 | [src/minipixels/math/types.ml](File-src-minipixels-math-types-ml-311947336.md) | `minipixels.math.types` | yes | 79 |

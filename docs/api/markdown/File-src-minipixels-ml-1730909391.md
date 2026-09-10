@@ -110,7 +110,7 @@ function audioBackend()
 Performs the audioBackend operation for the minipixels module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L688)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L692)
 
 <a id="function-function-minipixels-audioclip-function-audioclip-path-name-src-minipixels-ml-515413188"></a>
 ### audioClip
@@ -160,7 +160,7 @@ Performs the audioMixer operation for the minipixels module.
 | `maxChannels` | `dynamic` | — | maxChannels value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L675)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L679)
 
 <a id="function-function-minipixels-audiostate-function-audiostate-src-minipixels-ml-872649788"></a>
 ### audioState
@@ -174,6 +174,18 @@ Performs the audioState operation for the minipixels module.
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L648)
 
+<a id="function-function-minipixels-audiosupportsmp3-function-audiosupportsmp3-src-minipixels-ml-658236408"></a>
+### audioSupportsMp3
+
+```ml
+function audioSupportsMp3()
+```
+
+Returns whether the advanced mixer supports MP3 input.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L698)
+
 <a id="function-function-minipixels-audiosupportsmultiplesfx-function-audiosupportsmultiplesfx-src-minipixels-ml-155152452"></a>
 ### audioSupportsMultipleSfx
 
@@ -184,7 +196,19 @@ function audioSupportsMultipleSfx()
 Performs the audioSupportsMultipleSfx operation for the minipixels module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L690)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L694)
+
+<a id="function-function-minipixels-audiosupportsstereo-function-audiosupportsstereo-src-minipixels-ml-2076042780"></a>
+### audioSupportsStereo
+
+```ml
+function audioSupportsStereo()
+```
+
+Returns whether the advanced mixer preserves stereo input.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L700)
 
 <a id="function-function-minipixels-audiosupportsvolumecontrol-function-audiosupportsvolumecontrol-src-minipixels-ml-442255824"></a>
 ### audioSupportsVolumeControl
@@ -196,7 +220,7 @@ function audioSupportsVolumeControl()
 Performs the audioSupportsVolumeControl operation for the minipixels module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L692)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L696)
 
 <a id="function-function-minipixels-bindkey-function-bindkey-input-action-key-src-minipixels-ml-929736471"></a>
 ### bindKey
@@ -250,7 +274,7 @@ Performs the callIfFunction operation for the minipixels module.
 | `a` | `dynamic` | — | a value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L700)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L708)
 
 <a id="function-function-minipixels-callrender-function-callrender-fn-game-canvas-src-minipixels-ml-417238454"></a>
 ### callRender
@@ -268,7 +292,7 @@ Performs the callRender operation for the minipixels module.
 | `canvas` | `dynamic` | — | canvas value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L716)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L724)
 
 <a id="function-function-minipixels-callupdate-function-callupdate-fn-game-dt-src-minipixels-ml-623549234"></a>
 ### callUpdate
@@ -286,7 +310,7 @@ Performs the callUpdate operation for the minipixels module.
 | `dt` | `dynamic` | — | dt value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L708)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L716)
 
 <a id="function-function-minipixels-camera-function-camera-width-height-src-minipixels-ml-1194025291"></a>
 ### camera
@@ -591,7 +615,7 @@ Performs the frameHash operation for the minipixels module.
 | `canvas` | `dynamic` | — | canvas value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L695)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L703)
 
 - [minipixels.Game](Type-minipixels-game-1761105865.md) — struct
 - [minipixels.GameConfig](Type-minipixels-gameconfig-282091547.md) — struct
@@ -800,7 +824,7 @@ Performs the mixerPlayMusic operation for the minipixels module.
 | `clip` | `dynamic` | — | clip value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L683)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L687)
 
 <a id="function-function-minipixels-mixerplaysfx-function-mixerplaysfx-mixer-clip-src-minipixels-ml-1261022307"></a>
 ### mixerPlaySfx
@@ -817,7 +841,7 @@ Performs the mixerPlaySfx operation for the minipixels module.
 | `clip` | `dynamic` | — | clip value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L679)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L683)
 
 <a id="function-function-minipixels-mixerstopall-function-mixerstopall-mixer-src-minipixels-ml-1666561493"></a>
 ### mixerStopAll
@@ -833,7 +857,7 @@ Performs the mixerStopAll operation for the minipixels module.
 | `mixer` | `dynamic` | — | mixer value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L686)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L690)
 
 <a id="function-function-minipixels-musicclip-function-musicclip-path-name-src-minipixels-ml-1876241718"></a>
 ### musicClip
@@ -851,6 +875,23 @@ Performs the musicClip operation for the minipixels module.
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L668)
+
+<a id="function-function-minipixels-musicclipfrombytes-function-musicclipfrombytes-data-name-src-minipixels-ml-1447723125"></a>
+### musicClipFromBytes
+
+```ml
+function musicClipFromBytes(data, name)
+```
+
+Creates a streaming-capable music clip from complete WAV or MP3 bytes.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `data` | `dynamic` | — | Complete audio file bytes. |
+| `name` | `dynamic` | — | Stable clip name. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L672)
 
 <a id="function-function-minipixels-openassetpack-function-openassetpack-path-src-minipixels-ml-1608444883"></a>
 ### openAssetPack
@@ -902,7 +943,7 @@ Performs the playAudio operation for the minipixels module.
 | `clip` | `dynamic` | — | clip value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L672)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L676)
 
 <a id="function-function-minipixels-playmusic-function-playmusic-path-src-minipixels-ml-497976999"></a>
 ### playMusic
@@ -1262,7 +1303,7 @@ Runs run for the minipixels workflow.
 | `shutdown` | `dynamic` | — | shutdown value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L760)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L768)
 
 <a id="function-function-minipixels-runheadless-function-runheadless-cfg-initialize-update-render-shutdown-src-minipixels-ml-1345190063"></a>
 ### runHeadless
@@ -1282,7 +1323,7 @@ Runs headless for the minipixels workflow.
 | `shutdown` | `dynamic` | — | shutdown value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L726)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L734)
 
 <a id="function-function-minipixels-savecanvaspng-function-savecanvaspng-canvas-path-src-minipixels-ml-94977153"></a>
 ### saveCanvasPng

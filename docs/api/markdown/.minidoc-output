@@ -13,6 +13,7 @@ File-src-minipixels-core-time-ml-1360759889.md
 File-src-minipixels-debug-debug-ml-1202344879.md
 File-src-minipixels-graphics-canvas-ml-370061960.md
 File-src-minipixels-graphics-font-ml-906525775.md
+File-src-minipixels-graphics-gpu-ml-159526452.md
 File-src-minipixels-graphics-sprite-ml-1992064667.md
 File-src-minipixels-input-input-ml-1476207415.md
 File-src-minipixels-math-types-ml-311947336.md
@@ -43,6 +44,7 @@ Package-minipixels-core-time-683059339.md
 Package-minipixels-debug-debug-706893891.md
 Package-minipixels-graphics-canvas-2037800108.md
 Package-minipixels-graphics-font-76916397.md
+Package-minipixels-graphics-gpu-1856137742.md
 Package-minipixels-graphics-sprite-484808201.md
 Package-minipixels-input-input-1057851307.md
 Package-minipixels-math-types-2130299542.md
@@ -76,6 +78,7 @@ Type-minipixels-core-time-timestate-995826067.md
 Type-minipixels-game-1761105865.md
 Type-minipixels-gameconfig-282091547.md
 Type-minipixels-graphics-canvas-canvas-2121003546.md
+Type-minipixels-graphics-gpu-gpucanvas-1207336338.md
 Type-minipixels-graphics-sprite-image-712579706.md
 Type-minipixels-graphics-sprite-sprite-363793820.md
 Type-minipixels-graphics-sprite-spritesheet-395190639.md
