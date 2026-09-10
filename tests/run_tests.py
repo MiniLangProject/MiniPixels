@@ -152,6 +152,8 @@ def create_asset_pack_fixture() -> None:
     large_pixels = bytes([17, 34, 51, 255]) * (129 * 128)
     (fixture_assets / "large.png").write_bytes(mod.write_png_rgba_store(129, 128, large_pixels))
     (fixture_assets / "tone.wav").write_bytes(bytes([82, 73, 73, 70, 1, 2, 3, 4]))
+    repeated = ("MiniPixels compressed and deduplicated payload.\n" * 64).encode("utf-8")
+    (fixture_assets / "repeated.txt").write_bytes(repeated)
     png_fixtures = ROOT / "build" / "tests" / "png"
     png_fixtures.mkdir(parents=True, exist_ok=True)
     dynamic_png = filtered_rgba_png(64, 32)
@@ -173,6 +175,18 @@ def create_asset_pack_fixture() -> None:
         + pcm
     )
     (ROOT / "build" / "tests" / "tone_valid.wav").write_bytes(wav)
+    long_samples = [12000 if (frame // 40) % 2 == 0 else -12000 for frame in range(22050)]
+    long_pcm = struct.pack("<" + "h" * len(long_samples), *long_samples)
+    long_wav = (
+        b"RIFF"
+        + struct.pack("<I", 36 + len(long_pcm))
+        + b"WAVEfmt "
+        + struct.pack("<IHHIIHH", 16, 1, 1, 22050, 44100, 2, 16)
+        + b"data"
+        + struct.pack("<I", len(long_pcm))
+        + long_pcm
+    )
+    (fixture_assets / "tone_long.wav").write_bytes(long_wav)
     (ROOT / "build" / "tests" / "tone_stereo.mp3").write_bytes(STEREO_MP3_FIXTURE)
     mod.write_asset_pack(
         {
@@ -180,7 +194,10 @@ def create_asset_pack_fixture() -> None:
                 {"id": "hero", "type": "image", "path": "assets/hero.png"},
                 {"id": "large", "type": "image", "path": "assets/large.png"},
                 {"id": "generated", "type": "procedural", "kind": "checker", "width": 4, "height": 2},
-                {"id": "tone", "type": "audio", "path": "assets/tone.wav"},
+                {"id": "repeated_a", "type": "file", "path": "assets/repeated.txt"},
+                {"id": "repeated_b", "type": "file", "path": "assets/repeated.txt"},
+                {"id": "tone", "type": "audio", "path": "assets/tone.wav", "transcode": False},
+                {"id": "tone_mp3", "type": "audio", "path": "assets/tone_long.wav"},
             ]
         },
         fixture_root,
@@ -226,6 +243,7 @@ def create_protected_asset_fixture() -> Path:
     pack = project / "build" / "assets.mpx"
     data = pack.read_bytes()
     assert data.startswith(b"MPX3"), data[:4]
+    assert data[4] == 4, data[4]
     assert b"menu.start" not in data and b"world" not in data and b"MPT1" not in data
     tampered = bytearray(data)
     tampered[80] ^= 1
@@ -233,6 +251,12 @@ def create_protected_asset_fixture() -> Path:
     payload_tampered = bytearray(data)
     payload_tampered[-1] ^= 1
     (project / "build" / "assets-payload-tampered.mpx").write_bytes(payload_tampered)
+    old_version = bytearray(data)
+    old_version[4] = 3
+    (project / "build" / "assets-version3.mpx").write_bytes(old_version)
+    old_container = bytearray(data)
+    old_container[:4] = b"MPX2"
+    (project / "build" / "assets-mpx2.mpx").write_bytes(old_container)
     assert (generated / "asset_security.ml").is_file()
     assert (generated / "constants" / "balance.ml").is_file()
     return project
@@ -244,7 +268,7 @@ def run_python_tests() -> None:
         raise RuntimeError("could not load tools/minipixels.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    assert mod.VERSION == "0.12.0", mod.VERSION
+    assert mod.VERSION == "0.13.0", mod.VERSION
     with tempfile.TemporaryDirectory(prefix="minipixels_security_") as td:
         security_root = Path(td)
         security_manifest = security_root / "minipixels.json"
@@ -389,6 +413,81 @@ def run_python_tests() -> None:
         pack_path = mod.write_asset_pack(pack_manifest, tmp_path, tmp_path / "assets.mpx")
         assert pack_path.exists(), pack_path
         assert pack_path.read_bytes().startswith(b"MPX1"), pack_path
+        assert len(pack_path.read_bytes()) < len(hero_png) + 40, pack_path.stat().st_size
+        repeated = ("compress me and store me once\n" * 128).encode("utf-8")
+        (asset_dir / "same.txt").write_bytes(repeated)
+        duplicate_pack = mod.write_asset_pack(
+            {
+                "assets": [
+                    {"id": "same_a", "type": "file", "path": "assets/same.txt"},
+                    {"id": "same_b", "type": "file", "path": "assets/same.txt"},
+                ]
+            },
+            tmp_path,
+            tmp_path / "duplicate.mpx",
+        )
+        duplicate_data = duplicate_pack.read_bytes()
+        first_name_size = struct.unpack_from("<H", duplicate_data, 8)[0]
+        first_meta = 10 + first_name_size
+        first_codec = duplicate_data[first_meta + 1]
+        first_offset, first_size = struct.unpack_from("<II", duplicate_data, first_meta + 2)
+        second_entry = first_meta + 10
+        second_name_size = struct.unpack_from("<H", duplicate_data, second_entry)[0]
+        second_meta = second_entry + 2 + second_name_size
+        second_offset, second_size = struct.unpack_from("<II", duplicate_data, second_meta + 2)
+        assert first_codec in (mod.PACK_CODEC_DEFLATE, mod.PACK_CODEC_RLE), first_codec
+        assert (first_offset, first_size) == (second_offset, second_size)
+        assert len(duplicate_data) < len(repeated), len(duplicate_data)
+        key_dir = tmp_path / ".minipixels"
+        mod.generate_signing_key(key_dir / "private.pem", key_dir / "public.pem")
+        signing_key = mod.load_signing_key(tmp_path, {"signingKey": ".minipixels/private.pem"})
+        protected_duplicate = mod.protect_pack(duplicate_data, signing_key)
+        from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+
+        protected_bytes = protected_duplicate.data
+        protected_index_size = struct.unpack_from("<Q", protected_bytes, 12)[0]
+        protected_header = protected_bytes[:64]
+        protected_index = AESGCM(protected_duplicate.aes_key).decrypt(
+            protected_header[36:48],
+            protected_bytes[64 : 64 + protected_index_size + 16],
+            protected_header,
+        )
+        protected_offsets = []
+        protected_position = 8
+        for _ in range(2):
+            protected_name_size = struct.unpack_from("<H", protected_index, protected_position)[0]
+            protected_position += 2 + protected_name_size + 2
+            protected_offsets.append(struct.unpack_from("<Q", protected_index, protected_position)[0])
+            protected_position += 24 + 28
+        assert protected_offsets[0] == protected_offsets[1], protected_offsets
+
+        frames = 22050
+        pcm = bytearray()
+        for frame in range(frames):
+            sample = 12000 if (frame // 40) % 2 == 0 else -12000
+            pcm.extend(struct.pack("<h", sample))
+        wav_data = (
+            b"RIFF"
+            + struct.pack("<I", 36 + len(pcm))
+            + b"WAVEfmt "
+            + struct.pack("<IHHIIHH", 16, 1, 1, 22050, 44100, 2, 16)
+            + b"data"
+            + struct.pack("<I", len(pcm))
+            + bytes(pcm)
+        )
+        (asset_dir / "tone.wav").write_bytes(wav_data)
+        audio_pack = mod.write_asset_pack(
+            {"assets": [{"id": "tone", "type": "audio", "path": "assets/tone.wav"}]},
+            tmp_path,
+            tmp_path / "audio.mpx",
+        )
+        audio_data = audio_pack.read_bytes()
+        audio_name_size = struct.unpack_from("<H", audio_data, 8)[0]
+        audio_meta = 10 + audio_name_size
+        audio_offset, audio_size = struct.unpack_from("<II", audio_data, audio_meta + 2)
+        encoded_audio = audio_data[audio_offset : audio_offset + audio_size]
+        assert encoded_audio.startswith(b"ID3") or (encoded_audio[0] == 0xFF and encoded_audio[1] & 0xE0 == 0xE0)
+        assert audio_size < len(wav_data) // 2, (audio_size, len(wav_data))
         procedural_pack = mod.write_asset_pack(
             {"assets": [{"id": "generated", "type": "procedural", "kind": "checker", "width": 4, "height": 2}]},
             tmp_path,
@@ -561,6 +660,10 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
                 "  rejectedPayload = try(mp.loadBytesFromPack(lazyTamper, \"world\"))",
                 "  a.assertTrue(typeof(rejectedPayload) == \"error\", \"tampered payload rejected on first access\")",
                 "  mp.closeAssetPack(lazyTamper)",
+                "  rejectedV3 = try(mp.openProtectedAssetPack(\"build/assets-version3.mpx\", security.aesKey(), security.publicKey(), security.keyId()))",
+                "  a.assertTrue(typeof(rejectedV3) == \"error\", \"MPX3 version 3 rejected\")",
+                "  rejectedMpx2 = try(mp.openProtectedAssetPack(\"build/assets-mpx2.mpx\", security.aesKey(), security.publicKey(), security.keyId()))",
+                "  a.assertTrue(typeof(rejectedMpx2) == \"error\", \"MPX2 rejected\")",
                 "  print \"=== PROTECTED ASSET SMOKE DONE ===\"",
                 "  return 0",
                 "end function",

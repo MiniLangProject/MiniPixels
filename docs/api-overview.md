@@ -117,9 +117,9 @@ function initialize(game)
 end function
 ```
 
-Project generation writes image, procedural, audio, file, text, and JSON data assets into `build/assets.mpx` and emits lazy MiniLang loader functions. Constants become generated MiniLang code rather than runtime pack entries. Opening reads only the pack index; payload ranges are fetched on first use. Generated accessors use pre-resolved numeric slots, cache decoded images/text/data, and release source bytes when the decoded object no longer needs them. `gen.preload()` optionally warms all generated assets during a loading screen. The non-interlaced PNG decoder supports stored/fixed/dynamic Deflate, all PNG scanline filters, and grayscale, RGB, indexed, grayscale-alpha, and RGBA color types. `mp.loadPng(path)` also hot-loads ordinary PNG files directly.
+Project generation writes image, procedural, audio, file, text, and JSON data assets into `build/assets.mpx` and emits lazy MiniLang loader functions. Constants become generated MiniLang code rather than runtime pack entries. Compatible source PNGs are retained, generated PNGs use real Deflate, WAV assets become MP3 when smaller, and structured/file payloads select per-entry Deflate or RLE adaptively. Identical stored payloads share one block. Opening reads only the pack index; payload ranges are authenticated, read, and decompressed on first use. Generated accessors use pre-resolved numeric slots, cache decoded images/text/data, and release source bytes when the decoded object no longer needs them. `gen.preload()` optionally warms all generated assets during a loading screen. The non-interlaced PNG decoder supports stored/fixed/dynamic Deflate, all PNG scanline filters, and grayscale, RGB, indexed, grayscale-alpha, and RGBA color types. `mp.loadPng(path)` also hot-loads ordinary PNG files directly.
 
-The Python driver writes protected assets as random-access MPX3. It signs an encrypted index and stores every payload as an independent AES-256-GCM block, so startup does not read or decrypt the whole pack. `python tools/minipixels.py security init <manifest>` creates the build-only P-256 signing key and enables protection. Generated game code reconstructs the obfuscated AES key and performs verification/decryption transparently. Legacy MPX2 packs are still accepted by the runtime.
+The Python driver writes protected assets as random-access MPX3 version 4. It signs an encrypted index and stores every payload as an independent AES-256-GCM block, so startup does not read or decrypt the whole pack. `python tools/minipixels.py security init <manifest>` creates the build-only P-256 signing key and enables protection. Generated game code reconstructs the obfuscated AES key and performs verification/decryption transparently. MPX2 and older MPX3 versions are rejected.
 
 ```json
 {
@@ -283,7 +283,7 @@ mixer.setChannel(0, 75, -30)
 mixer.stopAll()
 ```
 
-PCM WAV input supports mono/stereo 8/16/24/32-bit samples. MP3 input is decoded lazily to signed 16-bit PCM for sound effects and incrementally for the dedicated music voice, so packed music remains compressed in memory. Both formats preserve independent left/right channels and use nearest-rate conversion to 44.1 kHz stereo, looping, master/bus/clip/channel volume, and pan. `mp.audioSupportsMp3()` and `mp.audioSupportsStereo()` expose the new capabilities. The legacy `playSound*` helpers remain WAV-only.
+PCM WAV input supports mono/stereo 8/16/24/32-bit samples. During Python asset builds, PCM WAV entries are automatically transcoded to MP3 when smaller; `mp3Bitrate`, `mp3Quality`, and `transcode` configure or disable this build-time step. MP3 input is decoded lazily to signed 16-bit PCM for sound effects and incrementally for the dedicated music voice, so packed music remains compressed in memory. Both formats preserve independent left/right channels and use nearest-rate conversion to 44.1 kHz stereo, looping, master/bus/clip/channel volume, and pan. `mp.audioSupportsMp3()` and `mp.audioSupportsStereo()` expose the capabilities. The legacy `playSound*` helpers remain WAV-only.
 
 ## Releases
 

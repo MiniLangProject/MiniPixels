@@ -39,7 +39,9 @@ MiniPixels projects are described by `minipixels.json`.
     {
       "id": "coinSound",
       "type": "audio",
-      "path": "assets/audio/coin.wav"
+      "path": "assets/audio/coin.wav",
+      "mp3Bitrate": 96,
+      "mp3Quality": 2
     },
     {
       "id": "de",
@@ -60,17 +62,17 @@ Asset types:
 
 | Type | Meaning | Python CLI | Native CLI `generate` |
 | --- | --- | --- | --- |
-| `image` | non-interlaced PNG image asset | stores deterministic RGBA PNG payload and generates lazy loader functions | stores source PNG payload and generates lazy loader functions |
-| `procedural` | generated checker/player/tile sprite data from manifest fields | renders a PNG payload into `assets.mpx` and generates a loader | renders a deterministic PNG payload and generates a loader |
-| `audio` | runtime PCM WAV or MP3 file | stores original payload and generates a lazy memory-clip helper | stores original payload and generates a lazy memory-clip helper |
-| `file` | runtime data file | stores payload and generates pack access | stores payload and generates pack access |
-| `text` | UTF-8 JSON translation catalog | validates keys/placeholders, encodes MPT1, and generates localization helpers | encodes MPT1 and generates a catalog helper |
-| `data` | structured runtime JSON data | canonicalizes and stores UTF-8 JSON in the pack | stores UTF-8 JSON in the pack |
+| `image` | non-interlaced PNG image asset | validates and preserves source PNG bytes | stores source PNG bytes |
+| `procedural` | generated checker/player/tile sprite data from manifest fields | renders a Deflate-compressed PNG | renders a deterministic PNG and applies pack RLE when useful |
+| `audio` | runtime PCM WAV or MP3 file | transcodes WAV to MP3 when smaller and generates a lazy memory-clip helper | stores original payload and generates a lazy memory-clip helper |
+| `file` | runtime data file | selects Deflate/RLE when smaller | selects RLE when smaller |
+| `text` | UTF-8 JSON translation catalog | validates, encodes MPT1, and compresses when useful | encodes MPT1 and applies RLE when useful |
+| `data` | structured runtime JSON data | canonicalizes JSON and compresses when useful | stores JSON and applies RLE when useful |
 | `constants` | build-time game configuration | generates scalar constants plus a structured `data()` accessor | requires the Python build driver |
 
 Assets with `sheet` metadata also get generated helpers such as `gen.sheet_player()`.
 
-Both generators write `build/assets.mpx`; the Python build additionally copies it next to the executable. The runtime accepts ordinary non-interlaced grayscale, RGB, indexed, grayscale-alpha, and RGBA PNGs. Audio entries are loaded as bytes and can be mixed as in-memory PCM clips.
+Both generators write `build/assets.mpx`; the Python build additionally copies it next to the executable. The runtime accepts ordinary non-interlaced grayscale, RGB, indexed, grayscale-alpha, and RGBA PNGs. Compression and identical-payload deduplication are transparent to generated code. Python builds convert PCM WAV entries to MP3 only when the encoded result is smaller. `mp3Bitrate` accepts 32–320 kbit/s, `mp3Quality` accepts 0–9, and `"transcode": false` preserves WAV bytes.
 
 ## Protected Asset Builds
 
@@ -83,7 +85,7 @@ python tools\minipixels.py security status path\to\game\minipixels.json
 
 `security init` creates an unencrypted P-256 PKCS#8 private PEM below `.minipixels`, writes the public PEM beside it, adds the private path to the game's `.gitignore`, and enables `assetProtection`. Subsequent `generate`, `pack`, `build`, and `run` commands create MPX3 automatically. In CI, supply the PEM through `MINIPIXELS_ASSET_SIGNING_KEY` or point `MINIPIXELS_ASSET_SIGNING_KEY_FILE` at a secret file. A protected build fails when the private key is unavailable.
 
-MPX3 keeps only a fixed 64-byte transport header in clear text. Names, kinds, ranges, per-entry nonces and tags live in an AES-256-GCM encrypted index; each payload is a separate AES-256-GCM block. MiniPixels signs `header || encrypted-index || index-tag` with ECDSA-P256-SHA256. Because the signed index authenticates each payload's GCM material, changing an asset is detected on first access and valid replacement still requires the signing key. Generated code embeds the public verification key, its key id, and a per-build masked/permuted AES key. The runtime never accepts MPX1 as a fallback for a protected generated module, while direct runtime calls can still open legacy MPX2 files.
+MPX3 version 4 keeps only a fixed 64-byte transport header in clear text. Names, kinds, codecs, logical/stored sizes, ranges, per-entry nonces and tags live in an AES-256-GCM encrypted index; each unique compressed/raw payload is a separate AES-256-GCM block. MiniPixels signs `header || encrypted-index || index-tag` with ECDSA-P256-SHA256. Because the signed index authenticates each payload's GCM material, changing an asset is detected on first access and valid replacement still requires the signing key. Generated code embeds the public verification key, its key id, and a per-build masked/permuted AES key. The protected loader accepts only MPX3 version 4 and rejects MPX1, MPX2, and older MPX3 versions.
 
 The embedded AES key is deliberate obfuscation against trivial extraction, not a hardware-backed secret. The signing private key is the actual modification boundary and is never emitted into generated code or the asset pack.
 

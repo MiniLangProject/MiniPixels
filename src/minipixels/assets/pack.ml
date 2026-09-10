@@ -4,7 +4,6 @@
 
 package minipixels.assets.pack
 
-import std.fs as fs
 import std.io.file as fileio
 import std.bytes as by
 import std.crypto as crypto
@@ -17,6 +16,14 @@ import minipixels.assets.png as png
 const PACK_ERR = 9302
 /// Maximum encrypted index accepted before signature verification.
 const MAX_INDEX_SIZE = 67108864
+/// No container-level payload compression.
+const CODEC_NONE = 0
+/// MPC1-wrapped zlib/Deflate payload compression.
+const CODEC_DEFLATE = 1
+/// MPR1 byte-run compression used by the native MiniLang packer.
+const CODEC_RLE = 2
+/// Maximum logical size of one decompressed asset.
+const MAX_DECOMPRESSED_ASSET_SIZE = 536870912
 
 /// Represents the asset pack data used by the minipixels assets pack module.
 struct AssetPack
@@ -36,10 +43,14 @@ struct AssetPack
   names
   /// Stores the kinds value associated with asset pack.
   kinds
+  /// Per-entry container compression codec.
+  codecs
   /// Stores the offsets value associated with asset pack.
   offsets
-  /// Stores the sizes value associated with asset pack.
+  /// Logical payload sizes where available.
   sizes
+  /// Number of bytes stored in the backing file for each entry.
+  storedSizes
   /// Per-entry AES-GCM nonces for MPX3 payload blocks.
   nonces
   /// Per-entry AES-GCM authentication tags for MPX3 payload blocks.
@@ -100,54 +111,56 @@ function isPack(data)
   return data[0] == 77 and data[1] == 80 and data[2] == 88 and data[3] == 49
 end function
 
-/// Opens open for the minipixels assets pack module.
-/// @param path Path of the file or directory used by the operation.
-/// @param data Complete MPX1 byte buffer.
-function _openData(path, data)
-  if not isPack(data) then return packError("not a MiniPixels asset pack") end if
-  count = by.readU32LE(data, 4)
-  if typeof(count) != "int" or count < 0 then return packError("invalid asset count") end if
-  if count * 12 > len(data) - 8 then return packError("asset count exceeds pack index bounds") end if
-  names = array(count)
-  kinds = array(count, 0)
-  offsets = array(count, 0)
-  sizes = array(count, 0)
-  index = hm.HashMap.withCapacity((count * 2) + 1)
-  pos = 8
-  i = 0
-  while i < count
-    if not hasRange(data, pos, 12) then return packError("asset pack index truncated") end if
-    nameLen = by.readU16LE(data, pos)
-    if nameLen <= 0 then return packError("asset pack name is empty") end if
-    pos = pos + 2
-    if not hasRange(data, pos, nameLen + 10) then return packError("asset pack name truncated") end if
-    nameBytes = slice(data, pos, nameLen)
-    name = decode(nameBytes)
-    if typeof(name) != "string" then return packError("asset pack name is not utf-8") end if
-    if index.has(name) then return packError("duplicate asset name: " + name) end if
-    pos = pos + nameLen
-    kind = data[pos]
-    pos = pos + 2
-    offset = by.readU32LE(data, pos)
-    size = by.readU32LE(data, pos + 4)
-    pos = pos + 8
-    if not hasRange(data, offset, size) then return packError("asset pack payload out of range") end if
-    names[i] = name
-    kinds[i] = kind
-    offsets[i] = offset
-    sizes[i] = size
-    index.set(name, i)
-    i = i + 1
-  end while
-  if count > 0 then
-    for i = 0 to count - 1
-      if offsets[i] < pos then return packError("asset payload overlaps the pack index") end if
-    end for
+/// Expands one authenticated/read payload according to its index codec.
+/// @internal
+function _decodePayload(codec, payload, expectedSize)
+  if codec == CODEC_NONE then
+    if expectedSize >= 0 and len(payload) != expectedSize then return packError("asset payload size mismatch") end if
+    return payload
   end if
-  return AssetPack(path, data, void, false, false, void, names, kinds, offsets, sizes, array(count), array(count), count, index, array(count, false), array(count, false), array(count, false), array(count, false), 0, 0, 0, 0, 0)
+  if codec != CODEC_DEFLATE and codec != CODEC_RLE then return packError("unsupported asset compression codec") end if
+  if not hasRange(payload, 0, 8) or payload[0] != 77 or payload[1] != 80 then
+    return packError("compressed asset envelope is invalid")
+  end if
+  if codec == CODEC_DEFLATE and (payload[2] != 67 or payload[3] != 49) then return packError("compressed asset envelope is invalid") end if
+  if codec == CODEC_RLE and (payload[2] != 82 or payload[3] != 49) then return packError("compressed asset envelope is invalid") end if
+  logicalSize = by.readU32LE(payload, 4)
+  if logicalSize < 0 or logicalSize > MAX_DECOMPRESSED_ASSET_SIZE then return packError("compressed asset size exceeds limit") end if
+  if expectedSize >= 0 and logicalSize != expectedSize then return packError("compressed asset size mismatch") end if
+  if codec == CODEC_DEFLATE then
+    compressed = slice(payload, 8, len(payload) - 8)
+    decoded = try(png.inflateZlib(compressed, logicalSize))
+    if typeof(decoded) == "error" then return packError("asset decompression failed") end if
+    return decoded
+  end if
+  decoded = bytes(logicalSize, 0)
+  source = 8
+  target = 0
+  while source < len(payload)
+    control = payload[source]
+    source = source + 1
+    if (control & 128) != 0 then
+      run = (control & 127) + 3
+      if source >= len(payload) or target + run > logicalSize then return packError("RLE asset payload is invalid") end if
+      value = payload[source]
+      source = source + 1
+      for i = 0 to run - 1
+        decoded[target + i] = value
+      end for
+      target = target + run
+    else
+      run = control + 1
+      if not hasRange(payload, source, run) or target + run > logicalSize then return packError("RLE asset payload is invalid") end if
+      copyBytes(decoded, target, payload, source, run)
+      source = source + run
+      target = target + run
+    end if
+  end while
+  if target != logicalSize then return packError("RLE asset payload is truncated") end if
+  return decoded
 end function
 
-/// Reads one unsigned little-endian 64-bit size from an MPX2 header.
+/// Reads one unsigned little-endian 64-bit size from an MPX3 header or index.
 /// @internal
 function _readU64LE(data, offset)
   low = by.readU32LE(data, offset)
@@ -171,6 +184,7 @@ function _openFile1(path, file, header)
   end if
   names = array(count)
   kinds = array(count, 0)
+  codecs = array(count, 0)
   offsets = array(count, 0)
   sizes = array(count, 0)
   nameIndex = hm.HashMap.withCapacity((count * 2) + 1)
@@ -198,6 +212,11 @@ function _openFile1(path, file, header)
       return packError("invalid or duplicate MPX1 asset name")
     end if
     kind = entry[nameLen]
+    codec = entry[nameLen + 1]
+    if codec != CODEC_NONE and codec != CODEC_DEFLATE and codec != CODEC_RLE then
+      fileio.close(file)
+      return packError("unsupported asset compression codec")
+    end if
     offset = by.readU32LE(entry, nameLen + 2)
     size = by.readU32LE(entry, nameLen + 6)
     if offset < 0 or size < 0 or offset + size > actualFileSize then
@@ -206,6 +225,7 @@ function _openFile1(path, file, header)
     end if
     names[i] = name
     kinds[i] = kind
+    codecs[i] = codec
     offsets[i] = offset
     sizes[i] = size
     nameIndex.set(name, i)
@@ -220,7 +240,7 @@ function _openFile1(path, file, header)
       end if
     end for
   end if
-  return AssetPack(path, void, file, true, false, void, names, kinds, offsets, sizes, array(count), array(count), count, nameIndex, array(count, false), array(count, false), array(count, false), array(count, false), 0, 0, 0, 0, 0)
+  return AssetPack(path, void, file, true, false, void, names, kinds, codecs, offsets, sizes, sizes, array(count), array(count), count, nameIndex, array(count, false), array(count, false), array(count, false), array(count, false), 0, 0, 0, 0, 0)
 end function
 
 /// Opens an ordinary MPX1 asset pack with lazy random-access payload reads.
@@ -250,7 +270,7 @@ end function
 /// Payload blocks remain encrypted on disk until first access.
 /// @internal
 function _openProtected3(path, file, header, key, publicKey, expectedKeyId)
-  if header[4] != 3 or header[5] != 0 or header[6] != 1 or header[7] != 1 or by.readU16LE(header, 8) != 64 or by.readU16LE(header, 10) != 0 then
+  if header[4] != 4 or header[5] != 0 or header[6] != 1 or header[7] != 1 or by.readU16LE(header, 8) != 64 or by.readU16LE(header, 10) != 0 then
     fileio.close(file)
     crypto.secureZero(key)
     return packError("unsupported MPX3 header or algorithm suite")
@@ -307,13 +327,15 @@ function _openProtected3(path, file, header, key, publicKey, expectedKeyId)
   end if
   names = array(count)
   kinds = array(count, 0)
+  codecs = array(count, 0)
   offsets = array(count, 0)
   sizes = array(count, 0)
+  storedSizes = array(count, 0)
   nonces = array(count)
   tags = array(count)
   nameIndex = hm.HashMap.withCapacity((count * 2) + 1)
   pos = 8
-  previousEnd = metadataSize
+  maximumEnd = metadataSize
   i = 0
   while i < count
     if not hasRange(indexData, pos, 56) then
@@ -336,6 +358,12 @@ function _openProtected3(path, file, header, key, publicKey, expectedKeyId)
     end if
     pos = pos + nameLen
     kind = indexData[pos]
+    codec = indexData[pos + 1]
+    if codec != CODEC_NONE and codec != CODEC_DEFLATE and codec != CODEC_RLE then
+      fileio.close(file)
+      crypto.secureZero(key)
+      return packError("unsupported MPX3 asset compression codec")
+    end if
     pos = pos + 2
     offset = _readU64LE(indexData, pos)
     size = _readU64LE(indexData, pos + 8)
@@ -344,33 +372,45 @@ function _openProtected3(path, file, header, key, publicKey, expectedKeyId)
     entryNonce = slice(indexData, pos, 12)
     entryTag = slice(indexData, pos + 12, 16)
     pos = pos + 28
-    if offset < previousEnd or size != cipherSize or offset + cipherSize > storedFileSize then
+    if offset < metadataSize or size < 0 or cipherSize < 0 or offset + cipherSize > storedFileSize then
       fileio.close(file)
       crypto.secureZero(key)
       return packError("MPX3 payload range is invalid")
     end if
+    if codec == CODEC_NONE and size != cipherSize then
+      fileio.close(file)
+      crypto.secureZero(key)
+      return packError("MPX3 payload size is invalid")
+    end if
+    if codec != CODEC_NONE and size > MAX_DECOMPRESSED_ASSET_SIZE then
+      fileio.close(file)
+      crypto.secureZero(key)
+      return packError("MPX3 decompressed asset size exceeds limit")
+    end if
     names[i] = name
     kinds[i] = kind
+    codecs[i] = codec
     offsets[i] = offset
     sizes[i] = size
+    storedSizes[i] = cipherSize
     nonces[i] = entryNonce
     tags[i] = entryTag
     nameIndex.set(name, i)
-    previousEnd = offset + cipherSize
+    if offset + cipherSize > maximumEnd then maximumEnd = offset + cipherSize end if
     i = i + 1
   end while
-  if pos != len(indexData) or previousEnd != storedFileSize then
+  if pos != len(indexData) or maximumEnd != storedFileSize then
     fileio.close(file)
     crypto.secureZero(key)
     return packError("MPX3 index has invalid trailing data")
   end if
   keyCopy = slice(key, 0, len(key))
   crypto.secureZero(key)
-  return AssetPack(path, void, file, true, true, keyCopy, names, kinds, offsets, sizes, nonces, tags, count, nameIndex, array(count, false), array(count, false), array(count, false), array(count, false), 0, 0, 0, 0, 0)
+  return AssetPack(path, void, file, true, true, keyCopy, names, kinds, codecs, offsets, sizes, storedSizes, nonces, tags, count, nameIndex, array(count, false), array(count, false), array(count, false), array(count, false), 0, 0, 0, 0, 0)
 end function
 
-/// Opens an authenticated MPX3 or legacy MPX2 pack. MPX3 verifies/decrypts
-/// only its index up front; caller-owned AES key bytes are always wiped.
+/// Opens an authenticated MPX3 version-4 pack. Only its index is verified and
+/// decrypted up front; caller-owned AES key bytes are always wiped.
 /// @param path Path to the protected pack.
 /// @param key Obfuscated build key reconstructed by generated game code.
 /// @param publicKey Embedded 64-byte P-256 public key.
@@ -396,51 +436,12 @@ function openProtected(path, key, publicKey, expectedKeyId)
     crypto.secureZero(key)
     return header
   end if
-  if header[0] == 77 and header[1] == 80 and header[2] == 88 and header[3] == 51 then
-    return _openProtected3(path, file, header, key, publicKey, expectedKeyId)
-  end if
-  fileio.close(file)
-  data = try(fs.readAllBytes(path))
-  if typeof(data) == "error" then
+  if header[0] != 77 or header[1] != 80 or header[2] != 88 or header[3] != 51 then
+    fileio.close(file)
     crypto.secureZero(key)
-    return data
+    return packError("not an MPX3 protected asset pack")
   end if
-  if not hasRange(data, 0, 144) or data[0] != 77 or data[1] != 80 or data[2] != 88 or data[3] != 50 then
-    crypto.secureZero(key)
-    return packError("not a protected MiniPixels asset pack")
-  end if
-  if data[4] != 2 or data[5] != 0 or data[6] != 1 or data[7] != 1 or by.readU16LE(data, 8) != 64 or by.readU16LE(data, 10) != 0 then
-    crypto.secureZero(key)
-    return packError("unsupported MPX2 header or algorithm suite")
-  end if
-  plaintextSize = _readU64LE(data, 12)
-  ciphertextSize = _readU64LE(data, 20)
-  expectedSize = 64 + ciphertextSize + 16 + 64
-  if plaintextSize < 8 or plaintextSize != ciphertextSize or expectedSize != len(data) then
-    crypto.secureZero(key)
-    return packError("invalid MPX2 payload size")
-  end if
-  storedKeyId = slice(data, 40, 8)
-  if not crypto.constantTimeEquals(storedKeyId, expectedKeyId) then
-    crypto.secureZero(key)
-    return packError("MPX2 signing key mismatch")
-  end if
-  signedLength = 64 + ciphertextSize + 16
-  signed = slice(data, 0, signedLength)
-  signature = slice(data, signedLength, 64)
-  if not ecdsa.verify(publicKey, signed, signature) then
-    crypto.secureZero(key)
-    return packError("MPX2 signature verification failed")
-  end if
-  header = slice(data, 0, 64)
-  nonce = slice(data, 28, 12)
-  ciphertext = slice(data, 64, ciphertextSize)
-  tag = slice(data, 64 + ciphertextSize, 16)
-  plaintext = try(aes.decrypt(key, nonce, ciphertext, tag, header))
-  crypto.secureZero(key)
-  if typeof(plaintext) == "error" then return packError("MPX2 decryption failed") end if
-  if len(plaintext) != plaintextSize then return packError("MPX2 plaintext size mismatch") end if
-  return _openData(path, plaintext)
+  return _openProtected3(path, file, header, key, publicKey, expectedKeyId)
 end function
 
 /// Finds find used by the minipixels assets pack module.
@@ -467,16 +468,20 @@ function getBytesAt(pack, index)
   pack.payloadMisses = pack.payloadMisses + 1
   payload = void
   if pack.protected then
-    ciphertext = _readRange(pack.file, pack.offsets[index], pack.sizes[index])
+    ciphertext = _readRange(pack.file, pack.offsets[index], pack.storedSizes[index])
     if typeof(ciphertext) == "error" then return ciphertext end if
     payload = try(aes.decrypt(pack.key, pack.nonces[index], ciphertext, pack.tags[index], bytes(0, 0)))
     if typeof(payload) == "error" then return packError("MPX3 asset authentication failed: " + pack.names[index]) end if
   else if pack.fileBacked then
-    payload = _readRange(pack.file, pack.offsets[index], pack.sizes[index])
+    payload = _readRange(pack.file, pack.offsets[index], pack.storedSizes[index])
     if typeof(payload) == "error" then return payload end if
   else
-    payload = slice(pack.data, pack.offsets[index], pack.sizes[index])
+    payload = slice(pack.data, pack.offsets[index], pack.storedSizes[index])
   end if
+  expectedSize = -1
+  if pack.protected then expectedSize = pack.sizes[index] end if
+  payload = _decodePayload(pack.codecs[index], payload, expectedSize)
+  if typeof(payload) == "error" then return payload end if
   pack.payloadCache[index] = payload
   pack.payloadLoaded[index] = true
   pack.cachedPayloadBytes = pack.cachedPayloadBytes + len(payload)

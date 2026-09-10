@@ -1034,7 +1034,7 @@ Opens asset pack for the minipixels module.
 function openProtectedAssetPack(path, key, publicKey, keyId)
 ```
 
-Opens a signed and AES-256-GCM encrypted MPX2 or lazy MPX3 asset pack. Generated MiniPixels asset modules call this automatically for protected builds.
+Opens a signed and AES-256-GCM encrypted MPX3 version-4 asset pack. Generated MiniPixels asset modules call this automatically for protected builds.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |

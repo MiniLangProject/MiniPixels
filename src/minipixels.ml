@@ -150,7 +150,7 @@ function createGame(cfg)
 end function
 
 /// Performs the version operation for the minipixels module.
-function version() return "0.12.0" end function
+function version() return "0.13.0" end function
 /// Updates renderer maintained by the minipixels module.
 /// @param cfg Configuration used by the operation.
 /// @param renderer renderer value consumed by this operation.
@@ -420,7 +420,7 @@ function drawSpriteRotated(canvas, sprite, x, y, radians, scale, tint) return cv
 /// Opens asset pack for the minipixels module.
 /// @param path Path of the file or directory used by the operation.
 function openAssetPack(path) return pack.open(path) end function
-/// Opens a signed and AES-256-GCM encrypted MPX2 or lazy MPX3 asset pack.
+/// Opens a signed and AES-256-GCM encrypted MPX3 version-4 asset pack.
 /// Generated MiniPixels asset modules call this automatically for protected builds.
 /// @param path Path to the protected pack.
 /// @param key Per-build 32-byte AES key.

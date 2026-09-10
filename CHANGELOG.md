@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.13.0 - 2026-09-11
+
+- Preserved compatible source PNGs and switched generated PNGs to real Deflate, eliminating the stored-block size inflation in Python-built packs.
+- Added automatic size-aware PCM WAV-to-MP3 transcoding with configurable bitrate/quality and a build-only `lameenc` dependency.
+- Added transparent per-entry Deflate/RLE compression, decompression size limits, and identical-payload block deduplication for MPX1 and MPX3.
+- Expanded asset reports with source, logical, stored, codec, transform, and deduplication metrics.
+- Removed the legacy MPX2 and MPX3 version-3 protected-pack loaders; protected builds now accept only MPX3 version 4.
+
 ## 0.12.0
 
 - Added random-access MPX3 protected packs with a signed/encrypted index and independently authenticated AES-256-GCM payload blocks, retaining legacy MPX2 read compatibility.

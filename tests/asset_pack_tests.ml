@@ -1,4 +1,5 @@
 import minipixels as mp
+import minipixels.audio.audio as audio
 import std.assert as a
 
 function main(args)
@@ -36,6 +37,14 @@ function main(args)
   a.assertEq(stats.imageHits, 1, "image cache hit is measured")
   a.assertEq(stats.payloadHits, 1, "payload cache hit is measured")
   a.assertEq(stats.cachedPayloadBytes, 8, "only undecoded raw payload remains cached")
+  repeatedA = mp.loadBytesFromPack(pack, "repeated_a")
+  repeatedB = mp.loadBytesFromPack(pack, "repeated_b")
+  a.assertTrue(typeof(repeatedA) == "bytes" and len(repeatedA) > 1000, "compressed file payload expands")
+  a.assertEq(repeatedB, repeatedA, "deduplicated payload aliases decode equally")
+  encodedAudio = mp.loadBytesFromPack(pack, "tone_mp3")
+  encodedClip = audio.clipFromBytes(encodedAudio, "packed-transcode")
+  a.assertTrue(audio.prepareClip(encodedClip), "transcoded packed MP3 decodes")
+  a.assertEq(encodedClip.codec, "mp3", "WAV asset is stored as MP3")
   a.assertTrue(mp.closeAssetPack(pack), "asset pack closes")
   closedRead = try(mp.loadBytesFromPack(pack, "tone"))
   a.assertTrue(typeof(closedRead) == "error", "closed asset pack rejects reads")

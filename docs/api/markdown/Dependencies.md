@@ -17,7 +17,7 @@ These MiniLang source files are reachable through imports but are outside the co
 | 1 | `std.ds.list` | `../MiniLangCompilerML/std/ds/list.ml` |
 | 0 | `std.encoding.hex` | `../MiniLangCompilerML/std/encoding/hex.ml` |
 | 0 | `std.fmt` | `../MiniLangCompilerML/std/fmt.ml` |
-| 6 | `std.fs` | `../MiniLangCompilerML/std/fs.ml` |
+| 5 | `std.fs` | `../MiniLangCompilerML/std/fs.ml` |
 | 1 | `std.io.file` | `../MiniLangCompilerML/std/io/file.ml` |
 | 3 | `std.math` | `../MiniLangCompilerML/std/math.ml` |
 | 0 | `std.path` | `../MiniLangCompilerML/std/path.ml` |

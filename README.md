@@ -3,9 +3,9 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.12.0`
+Current version: `0.13.0`
 
-See the [0.12.0 release notes](RELEASE_NOTES_0.12.0.md) for lazy random-access asset loading, MPX3 protection, generated O(1) slot access, and cache controls.
+See the [0.13.0 release notes](RELEASE_NOTES_0.13.0.md) for compact asset packs, automatic WAV-to-MP3 conversion, payload deduplication, and the streamlined MPX3 version-4 format.
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.7 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
@@ -36,7 +36,7 @@ diagnostics as failures.
 - Windows x64 or Linux x64 with glibc, X11 (`libX11.so.6`) and ALSA (`libasound.so.2`)
 - MiniLang Compiler 1.2.7 or newer in a sibling checkout; lazy MPX I/O uses `std.io.file` and protected builds use `std.crypto.ecdsa_p256`
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
-- The Python packages in `requirements.txt` for protected asset builds
+- The Python packages in `requirements.txt` for protected builds and WAV-to-MP3 asset transcoding
 - Visual Studio C++ Build Tools on Windows, or GCC on Linux, for the small MP3 decoder bridge
 
 Expected sibling layout during local development:
@@ -46,7 +46,7 @@ MiniLangCompilerPy/
 MiniPixels/
 ```
 
-Install the build dependency once before enabling protected assets:
+Install the build dependencies once before packing protected assets or WAV audio:
 
 ```powershell
 python -m pip install -r requirements.txt
@@ -364,7 +364,7 @@ size      field
 2         asset id byte length: u16
 N         asset id as UTF-8 bytes, no terminator
 1         kind: u8
-1         flags: u8, currently 0
+1         payload codec: u8 (`0` raw, `1` Deflate, `2` RLE)
 4         payload offset from start of file: u32
 4         payload size in bytes: u32
 ```
@@ -374,14 +374,14 @@ Current `kind` values:
 | Kind | Asset type | Payload |
 | --- | --- | --- |
 | `1` | `image` or `procedural` | non-interlaced PNG bytes |
-| `2` | `audio` | Original WAV or MP3 file bytes |
-| `3` | `file` | Original file bytes |
+| `2` | `audio` | MP3 bytes, or WAV when transcoding is disabled/not smaller |
+| `3` | `file` | Original bytes after optional container compression |
 | `4` | `text` | Deterministic `MPT1` UTF-8 key/value catalog |
 | `5` | `data` | Canonical UTF-8 JSON |
 
 `constants` assets are intentionally absent from the pack: the generator turns their JSON values into MiniLang constants and a structured `data()` accessor at compile time.
 
-With `assetProtection.enabled`, new builds write MPX3. Its compact encrypted index is signed with ECDSA P-256/SHA-256 and each asset is an independent AES-256-GCM block. Opening verifies and decrypts only the index; an asset remains encrypted on disk until first use. The signed index binds every block's offset, size, nonce, and authentication tag, so a changed block is rejected when accessed and the pack cannot be repacked without the private signing key. Generated MiniLang code embeds the public verification key plus an obfuscated reconstruction of the per-build AES key. The private key remains build-only. Existing MPX2 files remain readable for compatibility.
+With `assetProtection.enabled`, builds write MPX3 version 4. Its compact encrypted index is signed with ECDSA P-256/SHA-256 and each unique stored payload is an independent AES-256-GCM block. Opening verifies and decrypts only the index; an asset remains encrypted on disk until first use. Compression happens before encryption, and the signed index binds every block's codec, logical/stored size, offset, nonce, and authentication tag. A changed block is rejected when accessed and the pack cannot be repacked without the private signing key. Generated MiniLang code embeds the public verification key plus an obfuscated reconstruction of the per-build AES key. The private key remains build-only. Older MPX2 containers and MPX3 format versions are deliberately rejected.
 
 Enable it once per project:
 
@@ -392,7 +392,9 @@ python tools\minipixels.py security status path\to\minipixels.json
 
 The default private key is `.minipixels/asset-signing-key.pem` and is added to the project's `.gitignore`. CI can provide `MINIPIXELS_ASSET_SIGNING_KEY` or `MINIPIXELS_ASSET_SIGNING_KEY_FILE` instead. This deliberately raises the effort needed for casual extraction and gives strong modification detection; it cannot make a client-side decryption key impossible to recover from a determined attacker.
 
-The runtime decodes stored, fixed, and dynamic Deflate streams, PNG filters 0 through 4, grayscale, RGB, indexed, grayscale-alpha, and RGBA data. Current decoding is non-interlaced; the Python packer still emits a deterministic 8-bit RGBA profile while the native packer can retain ordinary source PNG bytes. Audio and file assets are stored byte-for-byte.
+The runtime decodes stored, fixed, and dynamic Deflate streams, PNG filters 0 through 4, grayscale, RGB, indexed, grayscale-alpha, and RGBA data. Current decoding is non-interlaced. The Python packer validates and preserves compatible source PNG bytes, while generated images use actual Deflate rather than uncompressed PNG blocks. File, text, and JSON data entries select Deflate or RLE only when the complete encoded payload is meaningfully smaller. Identical encoded payloads share one block transparently.
+
+PCM WAV assets are converted to MP3 during Python builds when the result is smaller. Mono defaults to 96 kbit/s, stereo to 128 kbit/s, and LAME quality 2. Set `mp3Bitrate` (32–320), `mp3Quality` (0–9), or `"transcode": false` on an audio asset to override this behavior. Existing MP3 sources remain byte-for-byte unchanged.
 
 Runtime APIs:
 
@@ -408,6 +410,8 @@ stats = mp.assetPackStats(pack)
 ```
 
 Generated helpers use numeric slots automatically, cache decoded sprites, text catalogs, localization services and JSON text, and release PNG/text/data source bytes after successful decoding. Call `gen.preload()` during a loading screen when predictable first-frame latency is more important than fully lazy loading.
+
+`asset-report.json` records `sourceBytes`, `logicalBytes`, `storedBytes`, the selected `codec`/`transform`, and whether an entry was deduplicated. Its totals count shared payload blocks only once.
 
 ## Mini Code Examples
 

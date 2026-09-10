@@ -27,6 +27,12 @@ struct GenerateResult
   errors
 end struct
 
+/// Stored representation selected for one native pack payload.
+struct PackedPayload
+  codec
+  data
+end struct
+
 /// Performs the result operation for the minipixels tools generator module.
 /// @param outDir outDir value consumed by this operation.
 function result(outDir)
@@ -322,6 +328,61 @@ function assetPayload(asset, projectRoot)
   return fs.readAllBytes(join(projectRoot, path))
 end function
 
+/// Encodes repeated byte runs and bounded literal spans into an MPR1 envelope.
+/// @internal
+function rlePayload(data)
+  output = bytes((len(data) * 2) + 8, 0)
+  output[0] = 77
+  output[1] = 80
+  output[2] = 82
+  output[3] = 49
+  by.writeU32LE(output, 4, len(data))
+  source = 0
+  target = 8
+  while source < len(data)
+    run = 1
+    while source + run < len(data) and data[source + run] == data[source] and run < 130
+      run = run + 1
+    end while
+    if run >= 3 then
+      output[target] = 128 | (run - 3)
+      output[target + 1] = data[source]
+      target = target + 2
+      source = source + run
+    else
+      literalStart = source
+      source = source + run
+      while source < len(data) and source - literalStart < 128
+        nextRun = 1
+        while source + nextRun < len(data) and data[source + nextRun] == data[source] and nextRun < 130
+          nextRun = nextRun + 1
+        end while
+        if nextRun >= 3 then break end if
+        remaining = 128 - (source - literalStart)
+        if nextRun > remaining then nextRun = remaining end if
+        source = source + nextRun
+      end while
+      literalSize = source - literalStart
+      output[target] = literalSize - 1
+      target = target + 1
+      copyBytes(output, target, data, literalStart, literalSize)
+      target = target + literalSize
+    end if
+  end while
+  return slice(output, 0, target)
+end function
+
+/// Selects native RLE only when its complete envelope produces a useful saving.
+/// @internal
+function compactPayload(data)
+  if len(data) < 32 then return PackedPayload(0, data) end if
+  encoded = rlePayload(data)
+  minimumSaving = integerDivide(len(data), 100)
+  if minimumSaving < 8 then minimumSaving = 8 end if
+  if len(encoded) + minimumSaving <= len(data) then return PackedPayload(2, encoded) end if
+  return PackedPayload(0, data)
+end function
+
 /// Writes a deterministic native MiniPixels asset pack.
 /// @param root Parsed project root.
 /// @param projectRoot Project directory.
@@ -332,24 +393,39 @@ function writeAssetPack(root, projectRoot, path, r)
   count = len(sourceAssets)
   ids = array(count)
   kinds = array(count, 0)
+  codecs = array(count, 0)
   payloads = array(count)
+  duplicateOf = array(count, -1)
   indexSize = 8
   payloadSize = 0
   if count > 0 then
     for index = 0 to count - 1
       asset = sourceAssets[index]
       id = stringField(asset, "id", "asset")
-      payload = try(assetPayload(asset, projectRoot))
-      if typeof(payload) == "error" then
-        addError(r, payload.message)
+      logicalPayload = try(assetPayload(asset, projectRoot))
+      if typeof(logicalPayload) == "error" then
+        addError(r, logicalPayload.message)
         return false
       end if
+      packed = compactPayload(logicalPayload)
+      payload = packed.data
       encodedId = identifierBytes(id)
       ids[index] = encodedId
       kinds[index] = assetKind(asset)
+      codecs[index] = packed.codec
       payloads[index] = payload
       indexSize = indexSize + 12 + len(encodedId)
-      payloadSize = payloadSize + len(payload)
+      duplicate = -1
+      if index > 0 then
+        for previous = 0 to index - 1
+          if codecs[previous] == packed.codec and fsu.bytesEqual(payloads[previous], payload) then
+            duplicate = previous
+            break
+          end if
+        end for
+      end if
+      duplicateOf[index] = duplicate
+      if duplicate < 0 then payloadSize = payloadSize + len(payload) end if
     end for
   end if
   output = bytes(indexSize + payloadSize, 0)
@@ -360,6 +436,7 @@ function writeAssetPack(root, projectRoot, path, r)
   by.writeU32LE(output, 4, count)
   entryOffset = 8
   payloadOffset = indexSize
+  payloadOffsets = array(count, 0)
   if count > 0 then
     for index = 0 to count - 1
       idBytes = ids[index]
@@ -368,12 +445,17 @@ function writeAssetPack(root, projectRoot, path, r)
       copyBytes(output, entryOffset + 2, idBytes, 0, len(idBytes))
       entryOffset = entryOffset + 2 + len(idBytes)
       output[entryOffset] = kinds[index]
-      output[entryOffset + 1] = 0
-      by.writeU32LE(output, entryOffset + 2, payloadOffset)
+      output[entryOffset + 1] = codecs[index]
+      storedOffset = payloadOffset
+      if duplicateOf[index] >= 0 then storedOffset = payloadOffsets[duplicateOf[index]] end if
+      payloadOffsets[index] = storedOffset
+      by.writeU32LE(output, entryOffset + 2, storedOffset)
       by.writeU32LE(output, entryOffset + 6, len(payload))
       entryOffset = entryOffset + 10
-      if len(payload) > 0 then copyBytes(output, payloadOffset, payload, 0, len(payload)) end if
-      payloadOffset = payloadOffset + len(payload)
+      if duplicateOf[index] < 0 then
+        if len(payload) > 0 then copyBytes(output, payloadOffset, payload, 0, len(payload)) end if
+        payloadOffset = payloadOffset + len(payload)
+      end if
     end for
   end if
   written = try(fsu.writeBytes(path, output))

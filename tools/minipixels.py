@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import math
 import os
@@ -12,6 +13,7 @@ import shutil
 import struct
 import subprocess
 import sys
+import wave
 import zlib
 from pathlib import Path
 
@@ -25,8 +27,13 @@ from build_audio_runtime import ensure_audio_runtime
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 ASSET_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-VERSION = "0.12.0"
+VERSION = "0.13.0"
 DEFAULT_TARGET = "windows-x64" if os.name == "nt" else "linux-x64"
+PACK_CODEC_NONE = 0
+PACK_CODEC_DEFLATE = 1
+PACK_CODEC_RLE = 2
+PACK_COMPRESSED_MAGIC = b"MPC1"
+PACK_RLE_MAGIC = b"MPR1"
 
 
 def asset_protection(data: dict) -> dict | None:
@@ -110,6 +117,19 @@ def validate(project_file: Path) -> dict:
         kind = str(asset.get("type", "image")).lower()
         if kind not in ("image", "procedural", "audio", "file", "text", "data", "constants"):
             errors.append(f"{project_file}: asset '{aid}' has unsupported type '{kind}'")
+        if kind == "audio":
+            try:
+                bitrate = int(asset.get("mp3Bitrate", 128))
+                quality = int(asset.get("mp3Quality", 2))
+                if bitrate < 32 or bitrate > 320:
+                    errors.append(f"{project_file}: asset '{aid}' mp3Bitrate must be between 32 and 320")
+                if quality < 0 or quality > 9:
+                    errors.append(f"{project_file}: asset '{aid}' mp3Quality must be between 0 and 9")
+            except (TypeError, ValueError):
+                errors.append(f"{project_file}: asset '{aid}' MP3 settings must be integers")
+            transcode = asset.get("transcode", "mp3")
+            if transcode not in (True, False, "mp3", "none", "wav"):
+                errors.append(f"{project_file}: asset '{aid}' transcode must be mp3, none, wav, true, or false")
         if kind in ("text", "constants") and path and (root / path).is_file():
             try:
                 structured = json.loads((root / path).read_text(encoding="utf-8"))
@@ -364,6 +384,7 @@ def read_png_rgba(path: Path) -> tuple[int, int, bytes]:
         die(f"{path}: not a PNG file")
     pos = 8
     width = height = color_type = bit_depth = None
+    compression = filter_method = interlace = None
     compressed = bytearray()
     while pos + 8 <= len(data):
         length = struct.unpack(">I", data[pos : pos + 4])[0]
@@ -371,12 +392,20 @@ def read_png_rgba(path: Path) -> tuple[int, int, bytes]:
         payload = data[pos + 8 : pos + 8 + length]
         pos += 12 + length
         if ctype == b"IHDR":
-            width, height, bit_depth, color_type = struct.unpack(">IIBB", payload[:10])
+            width, height, bit_depth, color_type, compression, filter_method, interlace = struct.unpack(">IIBBBBB", payload[:13])
         elif ctype == b"IDAT":
             compressed.extend(payload)
         elif ctype == b"IEND":
             break
-    if width is None or height is None or bit_depth != 8 or color_type not in (2, 6):
+    if (
+        width is None
+        or height is None
+        or bit_depth != 8
+        or color_type not in (2, 6)
+        or compression != 0
+        or filter_method != 0
+        or interlace != 0
+    ):
         die(f"{path}: only 8-bit RGB/RGBA PNG assets are supported by this processor")
     channels = 4 if color_type == 6 else 3
     raw = zlib.decompress(bytes(compressed))
@@ -466,6 +495,203 @@ def write_png_rgba_store(width: int, height: int, rgba: bytes) -> bytes:
         + png_chunk(b"IDAT", zlib_store(bytes(rows)))
         + png_chunk(b"IEND", b"")
     )
+
+
+def write_png_rgba_compressed(width: int, height: int, rgba: bytes) -> bytes:
+    """Encode generated RGBA pixels using real Deflate instead of stored blocks."""
+    if len(rgba) != width * height * 4:
+        die("internal error: RGBA buffer size does not match image dimensions")
+    rows = bytearray()
+    stride = width * 4
+    for y in range(height):
+        rows.append(0)
+        start = y * stride
+        rows.extend(rgba[start : start + stride])
+    ihdr = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
+    return (
+        b"\x89PNG\r\n\x1a\n"
+        + png_chunk(b"IHDR", ihdr)
+        + png_chunk(b"IDAT", zlib.compress(bytes(rows), level=9))
+        + png_chunk(b"IEND", b"")
+    )
+
+
+def _pcm_s16le(data: bytes, sample_width: int) -> bytes:
+    if sample_width == 2:
+        return data
+    output = bytearray((len(data) // sample_width) * 2)
+    target = 0
+    for source in range(0, len(data) - sample_width + 1, sample_width):
+        if sample_width == 1:
+            sample = (data[source] - 128) << 8
+        elif sample_width == 3:
+            sample = int.from_bytes(data[source : source + 3], "little", signed=True) >> 8
+        elif sample_width == 4:
+            sample = int.from_bytes(data[source : source + 4], "little", signed=True) >> 16
+        else:
+            raise RuntimeError(f"unsupported WAV sample width: {sample_width * 8} bit")
+        output[target : target + 2] = int(sample).to_bytes(2, "little", signed=True)
+        target += 2
+    return bytes(output)
+
+
+def transcode_wav_to_mp3(data: bytes, asset: dict) -> bytes:
+    """Transcode PCM WAV bytes to a compact MP3 payload using the build dependency."""
+    try:
+        import lameenc
+    except ImportError as exc:
+        raise RuntimeError(
+            "WAV asset transcoding requires 'lameenc'; install build dependencies with: "
+            "python -m pip install -r requirements.txt"
+        ) from exc
+    try:
+        with wave.open(io.BytesIO(data), "rb") as source:
+            if source.getcomptype() != "NONE":
+                raise RuntimeError("only uncompressed PCM WAV assets can be transcoded")
+            channels = source.getnchannels()
+            sample_rate = source.getframerate()
+            sample_width = source.getsampwidth()
+            pcm = source.readframes(source.getnframes())
+    except (EOFError, wave.Error) as exc:
+        raise RuntimeError(f"invalid PCM WAV asset: {exc}") from exc
+    if channels not in (1, 2):
+        raise RuntimeError("WAV to MP3 transcoding supports mono or stereo audio")
+    if sample_rate <= 0 or not pcm:
+        raise RuntimeError("WAV asset contains no PCM samples")
+    pcm16 = _pcm_s16le(pcm, sample_width)
+    bitrate = int(asset.get("mp3Bitrate", 96 if channels == 1 else 128))
+    quality = int(asset.get("mp3Quality", 2))
+    if bitrate < 32 or bitrate > 320:
+        raise RuntimeError("mp3Bitrate must be between 32 and 320 kbit/s")
+    if quality < 0 or quality > 9:
+        raise RuntimeError("mp3Quality must be between 0 and 9")
+    encoder = lameenc.Encoder()
+    encoder.set_channels(channels)
+    encoder.set_in_sample_rate(sample_rate)
+    encoder.set_bit_rate(bitrate)
+    encoder.set_quality(quality)
+    return encoder.encode(pcm16) + encoder.flush()
+
+
+def compress_pack_payload(payload: bytes) -> tuple[int, bytes]:
+    """Return a compressed payload only when its complete envelope is smaller."""
+    if len(payload) < 32:
+        return PACK_CODEC_NONE, payload
+    deflated = PACK_COMPRESSED_MAGIC + struct.pack("<I", len(payload)) + zlib.compress(payload, level=9)
+    rle = bytearray(PACK_RLE_MAGIC + struct.pack("<I", len(payload)))
+    position = 0
+    while position < len(payload):
+        run = 1
+        while position + run < len(payload) and payload[position + run] == payload[position] and run < 130:
+            run += 1
+        if run >= 3:
+            rle.extend((0x80 | (run - 3), payload[position]))
+            position += run
+            continue
+        literal_start = position
+        position += run
+        while position < len(payload) and position - literal_start < 128:
+            next_run = 1
+            while position + next_run < len(payload) and payload[position + next_run] == payload[position] and next_run < 130:
+                next_run += 1
+            if next_run >= 3:
+                break
+            position += min(next_run, 128 - (position - literal_start))
+        literal = payload[literal_start:position]
+        rle.append(len(literal) - 1)
+        rle.extend(literal)
+    candidates = [(PACK_CODEC_DEFLATE, deflated), (PACK_CODEC_RLE, bytes(rle))]
+    codec, candidate = min(candidates, key=lambda item: len(item[1]))
+    minimum_saving = max(8, len(payload) // 100)
+    if len(candidate) + minimum_saving <= len(payload):
+        return codec, candidate
+    return PACK_CODEC_NONE, payload
+
+
+def asset_pack_payload(asset: dict, root: Path) -> dict | None:
+    """Build one logical asset and select its compact on-disk representation."""
+    kind = str(asset.get("type", "image")).lower()
+    source_size = 0
+    transform = "raw"
+    if kind == "procedural":
+        width, height, rgba = procedural_pixels(asset)
+        payload = write_png_rgba_compressed(width, height, rgba)
+        type_code = 1
+        transform = "png-deflate"
+    elif kind == "image":
+        raw_path = asset.get("path")
+        if not raw_path:
+            return None
+        path = root / raw_path
+        read_png_rgba(path)
+        payload = path.read_bytes()
+        source_size = len(payload)
+        type_code = 1
+        transform = "png-source"
+    elif kind == "audio":
+        raw_path = asset.get("path")
+        if not raw_path:
+            return None
+        path = root / raw_path
+        payload = path.read_bytes()
+        source_size = len(payload)
+        type_code = 2
+        transcode = asset.get("transcode", "mp3")
+        if path.suffix.lower() == ".wav" and transcode not in (False, "none", "wav"):
+            encoded = transcode_wav_to_mp3(payload, asset)
+            if len(encoded) < len(payload):
+                payload = encoded
+                transform = "wav-to-mp3"
+            else:
+                transform = "wav-source-smaller"
+        else:
+            transform = path.suffix.lower().lstrip(".") or "audio"
+    elif kind == "file":
+        raw_path = asset.get("path")
+        if not raw_path:
+            return None
+        path = root / raw_path
+        payload = path.read_bytes()
+        source_size = len(payload)
+        type_code = 3
+    elif kind == "text":
+        raw_path = asset.get("path")
+        if not raw_path:
+            return None
+        path = root / raw_path
+        source_size = path.stat().st_size
+        payload = text_catalog_payload(path)
+        type_code = 4
+        transform = "mpt1"
+    elif kind == "data":
+        raw_path = asset.get("path")
+        if not raw_path:
+            return None
+        path = root / raw_path
+        source_size = path.stat().st_size
+        payload = normalized_json_payload(path)
+        type_code = 5
+        transform = "canonical-json"
+    else:
+        return None
+    payload = bytes(payload)
+    logical_size = len(payload)
+    codec = PACK_CODEC_NONE
+    stored = payload
+    if kind in ("file", "text", "data"):
+        codec, stored = compress_pack_payload(payload)
+        if codec == PACK_CODEC_DEFLATE:
+            transform += "+deflate"
+    if source_size == 0:
+        source_size = logical_size
+    return {
+        "data": stored,
+        "logicalSize": logical_size,
+        "sourceSize": source_size,
+        "type": type_code,
+        "codec": codec,
+        "transform": transform,
+    }
 
 
 def procedural_pixels(asset: dict) -> tuple[int, int, bytes]:
@@ -853,53 +1079,19 @@ def write_asset_security_module(path: Path, protected) -> Path:
 def write_asset_pack(data: dict, root: Path, output: Path, security_module: Path | None = None) -> Path:
     output.parent.mkdir(parents=True, exist_ok=True)
     entries: list[dict] = []
-    blob = bytearray()
 
     for asset in sorted(data.get("assets", []), key=lambda a: a["id"]):
-        kind = str(asset.get("type", "image")).lower()
-        if kind == "procedural":
-            width, height, rgba = procedural_pixels(asset)
-            payload = write_png_rgba_store(width, height, rgba)
-            type_code = 1
-        elif kind == "image":
-            raw_path = asset.get("path")
-            if not raw_path:
-                continue
-            path = root / raw_path
-            width, height, rgba = read_png_rgba(path)
-            payload = write_png_rgba_store(width, height, rgba)
-            type_code = 1
-        elif kind == "audio":
-            raw_path = asset.get("path")
-            if not raw_path:
-                continue
-            path = root / raw_path
-            payload = path.read_bytes()
-            type_code = 2
-        elif kind == "file":
-            raw_path = asset.get("path")
-            if not raw_path:
-                continue
-            path = root / raw_path
-            payload = path.read_bytes()
-            type_code = 3
-        elif kind == "text":
-            raw_path = asset.get("path")
-            if not raw_path:
-                continue
-            payload = text_catalog_payload(root / raw_path)
-            type_code = 4
-        elif kind == "data":
-            raw_path = asset.get("path")
-            if not raw_path:
-                continue
-            payload = normalized_json_payload(root / raw_path)
-            type_code = 5
-        else:
+        built = asset_pack_payload(asset, root)
+        if built is None:
             continue
-        offset = len(blob)
-        blob.extend(payload)
-        entries.append({"id": asset["id"], "type": type_code, "offset": offset, "size": len(payload)})
+        entries.append(
+            {
+                "id": asset["id"],
+                "type": built["type"],
+                "codec": built["codec"],
+                "payload": built["data"],
+            }
+        )
 
     index_size = 8
     for entry in entries:
@@ -907,6 +1099,18 @@ def write_asset_pack(data: dict, root: Path, output: Path, security_module: Path
         index_size += 2 + len(name) + 1 + 1 + 4 + 4
 
     payload_base = index_size
+    blob = bytearray()
+    unique_offsets: dict[tuple[int, bytes], int] = {}
+    for entry in entries:
+        key = (entry["codec"], entry["payload"])
+        relative_offset = unique_offsets.get(key)
+        if relative_offset is None:
+            relative_offset = len(blob)
+            unique_offsets[key] = relative_offset
+            blob.extend(entry["payload"])
+        entry["offset"] = relative_offset
+        entry["size"] = len(entry["payload"])
+
     index = bytearray(b"MPX1")
     index.extend(struct.pack("<I", len(entries)))
     for entry in entries:
@@ -914,7 +1118,7 @@ def write_asset_pack(data: dict, root: Path, output: Path, security_module: Path
         index.extend(struct.pack("<H", len(name)))
         index.extend(name)
         index.append(entry["type"])
-        index.append(0)
+        index.append(entry["codec"])
         index.extend(struct.pack("<I", payload_base + entry["offset"]))
         index.extend(struct.pack("<I", entry["size"]))
 
@@ -1113,7 +1317,20 @@ def pack(project_file: Path, output: Path) -> Path:
 
 
 def asset_report(data: dict, root: Path) -> dict:
-    report = {"embedded": [], "container": [], "runtime": [], "totals": {"embeddedBytes": 0, "containerBytes": 0, "runtimeBytes": 0}}
+    report = {
+        "embedded": [],
+        "container": [],
+        "runtime": [],
+        "totals": {
+            "sourceBytes": 0,
+            "logicalBytes": 0,
+            "containerBytes": 0,
+            "deduplicatedBytes": 0,
+            "embeddedBytes": 0,
+            "runtimeBytes": 0,
+        },
+    }
+    stored_payloads: set[tuple[int, bytes]] = set()
     levels = load_levels(data)
     if levels is not None:
         report["levels"] = {"count": len(validate_levels(levels, data["levels"].get("_absolute_path", "levels")))}
@@ -1131,13 +1348,34 @@ def asset_report(data: dict, root: Path) -> dict:
         if sheet is not None:
             entry["sheet"] = sheet
         kind = str(asset.get("type", "image")).lower()
-        if kind == "procedural":
-            width, height, rgba = procedural_pixels(asset)
-            size = len(write_png_rgba_store(width, height, rgba))
-            entry["bytes"] = size
         if kind in ("image", "procedural", "audio", "file", "text", "data"):
+            built = None
+            if kind == "procedural" or (path is not None and path.is_file()):
+                built = asset_pack_payload(asset, root)
+            if built is not None:
+                stored_size = len(built["data"])
+                entry["sourceBytes"] = built["sourceSize"]
+                entry["logicalBytes"] = built["logicalSize"]
+                entry["storedBytes"] = stored_size
+                entry["bytes"] = stored_size
+                codec_names = {PACK_CODEC_NONE: "none", PACK_CODEC_DEFLATE: "deflate", PACK_CODEC_RLE: "rle"}
+                entry["codec"] = codec_names[built["codec"]]
+                entry["transform"] = built["transform"]
+                key = (built["codec"], built["data"])
+                duplicate = key in stored_payloads
+                entry["deduplicated"] = duplicate
+                report["totals"]["sourceBytes"] += built["sourceSize"]
+                report["totals"]["logicalBytes"] += built["logicalSize"]
+                if duplicate:
+                    report["totals"]["deduplicatedBytes"] += stored_size
+                else:
+                    stored_payloads.add(key)
+                    report["totals"]["containerBytes"] += stored_size
+            else:
+                report["totals"]["sourceBytes"] += size
+                report["totals"]["logicalBytes"] += size
+                report["totals"]["containerBytes"] += size
             report["container"].append(entry)
-            report["totals"]["containerBytes"] += size
         elif kind == "constants":
             report["embedded"].append(entry)
             report["totals"]["embeddedBytes"] += size
