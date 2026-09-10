@@ -128,6 +128,27 @@ python ..\MiniLangCompilerPy\mlc_win64.py tests\window_renderer_smoke.ml build\t
 build\tests\window_renderer_smoke.exe
 ```
 
+### Experimental GPU scene canvas
+
+The regular `opengl` renderer keeps the portable CPU canvas and accelerates upload,
+scaling, and presentation. Windows builds can additionally opt into the experimental
+batched scene canvas in `minipixels.graphics.gpu`; this renders sprites and primitives
+directly into an OpenGL framebuffer. It currently supports CPU images/canvases as
+texture sources, explicit texture invalidation, resizing, readback, and optional point
+lights. Linux keeps a compile-safe unsupported fallback.
+
+Build the optional runtime next to the game executable before running it:
+
+```powershell
+pwsh .\native\build-gpu.ps1 -OutputDirectory .\build\my-game
+```
+
+Open a window with the `opengl` renderer, call `gpu.create`, then wrap scene drawing in
+`gpu.begin(window)` / `gpu.finish(window)` and call the normal platform `present` once.
+Call `gpu.shutdown()` before closing the window. This API is intentionally separate
+from the stable CPU `Canvas`: rotated sprites, canvas-to-canvas GPU sources, and Linux
+GPU scene rendering are not implemented yet.
+
 Optional renderer benchmark:
 
 ```powershell

@@ -486,7 +486,6 @@ function fillRect(c, x, y, w, h, color)
       yy = yy + 1
     end while
   end if
-  if a < 255 then c.imageView.opaque = false end if
   markDirty(c, x0, y0, x1 - x0, y1 - y0)
   c.drawCalls = c.drawCalls + 1
 end function
@@ -668,11 +667,62 @@ function fillScaledPixel(c, x, y, scale, color)
   end while
 end function
 
-/// Draws sprite fast1x through the minipixels graphics canvas rendering path.
-/// @param c c value consumed by this operation.
-/// @param spr spr value consumed by this operation.
-/// @param x Horizontal coordinate used by the operation.
-/// @param y Vertical coordinate used by the operation.
+/// @internal
+function blendOpaqueSpriteRow(destination as bytes, source as bytes, di as int, si as int, count as int) returns bool
+  x = 0
+  while x < count
+    a = source[si + 3]
+    if a == 255 then
+      destination[di] = source[si]
+      destination[di + 1] = source[si + 1]
+      destination[di + 2] = source[si + 2]
+    else if a > 0 then
+      inv = 255 - a
+      red = source[si] * a + destination[di] * inv
+      green = source[si + 1] * a + destination[di + 1] * inv
+      blue = source[si + 2] * a + destination[di + 2] * inv
+      destination[di] = (red + 1 + (red >> 8)) >> 8
+      destination[di + 1] = (green + 1 + (green >> 8)) >> 8
+      destination[di + 2] = (blue + 1 + (blue >> 8)) >> 8
+    end if
+    si = si + 4
+    di = di + 4
+    x = x + 1
+  end while
+  return true
+end function
+
+/// @internal
+function blendTransparentSpriteRow(destination as bytes, source as bytes, di as int, si as int, count as int) returns bool
+  x = 0
+  while x < count
+    a = source[si + 3]
+    if a > 0 then
+      if a == 255 or destination[di + 3] == 0 then
+        // Straight RGBA over a transparent destination is a copy, not a
+        // premultiply/divide operation. Preserve the source alpha exactly.
+        destination[di] = source[si]
+        destination[di + 1] = source[si + 1]
+        destination[di + 2] = source[si + 2]
+        destination[di + 3] = a
+      else
+        dst = mt.rgba(destination[di], destination[di + 1], destination[di + 2], destination[di + 3])
+        src = mt.rgba(source[si], source[si + 1], source[si + 2], a)
+        result = mt.alphaBlend(dst, src)
+        destination[di] = mt.colorR(result)
+        destination[di + 1] = mt.colorG(result)
+        destination[di + 2] = mt.colorB(result)
+        destination[di + 3] = mt.colorA(result)
+      end if
+    end if
+    di = di + 4
+    si = si + 4
+    x = x + 1
+  end while
+  return true
+end function
+
+/// @internal
 function drawSpriteFast1x(c, spr, x, y)
   x0 = mt.clamp(x, 0, c.width)
   y0 = mt.clamp(y, 0, c.height)
@@ -692,38 +742,10 @@ function drawSpriteFast1x(c, spr, x, y)
     di = ((yy * c.width) + x0) * 4
     if spr.image.opaque then
       copyBytes(c.pixels, di, spr.image.pixels, si, (x1 - x0) * 4)
+    else if destinationOpaque then
+      blendOpaqueSpriteRow(c.pixels, spr.image.pixels, di, si, x1 - x0)
     else
-      xx = x0
-      while xx < x1
-        a = spr.image.pixels[si + 3]
-        if a >= 255 then
-          c.pixels[di] = spr.image.pixels[si]
-          c.pixels[di + 1] = spr.image.pixels[si + 1]
-          c.pixels[di + 2] = spr.image.pixels[si + 2]
-          c.pixels[di + 3] = 255
-        else
-          if a > 0 and destinationOpaque then
-            inv = 255 - a
-            c.pixels[di] = mt.clamp(mt.floorInt(((spr.image.pixels[si] * a) + (c.pixels[di] * inv)) / 255), 0, 255)
-            c.pixels[di + 1] = mt.clamp(mt.floorInt(((spr.image.pixels[si + 1] * a) + (c.pixels[di + 1] * inv)) / 255), 0, 255)
-            c.pixels[di + 2] = mt.clamp(mt.floorInt(((spr.image.pixels[si + 2] * a) + (c.pixels[di + 2] * inv)) / 255), 0, 255)
-            c.pixels[di + 3] = 255
-          else
-            if a > 0 then
-              dst = mt.rgba(c.pixels[di], c.pixels[di + 1], c.pixels[di + 2], c.pixels[di + 3])
-              src = mt.rgba(spr.image.pixels[si], spr.image.pixels[si + 1], spr.image.pixels[si + 2], a)
-              blended = mt.alphaBlend(dst, src)
-              c.pixels[di] = mt.colorR(blended)
-              c.pixels[di + 1] = mt.colorG(blended)
-              c.pixels[di + 2] = mt.colorB(blended)
-              c.pixels[di + 3] = mt.colorA(blended)
-            end if
-          end if
-        end if
-        si = si + 4
-        di = di + 4
-        xx = xx + 1
-      end while
+      blendTransparentSpriteRow(c.pixels, spr.image.pixels, di, si, x1 - x0)
     end if
     yy = yy + 1
   end while

@@ -15,6 +15,7 @@ INCLUDE_DIRS = [
     "benchmarks",
     "docs",
     "examples",
+    "native",
     "src",
     "tests",
     "tools",

@@ -636,7 +636,7 @@ end function
 /// @param w w value consumed by this operation.
 function isGpuRenderer(w)
   if w is not Window then return false end if
-  return w.renderer == "opengl"
+  return w.renderer == "opengl" or w.renderer == "opengl-scene"
 end function
 
 /// Performs the rendererFallbackReason operation for the minipixels platform windows module.
@@ -941,15 +941,19 @@ function presentOpenGL(w, canvas)
   cw = clientWidth(w)
   ch = clientHeight(w)
   updateViewport(w)
-  glViewport(0, 0, cw, ch)
-  glDisable(GL_TEXTURE_2D)
-  glColor3ub(0, 0, 0)
-  glBegin(GL_QUADS)
-  glVertex2i(-1, -1)
-  glVertex2i(1, -1)
-  glVertex2i(1, 1)
-  glVertex2i(-1, 1)
-  glEnd()
+  // A full-client opaque texture already replaces every pixel. Only clear
+  // when letterboxing leaves pixels outside the image viewport.
+  if viewportX(w) != 0 or viewportY(w) != 0 or viewportW(w) != cw or viewportH(w) != ch then
+    glViewport(0, 0, cw, ch)
+    glDisable(GL_TEXTURE_2D)
+    glColor3ub(0, 0, 0)
+    glBegin(GL_QUADS)
+    glVertex2i(-1, -1)
+    glVertex2i(1, -1)
+    glVertex2i(1, 1)
+    glVertex2i(-1, 1)
+    glEnd()
+  end if
   glViewport(viewportX(w), ch - viewportY(w) - viewportH(w), viewportW(w), viewportH(w))
   glEnable(GL_TEXTURE_2D)
   glColor3ub(255, 255, 255)
@@ -988,12 +992,17 @@ end function
 /// @param w w value consumed by this operation.
 /// @param canvas canvas value consumed by this operation.
 function presentGDI(w, canvas)
+  global windowNeedsPresent
   dc = GetDC(w.hwnd)
   clientW = clientWidth(w)
   clientH = clientHeight(w)
   updateViewport(w)
   SetStretchBltMode(dc, 3)
-  PatBlt(dc, 0, 0, clientW, clientH, BLACKNESS)
+  // Avoid an extra full-window GDI operation (and a visible black interframe).
+  // On resize/expose the letterbox must still be repainted.
+  if windowNeedsPresent and (viewportX(w) != 0 or viewportY(w) != 0 or viewportW(w) != clientW or viewportH(w) != clientH) then
+    PatBlt(dc, 0, 0, clientW, clientH, BLACKNESS)
+  end if
   StretchDIBits(dc, viewportX(w), viewportY(w), viewportW(w), viewportH(w), 0, 0, canvas.width, canvas.height, canvas.pixels, w.bmi, DIB_RGB_COLORS, SRCCOPY)
   ReleaseDC(w.hwnd, dc)
   canvas.dirty = false
@@ -1005,6 +1014,12 @@ end function
 /// @param canvas canvas value consumed by this operation.
 function present(w, canvas)
   global windowNeedsPresent
+  // An optional scene backend has already drawn the backbuffer. Never upload
+  // the CPU canvas over it. Presentation and window lifetime remain centralized.
+  if w.renderer == "opengl-scene" then
+    windowNeedsPresent = false
+    return SwapBuffers(w.dc)
+  end if
   if canvas.dirty == false and windowNeedsPresent == false then return true end if
   if w.renderer == "opengl" then
     if presentOpenGL(w, canvas) then
