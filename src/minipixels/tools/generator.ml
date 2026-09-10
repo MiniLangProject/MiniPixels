@@ -443,7 +443,8 @@ end function
 /// Performs the assetModule operation for the minipixels tools generator module.
 /// @param asset asset value consumed by this operation.
 /// @param r r value consumed by this operation.
-function assetModule(asset, r)
+/// @param slot Stable pack slot generated for the asset.
+function assetModule(asset, r, slot)
   id = stringField(asset, "id", "asset")
   code = sb.StringBuilder.withCapacity(512)
   code.appendLine("sprite_" + id + "_cache = void")
@@ -451,7 +452,7 @@ function assetModule(asset, r)
   code.appendLine("function make_" + id + "()")
   code.appendLine("  global sprite_" + id + "_cache")
   code.appendLine("  if sprite_" + id + "_cache == void then")
-  code.appendLine("    img = mp.loadPngFromPack(assetPack(), " + quote(id) + ")")
+  code.appendLine("    img = mp.loadPngFromPackSlot(assetPack(), " + slot + ")")
   code.appendLine("    sprite_" + id + "_cache = mp.spriteFromImage(img, " + quote(id) + ")")
   code.appendLine("  end if")
   code.appendLine("  return sprite_" + id + "_cache")
@@ -463,7 +464,8 @@ end function
 
 /// Emits an audio or generic-file accessor backed by the generated pack.
 /// @param asset Manifest asset object.
-function runtimeAssetModule(asset)
+/// @param slot Stable pack slot generated for the asset.
+function runtimeAssetModule(asset, slot)
   id = stringField(asset, "id", "asset")
   typ = stringField(asset, "type", "file")
   code = sb.StringBuilder.withCapacity(256)
@@ -472,21 +474,34 @@ function runtimeAssetModule(asset)
     code.appendLine("")
     code.appendLine("function audio_" + id + "()")
     code.appendLine("  global audio_" + id + "_cache")
-    code.appendLine("  if audio_" + id + "_cache == void then audio_" + id + "_cache = mp.audioClipFromBytes(mp.loadBytesFromPack(assetPack(), " + quote(id) + "), " + quote(id) + ") end if")
+    code.appendLine("  if audio_" + id + "_cache == void then audio_" + id + "_cache = mp.audioClipFromBytes(mp.loadBytesFromPackSlot(assetPack(), " + slot + "), " + quote(id) + ") end if")
     code.appendLine("  return audio_" + id + "_cache")
     code.appendLine("end function")
   else if typ == "text" then
     locale = stringField(asset, "locale", id)
+    code.appendLine("text_" + id + "_cache = void")
+    code.appendLine("")
     code.appendLine("function text_" + id + "()")
-    code.appendLine("  return mp.loadTextCatalogFromPack(assetPack(), " + quote(id) + ", " + quote(locale) + ")")
+    code.appendLine("  global text_" + id + "_cache")
+    code.appendLine("  if text_" + id + "_cache == void then text_" + id + "_cache = mp.loadTextCatalogFromPackSlot(assetPack(), " + slot + ", " + quote(locale) + ") end if")
+    code.appendLine("  return text_" + id + "_cache")
     code.appendLine("end function")
   else if typ == "data" then
+    code.appendLine("data_" + id + "_cache = void")
+    code.appendLine("data_" + id + "_loaded = false")
+    code.appendLine("")
     code.appendLine("function data_" + id + "()")
-    code.appendLine("  return decode(mp.loadBytesFromPack(assetPack(), " + quote(id) + "))")
+    code.appendLine("  global data_" + id + "_cache")
+    code.appendLine("  global data_" + id + "_loaded")
+    code.appendLine("  if data_" + id + "_loaded then return data_" + id + "_cache end if")
+    code.appendLine("  data_" + id + "_cache = decode(mp.loadBytesFromPackSlot(assetPack(), " + slot + "))")
+    code.appendLine("  data_" + id + "_loaded = true")
+    code.appendLine("  mp.releasePackedAssetBytesSlot(assetPack(), " + slot + ")")
+    code.appendLine("  return data_" + id + "_cache")
     code.appendLine("end function")
   else
     code.appendLine("function file_" + id + "()")
-    code.appendLine("  return mp.loadBytesFromPack(assetPack(), " + quote(id) + ")")
+    code.appendLine("  return mp.loadBytesFromPackSlot(assetPack(), " + slot + ")")
     code.appendLine("end function")
   end if
   code.appendLine("")
@@ -500,20 +515,47 @@ end function
 function assetsModule(root, fallbackPackPath, r)
   code = sb.StringBuilder.withCapacity(4096)
   code.appendString(assetsHeader(fallbackPackPath))
-  assets = json.get(root, "assets")
+  assets = sortedAssets(root)
   embedded = []
-  if typeof(assets) != "void" and assets.kind == "array" and len(assets.arrayItems) > 0 then
-    for i = 0 to len(assets.arrayItems) - 1
-      asset = assets.arrayItems[i]
+  if len(assets) > 0 then
+    for i = 0 to len(assets) - 1
+      id = stringField(assets[i], "id", "asset")
+      code.appendLine("slot_" + id + "_cache = -1")
+      code.appendLine("")
+      code.appendLine("function slot_" + id + "()")
+      code.appendLine("  global slot_" + id + "_cache")
+      code.appendLine("  if slot_" + id + "_cache < 0 then slot_" + id + "_cache = mp.assetSlotFromPack(assetPack(), " + quote(id) + ") end if")
+      code.appendLine("  return slot_" + id + "_cache")
+      code.appendLine("end function")
+      code.appendLine("")
+    end for
+    for i = 0 to len(assets) - 1
+      asset = assets[i]
       typ = stringField(asset, "type", "image")
       id = stringField(asset, "id", "asset")
       if typ == "image" or typ == "procedural" then
-        code.appendString(assetModule(asset, r))
+        code.appendString(assetModule(asset, r, "slot_" + id + "()"))
         embedded = arr.append(embedded, asset)
       else if typ != "constants" then
-        code.appendString(runtimeAssetModule(asset))
+        code.appendString(runtimeAssetModule(asset, "slot_" + id + "()"))
       end if
     end for
+  end if
+  if len(assets) > 0 then
+    code.appendLine("function preload()")
+    for i = 0 to len(assets) - 1
+      asset = assets[i]
+      typ = stringField(asset, "type", "image")
+      id = stringField(asset, "id", "asset")
+      if typ == "image" or typ == "procedural" then code.appendLine("  make_" + id + "()") end if
+      if typ == "audio" then code.appendLine("  audio_" + id + "()") end if
+      if typ == "text" then code.appendLine("  text_" + id + "()") end if
+      if typ == "data" then code.appendLine("  data_" + id + "()") end if
+      if typ == "file" then code.appendLine("  file_" + id + "()") end if
+    end for
+    code.appendLine("  return true")
+    code.appendLine("end function")
+    code.appendLine("")
   end if
   code.appendLine("function registry()")
   code.appendLine("  reg = assets.create(64)")
@@ -981,7 +1023,7 @@ function generate(projectPath, outDir)
   if r.ok == false then return r end if
   protection = objectField(root, "assetProtection")
   if typeof(protection) != "void" and json.asBool(json.get(protection, "enabled"), false) then
-    addError(r, "protected MPX2 generation is a build operation; use tools/minipixels.py build or generate")
+    addError(r, "protected MPX3 generation is a build operation; use tools/minipixels.py build or generate")
     return r
   end if
   projectAssets = arrayField(root, "assets")

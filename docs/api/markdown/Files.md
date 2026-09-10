@@ -4,12 +4,12 @@
 
 | File | Package | Reachable | Symbols |
 | --- | --- | --- | ---: |
-| [src/minipixels.ml](File-src-minipixels-ml-1730909391.md) | `minipixels` | yes | 146 |
+| [src/minipixels.ml](File-src-minipixels-ml-1730909391.md) | `minipixels` | yes | 154 |
 | [src/minipixels/animation/animation.ml](File-src-minipixels-animation-animation-ml-2065983051.md) | `minipixels.animation.animation` | yes | 28 |
 | [src/minipixels/assets/assets.ml](File-src-minipixels-assets-assets-ml-652120143.md) | `minipixels.assets.assets` | yes | 24 |
-| [src/minipixels/assets/pack.ml](File-src-minipixels-assets-pack-ml-1157891367.md) | `minipixels.assets.pack` | yes | 25 |
+| [src/minipixels/assets/pack.ml](File-src-minipixels-assets-pack-ml-1157891367.md) | `minipixels.assets.pack` | yes | 56 |
 | [src/minipixels/assets/png.ml](File-src-minipixels-assets-png-ml-1155821131.md) | `minipixels.assets.png` | yes | 45 |
-| [src/minipixels/assets/text.ml](File-src-minipixels-assets-text-ml-1300721413.md) | `minipixels.assets.text` | yes | 20 |
+| [src/minipixels/assets/text.ml](File-src-minipixels-assets-text-ml-1300721413.md) | `minipixels.assets.text` | yes | 21 |
 | [src/minipixels/audio/audio.ml](File-src-minipixels-audio-audio-ml-660527635.md) | `minipixels.audio.audio` | yes | 168 |
 | [src/minipixels/collision/collision.ml](File-src-minipixels-collision-collision-ml-1544745439.md) | `minipixels.collision.collision` | yes | 14 |
 | [src/minipixels/core/time.ml](File-src-minipixels-core-time-ml-1360759889.md) | `minipixels.core.time` | yes | 16 |

@@ -25,7 +25,7 @@ from build_audio_runtime import ensure_audio_runtime
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 ASSET_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-VERSION = "0.11.0"
+VERSION = "0.12.0"
 DEFAULT_TARGET = "windows-x64" if os.name == "nt" else "linux-x64"
 
 
@@ -957,6 +957,7 @@ def generate(project_file: Path, out_dir: Path) -> Path:
     audio_assets = sorted(container_audio_assets(data), key=lambda a: a["id"])
     text_assets = sorted((asset for asset in pack_assets if str(asset.get("type", "")).lower() == "text"), key=lambda a: a["id"])
     data_assets = sorted((asset for asset in pack_assets if str(asset.get("type", "")).lower() == "data"), key=lambda a: a["id"])
+    file_assets = sorted((asset for asset in pack_assets if str(asset.get("type", "")).lower() == "file"), key=lambda a: a["id"])
     if pack_assets:
         lines.extend(
             [
@@ -973,6 +974,16 @@ def generate(project_file: Path, out_dir: Path) -> Path:
                 "",
             ]
         )
+        for asset in pack_assets:
+            aid = asset["id"]
+            lines.append(f"slot_{aid}_cache = -1")
+            lines.append("")
+            lines.append(f"function slot_{aid}()")
+            lines.append(f"  global slot_{aid}_cache")
+            lines.append(f"  if slot_{aid}_cache < 0 then slot_{aid}_cache = mp.assetSlotFromPack(assetPack(), {json.dumps(aid)}) end if")
+            lines.append(f"  return slot_{aid}_cache")
+            lines.append("end function")
+            lines.append("")
     for asset in image_assets:
         aid = asset["id"]
         lines.append(f"sprite_{aid}_cache = void")
@@ -980,7 +991,7 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         lines.append(f"function make_{aid}()")
         lines.append(f"  global sprite_{aid}_cache")
         lines.append(f"  if sprite_{aid}_cache == void then")
-        lines.append(f'    img = mp.loadPngFromPack(assetPack(), "{aid}")')
+        lines.append(f"    img = mp.loadPngFromPackSlot(assetPack(), slot_{aid}())")
         lines.append(f'    sprite_{aid}_cache = mp.spriteFromImage(img, "{aid}")')
         lines.append("  end if")
         lines.append(f"  return sprite_{aid}_cache")
@@ -1008,7 +1019,7 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         lines.append(f"function audio_{aid}()")
         lines.append(f"  global audio_{aid}_cache")
         lines.append(f"  if audio_{aid}_cache == void then")
-        lines.append(f'    audio_{aid}_cache = mp.audioClipFromBytes(mp.loadBytesFromPack(assetPack(), "{aid}"), "{aid}")')
+        lines.append(f'    audio_{aid}_cache = mp.audioClipFromBytes(mp.loadBytesFromPackSlot(assetPack(), slot_{aid}()), "{aid}")')
         lines.append("  end if")
         lines.append(f"  return audio_{aid}_cache")
         lines.append("end function")
@@ -1016,23 +1027,68 @@ def generate(project_file: Path, out_dir: Path) -> Path:
     for asset in text_assets:
         aid = asset["id"]
         locale = str(asset.get("locale", aid))
+        lines.append(f"text_{aid}_cache = void")
+        lines.append("")
         lines.append(f"function text_{aid}()")
-        lines.append(f"  return mp.loadTextCatalogFromPack(assetPack(), {json.dumps(aid)}, {json.dumps(locale)})")
+        lines.append(f"  global text_{aid}_cache")
+        lines.append(f"  if text_{aid}_cache == void then")
+        lines.append(f"    text_{aid}_cache = mp.loadTextCatalogFromPackSlot(assetPack(), slot_{aid}(), {json.dumps(locale)})")
+        lines.append("  end if")
+        lines.append(f"  return text_{aid}_cache")
         lines.append("end function")
         lines.append("")
     if text_assets:
         default_locale = str(data.get("localization", {}).get("defaultLocale", text_assets[0].get("locale", text_assets[0]["id"])))
+        lines.append("localization_cache = void")
+        lines.append("")
         lines.append("function localization()")
+        lines.append("  global localization_cache")
+        lines.append("  if localization_cache != void then return localization_cache end if")
         lines.append(f"  service = mp.localization({json.dumps(default_locale)})")
         for asset in text_assets:
             lines.append(f"  service.add(text_{asset['id']}())")
-        lines.append("  return service")
+        lines.append("  localization_cache = service")
+        lines.append("  return localization_cache")
         lines.append("end function")
         lines.append("")
     for asset in data_assets:
         aid = asset["id"]
+        lines.append(f"data_{aid}_cache = void")
+        lines.append(f"data_{aid}_loaded = false")
+        lines.append("")
         lines.append(f"function data_{aid}()")
-        lines.append(f"  return decode(mp.loadBytesFromPack(assetPack(), {json.dumps(aid)}))")
+        lines.append(f"  global data_{aid}_cache")
+        lines.append(f"  global data_{aid}_loaded")
+        lines.append(f"  if data_{aid}_loaded then return data_{aid}_cache end if")
+        lines.append(f"  slot = slot_{aid}()")
+        lines.append(f"  data_{aid}_cache = decode(mp.loadBytesFromPackSlot(assetPack(), slot))")
+        lines.append(f"  data_{aid}_loaded = true")
+        lines.append(f"  mp.releasePackedAssetBytesSlot(assetPack(), slot)")
+        lines.append(f"  return data_{aid}_cache")
+        lines.append("end function")
+        lines.append("")
+    for asset in file_assets:
+        aid = asset["id"]
+        lines.append(f"function file_{aid}()")
+        lines.append(f"  return mp.loadBytesFromPackSlot(assetPack(), slot_{aid}())")
+        lines.append("end function")
+        lines.append("")
+    if pack_assets:
+        lines.append("function preload()")
+        for asset in pack_assets:
+            aid = asset["id"]
+            kind = str(asset.get("type", "image")).lower()
+            if kind in ("image", "procedural"):
+                lines.append(f"  make_{aid}()")
+            elif kind == "audio":
+                lines.append(f"  audio_{aid}()")
+            elif kind == "text":
+                lines.append(f"  text_{aid}()")
+            elif kind == "data":
+                lines.append(f"  data_{aid}()")
+            elif kind == "file":
+                lines.append(f"  file_{aid}()")
+        lines.append("  return true")
         lines.append("end function")
         lines.append("")
     lines.append("function registry()")

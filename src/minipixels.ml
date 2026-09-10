@@ -150,7 +150,7 @@ function createGame(cfg)
 end function
 
 /// Performs the version operation for the minipixels module.
-function version() return "0.11.0" end function
+function version() return "0.12.0" end function
 /// Updates renderer maintained by the minipixels module.
 /// @param cfg Configuration used by the operation.
 /// @param renderer renderer value consumed by this operation.
@@ -420,7 +420,7 @@ function drawSpriteRotated(canvas, sprite, x, y, radians, scale, tint) return cv
 /// Opens asset pack for the minipixels module.
 /// @param path Path of the file or directory used by the operation.
 function openAssetPack(path) return pack.open(path) end function
-/// Opens a signed and AES-256-GCM encrypted MPX2 asset pack.
+/// Opens a signed and AES-256-GCM encrypted MPX2 or lazy MPX3 asset pack.
 /// Generated MiniPixels asset modules call this automatically for protected builds.
 /// @param path Path to the protected pack.
 /// @param key Per-build 32-byte AES key.
@@ -431,15 +431,36 @@ function openProtectedAssetPack(path, key, publicKey, keyId) return pack.openPro
 /// @param assetPack assetPack value consumed by this operation.
 /// @param name Name of the affected item.
 function loadBytesFromPack(assetPack, name) return pack.getBytes(assetPack, name) end function
+/// Resolves a dynamic asset name to a stable numeric slot, or -1.
+/// @param assetPack Open asset pack.
+/// @param name Stable asset name.
+function assetSlotFromPack(assetPack, name) return pack.find(assetPack, name) end function
+/// Loads bytes from a pre-resolved asset slot without a string lookup.
+/// @param assetPack Open asset pack.
+/// @param slot Pre-resolved entry slot.
+function loadBytesFromPackSlot(assetPack, slot) return pack.getBytesAt(assetPack, slot) end function
+/// Releases cached raw bytes for a pre-resolved slot while keeping decoded objects.
+/// @param assetPack Open asset pack.
+/// @param slot Pre-resolved entry slot.
+function releasePackedAssetBytesSlot(assetPack, slot) return pack.dropPayloadAt(assetPack, slot) end function
 /// Performs the assetKindFromPack operation for the minipixels module.
 /// @param assetPack assetPack value consumed by this operation.
 /// @param name Name of the affected item.
 function assetKindFromPack(assetPack, name) return pack.getKind(assetPack, name) end function
+/// Returns the type code for a pre-resolved asset slot.
+/// @param assetPack Open asset pack.
+/// @param slot Pre-resolved entry slot.
+function assetKindFromPackSlot(assetPack, slot) return pack.getKindAt(assetPack, slot) end function
 /// Loads a UTF-8 localization catalog from a packed text asset.
 /// @param assetPack Open asset pack.
 /// @param name Packed text asset id.
 /// @param locale Locale assigned to the decoded catalog.
 function loadTextCatalogFromPack(assetPack, name, locale) return textAssets.load(assetPack, name, locale) end function
+/// Loads a UTF-8 localization catalog from a pre-resolved asset slot.
+/// @param assetPack Open asset pack.
+/// @param slot Pre-resolved entry slot.
+/// @param locale Locale assigned to the decoded catalog.
+function loadTextCatalogFromPackSlot(assetPack, slot, locale) return textAssets.loadAt(assetPack, slot, locale) end function
 /// Creates a locale service with language-region fallback and a default locale.
 /// @param defaultLocale Locale used when a requested catalog or key is absent.
 function localization(defaultLocale) return textAssets.create(defaultLocale) end function
@@ -447,6 +468,10 @@ function localization(defaultLocale) return textAssets.create(defaultLocale) end
 /// @param assetPack assetPack value consumed by this operation.
 /// @param name Name of the affected item.
 function loadPngFromPack(assetPack, name) return pack.loadPng(assetPack, name) end function
+/// Loads a PNG from a pre-resolved asset slot without a string lookup.
+/// @param assetPack Open asset pack.
+/// @param slot Pre-resolved entry slot.
+function loadPngFromPackSlot(assetPack, slot) return pack.loadPngAt(assetPack, slot) end function
 /// Loads a common non-interlaced PNG file directly from disk.
 /// @param path PNG file path.
 function loadPng(path) return png.load(path) end function
@@ -461,6 +486,12 @@ function unloadPackedAsset(assetPack, name) return pack.unload(assetPack, name) 
 /// Clears every cached payload and decoded image retained by an asset pack.
 /// @param assetPack Asset pack to mutate.
 function clearAssetPackCache(assetPack) return pack.clearCache(assetPack) end function
+/// Returns asset-pack cache and lazy-I/O counters.
+/// @param assetPack Open asset pack.
+function assetPackStats(assetPack) return pack.stats(assetPack) end function
+/// Closes an asset pack and wipes a retained MPX3 decryption key.
+/// @param assetPack Open asset pack.
+function closeAssetPack(assetPack) return pack.close(assetPack) end function
 /// Performs the animation operation for the minipixels module.
 /// @param maxFrames maxFrames value consumed by this operation.
 function animation(maxFrames) return anim.create(maxFrames) end function

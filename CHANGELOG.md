@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.12.0
+
+- Added random-access MPX3 protected packs with a signed/encrypted index and independently authenticated AES-256-GCM payload blocks, retaining legacy MPX2 read compatibility.
+- Made unprotected MPX1 payloads file-backed and lazy instead of retaining the complete pack in memory.
+- Added generated numeric-slot access, caches for text/data/localization, automatic decoded-source byte release, optional `preload()`, explicit pack closing, and cache/I/O statistics.
+
 ## 0.11.0
 
 - Added mono/stereo MP3 support backed by a checksum-pinned `dr_mp3` bridge for Windows and Linux; sound effects decode lazily and music streams from compressed file or MPX bytes.

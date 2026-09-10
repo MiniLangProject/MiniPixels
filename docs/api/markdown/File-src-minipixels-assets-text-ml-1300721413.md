@@ -31,7 +31,7 @@ Create a localization service with a default locale.
 | `defaultLocale` | `dynamic` | — | Locale used when the requested catalog or key is absent. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/text.ml#L154)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/text.ml#L166)
 
 <a id="function-function-minipixels-assets-text-decodecatalog-function-decodecatalog-data-locale-src-minipixels-assets-text-ml-1583293442"></a>
 ### decodeCatalog
@@ -85,6 +85,24 @@ Load a text catalog directly from an asset pack entry.
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/text.ml#L146)
+
+<a id="function-function-minipixels-assets-text-loadat-function-loadat-pack-slot-locale-src-minipixels-assets-text-ml-421319903"></a>
+### loadAt
+
+```ml
+function loadAt(pack, slot, locale)
+```
+
+Load a text catalog through a pre-resolved pack slot.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `pack` | `dynamic` | — | Open asset pack. |
+| `slot` | `dynamic` | — | Stable entry slot generated at build time. |
+| `locale` | `dynamic` | — | Locale assigned to the resulting catalog. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/text.ml#L156)
 
 - [minipixels.assets.text.Localization](Type-minipixels-assets-text-localization-191735638.md) — struct
 <a id="constant-constant-minipixels-assets-text-text-err-const-text-err-9303-src-minipixels-assets-text-ml-134791708"></a>

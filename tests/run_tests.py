@@ -225,11 +225,14 @@ def create_protected_asset_fixture() -> Path:
     mod.generate(project_file, generated)
     pack = project / "build" / "assets.mpx"
     data = pack.read_bytes()
-    assert data.startswith(b"MPX2"), data[:4]
+    assert data.startswith(b"MPX3"), data[:4]
     assert b"menu.start" not in data and b"world" not in data and b"MPT1" not in data
     tampered = bytearray(data)
     tampered[80] ^= 1
     (project / "build" / "assets-tampered.mpx").write_bytes(tampered)
+    payload_tampered = bytearray(data)
+    payload_tampered[-1] ^= 1
+    (project / "build" / "assets-payload-tampered.mpx").write_bytes(payload_tampered)
     assert (generated / "asset_security.ml").is_file()
     assert (generated / "constants" / "balance.ml").is_file()
     return project
@@ -241,7 +244,7 @@ def run_python_tests() -> None:
         raise RuntimeError("could not load tools/minipixels.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    assert mod.VERSION == "0.11.0", mod.VERSION
+    assert mod.VERSION == "0.12.0", mod.VERSION
     with tempfile.TemporaryDirectory(prefix="minipixels_security_") as td:
         security_root = Path(td)
         security_manifest = security_root / "minipixels.json"
@@ -526,7 +529,7 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
                 "",
                 "function main(args)",
                 "  pack = gen.assetPack()",
-                "  a.assertTrue(typeof(pack) != \"error\", \"protected MPX2 opens\")",
+                "  a.assertTrue(typeof(pack) != \"error\", \"protected MPX3 opens\")",
                 "  a.assertEq(mp.assetKindFromPack(pack, \"de\"), 4, \"text kind\")",
                 "  a.assertEq(mp.assetKindFromPack(pack, \"world\"), 5, \"data kind\")",
                 "  i18n = gen.localization()",
@@ -534,6 +537,15 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
                 "  a.assertEq(i18n.format(\"coins\", [5]), \"Münzen: 5\", \"text formatting\")",
                 "  i18n.setLocale(\"en-US\")",
                 "  a.assertEq(i18n.format(\"coins\", [8]), \"Coins: 8\", \"language fallback\")",
+                "  a.assertTrue(gen.localization() == i18n, \"localization service is cached\")",
+                "  world = gen.data_world()",
+                "  a.assertTrue(typeof(world) == \"string\" and len(world) > 0, \"packed JSON data\")",
+                "  a.assertEq(gen.data_world(), world, \"decoded JSON is cached\")",
+                "  stats = mp.assetPackStats(pack)",
+                "  a.assertTrue(stats.lazyFile, \"MPX3 payloads remain file-backed\")",
+                "  a.assertEq(stats.payloadMisses, 3, \"each decoded payload read once\")",
+                "  a.assertEq(stats.cachedPayloadBytes, 0, \"decoded payload bytes released\")",
+                "  a.assertTrue(gen.preload(), \"preload reuses generated caches\")",
                 "  a.assertEq(balance.PLAYER_SPEED, 120, \"compiled scalar constant\")",
                 "  a.assertEq(balance.ENEMIES_SLIME_HEALTH, 3, \"compiled nested constant\")",
                 "  values = balance.data()",
@@ -544,6 +556,11 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
                 "  a.assertTrue(typeof(rejectedKey) == \"error\", \"wrong AES key rejected\")",
                 "  rejectedTamper = try(mp.openProtectedAssetPack(\"build/assets-tampered.mpx\", security.aesKey(), security.publicKey(), security.keyId()))",
                 "  a.assertTrue(typeof(rejectedTamper) == \"error\", \"tampered signature rejected\")",
+                "  lazyTamper = try(mp.openProtectedAssetPack(\"build/assets-payload-tampered.mpx\", security.aesKey(), security.publicKey(), security.keyId()))",
+                "  a.assertTrue(typeof(lazyTamper) != \"error\", \"payload tamper opens without eager payload I/O\")",
+                "  rejectedPayload = try(mp.loadBytesFromPack(lazyTamper, \"world\"))",
+                "  a.assertTrue(typeof(rejectedPayload) == \"error\", \"tampered payload rejected on first access\")",
+                "  mp.closeAssetPack(lazyTamper)",
                 "  print \"=== PROTECTED ASSET SMOKE DONE ===\"",
                 "  return 0",
                 "end function",

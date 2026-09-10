@@ -144,9 +144,21 @@ end function
 /// @param name Packed text asset id.
 /// @param locale Locale assigned to the resulting catalog.
 function load(pack, name, locale)
-  data = packs.getBytes(pack, name)
+  slot = packs.find(pack, name)
+  if slot < 0 then return textError("text asset not found: " + name) end if
+  return loadAt(pack, slot, locale)
+end function
+
+/// Load a text catalog through a pre-resolved pack slot.
+/// @param pack Open asset pack.
+/// @param slot Stable entry slot generated at build time.
+/// @param locale Locale assigned to the resulting catalog.
+function loadAt(pack, slot, locale)
+  data = packs.getBytesAt(pack, slot)
   if typeof(data) == "error" then return data end if
-  return decodeCatalog(data, locale)
+  catalog = decodeCatalog(data, locale)
+  if typeof(catalog) != "error" then packs.dropPayloadAt(pack, slot) end if
+  return catalog
 end function
 
 /// Create a localization service with a default locale.

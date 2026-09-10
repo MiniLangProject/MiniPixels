@@ -81,11 +81,13 @@ python tools\minipixels.py security init path\to\game\minipixels.json
 python tools\minipixels.py security status path\to\game\minipixels.json
 ```
 
-`security init` creates an unencrypted P-256 PKCS#8 private PEM below `.minipixels`, writes the public PEM beside it, adds the private path to the game's `.gitignore`, and enables `assetProtection`. Subsequent `generate`, `pack`, `build`, and `run` commands create MPX2 automatically. In CI, supply the PEM through `MINIPIXELS_ASSET_SIGNING_KEY` or point `MINIPIXELS_ASSET_SIGNING_KEY_FILE` at a secret file. A protected build fails when the private key is unavailable.
+`security init` creates an unencrypted P-256 PKCS#8 private PEM below `.minipixels`, writes the public PEM beside it, adds the private path to the game's `.gitignore`, and enables `assetProtection`. Subsequent `generate`, `pack`, `build`, and `run` commands create MPX3 automatically. In CI, supply the PEM through `MINIPIXELS_ASSET_SIGNING_KEY` or point `MINIPIXELS_ASSET_SIGNING_KEY_FILE` at a secret file. A protected build fails when the private key is unavailable.
 
-MPX2 keeps only a fixed 64-byte transport header in clear text. The complete MPX1 stream—including names, entry table, kinds, sizes, and payloads—is encrypted with a fresh AES-256-GCM key. MiniPixels signs `header || ciphertext || tag` with ECDSA-P256-SHA256. Generated code embeds the public verification key, its key id, and a per-build masked/permuted AES key. The runtime verifies the signature before decrypting and never accepts MPX1 as a fallback for a protected generated module.
+MPX3 keeps only a fixed 64-byte transport header in clear text. Names, kinds, ranges, per-entry nonces and tags live in an AES-256-GCM encrypted index; each payload is a separate AES-256-GCM block. MiniPixels signs `header || encrypted-index || index-tag` with ECDSA-P256-SHA256. Because the signed index authenticates each payload's GCM material, changing an asset is detected on first access and valid replacement still requires the signing key. Generated code embeds the public verification key, its key id, and a per-build masked/permuted AES key. The runtime never accepts MPX1 as a fallback for a protected generated module, while direct runtime calls can still open legacy MPX2 files.
 
 The embedded AES key is deliberate obfuscation against trivial extraction, not a hardware-backed secret. The signing private key is the actual modification boundary and is never emitted into generated code or the asset pack.
+
+Generated accessors cache decoded sprites, text catalogs, localization state and JSON text. They use pre-resolved entry slots rather than hashing the asset id on every call. Call `generated.assets.preload()` explicitly from a loading scene to warm every generated asset; otherwise loading remains lazy.
 
 ## Localization and Constants
 

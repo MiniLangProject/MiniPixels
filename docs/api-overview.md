@@ -117,9 +117,9 @@ function initialize(game)
 end function
 ```
 
-Project generation writes image, procedural, audio, file, text, and JSON data assets into `build/assets.mpx` and emits lazy MiniLang loader functions. Constants become generated MiniLang code rather than runtime pack entries. The runtime indexes pack entries with a hash map and caches payloads plus decoded images. Its non-interlaced PNG decoder supports stored/fixed/dynamic Deflate, all PNG scanline filters, and grayscale, RGB, indexed, grayscale-alpha, and RGBA color types. `mp.loadPng(path)` also hot-loads ordinary PNG files directly.
+Project generation writes image, procedural, audio, file, text, and JSON data assets into `build/assets.mpx` and emits lazy MiniLang loader functions. Constants become generated MiniLang code rather than runtime pack entries. Opening reads only the pack index; payload ranges are fetched on first use. Generated accessors use pre-resolved numeric slots, cache decoded images/text/data, and release source bytes when the decoded object no longer needs them. `gen.preload()` optionally warms all generated assets during a loading screen. The non-interlaced PNG decoder supports stored/fixed/dynamic Deflate, all PNG scanline filters, and grayscale, RGB, indexed, grayscale-alpha, and RGBA color types. `mp.loadPng(path)` also hot-loads ordinary PNG files directly.
 
-The Python driver can wrap the complete pack in signed, AES-256-GCM-encrypted MPX2. `python tools/minipixels.py security init <manifest>` creates the build-only P-256 signing key and enables protection. Generated game code reconstructs the obfuscated AES key, verifies the embedded public-key identity and signature, then decrypts the pack transparently.
+The Python driver writes protected assets as random-access MPX3. It signs an encrypted index and stores every payload as an independent AES-256-GCM block, so startup does not read or decrypt the whole pack. `python tools/minipixels.py security init <manifest>` creates the build-only P-256 signing key and enables protection. Generated game code reconstructs the obfuscated AES key and performs verification/decryption transparently. Legacy MPX2 packs are still accepted by the runtime.
 
 ```json
 {

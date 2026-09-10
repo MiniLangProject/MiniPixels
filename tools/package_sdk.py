@@ -24,7 +24,7 @@ INCLUDE_FILES = [
     "CHANGELOG.md",
     "LICENSE",
     "README.md",
-    "RELEASE_NOTES_0.11.0.md",
+    "RELEASE_NOTES_0.12.0.md",
     "requirements.txt",
     "VERSION",
 ]

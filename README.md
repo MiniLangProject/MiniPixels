@@ -3,11 +3,11 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.11.0`
+Current version: `0.12.0`
 
-See the [0.11.0 release notes](RELEASE_NOTES_0.11.0.md) for MP3/stereo audio and experimental GPU scene-rendering details.
+See the [0.12.0 release notes](RELEASE_NOTES_0.12.0.md) for lazy random-access asset loading, MPX3 protection, generated O(1) slot access, and cache controls.
 
-MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.4 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
+MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.7 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
 MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, fixed/native/scaled framebuffers, OpenGL/WGL, GDI and XImage presentation, an optional batched Windows GPU scene canvas, configurable keyboard/mouse actions, sprites and rotated render targets, signed and optionally encrypted asset packs, localized text and generated game data, scene stacks, swept tile collision, bitmap text, multi-voice WAV/MP3 audio through waveOut or ALSA, headless tests, and example projects.
 
@@ -34,7 +34,7 @@ diagnostics as failures.
 ## Requirements
 
 - Windows x64 or Linux x64 with glibc, X11 (`libX11.so.6`) and ALSA (`libasound.so.2`)
-- MiniLang Compiler 1.2.4 or newer in a sibling checkout; protected MPX2 builds require the current `MiniLangCompilerPy` with `std.crypto.ecdsa_p256`
+- MiniLang Compiler 1.2.7 or newer in a sibling checkout; lazy MPX I/O uses `std.io.file` and protected builds use `std.crypto.ecdsa_p256`
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
 - The Python packages in `requirements.txt` for protected asset builds
 - Visual Studio C++ Build Tools on Windows, or GCC on Linux, for the small MP3 decoder bridge
@@ -81,7 +81,7 @@ python3 tests/run_tests.py --target linux-x64
 python3 tools/build_examples.py --target linux-x64
 ```
 
-The self-hosted 1.2.4 compiler is accepted directly as well, for example `--compiler ..\MiniLangCompilerML\build\mlc_win64.exe`.
+The current self-hosted compiler is accepted directly as well, for example `--compiler ..\MiniLangCompilerML\build\mlc_win64.exe`.
 
 Build the native MiniLang CLI:
 
@@ -112,7 +112,7 @@ Tooling split:
 | Inspect/validate manifests | `info`, `doctor`, `validate` | `info`, `doctor`, `validate` |
 | Generate `generated.assets` | image/procedural/audio/file/text/data helpers backed by unprotected `assets.mpx` | all runtime helpers, localization, protection module, and constants |
 | Generate `generated.levels` | MiniPixels `levels.json` and Tiled JSON/TMJ | MiniPixels `levels.json` and Tiled JSON/TMJ |
-| Create runtime assets | deterministic MPX1 | MPX1 or signed/encrypted MPX2 plus build reports |
+| Create runtime assets | deterministic MPX1 | MPX1 or signed/encrypted, random-access MPX3 plus build reports |
 | Build/run/package | Not yet | `build`, `run`, `package`, `pack` |
 
 Run tests:
@@ -337,7 +337,7 @@ python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler
 python tools\minipixels.py package
 ```
 
-The Python CLI validates project JSON, writes asset, localization, constants, and level modules, emits `asset-report.json`, builds the target audio bridge, and invokes the MiniLang compiler. Run `security init` once to enable signed and encrypted MPX2 builds. Generated audio helpers create memory-backed WAV/MP3 clips, so games do not need loose sound files next to the executable.
+The Python CLI validates project JSON, writes asset, localization, constants, and level modules, emits `asset-report.json`, builds the target audio bridge, and invokes the MiniLang compiler. Run `security init` once to enable signed and encrypted MPX3 builds. Generated audio helpers create memory-backed WAV/MP3 clips, so games do not need loose sound files next to the executable.
 
 Windowed Windows games built through `tools\minipixels.py build` or `run` use the GUI PE subsystem by default, so double-clicking the executable opens only the game window and no companion console. Linux builds are normal ELF executables. Use `--headless` for Windows console-subsystem builds that are meant to print test or tool output.
 
@@ -345,7 +345,7 @@ Builds use MiniLang's exact-hit incremental artifact cache by default. Use `--no
 
 ## MPX Asset Pack Format
 
-The logical MiniPixels container is MPX1: a fixed header, a compact entry table, and contiguous payload bytes. Without asset protection, `assets.mpx` contains MPX1 directly.
+The logical MiniPixels container is MPX1: a fixed header, a compact entry table, and contiguous payload bytes. Without asset protection, `assets.mpx` contains MPX1 directly. The runtime reads only its index during open and fetches payload ranges on first access.
 
 All multi-byte integers are unsigned little-endian values.
 
@@ -381,7 +381,7 @@ Current `kind` values:
 
 `constants` assets are intentionally absent from the pack: the generator turns their JSON values into MiniLang constants and a structured `data()` accessor at compile time.
 
-With `assetProtection.enabled`, the file is an MPX2 envelope containing the complete encrypted MPX1 payload. The build uses AES-256-GCM, signs the envelope with ECDSA P-256/SHA-256, and embeds the verification key plus an obfuscated reconstruction of the per-build AES key in generated MiniLang code. The private signing key remains a build secret and is never placed in the pack or generated source. Runtime loading verifies the signature before decrypting and rejects changed, truncated, wrongly keyed, or malformed files.
+With `assetProtection.enabled`, new builds write MPX3. Its compact encrypted index is signed with ECDSA P-256/SHA-256 and each asset is an independent AES-256-GCM block. Opening verifies and decrypts only the index; an asset remains encrypted on disk until first use. The signed index binds every block's offset, size, nonce, and authentication tag, so a changed block is rejected when accessed and the pack cannot be repacked without the private signing key. Generated MiniLang code embeds the public verification key plus an obfuscated reconstruction of the per-build AES key. The private key remains build-only. Existing MPX2 files remain readable for compatibility.
 
 Enable it once per project:
 
@@ -402,7 +402,12 @@ img = mp.loadPngFromPack(pack, "player")
 raw = mp.loadBytesFromPack(pack, "coin_sfx")
 strings = mp.loadTextCatalogFromPack(pack, "ui", "de")
 kind = mp.assetKindFromPack(pack, "coin_sfx")
+slot = mp.assetSlotFromPack(pack, "player")
+fastImage = mp.loadPngFromPackSlot(pack, slot)
+stats = mp.assetPackStats(pack)
 ```
+
+Generated helpers use numeric slots automatically, cache decoded sprites, text catalogs, localization services and JSON text, and release PNG/text/data source bytes after successful decoding. Call `gen.preload()` during a loading screen when predictable first-frame latency is more important than fully lazy loading.
 
 ## Mini Code Examples
 

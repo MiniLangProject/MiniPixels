@@ -30,6 +30,8 @@ function main(args)
   a.assertTrue(stringIndexOf(assets, "function make_player", 0) >= 0, "generator asset maker")
   a.assertTrue(stringIndexOf(assets, "function sheet_player", 0) >= 0, "generator sheet maker")
   a.assertTrue(stringIndexOf(assets, "function audio_coin_sfx", 0) >= 0, "generator audio helper")
+  a.assertTrue(stringIndexOf(assets, "loadPngFromPackSlot", 0) >= 0, "generator uses direct asset slots")
+  a.assertTrue(stringIndexOf(assets, "function preload", 0) >= 0, "generator preload helper")
 
   r3 = gen.generate("examples/tiled-platformer/minipixels.json", "build/tests/native_generated_procedural/generated")
   a.assertTrue(r3.ok, "generator supports procedural manifest")
