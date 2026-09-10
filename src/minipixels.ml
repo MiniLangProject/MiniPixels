@@ -150,7 +150,7 @@ function createGame(cfg)
 end function
 
 /// Performs the version operation for the minipixels module.
-function version() return "0.10.0" end function
+function version() return "0.11.0" end function
 /// Updates renderer maintained by the minipixels module.
 /// @param cfg Configuration used by the operation.
 /// @param renderer renderer value consumed by this operation.

@@ -59,6 +59,12 @@ jobs:
           python ../MiniLangCompilerPy/mlc_win64.py tests/window_renderer_smoke.ml build/tests/window_renderer_smoke -I src -I ../MiniLangCompilerPy --target linux-x64
           xvfb-run -a build/tests/window_renderer_smoke
 
+      - name: Smoke optional GPU fallback
+        working-directory: MiniPixels
+        run: |
+          python ../MiniLangCompilerPy/mlc_win64.py tests/gpu_scene_smoke.ml build/tests/gpu_scene_smoke -I src -I ../MiniLangCompilerPy --target linux-x64
+          build/tests/gpu_scene_smoke
+
       - name: Build and smoke native MiniLang CLI
         working-directory: MiniPixels
         run: |
@@ -126,6 +132,13 @@ jobs:
       - name: Build examples
         working-directory: MiniPixels
         run: python tools\build_examples.py
+
+      - name: Build optional GPU scene runtime
+        shell: pwsh
+        working-directory: MiniPixels
+        run: |
+          .\native\build-gpu.ps1 -OutputDirectory build\tests
+          python ..\MiniLangCompilerPy\mlc_win64.py tests\gpu_scene_smoke.ml build\tests\gpu_scene_smoke.exe -I src -I ..\MiniLangCompilerPy
 
       - name: Build native MiniLang CLI
         shell: pwsh

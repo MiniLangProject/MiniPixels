@@ -25,7 +25,7 @@ from build_audio_runtime import ensure_audio_runtime
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 ASSET_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-VERSION = "0.10.0"
+VERSION = "0.11.0"
 DEFAULT_TARGET = "windows-x64" if os.name == "nt" else "linux-x64"
 
 

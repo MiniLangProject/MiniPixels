@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+## 0.11.0
+
 - Added mono/stereo MP3 support backed by a checksum-pinned `dr_mp3` bridge for Windows and Linux; sound effects decode lazily and music streams from compressed file or MPX bytes.
 - Added automatic target-native audio bridge builds/copying, `musicClipFromBytes`, MP3/stereo capability queries, and stereo/streaming regression coverage.
+- Added an experimental batched Windows OpenGL scene canvas with GPU sprites, primitives, framebuffer resizing, readback, texture invalidation, optional point lights, and a compile-safe Linux fallback.
+- Added an optional native GPU runtime build, SDK packaging, cross-target smoke coverage, and renderer/API documentation.
+- Optimized opaque-destination sprite blending and avoided redundant full-window clears in the Windows OpenGL and GDI presenters.
 
 ## 0.10.0
 

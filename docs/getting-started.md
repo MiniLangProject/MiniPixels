@@ -92,8 +92,8 @@ Game logic, input polling, PCM mixing, MP3 stream decoding, rendering, and nativ
 
 ## Implemented now
 
-Canvas, render targets, rotated sprites, deterministic PNG screenshots, cached signed/encrypted `.mpx` asset packs, localized text, generated constants/data, general non-interlaced PNG loading, native asset/Tiled generation, sprite sheets, scene stacks, animation, camera, tilemaps, parallax, swept collision, bitmap text, buffered configurable input, a real multi-voice PCM mixer, headless/visual regression tests, Win32 GDI/OpenGL and Linux X11/XImage presentation, CLI, cross-platform CI, SDK packaging, and examples are present.
+Canvas, render targets, rotated sprites, deterministic PNG screenshots, cached signed/encrypted `.mpx` asset packs, localized text, generated constants/data, general non-interlaced PNG loading, native asset/Tiled generation, sprite sheets, scene stacks, animation, camera, tilemaps, parallax, swept collision, bitmap text, buffered configurable input, a real multi-voice PCM mixer, headless/visual regression tests, Win32 GDI/OpenGL and Linux X11/XImage presentation, an experimental batched Windows GPU scene canvas, CLI, cross-platform CI, SDK packaging, and examples are present.
 
 ## Not yet in the engine
 
-Wayland and GPU-accelerated Linux presentation, additional compressed audio codecs, Adam7/16-bit PNG decoding, background asset I/O, GPU-native render targets, a complete ECS/physics layer, and an editor remain extension points.
+Wayland and GPU-accelerated Linux presentation, additional compressed audio codecs, Adam7/16-bit PNG decoding, background asset I/O, fully integrated cross-platform GPU-native render targets, a complete ECS/physics layer, and an editor remain extension points.

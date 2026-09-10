@@ -43,6 +43,24 @@ Native and scaled policies resize the existing `game.canvas` object before `init
 
 You can also set `cfg.renderer` manually to `"auto"`, `"opengl"`, `"gpu"`, `"gdi"`, or `"cpu"`. The OpenGL path uploads the canvas's dirty rectangle and uses the GPU for scaling and swapping the window framebuffer. It reallocates its backing texture only when the framebuffer crosses a power-of-two boundary. Both platforms skip unchanged presentation until the window requests repainting; the Linux XImage path additionally converts and uploads only dirty regions at native 1:1 size. Canvas drawing, collisions, animation state, and frame hashes stay CPU-side and deterministic.
 
+Windows also offers the separate experimental `minipixels.graphics.gpu` scene canvas. It batches sprites and primitives directly into an OpenGL framebuffer and supports explicit resize, readback, mutable-texture invalidation, and optional point lights. Build `native/build-gpu.ps1` into the executable directory, open an `opengl` window, and use the explicit frame lifecycle:
+
+```ml
+import minipixels.graphics.gpu as gpu
+import minipixels.platform.windows as win
+
+scene = gpu.create(window, 640, 360, true)
+if typeof(scene) != "void" then
+  gpu.begin(window)
+  scene.clear(0x101820ff)
+  scene.drawSprite(player, x, y)
+  gpu.finish(window)
+  win.present(window, scene)
+end if
+```
+
+Call `gpu.shutdown()` before closing the window. This experimental API is not a drop-in replacement for the stable CPU `Canvas`: GPU-to-GPU canvas sources, rotated sprites, automatic `mp.run` integration, and Linux GPU rendering are not implemented yet.
+
 Presentation scale modes:
 
 - `"stretch"` fills the whole client area, even when the aspect ratio changes.
@@ -57,7 +75,7 @@ gpu = mp.isGpuRenderer(game)
 reason = mp.rendererFallbackReason(game)
 ```
 
-For quick local checks, `tests/window_renderer_smoke.ml` opens a tiny window and prints the active backend. For rough presentation timing, build and run `benchmarks/renderer_bench.ml`.
+For quick local checks, `tests/window_renderer_smoke.ml` opens a tiny window and prints the active backend. `tests/gpu_scene_smoke.ml` exercises GPU drawing, resizing, readback, presentation, and the Linux fallback. For rough presentation timing, build and run `benchmarks/renderer_bench.ml`.
 
 OpenGL presentation may be capped by the graphics driver or display swap interval, so benchmark output around 60 FPS can mean the swap path is synchronized rather than slow.
 

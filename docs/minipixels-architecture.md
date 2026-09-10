@@ -26,6 +26,7 @@ MiniPixels is a working engine prototype, not the full future engine. It contain
 - `minipixels.core.time`: frame/update counters and fixed-step timing state.
 - `minipixels.math.types`: vectors, rectangles, transforms, color packing, RNG, timers.
 - `minipixels.graphics.canvas`: framebuffer, clipping, primitives, sprite blits, render targets.
+- `minipixels.graphics.gpu`: experimental Windows OpenGL scene framebuffer, batching, readback, and point lights, with non-Windows stubs.
 - `minipixels.graphics.sprite`: images, generated MPPM asset format, sprites, sprite sheets.
 - `minipixels.animation.animation`: frame-duration animation player.
 - `minipixels.input.input`: keyboard snapshots, action mapping.
@@ -46,6 +47,8 @@ MiniPixels is a working engine prototype, not the full future engine. It contain
 The public framebuffer format is straight-alpha RGBA8888 with packed colors as `0xRRGGBBAA`. `Canvas.pixels` stores bytes in `R,G,B,A` order. A framebuffer policy selects a fixed size, the native client size, or a fractional/multiple client size with an aspect-preserving pixel cap. Runtime resize reallocates the pixel storage while retaining the public Canvas object and publishes the new render/design ratios on Game.
 
 GDI uses explicit DIB color masks, avoiding a frame-by-frame channel conversion. The OpenGL/WGL presenter updates only the tracked dirty rectangle of the logical RGBA texture, grows or shrinks its power-of-two texture when necessary, and lets the GPU scale it to the client area. Unchanged Windows frames skip presentation until WM_PAINT or WM_SIZE invalidates the retained output. Linux converts and scales into a retained native XImage; unchanged frames likewise skip native presentation, while native 1:1 dirty frames convert and upload only their changed rectangle. Presentation scale modes independently support stretch, aspect-fit, and integer pixel-perfect output.
+
+The optional Windows GPU scene path is deliberately separate from the portable CPU framebuffer. A small C++ runtime owns an OpenGL framebuffer and resident texture cache, batches compatible sprite/rectangle work, and resolves the logical scene into the existing window viewport. MiniLang retains cached source images so native pointer keys remain valid and exposes explicit invalidation when mutable pixels change. Framebuffer resize and readback are explicit; the runtime validates the owning OpenGL context and keeps the scene opaque for a cheaper source-over blend path. Linux compiles the same module to unsupported stubs rather than acquiring a Windows DLL dependency.
 
 ## Game-loop strategy
 
@@ -74,5 +77,6 @@ The native MiniLang CLI validates manifests and generates real `assets.mpx`, `ge
 
 - PNG hot-loading intentionally excludes Adam7 interlace and 16-bit samples.
 - MP3 sound effects decode on first use, while MP3 music uses a per-voice source-frame buffer. WAV remains direct PCM and the final mixer output is interleaved 44.1-kHz signed-16 stereo.
-- Windows has GDI and OpenGL/WGL presentation; Linux currently uses X11/XImage. Wayland and a GPU presenter are natural next steps.
+- Windows has GDI and OpenGL/WGL presentation plus an experimental GPU-native scene path; Linux currently uses X11/XImage. Wayland and a Linux GPU presenter are natural next steps.
+- The GPU scene canvas is not yet integrated into `mp.run` and does not yet implement rotated sprites or GPU-canvas texture sources.
 - `nativeCallback` currently supports WNDPROC only; richer callback APIs should remain backend-internal.

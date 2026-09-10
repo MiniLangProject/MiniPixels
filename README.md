@@ -3,13 +3,13 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.10.0`
+Current version: `0.11.0`
 
-See the [0.10.0 release notes](RELEASE_NOTES_0.10.0.md) for dynamic-resolution and renderer-performance details.
+See the [0.11.0 release notes](RELEASE_NOTES_0.11.0.md) for MP3/stereo audio and experimental GPU scene-rendering details.
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.4 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
-MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, fixed/native/scaled framebuffers, OpenGL/WGL, GDI and XImage presentation, configurable keyboard/mouse actions, sprites and rotated render targets, signed and optionally encrypted asset packs, localized text and generated game data, scene stacks, swept tile collision, bitmap text, multi-voice WAV/MP3 audio through waveOut or ALSA, headless tests, and example projects.
+MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, fixed/native/scaled framebuffers, OpenGL/WGL, GDI and XImage presentation, an optional batched Windows GPU scene canvas, configurable keyboard/mouse actions, sprites and rotated render targets, signed and optionally encrypted asset packs, localized text and generated game data, scene stacks, swept tile collision, bitmap text, multi-voice WAV/MP3 audio through waveOut or ALSA, headless tests, and example projects.
 
 ![Moving Sprite](docs/images/moving-sprite.png)
 
