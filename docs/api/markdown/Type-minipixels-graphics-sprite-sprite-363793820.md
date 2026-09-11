@@ -12,7 +12,7 @@ struct Sprite
 Represents the sprite data used by the minipixels graphics sprite module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L31)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L35)
 
 ## Members
 
@@ -26,7 +26,7 @@ height as int
 Stores the height value associated with sprite.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L41)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L45)
 
 <a id="field-field-minipixels-graphics-sprite-sprite-image-image-src-minipixels-graphics-sprite-ml-1538881184"></a>
 ### image
@@ -38,7 +38,7 @@ image
 Stores the image value associated with sprite.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L33)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L37)
 
 <a id="field-field-minipixels-graphics-sprite-sprite-name-name-src-minipixels-graphics-sprite-ml-794259462"></a>
 ### name
@@ -50,7 +50,7 @@ name
 Stores the name value associated with sprite.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L47)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L51)
 
 <a id="field-field-minipixels-graphics-sprite-sprite-pivotx-pivotx-src-minipixels-graphics-sprite-ml-1154389884"></a>
 ### pivotX
@@ -62,7 +62,7 @@ pivotX
 Stores the pivot x value associated with sprite.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L43)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L47)
 
 <a id="field-field-minipixels-graphics-sprite-sprite-pivoty-pivoty-src-minipixels-graphics-sprite-ml-26187722"></a>
 ### pivotY
@@ -74,7 +74,7 @@ pivotY
 Stores the pivot y value associated with sprite.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L45)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L49)
 
 <a id="field-field-minipixels-graphics-sprite-sprite-sx-sx-as-int-src-minipixels-graphics-sprite-ml-350891479"></a>
 ### sx
@@ -86,7 +86,7 @@ sx as int
 Stores the sx value associated with sprite.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L35)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L39)
 
 <a id="field-field-minipixels-graphics-sprite-sprite-sy-sy-as-int-src-minipixels-graphics-sprite-ml-288975837"></a>
 ### sy
@@ -98,7 +98,7 @@ sy as int
 Stores the sy value associated with sprite.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L37)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L41)
 
 <a id="field-field-minipixels-graphics-sprite-sprite-width-width-as-int-src-minipixels-graphics-sprite-ml-1201133233"></a>
 ### width
@@ -110,4 +110,4 @@ width as int
 Stores the width value associated with sprite.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L39)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L43)

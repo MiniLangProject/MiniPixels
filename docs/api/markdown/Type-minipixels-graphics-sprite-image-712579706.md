@@ -31,7 +31,31 @@ Returns pixel maintained by the minipixels graphics sprite module.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L25)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L29)
+
+<a id="field-field-minipixels-graphics-sprite-image-gputexturegeneration-gputexturegeneration-as-int-src-minipixels-graphics-sprite-ml-122304125"></a>
+### gpuTextureGeneration
+
+```ml
+gpuTextureGeneration as int
+```
+
+GPU texture-cache generation owning gpuTextureId. Engine-managed.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L24)
+
+<a id="field-field-minipixels-graphics-sprite-image-gputextureid-gputextureid-as-int-src-minipixels-graphics-sprite-ml-882312275"></a>
+### gpuTextureId
+
+```ml
+gpuTextureId as int
+```
+
+Cached optional GPU-scene texture handle. Engine-managed.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L22)
 
 <a id="field-field-minipixels-graphics-sprite-image-height-height-as-int-src-minipixels-graphics-sprite-ml-1386129973"></a>
 ### height

@@ -287,11 +287,11 @@ Performs the recti operation for the minipixels math types module.
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L239)
 
-<a id="function-function-minipixels-math-types-rgb-function-rgb-r-g-b-src-minipixels-math-types-ml-2004077025"></a>
+<a id="function-function-minipixels-math-types-rgb-inline-function-rgb-r-g-b-src-minipixels-math-types-ml-1405579016"></a>
 ### rgb
 
 ```ml
-function rgb(r, g, b)
+inline function rgb(r, g, b)
 ```
 
 Performs the rgb operation for the minipixels math types module.
@@ -305,11 +305,11 @@ Performs the rgb operation for the minipixels math types module.
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L353)
 
-<a id="function-function-minipixels-math-types-rgba-function-rgba-r-g-b-a-src-minipixels-math-types-ml-1321736702"></a>
+<a id="function-function-minipixels-math-types-rgba-inline-function-rgba-r-g-b-a-src-minipixels-math-types-ml-1475027021"></a>
 ### rgba
 
 ```ml
-function rgba(r, g, b, a)
+inline function rgba(r, g, b, a)
 ```
 
 Performs the rgba operation for the minipixels math types module.

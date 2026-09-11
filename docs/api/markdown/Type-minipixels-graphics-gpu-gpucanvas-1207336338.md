@@ -12,7 +12,7 @@ struct GpuCanvas
 Experimental batched render target backed by an OpenGL framebuffer.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L111)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L119)
 
 ## Members
 
@@ -36,7 +36,7 @@ Draws a source image region without scaling.
 | `y` | `dynamic` | — | Destination y coordinate. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L174)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L182)
 
 <a id="method-method-minipixels-graphics-gpu-gpucanvas-clear-function-clear-color-src-minipixels-graphics-gpu-ml-274484978"></a>
 ### clear
@@ -52,7 +52,7 @@ Clears the complete scene target to an opaque color.
 | `color` | `dynamic` | — | Packed RGBA clear color; the target remains opaque. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L118)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L126)
 
 <a id="method-method-minipixels-graphics-gpu-gpucanvas-drawcanvas-function-drawcanvas-source-x-y-src-minipixels-graphics-gpu-ml-808238395"></a>
 ### drawCanvas
@@ -70,7 +70,7 @@ Draws a CPU canvas. GPU canvases are not valid sources.
 | `y` | `dynamic` | — | Destination y coordinate. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L162)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L170)
 
 <a id="method-method-minipixels-graphics-gpu-gpucanvas-drawlight-function-drawlight-x-y-radiusx-radiusy-red-green-blue-returns-bool-src-minipixels-graphics-gpu-ml-1222912900"></a>
 ### drawLight
@@ -94,7 +94,7 @@ Applies an additive screen-blend point light when shader support is available.
 
 **Returns:** True when the optional light shader is available.
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L229)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L237)
 
 <a id="method-method-minipixels-graphics-gpu-gpucanvas-drawline-function-drawline-x0-y0-x1-y1-color-src-minipixels-graphics-gpu-ml-331511308"></a>
 ### drawLine
@@ -114,7 +114,7 @@ Draws a one-pixel line.
 | `color` | `dynamic` | — | Packed RGBA color. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L207)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L215)
 
 <a id="method-method-minipixels-graphics-gpu-gpucanvas-drawrect-function-drawrect-x-y-w-h-color-src-minipixels-graphics-gpu-ml-140781264"></a>
 ### drawRect
@@ -134,7 +134,7 @@ Draws a one-pixel rectangle outline.
 | `color` | `dynamic` | — | Packed RGBA color. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L194)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L202)
 
 <a id="method-method-minipixels-graphics-gpu-gpucanvas-drawsprite-function-drawsprite-spr-x-y-src-minipixels-graphics-gpu-ml-951683967"></a>
 ### drawSprite
@@ -152,7 +152,7 @@ Draws a sprite at its natural size.
 | `y` | `dynamic` | — | Destination pivot y coordinate. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L144)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L152)
 
 <a id="method-method-minipixels-graphics-gpu-gpucanvas-drawspritescaled-function-drawspritescaled-spr-x-y-scale-tint-src-minipixels-graphics-gpu-ml-1627954726"></a>
 ### drawSpriteScaled
@@ -172,7 +172,7 @@ Draws a tinted sprite at a uniform scale.
 | `tint` | `dynamic` | — | Packed RGBA color multiplier. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L154)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L162)
 
 <a id="method-method-minipixels-graphics-gpu-gpucanvas-fillcircle-function-fillcircle-x-y-r-color-src-minipixels-graphics-gpu-ml-118501783"></a>
 ### fillCircle
@@ -191,7 +191,7 @@ Draws a filled circle.
 | `color` | `dynamic` | — | Packed RGBA color. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L216)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L224)
 
 <a id="method-method-minipixels-graphics-gpu-gpucanvas-fillrect-function-fillrect-x-y-w-h-color-src-minipixels-graphics-gpu-ml-612314980"></a>
 ### fillRect
@@ -211,7 +211,7 @@ Draws a filled rectangle.
 | `color` | `dynamic` | — | Packed RGBA color. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L184)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L192)
 
 <a id="field-field-minipixels-graphics-gpu-gpucanvas-height-height-src-minipixels-graphics-gpu-ml-845698813"></a>
 ### height
@@ -221,7 +221,7 @@ height
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L113)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L121)
 
 <a id="field-field-minipixels-graphics-gpu-gpucanvas-imageview-imageview-src-minipixels-graphics-gpu-ml-1140649519"></a>
 ### imageView
@@ -231,7 +231,7 @@ imageView
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L114)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L122)
 
 <a id="method-method-minipixels-graphics-gpu-gpucanvas-resize-function-resize-width-height-returns-bool-src-minipixels-graphics-gpu-ml-285495381"></a>
 ### resize
@@ -250,7 +250,7 @@ Resizes and clears the GPU framebuffer.
 
 **Returns:** True when the framebuffer was resized or already has this size.
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L126)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L134)
 
 <a id="field-field-minipixels-graphics-gpu-gpucanvas-width-width-src-minipixels-graphics-gpu-ml-1578370063"></a>
 ### width
@@ -260,4 +260,4 @@ width
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L112)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L120)

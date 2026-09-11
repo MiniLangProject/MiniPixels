@@ -88,6 +88,9 @@ end struct
 /// @param tileset tileset value consumed by this operation.
 /// @param maxLayers maxLayers value consumed by this operation.
 function create(tileWidth, tileHeight, width, height, tileset, maxLayers)
+  // Frame descriptors are immutable and otherwise allocated lazily from the
+  // render loop. Prewarming makes tile traversal allocation-free.
+  sp.cacheFrames(tileset.sheet)
   return TileMap(tileWidth, tileHeight, width, height, tileset, array(maxLayers), 0)
 end function
 
@@ -147,10 +150,14 @@ function drawLayer(map, layer, canvas, camera)
   lastCol = mt.clamp(lastCol, 0, layer.width - 1)
   lastRow = mt.clamp(lastRow, 0, layer.height - 1)
   for ty = firstRow to lastRow
+    rowOffset = ty * layer.width
     for tx = firstCol to lastCol
-      id = tileAt(layer, tx, ty)
+      // Camera clipping already guarantees valid coordinates here, so avoid a
+      // second bounds-checked function call for every visible tile.
+      id = layer.data[rowOffset + tx]
       if id > 0 then
-        frameIndex = mt.clamp(id - 1, 0, map.tileset.sheet.frameCount - 1)
+        frameIndex = id - 1
+        if frameIndex >= map.tileset.sheet.frameCount then frameIndex = map.tileset.sheet.frameCount - 1 end if
         spr = map.tileset.sheet.frames[frameIndex]
         if typeof(spr) == "void" then spr = map.tileset.sheet.getFrame(frameIndex) end if
         x = (tx * map.tileWidth) - ox

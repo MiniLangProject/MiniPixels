@@ -46,7 +46,7 @@ MiniPixels is a working engine prototype, not the full future engine. It contain
 
 The public framebuffer format is straight-alpha RGBA8888 with packed colors as `0xRRGGBBAA`. `Canvas.pixels` stores bytes in `R,G,B,A` order. A framebuffer policy selects a fixed size, the native client size, or a fractional/multiple client size with an aspect-preserving pixel cap. Runtime resize reallocates the pixel storage while retaining the public Canvas object and publishes the new render/design ratios on Game.
 
-GDI uses explicit DIB color masks, avoiding a frame-by-frame channel conversion. The OpenGL/WGL presenter updates only the tracked dirty rectangle of the logical RGBA texture, grows or shrinks its power-of-two texture when necessary, and lets the GPU scale it to the client area. Unchanged Windows frames skip presentation until WM_PAINT or WM_SIZE invalidates the retained output. Linux converts and scales into a retained native XImage; unchanged frames likewise skip native presentation, while native 1:1 dirty frames convert and upload only their changed rectangle. Presentation scale modes independently support stretch, aspect-fit, and integer pixel-perfect output.
+GDI uses explicit DIB color masks, avoiding a frame-by-frame channel conversion. The OpenGL/WGL presenter updates only the tracked dirty rectangle of the logical RGBA texture, grows or shrinks its power-of-two texture when necessary, and lets the GPU scale it to the client area. Unchanged Windows frames skip presentation until WM_PAINT or WM_SIZE invalidates the retained output. Linux converts and scales into a retained native XImage through optimized C routines in the already-required native runtime; unchanged frames likewise skip native presentation, while native 1:1 dirty frames convert and upload only their changed rectangle. Presentation scale modes independently support stretch, aspect-fit, and integer pixel-perfect output.
 
 The optional Windows GPU scene path is deliberately separate from the portable CPU framebuffer. A small C++ runtime owns an OpenGL framebuffer and resident texture cache, batches compatible sprite/rectangle work, and resolves the logical scene into the existing window viewport. MiniLang retains cached source images so native pointer keys remain valid and exposes explicit invalidation when mutable pixels change. Framebuffer resize and readback are explicit; the runtime validates the owning OpenGL context and keeps the scene opaque for a cheaper source-over blend path. Linux compiles the same module to unsupported stubs rather than acquiring a Windows DLL dependency.
 
@@ -56,7 +56,7 @@ The headless path runs deterministic fixed updates and renders exactly the reque
 
 ## Asset strategy
 
-Both generators validate `minipixels.json`, write an `assets.mpx` byte stream, generate lazy MiniLang asset modules, import MiniPixels or Tiled level data, and include referenced image, audio, text, and data assets in the same container. Runtime game code does not need a JSON parser for text catalogs in release builds. The Python path preserves compatible source PNGs, Deflate-compresses generated PNGs, and transcodes PCM WAV assets to MP3 when that reduces their size. File, text, and JSON payloads select Deflate or RLE only when useful. The native MiniLang generator uses dependency-free RLE where beneficial. The Python build driver also emits detailed size/codec reports, builds/copies the native MP3 decoder bridge, and writes compiler project manifests.
+Both generators validate `minipixels.json`, write an `assets.mpx` byte stream, generate lazy MiniLang asset modules, import MiniPixels or Tiled level data, and include referenced image, audio, text, and data assets in the same container. Runtime game code does not need a JSON parser for text catalogs in release builds. The Python path preserves compatible source PNGs, Deflate-compresses generated PNGs, and transcodes PCM WAV assets to MP3 when that reduces their size. File, text, and JSON payloads select Deflate or RLE only when useful. The native MiniLang generator uses dependency-free RLE where beneficial. The Python build driver also emits detailed size/codec reports, builds/copies the native runtime bridge, and writes compiler project manifests.
 
 Protected builds convert the deterministic MPX1 stream into MPX3. Compression and identical-payload deduplication occur before encryption. A fresh per-build AES-256-GCM key encrypts the compact index and each unique stored block independently. An ECDSA-P256-SHA256 signature authenticates the header and encrypted index; that index binds every payload codec, logical/stored size, offset, nonce and GCM tag. Startup therefore verifies/decrypts only metadata, while payload authentication and decompression happen on first access. The generated game module embeds only the public verification identity and a deliberately obfuscated AES key; the runtime retains its reconstructed key only while the lazy pack is open and wipes it on close. Signing keys remain build-only PEM secrets and may be supplied by the project key directory or CI environment.
 
@@ -71,7 +71,9 @@ The native MiniLang CLI validates manifests and generates real `assets.mpx`, `ge
 - `docs/*.md` architecture and user documentation.
 - `examples/*` three complete example projects.
 - `tests/*.ml` and `tests/run_tests.py` deterministic runtime tests.
-- `benchmarks/canvas_bench.ml` basic framebuffer benchmark.
+- `benchmarks/canvas_bench.ml` measures full-frame CPU pixel throughput and verifies its framebuffer hash.
+- `benchmarks/sprite_bench.ml` separates 1x, scaled/tinted, and rotated CPU sprite throughput.
+- `benchmarks/renderer_bench.ml` measures complete window presentation at several framebuffer sizes.
 
 ## Risks and next steps
 

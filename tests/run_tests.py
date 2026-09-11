@@ -268,7 +268,7 @@ def run_python_tests() -> None:
         raise RuntimeError("could not load tools/minipixels.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    assert mod.VERSION == "0.13.0", mod.VERSION
+    assert mod.VERSION == "0.14.0", mod.VERSION
     with tempfile.TemporaryDirectory(prefix="minipixels_security_") as td:
         security_root = Path(td)
         security_manifest = security_root / "minipixels.json"

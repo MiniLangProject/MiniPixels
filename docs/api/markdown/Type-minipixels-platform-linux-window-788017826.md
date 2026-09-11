@@ -12,7 +12,7 @@ struct Window
 Holds one X11 window and its retained presenter/input state.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L89)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L96)
 
 ## Members
 
@@ -24,7 +24,7 @@ alive
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L114)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L121)
 
 <a id="field-field-minipixels-platform-linux-window-clientheight-clientheight-src-minipixels-platform-linux-ml-981409725"></a>
 ### clientHeight
@@ -34,7 +34,7 @@ clientHeight
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L100)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L107)
 
 <a id="field-field-minipixels-platform-linux-window-clientwidth-clientwidth-src-minipixels-platform-linux-ml-93512713"></a>
 ### clientWidth
@@ -44,7 +44,7 @@ clientWidth
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L99)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L106)
 
 <a id="field-field-minipixels-platform-linux-window-depth-depth-src-minipixels-platform-linux-ml-1459969181"></a>
 ### depth
@@ -54,7 +54,7 @@ depth
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L94)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L101)
 
 <a id="field-field-minipixels-platform-linux-window-display-display-src-minipixels-platform-linux-ml-856374373"></a>
 ### display
@@ -64,7 +64,7 @@ display
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L90)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L97)
 
 <a id="field-field-minipixels-platform-linux-window-event-event-src-minipixels-platform-linux-ml-949985157"></a>
 ### event
@@ -74,7 +74,7 @@ event
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L107)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L114)
 
 <a id="field-field-minipixels-platform-linux-window-fallbackreason-fallbackreason-src-minipixels-platform-linux-ml-753195053"></a>
 ### fallbackReason
@@ -84,7 +84,7 @@ fallbackReason
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L104)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L111)
 
 <a id="field-field-minipixels-platform-linux-window-focused-focused-src-minipixels-platform-linux-ml-15758105"></a>
 ### focused
@@ -94,7 +94,7 @@ focused
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L113)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L120)
 
 <a id="field-field-minipixels-platform-linux-window-gc-gc-src-minipixels-platform-linux-ml-78277405"></a>
 ### gc
@@ -104,7 +104,7 @@ gc
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L92)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L99)
 
 <a id="field-field-minipixels-platform-linux-window-id-id-src-minipixels-platform-linux-ml-1843706735"></a>
 ### id
@@ -114,7 +114,7 @@ id
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L91)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L98)
 
 <a id="field-field-minipixels-platform-linux-window-image-image-src-minipixels-platform-linux-ml-1051595485"></a>
 ### image
@@ -124,7 +124,7 @@ image
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L95)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L102)
 
 <a id="field-field-minipixels-platform-linux-window-keystates-keystates-src-minipixels-platform-linux-ml-125190917"></a>
 ### keyStates
@@ -134,7 +134,7 @@ keyStates
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L108)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L115)
 
 <a id="field-field-minipixels-platform-linux-window-logicalheight-logicalheight-src-minipixels-platform-linux-ml-31223653"></a>
 ### logicalHeight
@@ -144,7 +144,7 @@ logicalHeight
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L98)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L105)
 
 <a id="field-field-minipixels-platform-linux-window-logicalwidth-logicalwidth-src-minipixels-platform-linux-ml-781338447"></a>
 ### logicalWidth
@@ -154,7 +154,7 @@ logicalWidth
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L97)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L104)
 
 <a id="field-field-minipixels-platform-linux-window-needspresent-needspresent-src-minipixels-platform-linux-ml-1009706261"></a>
 ### needsPresent
@@ -164,7 +164,7 @@ needsPresent
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L116)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L123)
 
 <a id="field-field-minipixels-platform-linux-window-pointerinside-pointerinside-src-minipixels-platform-linux-ml-1263314701"></a>
 ### pointerInside
@@ -174,7 +174,7 @@ pointerInside
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L111)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L118)
 
 <a id="field-field-minipixels-platform-linux-window-pointerx-pointerx-src-minipixels-platform-linux-ml-794532783"></a>
 ### pointerX
@@ -184,7 +184,7 @@ pointerX
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L109)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L116)
 
 <a id="field-field-minipixels-platform-linux-window-pointery-pointery-src-minipixels-platform-linux-ml-1098367669"></a>
 ### pointerY
@@ -194,7 +194,7 @@ pointerY
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L110)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L117)
 
 <a id="field-field-minipixels-platform-linux-window-presentpixels-presentpixels-src-minipixels-platform-linux-ml-1825687341"></a>
 ### presentPixels
@@ -204,7 +204,7 @@ presentPixels
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L96)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L103)
 
 <a id="field-field-minipixels-platform-linux-window-renderer-renderer-src-minipixels-platform-linux-ml-654146639"></a>
 ### renderer
@@ -214,7 +214,7 @@ renderer
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L103)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L110)
 
 <a id="field-field-minipixels-platform-linux-window-scale-scale-src-minipixels-platform-linux-ml-1110020357"></a>
 ### scale
@@ -224,7 +224,7 @@ scale
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L101)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L108)
 
 <a id="field-field-minipixels-platform-linux-window-scalemode-scalemode-src-minipixels-platform-linux-ml-1276529957"></a>
 ### scaleMode
@@ -234,7 +234,7 @@ scaleMode
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L105)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L112)
 
 <a id="field-field-minipixels-platform-linux-window-smoothing-smoothing-src-minipixels-platform-linux-ml-38783853"></a>
 ### smoothing
@@ -244,7 +244,7 @@ smoothing
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L106)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L113)
 
 <a id="field-field-minipixels-platform-linux-window-title-title-src-minipixels-platform-linux-ml-1782408461"></a>
 ### title
@@ -254,7 +254,7 @@ title
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L102)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L109)
 
 <a id="field-field-minipixels-platform-linux-window-visual-visual-src-minipixels-platform-linux-ml-1401944521"></a>
 ### visual
@@ -264,7 +264,7 @@ visual
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L93)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L100)
 
 <a id="field-field-minipixels-platform-linux-window-wheel-wheel-src-minipixels-platform-linux-ml-1880891137"></a>
 ### wheel
@@ -274,7 +274,7 @@ wheel
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L112)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L119)
 
 <a id="field-field-minipixels-platform-linux-window-wmdelete-wmdelete-src-minipixels-platform-linux-ml-489120607"></a>
 ### wmDelete
@@ -284,4 +284,4 @@ wmDelete
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L115)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L122)

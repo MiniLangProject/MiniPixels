@@ -9,6 +9,13 @@ import minipixels.math.types as mt
 import minipixels.input.input as inp
 
 /// @internal
+extern function mpPixelsRgbaToBgra(destination as bytes, destinationOffset as u64, source as bytes, sourceOffset as u64, pixelCount as int) from "./libminipixels_audio.so" returns void
+/// @internal
+extern function mpPixelsScaleIntegerBgra(destination as bytes, destinationWidth as int, destinationHeight as int, source as bytes, sourceWidth as int, sourceHeight as int, viewportX as int, viewportY as int, factor as int) from "./libminipixels_audio.so" returns i32
+/// @internal
+extern function mpPixelsScaleNearestBgra(destination as bytes, destinationWidth as int, destinationHeight as int, source as bytes, sourceWidth as int, sourceHeight as int, viewportX as int, viewportY as int, viewportWidth as int, viewportHeight as int) from "./libminipixels_audio.so" returns i32
+
+/// @internal
 extern function XOpenDisplay(name as ptr) from "libX11.so.6" returns ptr
 /// @internal
 extern function XDefaultScreen(display as ptr) from "libX11.so.6" returns int
@@ -481,14 +488,7 @@ function convertNativeRegion(w, canvas, x0, y0, x1, y1)
   for y = y0 to y1 - 1
     source = (y * canvas.width + x0) * 4
     destination = (y * w.clientWidth + x0) * 4
-    for x = x0 to x1 - 1
-      w.presentPixels[destination] = canvas.pixels[source + 2]
-      w.presentPixels[destination + 1] = canvas.pixels[source + 1]
-      w.presentPixels[destination + 2] = canvas.pixels[source]
-      w.presentPixels[destination + 3] = 0
-      source = source + 4
-      destination = destination + 4
-    end for
+    mpPixelsRgbaToBgra(w.presentPixels, destination, canvas.pixels, source, x1 - x0)
   end for
 end function
 
@@ -497,63 +497,12 @@ function scaleInteger(w, canvas, vx, vy, factor)
   if vx != 0 or vy != 0 or canvas.width * factor != w.clientWidth or canvas.height * factor != w.clientHeight then
     fillBytes(w.presentPixels, 0, len(w.presentPixels), 0)
   end if
-  rowBytes = canvas.width * factor * 4
-  for sourceY = 0 to canvas.height - 1
-    firstRow = ((vy + (sourceY * factor)) * w.clientWidth + vx) * 4
-    destination = firstRow
-    for sourceX = 0 to canvas.width - 1
-      source = (sourceY * canvas.width + sourceX) * 4
-      blue = canvas.pixels[source + 2]
-      green = canvas.pixels[source + 1]
-      red = canvas.pixels[source]
-      for duplicateX = 0 to factor - 1
-        w.presentPixels[destination] = blue
-        w.presentPixels[destination + 1] = green
-        w.presentPixels[destination + 2] = red
-        w.presentPixels[destination + 3] = 0
-        destination = destination + 4
-      end for
-    end for
-    for duplicateY = 1 to factor - 1
-      copyBytes(w.presentPixels, firstRow + (duplicateY * w.clientWidth * 4), w.presentPixels, firstRow, rowBytes)
-    end for
-  end for
+  mpPixelsScaleIntegerBgra(w.presentPixels, w.clientWidth, w.clientHeight, canvas.pixels, canvas.width, canvas.height, vx, vy, factor)
 end function
 
 /// @internal
 function scaleGeneric(w, canvas, vx, vy, vw, vh)
-  fillBytes(w.presentPixels, 0, len(w.presentPixels), 0)
-  previousSourceY = -1
-  previousRow = -1
-  startX = vx
-  startY = vy
-  endX = vx + vw
-  endY = vy + vh
-  if startX < 0 then startX = 0 end if
-  if startY < 0 then startY = 0 end if
-  if endX > w.clientWidth then endX = w.clientWidth end if
-  if endY > w.clientHeight then endY = w.clientHeight end if
-  if startX >= endX or startY >= endY then return end if
-  rowBytes = (endX - startX) * 4
-  for y = startY to endY - 1
-    sourceY = mt.floorInt(((y - vy) * canvas.height) / vh)
-    row = (y * w.clientWidth + startX) * 4
-    if sourceY == previousSourceY then
-      copyBytes(w.presentPixels, row, w.presentPixels, previousRow, rowBytes)
-    else
-      for x = startX to endX - 1
-        destination = (y * w.clientWidth + x) * 4
-        sourceX = mt.floorInt(((x - vx) * canvas.width) / vw)
-        source = (sourceY * canvas.width + sourceX) * 4
-        w.presentPixels[destination] = canvas.pixels[source + 2]
-        w.presentPixels[destination + 1] = canvas.pixels[source + 1]
-        w.presentPixels[destination + 2] = canvas.pixels[source]
-        w.presentPixels[destination + 3] = 0
-      end for
-      previousSourceY = sourceY
-      previousRow = row
-    end if
-  end for
+  mpPixelsScaleNearestBgra(w.presentPixels, w.clientWidth, w.clientHeight, canvas.pixels, canvas.width, canvas.height, vx, vy, vw, vh)
 end function
 
 /// Scales and presents an RGBA canvas through an X11 XImage.

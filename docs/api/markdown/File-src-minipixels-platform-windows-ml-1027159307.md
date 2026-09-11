@@ -15,6 +15,18 @@ Reachable from entry: **yes**
 
 ## Declarations
 
+<a id="global-global-minipixels-platform-windows-activeopenglcontext-activeopenglcontext-src-minipixels-platform-windows-ml-1709100368"></a>
+### activeOpenGLContext
+
+```ml
+activeOpenGLContext
+```
+
+OpenGL context MiniPixels most recently made current on this thread.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L346)
+
 <a id="function-function-minipixels-platform-windows-applytexturefilter-function-applytexturefilter-w-src-minipixels-platform-windows-ml-2147080741"></a>
 ### applyTextureFilter
 
@@ -29,7 +41,7 @@ Performs the applyTextureFilter operation for the minipixels platform windows mo
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L857)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L878)
 
 <a id="constant-constant-minipixels-platform-windows-bi-bitfields-const-bi-bitfields-3-src-minipixels-platform-windows-ml-1521755672"></a>
 ### BI_BITFIELDS
@@ -88,7 +100,7 @@ Performs the clientHeight operation for the minipixels platform windows module.
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L757)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L777)
 
 <a id="function-function-minipixels-platform-windows-clientwidth-function-clientwidth-w-src-minipixels-platform-windows-ml-638520075"></a>
 ### clientWidth
@@ -97,14 +109,14 @@ Performs the clientHeight operation for the minipixels platform windows module.
 function clientWidth(w)
 ```
 
-Performs the clientWidth operation for the minipixels platform windows module.
+Returns the current client-area width.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `w` | `dynamic` | — | w value consumed by this operation. |
+| `w` | `dynamic` | — | Window to inspect. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L746)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L769)
 
 <a id="function-function-minipixels-platform-windows-close-function-close-w-src-minipixels-platform-windows-ml-1000963621"></a>
 ### close
@@ -120,7 +132,7 @@ Closes close owned by the minipixels platform windows module.
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L611)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L613)
 
 <a id="function-function-minipixels-platform-windows-consumemousewheel-function-consumemousewheel-src-minipixels-platform-windows-ml-273982854"></a>
 ### consumeMouseWheel
@@ -132,7 +144,7 @@ function consumeMouseWheel()
 Consumes wheel steps accumulated by the window callback.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L713)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L720)
 
 <a id="function-function-minipixels-platform-windows-createbitmapinfo-function-createbitmapinfo-width-height-src-minipixels-platform-windows-ml-629354415"></a>
 ### createBitmapInfo
@@ -149,7 +161,7 @@ Creates bitmap info for the minipixels platform windows module.
 | `height` | `dynamic` | — | Height in the coordinate or storage units used by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L506)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L508)
 
 <a id="function-function-minipixels-platform-windows-createpixelformatdescriptor-function-createpixelformatdescriptor-src-minipixels-platform-windows-ml-160177046"></a>
 ### createPixelFormatDescriptor
@@ -161,7 +173,7 @@ function createPixelFormatDescriptor()
 Creates pixel format descriptor for the minipixels platform windows module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L522)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L524)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-createwindowexw-extern-function-createwindowexw-exstyle-as-int-classname-as-ptr-windowname-as-wstr-style-as-int-x-as-int-y-as-int-w-as-int-h-as-int-parent-as-ptr-menu-as-ptr-instance-as-ptr-param-as-ptr-from-user32-dll-returns-ptr-src-minipixels-platform-windows-ml-978331506"></a>
 ### CreateWindowExW
@@ -298,7 +310,7 @@ function ensureOpenGLTexture(w, canvas)
 | `canvas` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L917)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L941)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-getasynckeystate-extern-function-getasynckeystate-key-as-int-from-user32-dll-returns-i32-src-minipixels-platform-windows-ml-2035415046"></a>
 ### GetAsyncKeyState
@@ -416,7 +428,7 @@ Returns a signed 32-bit integer stored in a byte buffer.
 | `off` | `dynamic` | — | Byte offset of the encoded integer. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L443)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L445)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-getmodulehandlew-extern-function-getmodulehandlew-name-as-ptr-from-kernel32-dll-returns-ptr-src-minipixels-platform-windows-ml-1691831917"></a>
 ### GetModuleHandleW
@@ -465,7 +477,7 @@ Returns u32 maintained by the minipixels platform windows module.
 | `off` | `dynamic` | — | off value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L436)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L438)
 
 <a id="function-function-minipixels-platform-windows-getu64-function-getu64-buf-off-src-minipixels-platform-windows-ml-2042778668"></a>
 ### getU64
@@ -482,7 +494,7 @@ Returns an unsigned 64-bit integer stored in a byte buffer.
 | `off` | `dynamic` | — | Byte offset of the encoded integer. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L452)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L454)
 
 <a id="constant-constant-minipixels-platform-windows-gl-clamp-const-gl-clamp-10496-src-minipixels-platform-windows-ml-1902515937"></a>
 ### GL_CLAMP
@@ -914,7 +926,7 @@ Returns whether focus is available.
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L674)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L681)
 
 <a id="constant-constant-minipixels-platform-windows-idc-arrow-const-idc-arrow-32512-src-minipixels-platform-windows-ml-1946490360"></a>
 ### IDC_ARROW
@@ -942,7 +954,7 @@ Performs the initOpenGL operation for the minipixels platform windows module.
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L866)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L887)
 
 <a id="function-function-minipixels-platform-windows-isgpurenderer-function-isgpurenderer-w-src-minipixels-platform-windows-ml-1839018755"></a>
 ### isGpuRenderer
@@ -958,7 +970,7 @@ Returns whether gpu renderer satisfies the required condition.
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L637)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L641)
 
 <a id="function-function-minipixels-platform-windows-keydown-function-keydown-vk-src-minipixels-platform-windows-ml-531259703"></a>
 ### keyDown
@@ -974,7 +986,7 @@ Performs the keyDown operation for the minipixels platform windows module.
 | `vk` | `dynamic` | — | vk value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L668)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L675)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-loadcursorw-extern-function-loadcursorw-instance-as-ptr-cursorname-as-ptr-from-user32-dll-returns-ptr-src-minipixels-platform-windows-ml-1224271446"></a>
 ### LoadCursorW
@@ -1010,7 +1022,7 @@ Performs the maxInt operation for the minipixels platform windows module.
 | `b` | `dynamic` | — | b value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L794)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L811)
 
 <a id="function-function-minipixels-platform-windows-minint-function-minint-a-b-src-minipixels-platform-windows-ml-341836797"></a>
 ### minInt
@@ -1027,7 +1039,7 @@ Performs the minInt operation for the minipixels platform windows module.
 | `b` | `dynamic` | — | b value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L786)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L803)
 
 <a id="global-global-minipixels-platform-windows-mousewheelaccumulator-mousewheelaccumulator-src-minipixels-platform-windows-ml-230604820"></a>
 ### mouseWheelAccumulator
@@ -1055,7 +1067,7 @@ Performs the nextPow2 operation for the minipixels platform windows module.
 | `n` | `dynamic` | — | n value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L538)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L540)
 
 <a id="function-function-minipixels-platform-windows-normalizerenderer-function-normalizerenderer-renderer-src-minipixels-platform-windows-ml-1683476245"></a>
 ### normalizeRenderer
@@ -1071,7 +1083,7 @@ Normalizes renderer for the minipixels platform windows workflow.
 | `renderer` | `dynamic` | — | renderer value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L548)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L550)
 
 <a id="function-function-minipixels-platform-windows-normalizescalemode-function-normalizescalemode-scalemode-src-minipixels-platform-windows-ml-943866925"></a>
 ### normalizeScaleMode
@@ -1087,7 +1099,7 @@ Normalizes scale mode for the minipixels platform windows workflow.
 | `scaleMode` | `dynamic` | — | scaleMode value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L558)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L560)
 
 <a id="function-function-minipixels-platform-windows-open-function-open-title-width-height-scale-renderer-scalemode-smoothing-src-minipixels-platform-windows-ml-682059839"></a>
 ### open
@@ -1109,7 +1121,7 @@ Opens open for the minipixels platform windows module.
 | `smoothing` | `dynamic` | — | smoothing value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L573)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L575)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-patblt-extern-function-patblt-dc-as-ptr-x-as-int-y-as-int-width-as-int-height-as-int-rop-as-int-from-gdi32-dll-returns-bool-src-minipixels-platform-windows-ml-181015738"></a>
 ### PatBlt
@@ -1266,7 +1278,7 @@ Performs the pollEvents operation for the minipixels platform windows module.
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L659)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L666)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-postquitmessage-extern-function-postquitmessage-exitcode-as-int-from-user32-dll-returns-void-src-minipixels-platform-windows-ml-177238112"></a>
 ### PostQuitMessage
@@ -1299,7 +1311,7 @@ Performs the present operation for the minipixels platform windows module.
 | `canvas` | `dynamic` | — | canvas value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1015)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1044)
 
 <a id="function-function-minipixels-platform-windows-presentgdi-function-presentgdi-w-canvas-src-minipixels-platform-windows-ml-1093617233"></a>
 ### presentGDI
@@ -1316,7 +1328,7 @@ Performs the presentGDI operation for the minipixels platform windows module.
 | `canvas` | `dynamic` | — | canvas value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L994)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1022)
 
 <a id="function-function-minipixels-platform-windows-presentopengl-function-presentopengl-w-canvas-src-minipixels-platform-windows-ml-1644844221"></a>
 ### presentOpenGL
@@ -1333,7 +1345,7 @@ Performs the presentOpenGL operation for the minipixels platform windows module.
 | `canvas` | `dynamic` | — | canvas value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L937)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L961)
 
 <a id="function-function-minipixels-platform-windows-puti32-function-puti32-buf-off-v-src-minipixels-platform-windows-ml-2002961072"></a>
 ### putI32
@@ -1351,7 +1363,7 @@ Performs the putI32 operation for the minipixels platform windows module.
 | `v` | `dynamic` | — | v value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L419)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L421)
 
 <a id="function-function-minipixels-platform-windows-putu32-function-putu32-buf-off-v-src-minipixels-platform-windows-ml-1021775528"></a>
 ### putU32
@@ -1369,7 +1381,7 @@ Performs the putU32 operation for the minipixels platform windows module.
 | `v` | `dynamic` | — | v value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L407)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L409)
 
 <a id="function-function-minipixels-platform-windows-putu64-function-putu64-buf-off-v-src-minipixels-platform-windows-ml-847442640"></a>
 ### putU64
@@ -1387,7 +1399,7 @@ Performs the putU64 operation for the minipixels platform windows module.
 | `v` | `dynamic` | — | v value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L427)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L429)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-queryperformancecounter-extern-function-queryperformancecounter-value-as-bytes-from-kernel32-dll-returns-bool-src-minipixels-platform-windows-ml-1099920706"></a>
 ### QueryPerformanceCounter
@@ -1424,6 +1436,20 @@ Reads the high-resolution performance-counter frequency.
 **Returns:** Whether the counter was available.
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L98)
+
+<a id="function-function-minipixels-platform-windows-refreshclientsize-function-refreshclientsize-w-src-minipixels-platform-windows-ml-1628478687"></a>
+### refreshClientSize
+
+```ml
+function refreshClientSize(w)
+```
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `w` | `dynamic` | — |  |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L753)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-registerclassexw-extern-function-registerclassexw-wndclass-as-bytes-from-user32-dll-returns-u32-src-minipixels-platform-windows-ml-1362104956"></a>
 ### RegisterClassExW
@@ -1465,7 +1491,7 @@ function registerWindowClass()
 Performs the registerWindowClass operation for the minipixels platform windows module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L486)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L488)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-releasedc-extern-function-releasedc-hwnd-as-ptr-dc-as-ptr-from-user32-dll-returns-int-src-minipixels-platform-windows-ml-29800223"></a>
 ### ReleaseDC
@@ -1500,7 +1526,7 @@ Performs the rendererFallbackReason operation for the minipixels platform window
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L644)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L648)
 
 <a id="function-function-minipixels-platform-windows-renderername-function-renderername-w-src-minipixels-platform-windows-ml-969738357"></a>
 ### rendererName
@@ -1516,7 +1542,7 @@ Performs the rendererName operation for the minipixels platform windows module.
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L630)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L634)
 
 <a id="function-function-minipixels-platform-windows-running-function-running-src-minipixels-platform-windows-ml-1269548420"></a>
 ### running
@@ -1528,7 +1554,7 @@ function running()
 Performs the running operation for the minipixels platform windows module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L604)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L606)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-screentoclient-extern-function-screentoclient-hwnd-as-ptr-point-as-bytes-from-user32-dll-returns-bool-src-minipixels-platform-windows-ml-263265762"></a>
 ### ScreenToClient
@@ -1559,7 +1585,7 @@ function seconds()
 Returns a high-resolution monotonic time value in seconds.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1042)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1071)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-setforegroundwindow-extern-function-setforegroundwindow-hwnd-as-ptr-from-user32-dll-returns-bool-src-minipixels-platform-windows-ml-1099224625"></a>
 ### SetForegroundWindow
@@ -1615,7 +1641,7 @@ Updates the logical source size used by presentation and pointer mapping.
 | `height` | `dynamic` | — | New framebuffer height. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L770)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L787)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-setstretchbltmode-extern-function-setstretchbltmode-dc-as-ptr-mode-as-int-from-gdi32-dll-returns-int-src-minipixels-platform-windows-ml-1855644937"></a>
 ### SetStretchBltMode
@@ -1651,7 +1677,7 @@ Updates title maintained by the minipixels platform windows module.
 | `title` | `dynamic` | — | Human-readable title presented to the user. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L652)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L656)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-setwindowtextw-extern-function-setwindowtextw-hwnd-as-ptr-title-as-wstr-from-user32-dll-returns-bool-src-minipixels-platform-windows-ml-201005825"></a>
 ### SetWindowTextW
@@ -1721,7 +1747,7 @@ Performs the sleepMs operation for the minipixels platform windows module.
 | `ms` | `dynamic` | — | ms value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1072)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1101)
 
 <a id="constant-constant-minipixels-platform-windows-srccopy-const-srccopy-13369376-src-minipixels-platform-windows-ml-1695044999"></a>
 ### SRCCOPY
@@ -1805,7 +1831,7 @@ function ticks()
 Performs the ticks operation for the minipixels platform windows module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1037)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1066)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-translatemessage-extern-function-translatemessage-msg-as-bytes-from-user32-dll-returns-bool-src-minipixels-platform-windows-ml-34241778"></a>
 ### TranslateMessage
@@ -1839,7 +1865,7 @@ Updates input for the minipixels platform windows workflow.
 | `input` | `dynamic` | — | input value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L707)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L714)
 
 <a id="function-function-minipixels-platform-windows-updateinputforwindow-function-updateinputforwindow-w-input-src-minipixels-platform-windows-ml-991970669"></a>
 ### updateInputForWindow
@@ -1856,7 +1882,7 @@ Updates input for window for the minipixels platform windows workflow.
 | `input` | `dynamic` | — | input value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L682)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L689)
 
 <a id="function-function-minipixels-platform-windows-updatepointerforwindow-function-updatepointerforwindow-w-input-src-minipixels-platform-windows-ml-1648106125"></a>
 ### updatePointerForWindow
@@ -1873,7 +1899,7 @@ Updates the logical pointer position for a window and its active viewport.
 | `input` | `dynamic` | — | Input state receiving logical coordinates. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L723)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L730)
 
 <a id="function-function-minipixels-platform-windows-updateviewport-function-updateviewport-w-src-minipixels-platform-windows-ml-840770177"></a>
 ### updateViewport
@@ -1889,7 +1915,23 @@ Updates viewport for the minipixels platform windows workflow.
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L801)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L818)
+
+<a id="function-function-minipixels-platform-windows-updateviewportforsize-function-updateviewportforsize-w-cw-ch-src-minipixels-platform-windows-ml-827462462"></a>
+### updateViewportForSize
+
+```ml
+function updateViewportForSize(w, cw, ch)
+```
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `w` | `dynamic` | — |  |
+| `cw` | `dynamic` | — |  |
+| `ch` | `dynamic` | — |  |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L826)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-updatewindow-extern-function-updatewindow-hwnd-as-ptr-from-user32-dll-returns-bool-src-minipixels-platform-windows-ml-1654108303"></a>
 ### UpdateWindow
@@ -1923,7 +1965,7 @@ Performs the viewportH operation for the minipixels platform windows module.
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L853)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L874)
 
 <a id="function-function-minipixels-platform-windows-viewportw-function-viewportw-w-src-minipixels-platform-windows-ml-1163597675"></a>
 ### viewportW
@@ -1939,7 +1981,7 @@ Performs the viewportW operation for the minipixels platform windows module.
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L850)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L871)
 
 <a id="function-function-minipixels-platform-windows-viewportx-function-viewportx-w-src-minipixels-platform-windows-ml-547076125"></a>
 ### viewportX
@@ -1955,7 +1997,7 @@ Performs the viewportX operation for the minipixels platform windows module.
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L844)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L865)
 
 <a id="function-function-minipixels-platform-windows-viewporty-function-viewporty-w-src-minipixels-platform-windows-ml-1491031159"></a>
 ### viewportY
@@ -1971,7 +2013,7 @@ Performs the viewportY operation for the minipixels platform windows module.
 | `w` | `dynamic` | — | w value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L847)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L868)
 
 <a id="function-function-minipixels-platform-windows-waituntil-function-waituntil-deadline-src-minipixels-platform-windows-ml-1646201760"></a>
 ### waitUntil
@@ -1987,7 +2029,7 @@ Waits until a high-resolution deadline while leaving time for other threads.
 | `deadline` | `dynamic` | — | Absolute value previously obtained from seconds(). |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1057)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L1086)
 
 <a id="extern_function-extern-function-minipixels-platform-windows-wglcreatecontext-extern-function-wglcreatecontext-dc-as-ptr-from-opengl32-dll-returns-ptr-src-minipixels-platform-windows-ml-1832064209"></a>
 ### wglCreateContext
@@ -2146,7 +2188,7 @@ Performs the wndProc operation for the minipixels platform windows module.
 | `lParam` | `dynamic` | — | lParam value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L461)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L463)
 
 <a id="constant-constant-minipixels-platform-windows-ws-overlappedwindow-const-ws-overlappedwindow-13565952-src-minipixels-platform-windows-ml-165080941"></a>
 ### WS_OVERLAPPEDWINDOW

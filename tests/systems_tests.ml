@@ -2,9 +2,12 @@ import minipixels as mp
 import minipixels.input.input as inp
 import minipixels.world.tilemap as tile
 import std.assert as a
+#if TARGET_OS == "linux"
+import minipixels.platform.linux as linuxPlatform
+#endif
 
 function main(args)
-  a.assertEq(mp.version(), "0.13.0", "engine version")
+  a.assertEq(mp.version(), "0.14.0", "engine version")
   cfg = mp.createConfig("Renderer", 64, 36, 2)
   a.assertEq(cfg.renderer, "auto", "renderer defaults to auto")
   a.assertEq(cfg.scaleMode, "stretch", "scale mode defaults to stretch")
@@ -165,6 +168,29 @@ function main(args)
   v1 = rnd.nextInt(1, 10)
   rnd2 = mp.random(123)
   a.assertEq(v1, rnd2.nextInt(1, 10), "random seed deterministic")
+
+#if TARGET_OS == "linux"
+  rgbaPixels = bytes(8, 0)
+  rgbaPixels[0] = 1
+  rgbaPixels[1] = 2
+  rgbaPixels[2] = 3
+  rgbaPixels[3] = 255
+  rgbaPixels[4] = 10
+  rgbaPixels[5] = 20
+  rgbaPixels[6] = 30
+  rgbaPixels[7] = 128
+  bgraPixels = bytes(8, 0)
+  linuxPlatform.mpPixelsRgbaToBgra(bgraPixels, 0, rgbaPixels, 0, 2)
+  a.assertEq(bgraPixels[0], 3, "native presenter swaps red and blue")
+  a.assertEq(bgraPixels[2], 1, "native presenter preserves red")
+  a.assertEq(bgraPixels[4], 30, "native presenter converts following pixels")
+  scaledPixels = bytes(16, 0)
+  a.assertEq(linuxPlatform.mpPixelsScaleIntegerBgra(scaledPixels, 2, 2, rgbaPixels, 1, 1, 0, 0, 2), 1, "native integer presenter scaling succeeds")
+  a.assertEq(scaledPixels[12], 3, "native integer presenter duplicates rows")
+  nearestPixels = bytes(16, 0)
+  a.assertEq(linuxPlatform.mpPixelsScaleNearestBgra(nearestPixels, 4, 1, rgbaPixels, 2, 1, 0, 0, 4, 1), 1, "native generic presenter scaling succeeds")
+  a.assertEq(nearestPixels[8], 30, "native generic presenter samples nearest pixel")
+#endif
 
   print "=== SYSTEMS TESTS DONE ==="
   return 0

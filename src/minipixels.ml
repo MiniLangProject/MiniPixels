@@ -150,7 +150,7 @@ function createGame(cfg)
 end function
 
 /// Performs the version operation for the minipixels module.
-function version() return "0.13.0" end function
+function version() return "0.14.0" end function
 /// Updates renderer maintained by the minipixels module.
 /// @param cfg Configuration used by the operation.
 /// @param renderer renderer value consumed by this operation.
@@ -284,6 +284,15 @@ function renderToDesignY(game, value) return value / game.renderScaleY end funct
 function syncRenderResolution(game)
   game.resolutionChanged = false
   if typeof(game.window) == "void" then return false end if
+  if game.config.renderMode == "fixed" and game.canvas.width == game.config.width and game.canvas.height == game.config.height then
+    game.designWidth = game.config.designWidth
+    game.designHeight = game.config.designHeight
+    game.renderWidth = game.canvas.width
+    game.renderHeight = game.canvas.height
+    game.renderScaleX = game.renderWidth / (game.designWidth * 1.0)
+    game.renderScaleY = game.renderHeight / (game.designHeight * 1.0)
+    return false
+  end if
   clientW = win.clientWidth(game.window)
   clientH = win.clientHeight(game.window)
   // Minimized native windows commonly report a zero-sized client area. The
@@ -351,13 +360,13 @@ end function
 /// @param r r value consumed by this operation.
 /// @param g g value consumed by this operation.
 /// @param b b value consumed by this operation.
-function rgb(r, g, b) return mt.rgb(r, g, b) end function
+function inline rgb(r, g, b) return mt.rgb(r, g, b) end function
 /// Performs the rgba operation for the minipixels module.
 /// @param r r value consumed by this operation.
 /// @param g g value consumed by this operation.
 /// @param b b value consumed by this operation.
 /// @param a a value consumed by this operation.
-function rgba(r, g, b, a) return mt.rgba(r, g, b, a) end function
+function inline rgba(r, g, b, a) return mt.rgba(r, g, b, a) end function
 /// Performs the vec2 operation for the minipixels module.
 /// @param x Horizontal coordinate used by the operation.
 /// @param y Vertical coordinate used by the operation.
@@ -806,6 +815,7 @@ function run(cfg, initialize, update, render, shutdown)
 
   lastTime = win.seconds()
   nextFrameTime = lastTime
+  nextTitleTime = lastTime
   accumulator = 0.0
   while game.running and win.running() and typeof(failure) != "error"
     now = win.seconds()
@@ -820,8 +830,9 @@ function run(cfg, initialize, update, render, shutdown)
     if cfg.pauseWhenUnfocused and win.hasFocus(w) == false then dt = 0 end if
 
     tm.beginFrame(game.time, dt)
-    if game.time.frameNumber % 15 == 1 then
+    if now >= nextTitleTime then
       win.setTitle(w, cfg.title + " FPS " + mt.floorInt(game.time.fps) + " " + win.rendererName(w))
+      nextTitleTime = now + 0.25
     end if
     accumulator = accumulator + dt
     updates = 0

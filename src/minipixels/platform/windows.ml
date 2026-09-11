@@ -342,6 +342,8 @@ windowNeedsPresent = true
 performanceCounterBuffer = bytes(8, 0)
 /// Cached high-resolution performance-counter frequency.
 performanceFrequency = 0
+/// OpenGL context MiniPixels most recently made current on this thread.
+activeOpenGLContext = 0
 
 /// Represents the window data used by the minipixels platform windows module.
 struct Window
@@ -610,10 +612,12 @@ end function
 /// @param w w value consumed by this operation.
 function close(w)
   global windowRunning
+  global activeOpenGLContext
   windowRunning = false
   if w is Window then
     if w.glrc != 0 then
       wglMakeCurrent(0, 0)
+      activeOpenGLContext = 0
       wglDeleteContext(w.glrc)
       w.glrc = 0
     end if
@@ -651,7 +655,10 @@ end function
 /// @param title Human-readable title presented to the user.
 function setTitle(w, title)
   if w is not Window then return false end if
-  return SetWindowTextW(w.hwnd, title)
+  if title == w.title then return true end if
+  if SetWindowTextW(w.hwnd, title) == false then return false end if
+  w.title = title
+  return true
 end function
 
 /// Performs the pollEvents operation for the minipixels platform windows module.
@@ -741,25 +748,35 @@ function updatePointerForWindow(w, input)
   return true
 end function
 
-/// Performs the clientWidth operation for the minipixels platform windows module.
-/// @param w w value consumed by this operation.
-function clientWidth(w)
+/// @internal
+/// Refreshes cached client geometry with one Win32 query.
+function refreshClientSize(w)
   clientW = w.scaledWidth
+  clientH = w.scaledHeight
   if GetClientRect(w.hwnd, w.rect) then
     clientW = getU32(w.rect, 8) - getU32(w.rect, 0)
+    clientH = getU32(w.rect, 12) - getU32(w.rect, 4)
   end if
   if clientW < 1 then clientW = 1 end if
+  if clientH < 1 then clientH = 1 end if
+  w.scaledWidth = clientW
+  w.scaledHeight = clientH
+  return w
+end function
+
+/// Returns the current client-area width.
+/// @param w Window to inspect.
+function clientWidth(w)
+  refreshClientSize(w)
+  clientW = w.scaledWidth
   return clientW
 end function
 
 /// Performs the clientHeight operation for the minipixels platform windows module.
 /// @param w w value consumed by this operation.
 function clientHeight(w)
+  refreshClientSize(w)
   clientH = w.scaledHeight
-  if GetClientRect(w.hwnd, w.rect) then
-    clientH = getU32(w.rect, 12) - getU32(w.rect, 4)
-  end if
-  if clientH < 1 then clientH = 1 end if
   return clientH
 end function
 
@@ -801,8 +818,12 @@ end function
 function updateViewport(w)
   // Keep client geometry valid across minimize/maximize transitions.
   if typeof(w.rect) != "bytes" or len(w.rect) < 16 then w.rect = bytes(16, 0) end if
-  cw = clientWidth(w)
-  ch = clientHeight(w)
+  refreshClientSize(w)
+  return updateViewportForSize(w, w.scaledWidth, w.scaledHeight)
+end function
+
+/// @internal
+function updateViewportForSize(w, cw, ch)
   dx = 0
   dy = 0
   dw = cw
@@ -864,6 +885,7 @@ end function
 /// Performs the initOpenGL operation for the minipixels platform windows module.
 /// @param w w value consumed by this operation.
 function initOpenGL(w)
+  global activeOpenGLContext
   dc = GetDC(w.hwnd)
   if dc == 0 then return false end if
   pfd = createPixelFormatDescriptor()
@@ -886,6 +908,7 @@ function initOpenGL(w)
     ReleaseDC(w.hwnd, dc)
     return false
   end if
+  activeOpenGLContext = rc
   w.dc = dc
   w.glrc = rc
   w.texWidth = nextPow2(w.logicalWidth)
@@ -898,6 +921,7 @@ function initOpenGL(w)
   w.texture = getU32(tex, 0)
   if w.texture == 0 then
     wglMakeCurrent(0, 0)
+    activeOpenGLContext = 0
     wglDeleteContext(rc)
     ReleaseDC(w.hwnd, dc)
     w.dc = 0
@@ -935,12 +959,17 @@ end function
 /// @param w w value consumed by this operation.
 /// @param canvas canvas value consumed by this operation.
 function presentOpenGL(w, canvas)
+  global activeOpenGLContext
   if w.gpuReady == false then return false end if
-  if wglMakeCurrent(w.dc, w.glrc) == false then return false end if
+  if activeOpenGLContext != w.glrc then
+    if wglMakeCurrent(w.dc, w.glrc) == false then return false end if
+    activeOpenGLContext = w.glrc
+  end if
   ensureOpenGLTexture(w, canvas)
-  cw = clientWidth(w)
-  ch = clientHeight(w)
-  updateViewport(w)
+  refreshClientSize(w)
+  cw = w.scaledWidth
+  ch = w.scaledHeight
+  updateViewportForSize(w, cw, ch)
   // A full-client opaque texture already replaces every pixel. Only clear
   // when letterboxing leaves pixels outside the image viewport.
   if viewportX(w) != 0 or viewportY(w) != 0 or viewportW(w) != cw or viewportH(w) != ch then
@@ -958,7 +987,6 @@ function presentOpenGL(w, canvas)
   glEnable(GL_TEXTURE_2D)
   glColor3ub(255, 255, 255)
   glBindTexture(GL_TEXTURE_2D, w.texture)
-  applyTextureFilter(w)
   if canvas.dirty then
     uploadX = canvas.dirtyX0
     uploadY = canvas.dirtyY0
@@ -994,9 +1022,10 @@ end function
 function presentGDI(w, canvas)
   global windowNeedsPresent
   dc = GetDC(w.hwnd)
-  clientW = clientWidth(w)
-  clientH = clientHeight(w)
-  updateViewport(w)
+  refreshClientSize(w)
+  clientW = w.scaledWidth
+  clientH = w.scaledHeight
+  updateViewportForSize(w, clientW, clientH)
   SetStretchBltMode(dc, 3)
   // Avoid an extra full-window GDI operation (and a visible black interframe).
   // On resize/expose the letterbox must still be repainted.

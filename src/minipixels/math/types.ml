@@ -334,15 +334,15 @@ end function
 /// @param g g value consumed by this operation.
 /// @param b b value consumed by this operation.
 /// @param a a value consumed by this operation.
-function rgba(r, g, b, a)
+function inline rgba(r, g, b, a)
   if typeof(r) != "int" then r = 0 end if
   if typeof(g) != "int" then g = 0 end if
   if typeof(b) != "int" then b = 0 end if
   if typeof(a) != "int" then a = 0 end if
-  r = clamp(r, 0, 255)
-  g = clamp(g, 0, 255)
-  b = clamp(b, 0, 255)
-  a = clamp(a, 0, 255)
+  if r < 0 then r = 0 else if r > 255 then r = 255 end if
+  if g < 0 then g = 0 else if g > 255 then g = 255 end if
+  if b < 0 then b = 0 else if b > 255 then b = 255 end if
+  if a < 0 then a = 0 else if a > 255 then a = 255 end if
   return (r << 24) | (g << 16) | (b << 8) | a
 end function
 
@@ -350,7 +350,7 @@ end function
 /// @param r r value consumed by this operation.
 /// @param g g value consumed by this operation.
 /// @param b b value consumed by this operation.
-function rgb(r, g, b)
+function inline rgb(r, g, b)
   return rgba(r, g, b, 255)
 end function
 

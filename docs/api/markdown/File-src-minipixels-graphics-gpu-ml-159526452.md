@@ -24,7 +24,7 @@ active
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L56)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L57)
 
 <a id="global-global-minipixels-graphics-gpu-activeheight-activeheight-src-minipixels-graphics-gpu-ml-2049333506"></a>
 ### activeHeight
@@ -34,7 +34,7 @@ activeHeight
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L59)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L60)
 
 <a id="global-global-minipixels-graphics-gpu-activewidth-activewidth-src-minipixels-graphics-gpu-ml-1468791108"></a>
 ### activeWidth
@@ -44,7 +44,7 @@ activeWidth
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L58)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L59)
 
 <a id="global-global-minipixels-graphics-gpu-activewindow-activewindow-src-minipixels-graphics-gpu-ml-810560864"></a>
 ### activeWindow
@@ -54,7 +54,7 @@ activeWindow
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L57)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L58)
 
 <a id="function-function-minipixels-graphics-gpu-begin-function-begin-window-returns-bool-src-minipixels-graphics-gpu-ml-1898668671"></a>
 ### begin
@@ -72,7 +72,7 @@ Starts one GPU scene frame.
 
 **Returns:** True when the frame was started.
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L260)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L268)
 
 <a id="function-function-minipixels-graphics-gpu-create-function-create-window-width-height-vsync-src-minipixels-graphics-gpu-ml-504824184"></a>
 ### create
@@ -91,7 +91,7 @@ Creates the singleton GPU scene canvas for an OpenGL window.
 | `vsync` | `dynamic` | — | True to synchronize buffer swaps. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L241)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L249)
 
 <a id="function-function-minipixels-graphics-gpu-drawcalls-function-drawcalls-returns-int-src-minipixels-graphics-gpu-ml-1474591396"></a>
 ### drawCalls
@@ -105,7 +105,7 @@ Returns native draw calls recorded in the current frame.
 
 **Returns:** Number of native batches submitted in the current frame.
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L305)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L313)
 
 <a id="function-function-minipixels-graphics-gpu-drawregion-function-drawregion-c-image-sx-sy-sw-sh-x-y-dw-dh-tint-src-minipixels-graphics-gpu-ml-1741238635"></a>
 ### drawRegion
@@ -129,7 +129,7 @@ function drawRegion(c, image, sx, sy, sw, sh, x, y, dw, dh, tint)
 | `tint` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L102)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L110)
 
 <a id="function-function-minipixels-graphics-gpu-finish-function-finish-window-returns-bool-src-minipixels-graphics-gpu-ml-532089685"></a>
 ### finish
@@ -147,7 +147,7 @@ Resolves the GPU scene into the window backbuffer; call window present afterward
 
 **Returns:** True when the scene was resolved.
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L270)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L278)
 
 - [minipixels.graphics.gpu.GpuCanvas](Type-minipixels-graphics-gpu-gpucanvas-1207336338.md) — struct
 <a id="function-function-minipixels-graphics-gpu-invalidate-function-invalidate-image-src-minipixels-graphics-gpu-ml-1250890709"></a>
@@ -164,7 +164,7 @@ Uploads changed pixels for an image that has already been drawn by the GPU canva
 | `image` | `dynamic` | — | Mutable CPU image whose backing storage is unchanged. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L97)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L105)
 
 <a id="extern_function-extern-function-minipixels-graphics-gpu-mpgpubegin-extern-function-mpgpubegin-from-minipixels-gpu-dll-returns-void-src-minipixels-graphics-gpu-ml-611389443"></a>
 ### mpGpuBegin
@@ -469,7 +469,7 @@ function printInfo()
 Prints the current OpenGL device information to standard output.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L292)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L300)
 
 <a id="function-function-minipixels-graphics-gpu-readback-function-readback-destination-returns-bool-src-minipixels-graphics-gpu-ml-1042282877"></a>
 ### readback
@@ -487,7 +487,7 @@ Copies the scene into an equally sized CPU canvas.
 
 **Returns:** True when the dimensions match and the pixels were copied.
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L279)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L287)
 
 <a id="function-function-minipixels-graphics-gpu-resettextures-function-resettextures-src-minipixels-graphics-gpu-ml-2066754726"></a>
 ### resetTextures
@@ -499,7 +499,7 @@ function resetTextures()
 Releases every cached GPU texture while keeping the scene canvas active.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L68)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L69)
 
 <a id="global-global-minipixels-graphics-gpu-retained-retained-src-minipixels-graphics-gpu-ml-1547520812"></a>
 ### retained
@@ -531,7 +531,7 @@ function shutdown()
 Releases the GPU scene canvas and its cached textures.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L311)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L319)
 
 <a id="function-function-minipixels-graphics-gpu-supported-function-supported-returns-bool-src-minipixels-graphics-gpu-ml-2140388001"></a>
 ### supported
@@ -545,7 +545,7 @@ Reports whether this target supports the optional GPU scene runtime.
 
 **Returns:** True on Windows; the DLL and sufficient OpenGL support are still required.
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L63)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L64)
 
 <a id="function-function-minipixels-graphics-gpu-texture-function-texture-image-src-minipixels-graphics-gpu-ml-1711808915"></a>
 ### texture
@@ -559,7 +559,17 @@ function texture(image)
 | `image` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L77)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L79)
+
+<a id="global-global-minipixels-graphics-gpu-texturegeneration-texturegeneration-src-minipixels-graphics-gpu-ml-1179606816"></a>
+### textureGeneration
+
+```ml
+textureGeneration
+```
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L56)
 
 <a id="function-function-minipixels-graphics-gpu-uploadbytes-function-uploadbytes-returns-int-src-minipixels-graphics-gpu-ml-348491374"></a>
 ### uploadBytes
@@ -573,4 +583,4 @@ Returns texture upload bytes recorded in the current frame.
 
 **Returns:** Number of source bytes uploaded in the current frame.
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L298)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/gpu.ml#L306)

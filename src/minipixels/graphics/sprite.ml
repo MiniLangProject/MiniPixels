@@ -18,6 +18,10 @@ struct Image
   name
   /// Stores the opaque value associated with image.
   opaque as bool
+  /// Cached optional GPU-scene texture handle. Engine-managed.
+  gpuTextureId as int
+  /// GPU texture-cache generation owning gpuTextureId. Engine-managed.
+  gpuTextureGeneration as int
 
   /// Returns pixel maintained by the minipixels graphics sprite module.
   /// @param x Horizontal coordinate used by the operation.
@@ -82,7 +86,7 @@ function newImage(width, height, pixels, name)
   if typeof(pixels) != "bytes" then
     pixels = bytes(width * height * 4, 0)
   end if
-  return Image(width, height, pixels, name, pixelsAreOpaque(pixels, width * height))
+  return Image(width, height, pixels, name, pixelsAreOpaque(pixels, width * height), 0, 0)
 end function
 
 /// Performs the pixelsAreOpaque operation for the minipixels graphics sprite module.
@@ -107,13 +111,21 @@ end function
 /// @param name Name of the affected item.
 function solidImage(width, height, color, name)
   pix = bytes(width * height * 4, 0)
-  img = Image(width, height, pix, name, mt.colorA(color) >= 255)
-  for y = 0 to height - 1
-    for x = 0 to width - 1
-      imageSetPixel(img, x, y, color)
-    end for
-  end for
-  return img
+  a = color & 255
+  if len(pix) >= 4 then
+    pix[0] = (color >> 24) & 255
+    pix[1] = (color >> 16) & 255
+    pix[2] = (color >> 8) & 255
+    pix[3] = a
+    filled = 4
+    while filled < len(pix)
+      amount = filled
+      if amount > len(pix) - filled then amount = len(pix) - filled end if
+      copyBytes(pix, filled, pix, 0, amount)
+      filled = filled + amount
+    end while
+  end if
+  return Image(width, height, pix, name, a >= 255, 0, 0)
 end function
 
 /// Performs the imageIndex operation for the minipixels graphics sprite module.
@@ -132,11 +144,12 @@ end function
 function imageSetPixel(img, x, y, color)
   if x < 0 or y < 0 or x >= img.width or y >= img.height then return false end if
   i = imageIndex(img, x, y)
-  img.pixels[i] = mt.colorR(color)
-  img.pixels[i + 1] = mt.colorG(color)
-  img.pixels[i + 2] = mt.colorB(color)
-  img.pixels[i + 3] = mt.colorA(color)
-  if img.pixels[i + 3] < 255 then img.opaque = false end if
+  a = color & 255
+  img.pixels[i] = (color >> 24) & 255
+  img.pixels[i + 1] = (color >> 16) & 255
+  img.pixels[i + 2] = (color >> 8) & 255
+  img.pixels[i + 3] = a
+  if a < 255 then img.opaque = false end if
   return true
 end function
 
@@ -212,12 +225,7 @@ function spriteSheetFrame(sheet, index)
   cached = sheet.frames[index]
   if typeof(cached) != "void" then return cached end if
   col = index % sheet.columns
-  row = 0
-  scan = index
-  while scan >= sheet.columns
-    row = row + 1
-    scan = scan - sheet.columns
-  end while
+  row = mt.floorInt(index / sheet.columns)
   sx = sheet.margin + (col * (sheet.frameWidth + sheet.spacing))
   sy = sheet.margin + (row * (sheet.frameHeight + sheet.spacing))
   frame = Sprite(sheet.image, sx, sy, sheet.frameWidth, sheet.frameHeight, 0, 0, sheet.image.name + "#" + index)

@@ -32,7 +32,7 @@ Adds layer to the state managed by the minipixels world tilemap module.
 | `layer` | `dynamic` | — | layer value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L110)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L113)
 
 <a id="function-function-minipixels-world-tilemap-create-function-create-tilewidth-tileheight-width-height-tileset-maxlayers-src-minipixels-world-tilemap-ml-790301030"></a>
 ### create
@@ -71,7 +71,7 @@ Draws draw through the minipixels world tilemap rendering path.
 | `camera` | `dynamic` | — | camera value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L169)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L176)
 
 <a id="function-function-minipixels-world-tilemap-drawlayer-function-drawlayer-map-layer-canvas-camera-src-minipixels-world-tilemap-ml-1963841698"></a>
 ### drawLayer
@@ -90,7 +90,7 @@ Draws layer through the minipixels world tilemap rendering path.
 | `camera` | `dynamic` | — | camera value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L137)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L140)
 
 <a id="function-function-minipixels-world-tilemap-issolidatpixel-function-issolidatpixel-map-px-py-src-minipixels-world-tilemap-ml-966868149"></a>
 ### isSolidAtPixel
@@ -108,7 +108,7 @@ Returns whether solid at pixel satisfies the required condition.
 | `py` | `dynamic` | — | py value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L194)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L201)
 
 <a id="function-function-minipixels-world-tilemap-issolidattile-function-issolidattile-map-tx-ty-src-minipixels-world-tilemap-ml-312196433"></a>
 ### isSolidAtTile
@@ -126,7 +126,7 @@ Returns whether solid at tile satisfies the required condition.
 | `ty` | `dynamic` | — | ty value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L179)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L186)
 
 <a id="function-function-minipixels-world-tilemap-layer-function-layer-name-width-height-data-visible-collision-px-py-src-minipixels-world-tilemap-ml-472480845"></a>
 ### layer
@@ -149,7 +149,7 @@ Performs the layer operation for the minipixels world tilemap module.
 | `py` | `dynamic` | — | py value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L103)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L106)
 
 <a id="function-function-minipixels-world-tilemap-moveandcollide-function-moveandcollide-map-rect-vx-vy-src-minipixels-world-tilemap-ml-884331035"></a>
 ### moveAndCollide
@@ -168,7 +168,7 @@ Performs the moveAndCollide operation for the minipixels world tilemap module.
 | `vy` | `dynamic` | — | vy value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L203)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L210)
 
 <a id="function-function-minipixels-world-tilemap-tileat-function-tileat-layer-x-y-src-minipixels-world-tilemap-ml-833627148"></a>
 ### tileAt
@@ -186,7 +186,7 @@ Performs the tileAt operation for the minipixels world tilemap module.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L127)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/world/tilemap.ml#L130)
 
 - [minipixels.world.tilemap.TileLayer](Type-minipixels-world-tilemap-tilelayer-990760038.md) — struct
 - [minipixels.world.tilemap.TileMap](Type-minipixels-world-tilemap-tilemap-1121128705.md) — struct

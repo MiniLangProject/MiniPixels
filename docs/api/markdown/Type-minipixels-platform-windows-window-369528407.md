@@ -12,7 +12,7 @@ struct Window
 Represents the window data used by the minipixels platform windows module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L347)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L349)
 
 ## Members
 
@@ -26,7 +26,7 @@ bmi
 Stores the bmi value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L361)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L363)
 
 <a id="field-field-minipixels-platform-windows-window-classname-classname-src-minipixels-platform-windows-ml-1021243483"></a>
 ### className
@@ -38,7 +38,7 @@ className
 Stores the class name value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L369)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L371)
 
 <a id="field-field-minipixels-platform-windows-window-dc-dc-src-minipixels-platform-windows-ml-354130077"></a>
 ### dc
@@ -50,7 +50,7 @@ dc
 Stores the dc value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L373)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L375)
 
 <a id="field-field-minipixels-platform-windows-window-fallbackreason-fallbackreason-src-minipixels-platform-windows-ml-2070936067"></a>
 ### fallbackReason
@@ -62,7 +62,7 @@ fallbackReason
 Stores the fallback reason value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L391)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L393)
 
 <a id="field-field-minipixels-platform-windows-window-glrc-glrc-src-minipixels-platform-windows-ml-759505815"></a>
 ### glrc
@@ -74,7 +74,7 @@ glrc
 Stores the glrc value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L375)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L377)
 
 <a id="field-field-minipixels-platform-windows-window-gpuready-gpuready-src-minipixels-platform-windows-ml-1640872589"></a>
 ### gpuReady
@@ -86,7 +86,7 @@ gpuReady
 Stores the gpu ready value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L385)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L387)
 
 <a id="field-field-minipixels-platform-windows-window-hwnd-hwnd-src-minipixels-platform-windows-ml-1319774285"></a>
 ### hwnd
@@ -98,7 +98,7 @@ hwnd
 Stores the hwnd value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L349)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L351)
 
 <a id="field-field-minipixels-platform-windows-window-logicalheight-logicalheight-src-minipixels-platform-windows-ml-1459731143"></a>
 ### logicalHeight
@@ -110,7 +110,7 @@ logicalHeight
 Stores the logical height value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L353)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L355)
 
 <a id="field-field-minipixels-platform-windows-window-logicalwidth-logicalwidth-src-minipixels-platform-windows-ml-644593321"></a>
 ### logicalWidth
@@ -122,7 +122,7 @@ logicalWidth
 Stores the logical width value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L351)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L353)
 
 <a id="field-field-minipixels-platform-windows-window-msg-msg-src-minipixels-platform-windows-ml-1136896827"></a>
 ### msg
@@ -134,7 +134,7 @@ msg
 Stores the msg value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L363)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L365)
 
 <a id="field-field-minipixels-platform-windows-window-point-point-src-minipixels-platform-windows-ml-1007188391"></a>
 ### point
@@ -146,7 +146,7 @@ point
 Stores a reusable Win32 POINT buffer for pointer polling.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L400)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L402)
 
 <a id="field-field-minipixels-platform-windows-window-rect-rect-src-minipixels-platform-windows-ml-434366155"></a>
 ### rect
@@ -158,7 +158,7 @@ rect
 Stores the rect value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L365)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L367)
 
 <a id="field-field-minipixels-platform-windows-window-renderer-renderer-src-minipixels-platform-windows-ml-350771369"></a>
 ### renderer
@@ -170,7 +170,7 @@ renderer
 Stores the renderer value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L371)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L373)
 
 <a id="field-field-minipixels-platform-windows-window-scale-scale-src-minipixels-platform-windows-ml-304957615"></a>
 ### scale
@@ -182,7 +182,7 @@ scale
 Stores the scale value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L355)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L357)
 
 <a id="field-field-minipixels-platform-windows-window-scaledheight-scaledheight-src-minipixels-platform-windows-ml-1094664657"></a>
 ### scaledHeight
@@ -194,7 +194,7 @@ scaledHeight
 Stores the scaled height value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L359)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L361)
 
 <a id="field-field-minipixels-platform-windows-window-scaledwidth-scaledwidth-src-minipixels-platform-windows-ml-1907300639"></a>
 ### scaledWidth
@@ -206,7 +206,7 @@ scaledWidth
 Stores the scaled width value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L357)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L359)
 
 <a id="field-field-minipixels-platform-windows-window-scalemode-scalemode-src-minipixels-platform-windows-ml-1649133927"></a>
 ### scaleMode
@@ -218,7 +218,7 @@ scaleMode
 Stores the scale mode value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L387)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L389)
 
 <a id="field-field-minipixels-platform-windows-window-smoothing-smoothing-src-minipixels-platform-windows-ml-479142639"></a>
 ### smoothing
@@ -230,7 +230,7 @@ smoothing
 Stores the smoothing value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L389)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L391)
 
 <a id="field-field-minipixels-platform-windows-window-texheight-texheight-src-minipixels-platform-windows-ml-369332375"></a>
 ### texHeight
@@ -242,7 +242,7 @@ texHeight
 Stores the tex height value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L381)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L383)
 
 <a id="field-field-minipixels-platform-windows-window-texture-texture-src-minipixels-platform-windows-ml-734817047"></a>
 ### texture
@@ -254,7 +254,7 @@ texture
 Stores the texture value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L377)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L379)
 
 <a id="field-field-minipixels-platform-windows-window-texturedata-texturedata-src-minipixels-platform-windows-ml-2010307455"></a>
 ### textureData
@@ -266,7 +266,7 @@ textureData
 Stores the texture data value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L383)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L385)
 
 <a id="field-field-minipixels-platform-windows-window-texwidth-texwidth-src-minipixels-platform-windows-ml-374556225"></a>
 ### texWidth
@@ -278,7 +278,7 @@ texWidth
 Stores the tex width value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L379)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L381)
 
 <a id="field-field-minipixels-platform-windows-window-title-title-src-minipixels-platform-windows-ml-47082431"></a>
 ### title
@@ -290,7 +290,7 @@ title
 Stores the title value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L367)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L369)
 
 <a id="field-field-minipixels-platform-windows-window-viewport-viewport-src-minipixels-platform-windows-ml-1567451515"></a>
 ### viewport
@@ -302,7 +302,7 @@ viewport
 Stores the viewport value associated with window.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L393)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L395)
 
 <a id="field-field-minipixels-platform-windows-window-viewportheight-viewportheight-src-minipixels-platform-windows-ml-429986957"></a>
 ### viewportHeight
@@ -312,7 +312,7 @@ viewportHeight
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L398)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L400)
 
 <a id="field-field-minipixels-platform-windows-window-viewportleft-viewportleft-src-minipixels-platform-windows-ml-548395125"></a>
 ### viewportLeft
@@ -324,7 +324,7 @@ viewportLeft
 Resize-safe viewport values kept outside the native byte scratch buffer.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L395)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L397)
 
 <a id="field-field-minipixels-platform-windows-window-viewporttop-viewporttop-src-minipixels-platform-windows-ml-991085087"></a>
 ### viewportTop
@@ -334,7 +334,7 @@ viewportTop
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L396)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L398)
 
 <a id="field-field-minipixels-platform-windows-window-viewportwidth-viewportwidth-src-minipixels-platform-windows-ml-2025903767"></a>
 ### viewportWidth
@@ -344,4 +344,4 @@ viewportWidth
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L397)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/windows.ml#L399)

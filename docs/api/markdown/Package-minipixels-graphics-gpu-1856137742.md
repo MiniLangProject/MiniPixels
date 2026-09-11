@@ -47,4 +47,5 @@
 - [`minipixels.graphics.gpu.shutdown`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-shutdown-function-shutdown-src-minipixels-graphics-gpu-ml-959613120) — function
 - [`minipixels.graphics.gpu.supported`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-supported-function-supported-returns-bool-src-minipixels-graphics-gpu-ml-2140388001) — function
 - [`minipixels.graphics.gpu.texture`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-texture-function-texture-image-src-minipixels-graphics-gpu-ml-1711808915) — function
+- [`minipixels.graphics.gpu.textureGeneration`](File-src-minipixels-graphics-gpu-ml-159526452.md#global-global-minipixels-graphics-gpu-texturegeneration-texturegeneration-src-minipixels-graphics-gpu-ml-1179606816) — global
 - [`minipixels.graphics.gpu.uploadBytes`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-uploadbytes-function-uploadbytes-returns-int-src-minipixels-graphics-gpu-ml-348491374) — function

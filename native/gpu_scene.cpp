@@ -25,11 +25,13 @@ static SwapFn swapInterval; static GetSwapFn getSwapInterval;
 static HGLRC owner = nullptr;
 static GLuint fbo=0, scene=0, white=0, light=0;
 static int width=0,height=0; static bool ready=false,drawing=false;
+static GLint maxTextureSize=0;
 static const GLenum FBO=0x8D40, ATTACHMENT=0x8CE0;
 struct Texture { GLuint id; int w,h; bool opaque; };
 static std::unordered_map<const void*, Texture> textures;
 struct Vertex { float x,y,u,v; uint32_t color; };
 static std::vector<Vertex> vertices;
+static std::vector<unsigned char> readRow;
 static GLuint batchTexture=0;
 static uint64_t uploadBytes=0, drawCalls=0;
 static void destroyLight();
@@ -91,7 +93,7 @@ API int mpGpuInit(int w,int h) {
     attachFbo=(AttachFn)proc("glFramebufferTexture2D"); statusFbo=(StatusFn)proc("glCheckFramebufferStatus");
     deleteFbo=(DeleteFn)proc("glDeleteFramebuffers");
     if(!genFbo || !bindFbo || !attachFbo || !statusFbo || !deleteFbo) return 0;
-    GLint limit=0; glGetIntegerv(GL_MAX_TEXTURE_SIZE,&limit); if(w>limit || h>limit) return 0;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE,&maxTextureSize); if(w>maxTextureSize || h>maxTextureSize) return 0;
     owner=wglGetCurrentContext(); width=w; height=h;
     scene=makeTexture(w,h,nullptr); genFbo(1,&fbo); bindFbo(FBO,fbo);
     attachFbo(FBO,ATTACHMENT,GL_TEXTURE_2D,scene,0);
@@ -105,7 +107,7 @@ API int mpGpuInit(int w,int h) {
 API int mpGpuResize(int w,int h) {
     if(!current() || drawing || w<1 || h<1) return 0;
     if(w==width && h==height) return 1;
-    GLint limit=0; glGetIntegerv(GL_MAX_TEXTURE_SIZE,&limit); if(w>limit || h>limit) return 0;
+    if(w>maxTextureSize || h>maxTextureSize) return 0;
     flush();
     GLuint nextScene=makeTexture(w,h,nullptr),nextFbo=0; genFbo(1,&nextFbo); bindFbo(FBO,nextFbo);
     attachFbo(FBO,ATTACHMENT,GL_TEXTURE_2D,nextScene,0);
@@ -127,15 +129,14 @@ API void mpGpuShutdown() {
     flush(); mpGpuResetTextures(); deleteFbo(1,&fbo); glDeleteTextures(1,&scene); glDeleteTextures(1,&white);
     if(light) glDeleteTextures(1,&light);
     destroyLight();
-    fbo=scene=white=light=0; ready=false; drawing=false; owner=nullptr;
+    fbo=scene=white=light=0; maxTextureSize=0; ready=false; drawing=false; owner=nullptr;
 }
 // Positive means a new resident texture: MiniLang retains its source image until reset.
 // Negative means a cache hit. Source pointer is a key, never dereferenced after this call.
 API int mpGpuTexture(const void* pixels,int w,int h,bool opaque) {
     if(!current() || !pixels || w<1 || h<1) return 0;
     auto i=textures.find(pixels); if(i!=textures.end()) return -(int)i->second.id;
-    flush(); GLint limit=0; glGetIntegerv(GL_MAX_TEXTURE_SIZE,&limit);
-    if(w>limit || h>limit) return 0;
+    flush(); if(w>maxTextureSize || h>maxTextureSize) return 0;
     GLuint id=makeTexture(w,h,pixels,opaque); textures[pixels]={id,w,h,opaque}; uploadBytes+=(uint64_t)w*h*4;
     return (int)id;
 }
@@ -187,7 +188,22 @@ API void mpGpuCircle(int cx,int cy,int r,uint32_t color) {
 }
 API void mpGpuLine(int x0,int y0,int x1,int y1,uint32_t color) {
     int dx=std::abs(x1-x0),sx=x0<x1?1:-1,dy=-std::abs(y1-y0),sy=y0<y1?1:-1,err=dx+dy;
-    for(;;) { mpGpuRect(x0,y0,1,1,color); if(x0==x1 && y0==y1) break; int e=2*err; if(e>=dy){err+=dy;x0+=sx;} if(e<=dx){err+=dx;y0+=sy;} }
+    const bool horizontalRuns=dx>=-dy;
+    int runX=x0,runY=y0,previousX=x0,previousY=y0;
+    for(;;) {
+        if(x0==x1 && y0==y1) {
+            if(horizontalRuns) mpGpuRect(std::min(runX,x0),y0,std::abs(x0-runX)+1,1,color);
+            else mpGpuRect(x0,std::min(runY,y0),1,std::abs(y0-runY)+1,color);
+            break;
+        }
+        int e=2*err; if(e>=dy){err+=dy;x0+=sx;} if(e<=dx){err+=dx;y0+=sy;}
+        if((horizontalRuns && y0!=previousY) || (!horizontalRuns && x0!=previousX)) {
+            if(horizontalRuns) mpGpuRect(std::min(runX,previousX),previousY,std::abs(previousX-runX)+1,1,color);
+            else mpGpuRect(previousX,std::min(runY,previousY),1,std::abs(previousY-runY)+1,color);
+            runX=x0; runY=y0;
+        }
+        previousX=x0; previousY=y0;
+    }
 }
 // Screen blend light: a small reusable RGB falloff texture; application supplies
 // a black-exclusion mask through the shader in the later light pass below.
@@ -229,8 +245,8 @@ API void mpGpuLight(int cx,int cy,int rx,int ry,int red,int green,int blue) {
 API void mpGpuRead(void* pixels) {
     if(!current() || !pixels) return;
     flush(); bindFbo(FBO,fbo); glReadPixels(0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
-    auto p=(unsigned char*)pixels; std::vector<unsigned char> row(width*4);
-    for(int y=0;y<height/2;++y){auto a=p+y*width*4,b=p+(height-1-y)*width*4;std::memcpy(row.data(),a,width*4);std::memcpy(a,b,width*4);std::memcpy(b,row.data(),width*4);}
+    auto p=(unsigned char*)pixels; readRow.resize((size_t)width*4);
+    for(int y=0;y<height/2;++y){auto a=p+y*width*4,b=p+(height-1-y)*width*4;std::memcpy(readRow.data(),a,width*4);std::memcpy(a,b,width*4);std::memcpy(b,readRow.data(),width*4);}
     if(!drawing) bindFbo(FBO,0);
 }
 API void mpGpuEnd(int cw,int ch,int vx,int vy,int vw,int vh) {

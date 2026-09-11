@@ -8,6 +8,10 @@ import minipixels.math.types as mt
 import minipixels.graphics.sprite as sp
 import std.math as math
 
+// Construct the identity tint once. rgba() validates and clamps its arguments,
+// which is useful at API boundaries but unnecessary in every sprite draw.
+whiteTint = mt.rgba(255, 255, 255, 255)
+
 /// Represents the canvas data used by the minipixels graphics canvas module.
 struct Canvas
   /// Stores the width value associated with canvas.
@@ -247,7 +251,7 @@ end struct
 /// @param height Height in the coordinate or storage units used by the caller.
 function create(width, height)
   pixels = bytes(width * height * 4, 0)
-  view = sp.Image(width, height, pixels, "render-target", false)
+  view = sp.Image(width, height, pixels, "render-target", false, 0, 0)
   return Canvas(width, height, pixels, 0, 0, 0, 0, 0, view, true, 0, 0, width, height)
 end function
 
@@ -266,7 +270,7 @@ function resize(c, width, height)
   c.width = width
   c.height = height
   c.pixels = pixels
-  c.imageView = sp.Image(width, height, pixels, "render-target", false)
+  c.imageView = sp.Image(width, height, pixels, "render-target", false, 0, 0)
   c.dirty = true
   c.dirtyX0 = 0
   c.dirtyY0 = 0
@@ -282,6 +286,10 @@ end function
 /// @param w Rectangle width.
 /// @param h Rectangle height.
 function markDirty(c, x, y, w, h)
+  // Most games clear the complete framebuffer before drawing. In that common
+  // case every following primitive is already covered and needs no clipping or
+  // dirty-bound expansion at all.
+  if c.dirty and x >= c.dirtyX0 and y >= c.dirtyY0 and x + w <= c.dirtyX1 and y + h <= c.dirtyY1 then return end if
   x0 = mt.clamp(mt.floorInt(x), 0, c.width)
   y0 = mt.clamp(mt.floorInt(y), 0, c.height)
   x1 = mt.clamp(mt.floorInt(x + w), 0, c.width)
@@ -327,6 +335,28 @@ function inline index(c, x, y)
   return ((y * c.width) + x) * 4
 end function
 
+/// @internal
+/// Reads a source pixel after the caller has clipped the image coordinates.
+function inline imagePixelUnchecked(image, x, y)
+  i = ((y * image.width) + x) * 4
+  return (image.pixels[i] << 24) | (image.pixels[i + 1] << 16) | (image.pixels[i + 2] << 8) | image.pixels[i + 3]
+end function
+
+/// @internal
+function inline tintChannelUnchecked(source, tint)
+  value = source * tint
+  return (value + 1 + (value >> 8)) >> 8
+end function
+
+/// @internal
+function inline tintColorUnchecked(color, tint)
+  red = tintChannelUnchecked((color >> 24) & 255, (tint >> 24) & 255)
+  green = tintChannelUnchecked((color >> 16) & 255, (tint >> 16) & 255)
+  blue = tintChannelUnchecked((color >> 8) & 255, (tint >> 8) & 255)
+  alpha = tintChannelUnchecked(color & 255, tint & 255)
+  return (red << 24) | (green << 16) | (blue << 8) | alpha
+end function
+
 /// Clears canvas maintained by the minipixels graphics canvas module.
 /// @param c c value consumed by this operation.
 /// @param color color value consumed by this operation.
@@ -350,7 +380,11 @@ function clearCanvas(c, color)
     end while
   end if
   c.imageView.opaque = a >= 255
-  markDirty(c, 0, 0, c.width, c.height)
+  c.dirty = true
+  c.dirtyX0 = 0
+  c.dirtyY0 = 0
+  c.dirtyX1 = c.width
+  c.dirtyY1 = c.height
   c.drawCalls = c.drawCalls + 1
 end function
 
@@ -364,12 +398,15 @@ function setPixel(c, x, y, color)
   y = mt.floorInt(y - c.cameraY)
   if x < 0 or y < 0 or x >= c.width or y >= c.height then return false end if
   i = index(c, x, y)
-  c.pixels[i] = mt.colorR(color)
-  c.pixels[i + 1] = mt.colorG(color)
-  c.pixels[i + 2] = mt.colorB(color)
-  c.pixels[i + 3] = mt.colorA(color)
-  if mt.colorA(color) < 255 then c.imageView.opaque = false end if
-  markDirty(c, x, y, 1, 1)
+  a = color & 255
+  c.pixels[i] = (color >> 24) & 255
+  c.pixels[i + 1] = (color >> 16) & 255
+  c.pixels[i + 2] = (color >> 8) & 255
+  c.pixels[i + 3] = a
+  if a < 255 then c.imageView.opaque = false end if
+  if c.dirty == false or x < c.dirtyX0 or y < c.dirtyY0 or x >= c.dirtyX1 or y >= c.dirtyY1 then
+    markDirty(c, x, y, 1, 1)
+  end if
   return true
 end function
 
@@ -378,15 +415,37 @@ end function
 /// @param x Horizontal coordinate used by the operation.
 /// @param y Vertical coordinate used by the operation.
 /// @param color color value consumed by this operation.
-function blendPixelRaw(c, x, y, color)
+function inline blendPixelRaw(c, x, y, color)
   if x < 0 or y < 0 or x >= c.width or y >= c.height then return false end if
   i = index(c, x, y)
-  dst = mt.rgba(c.pixels[i], c.pixels[i + 1], c.pixels[i + 2], c.pixels[i + 3])
-  blended = mt.alphaBlend(dst, color)
-  c.pixels[i] = mt.colorR(blended)
-  c.pixels[i + 1] = mt.colorG(blended)
-  c.pixels[i + 2] = mt.colorB(blended)
-  c.pixels[i + 3] = mt.colorA(blended)
+  sa = color & 255
+  if sa <= 0 then return true end if
+  sr = (color >> 24) & 255
+  sg = (color >> 16) & 255
+  sb = (color >> 8) & 255
+  da = c.pixels[i + 3]
+  if sa >= 255 or da <= 0 then
+    c.pixels[i] = sr
+    c.pixels[i + 1] = sg
+    c.pixels[i + 2] = sb
+    c.pixels[i + 3] = sa
+    return true
+  end if
+  inv = 255 - sa
+  if da >= 255 then
+    red = sr * sa + c.pixels[i] * inv
+    green = sg * sa + c.pixels[i + 1] * inv
+    blue = sb * sa + c.pixels[i + 2] * inv
+    c.pixels[i] = (red + 1 + (red >> 8)) >> 8
+    c.pixels[i + 1] = (green + 1 + (green >> 8)) >> 8
+    c.pixels[i + 2] = (blue + 1 + (blue >> 8)) >> 8
+    return true
+  end if
+  outA = sa + mt.floorInt((da * inv) / 255)
+  c.pixels[i] = mt.floorInt(((sr * sa) + mt.floorInt((c.pixels[i] * da * inv) / 255)) / outA)
+  c.pixels[i + 1] = mt.floorInt(((sg * sa) + mt.floorInt((c.pixels[i + 1] * da * inv) / 255)) / outA)
+  c.pixels[i + 2] = mt.floorInt(((sb * sa) + mt.floorInt((c.pixels[i + 2] * da * inv) / 255)) / outA)
+  c.pixels[i + 3] = outA
   return true
 end function
 
@@ -420,7 +479,7 @@ end function
 /// @param x Horizontal coordinate used by the operation.
 /// @param y Vertical coordinate used by the operation.
 /// @param color color value consumed by this operation.
-function drawPixelFast(c, x, y, color)
+function inline drawPixelFast(c, x, y, color)
   if x < 0 or y < 0 or x >= c.width or y >= c.height then return false end if
   a = mt.colorA(color)
   if a <= 0 then return false end if
@@ -432,7 +491,7 @@ function drawPixelFast(c, x, y, color)
     c.pixels[i + 3] = a
     return true
   end if
-  return blendPixel(c, x, y, color)
+  return blendPixelRaw(c, x, y, color)
 end function
 
 /// Performs the fillRect operation for the minipixels graphics canvas module.
@@ -618,8 +677,10 @@ end function
 /// @param x Horizontal coordinate used by the operation.
 /// @param y Vertical coordinate used by the operation.
 function blitRegion(c, img, sx, sy, sw, sh, x, y)
-  spr = sp.Sprite(img, sx, sy, sw, sh, 0, 0, img.name)
-  return drawSpriteEx(c, spr, x, y, false, false, 1, mt.rgba(255, 255, 255, 255))
+  x = mt.floorInt(x)
+  y = mt.floorInt(y)
+  if sw <= 0 or sh <= 0 or x >= c.width or y >= c.height or x + sw <= 0 or y + sh <= 0 then return end if
+  return drawImageRegionFast1x(c, img, sx, sy, sw, sh, x, y)
 end function
 
 /// Draws sprite through the minipixels graphics canvas rendering path.
@@ -628,7 +689,7 @@ end function
 /// @param x Horizontal coordinate used by the operation.
 /// @param y Vertical coordinate used by the operation.
 function drawSprite(c, spr, x, y)
-  return drawSpriteEx(c, spr, x, y, false, false, 1, mt.rgba(255, 255, 255, 255))
+  return drawSpriteEx(c, spr, x, y, false, false, 1, whiteTint)
 end function
 
 /// Performs the fillScaledPixel operation for the minipixels graphics canvas module.
@@ -706,13 +767,13 @@ function blendTransparentSpriteRow(destination as bytes, source as bytes, di as 
         destination[di + 2] = source[si + 2]
         destination[di + 3] = a
       else
-        dst = mt.rgba(destination[di], destination[di + 1], destination[di + 2], destination[di + 3])
-        src = mt.rgba(source[si], source[si + 1], source[si + 2], a)
-        result = mt.alphaBlend(dst, src)
-        destination[di] = mt.colorR(result)
-        destination[di + 1] = mt.colorG(result)
-        destination[di + 2] = mt.colorB(result)
-        destination[di + 3] = mt.colorA(result)
+        da = destination[di + 3]
+        inv = 255 - a
+        outA = a + mt.floorInt((da * inv) / 255)
+        destination[di] = mt.floorInt(((source[si] * a) + mt.floorInt((destination[di] * da * inv) / 255)) / outA)
+        destination[di + 1] = mt.floorInt(((source[si + 1] * a) + mt.floorInt((destination[di + 1] * da * inv) / 255)) / outA)
+        destination[di + 2] = mt.floorInt(((source[si + 2] * a) + mt.floorInt((destination[di + 2] * da * inv) / 255)) / outA)
+        destination[di + 3] = outA
       end if
     end if
     di = di + 4
@@ -723,11 +784,11 @@ function blendTransparentSpriteRow(destination as bytes, source as bytes, di as 
 end function
 
 /// @internal
-function drawSpriteFast1x(c, spr, x, y)
+function drawImageRegionFast1x(c, image, sx, sy, width, height, x, y)
   x0 = mt.clamp(x, 0, c.width)
   y0 = mt.clamp(y, 0, c.height)
-  x1 = mt.clamp(x + spr.width, 0, c.width)
-  y1 = mt.clamp(y + spr.height, 0, c.height)
+  x1 = mt.clamp(x + width, 0, c.width)
+  y1 = mt.clamp(y + height, 0, c.height)
   if x0 >= x1 or y0 >= y1 then return end if
   markDirty(c, x0, y0, x1 - x0, y1 - y0)
   destinationOpaque = c.imageView.opaque
@@ -736,21 +797,26 @@ function drawSpriteFast1x(c, spr, x, y)
 
   yy = y0
   while yy < y1
-    srcY = spr.sy + (yy - y)
-    srcX = spr.sx + (x0 - x)
-    si = ((srcY * spr.image.width) + srcX) * 4
+    srcY = sy + (yy - y)
+    srcX = sx + (x0 - x)
+    si = ((srcY * image.width) + srcX) * 4
     di = ((yy * c.width) + x0) * 4
-    if spr.image.opaque then
-      copyBytes(c.pixels, di, spr.image.pixels, si, (x1 - x0) * 4)
+    if image.opaque then
+      copyBytes(c.pixels, di, image.pixels, si, (x1 - x0) * 4)
     else if destinationOpaque then
-      blendOpaqueSpriteRow(c.pixels, spr.image.pixels, di, si, x1 - x0)
+      blendOpaqueSpriteRow(c.pixels, image.pixels, di, si, x1 - x0)
     else
-      blendTransparentSpriteRow(c.pixels, spr.image.pixels, di, si, x1 - x0)
+      blendTransparentSpriteRow(c.pixels, image.pixels, di, si, x1 - x0)
     end if
     yy = yy + 1
   end while
   c.spriteCount = c.spriteCount + 1
   c.drawCalls = c.drawCalls + 1
+end function
+
+/// @internal
+function drawSpriteFast1x(c, spr, x, y)
+  return drawImageRegionFast1x(c, spr.image, spr.sx, spr.sy, spr.width, spr.height, x, y)
 end function
 
 /// Draws sprite ex through the minipixels graphics canvas rendering path.
@@ -767,11 +833,10 @@ function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
   x = mt.floorInt(x - spr.pivotX)
   y = mt.floorInt(y - spr.pivotY)
   if x >= c.width or y >= c.height or x + (spr.width * scale) <= 0 or y + (spr.height * scale) <= 0 then return end if
-  markDirty(c, x, y, spr.width * scale, spr.height * scale)
-  white = mt.rgba(255, 255, 255, 255)
-  if scale == 1 and flipX == false and flipY == false and tint == white then
+  if scale == 1 and flipX == false and flipY == false and tint == whiteTint then
     return drawSpriteFast1x(c, spr, x, y)
   end if
+  markDirty(c, x, y, spr.width * scale, spr.height * scale)
   yy = 0
   while yy < spr.height
     xx = 0
@@ -780,10 +845,10 @@ function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
       srcY = yy
       if flipX then srcX = spr.width - 1 - xx end if
       if flipY then srcY = spr.height - 1 - yy end if
-      color = sp.imageGetPixel(spr.image, spr.sx + srcX, spr.sy + srcY)
+      color = imagePixelUnchecked(spr.image, spr.sx + srcX, spr.sy + srcY)
       if mt.colorA(color) > 0 then
-        if tint != white then
-          color = mt.tintColor(color, tint)
+        if tint != whiteTint then
+          color = tintColorUnchecked(color, tint)
         end if
         if scale == 1 then
           drawPixelFast(c, x + xx, y + yy, color)
@@ -821,22 +886,21 @@ function drawSpriteScaled(c, spr, x, y, scale, tint)
   x1 = mt.clamp(x + scaledWidth, 0, c.width)
   y1 = mt.clamp(y + scaledHeight, 0, c.height)
   if x0 >= x1 or y0 >= y1 then return end if
-  white = mt.rgba(255, 255, 255, 255)
+  inverseScale = 1.0 / scale
   yy = y0
   while yy < y1
-    sourceY = mt.clamp(mt.floorInt((yy - y) / scale), 0, spr.height - 1)
+    sourceY = mt.clamp(mt.floorInt((yy - y) * inverseScale), 0, spr.height - 1)
     xx = x0
     while xx < x1
-      sourceX = mt.clamp(mt.floorInt((xx - x) / scale), 0, spr.width - 1)
-      color = sp.imageGetPixel(spr.image, spr.sx + sourceX, spr.sy + sourceY)
-      if tint != white then color = mt.tintColor(color, tint) end if
+      sourceX = mt.clamp(mt.floorInt((xx - x) * inverseScale), 0, spr.width - 1)
+      color = imagePixelUnchecked(spr.image, spr.sx + sourceX, spr.sy + sourceY)
+      if tint != whiteTint then color = tintColorUnchecked(color, tint) end if
       if mt.colorA(color) > 0 then drawPixelFast(c, xx, yy, color) end if
       xx = xx + 1
     end while
     yy = yy + 1
   end while
   markDirty(c, x0, y0, x1 - x0, y1 - y0)
-  if spr.image.opaque == false or mt.colorA(tint) < 255 then c.imageView.opaque = false end if
   c.spriteCount = c.spriteCount + 1
   c.drawCalls = c.drawCalls + 1
 end function
@@ -879,26 +943,31 @@ function drawSpriteRotated(c, spr, x, y, radians, scale, tint)
   x1 = mt.clamp(x1 + 1, 0, c.width)
   y1 = mt.clamp(y1 + 1, 0, c.height)
   if x0 >= x1 or y0 >= y1 then return end if
-  white = mt.rgba(255, 255, 255, 255)
+  inverseScale = 1.0 / scale
+  stepSourceX = cosine * inverseScale
+  stepSourceY = (0 - sine) * inverseScale
   yy = y0
   while yy < y1
+    dx = (x0 + 0.5 - x) * inverseScale
+    dy = (yy + 0.5 - y) * inverseScale
+    sourceXF = (dx * cosine) + (dy * sine) + pivotX
+    sourceYF = (0 - dx * sine) + (dy * cosine) + pivotY
     xx = x0
     while xx < x1
-      dx = (xx + 0.5 - x) / scale
-      dy = (yy + 0.5 - y) / scale
-      sourceX = mt.floorInt((dx * cosine) + (dy * sine) + pivotX)
-      sourceY = mt.floorInt((0 - dx * sine) + (dy * cosine) + pivotY)
+      sourceX = mt.floorInt(sourceXF)
+      sourceY = mt.floorInt(sourceYF)
       if sourceX >= 0 and sourceY >= 0 and sourceX < spr.width and sourceY < spr.height then
-        color = sp.imageGetPixel(spr.image, spr.sx + sourceX, spr.sy + sourceY)
-        if tint != white then color = mt.tintColor(color, tint) end if
+        color = imagePixelUnchecked(spr.image, spr.sx + sourceX, spr.sy + sourceY)
+        if tint != whiteTint then color = tintColorUnchecked(color, tint) end if
         if mt.colorA(color) > 0 then drawPixelFast(c, xx, yy, color) end if
       end if
+      sourceXF = sourceXF + stepSourceX
+      sourceYF = sourceYF + stepSourceY
       xx = xx + 1
     end while
     yy = yy + 1
   end while
   markDirty(c, x0, y0, x1 - x0, y1 - y0)
-  if spr.image.opaque == false or mt.colorA(tint) < 255 then c.imageView.opaque = false end if
   c.spriteCount = c.spriteCount + 1
   c.drawCalls = c.drawCalls + 1
 end function

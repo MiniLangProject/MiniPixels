@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.14.0 - 2026-09-11
+
+- Reworked CPU canvas hot paths with covered-dirty-region elision, direct color packing, specialized straight-alpha blending, allocation-free image-region blits, and incremental scaled/rotated sprite sampling.
+- Moved Linux RGBA-to-BGRA conversion and nearest/integer presentation scaling into the existing optimized native runtime bridge.
+- Cached Windows OpenGL context, client geometry, viewport and texture-filter state, and avoided fixed-resolution resize polling and unbounded title updates in the game loop.
+- Added per-image GPU texture handles, generation-safe cache invalidation, run-batched GPU lines, reusable readback storage, eager tile-frame descriptors, and bounds-check-free visible tile traversal.
+- Added deterministic CPU canvas/sprite benchmarks and Linux native presenter conversion tests.
+
 ## 0.13.0 - 2026-09-11
 
 - Preserved compatible source PNGs and switched generated PNGs to real Deflate, eliminating the stored-block size inflation in Python-built packs.

@@ -3,9 +3,9 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.13.0`
+Current version: `0.14.0`
 
-See the [0.13.0 release notes](RELEASE_NOTES_0.13.0.md) for compact asset packs, automatic WAV-to-MP3 conversion, payload deduplication, and the streamlined MPX3 version-4 format.
+See the [0.14.0 release notes](RELEASE_NOTES_0.14.0.md) for faster CPU drawing, native Linux presentation, reduced per-frame platform overhead, and improved GPU texture and primitive batching.
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.7 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
@@ -37,7 +37,7 @@ diagnostics as failures.
 - MiniLang Compiler 1.2.7 or newer in a sibling checkout; lazy MPX I/O uses `std.io.file` and protected builds use `std.crypto.ecdsa_p256`
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
 - The Python packages in `requirements.txt` for protected builds and WAV-to-MP3 asset transcoding
-- Visual Studio C++ Build Tools on Windows, or GCC on Linux, for the small MP3 decoder bridge
+- Visual Studio C++ Build Tools on Windows, or GCC on Linux, for the small native audio/presentation bridge
 
 Expected sibling layout during local development:
 
@@ -52,7 +52,7 @@ Install the build dependencies once before packing protected assets or WAV audio
 python -m pip install -r requirements.txt
 ```
 
-The normal `build` and `run` commands also build and copy the target-specific MP3 decoder automatically. On its first build, the helper downloads the checksum-verified `dr_mp3` single-header source at a pinned revision and caches it under `build/native-audio`.
+The normal `build` and `run` commands also build and copy the target-specific native runtime automatically. It provides MP3 decoding on both targets and accelerated XImage color conversion/scaling on Linux. On its first build, the helper downloads the checksum-verified `dr_mp3` single-header source at a pinned revision and caches it under `build/native-audio`.
 
 ## Quickstart
 
@@ -149,10 +149,14 @@ Call `gpu.shutdown()` before closing the window. This API is intentionally separ
 from the stable CPU `Canvas`: rotated sprites, canvas-to-canvas GPU sources, and Linux
 GPU scene rendering are not implemented yet.
 
-Optional renderer benchmark:
+Optional CPU-canvas, sprite, and presenter benchmarks:
 
 ```powershell
+python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\canvas_bench.ml build\benchmarks\canvas_bench.exe -I src -I ..\MiniLangCompilerPy
+python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\sprite_bench.ml build\benchmarks\sprite_bench.exe -I src -I ..\MiniLangCompilerPy
 python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\renderer_bench.ml build\benchmarks\renderer_bench.exe -I src -I ..\MiniLangCompilerPy
+build\benchmarks\canvas_bench.exe
+build\benchmarks\sprite_bench.exe
 build\benchmarks\renderer_bench.exe
 ```
 
@@ -337,7 +341,7 @@ python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler
 python tools\minipixels.py package
 ```
 
-The Python CLI validates project JSON, writes asset, localization, constants, and level modules, emits `asset-report.json`, builds the target audio bridge, and invokes the MiniLang compiler. Run `security init` once to enable signed and encrypted MPX3 builds. Generated audio helpers create memory-backed WAV/MP3 clips, so games do not need loose sound files next to the executable.
+The Python CLI validates project JSON, writes asset, localization, constants, and level modules, emits `asset-report.json`, builds the target native runtime bridge, and invokes the MiniLang compiler. Run `security init` once to enable signed and encrypted MPX3 builds. Generated audio helpers create memory-backed WAV/MP3 clips, so games do not need loose sound files next to the executable.
 
 Windowed Windows games built through `tools\minipixels.py build` or `run` use the GUI PE subsystem by default, so double-clicking the executable opens only the game window and no companion console. Linux builds are normal ELF executables. Use `--headless` for Windows console-subsystem builds that are meant to print test or tool output.
 

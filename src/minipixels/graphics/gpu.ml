@@ -53,6 +53,7 @@ extern function mpGpuDrawCalls() from "minipixels_gpu.dll" returns u64
 
 retained = array(4096)
 retainedCount = 0
+textureGeneration = 1
 active = false
 activeWindow = void
 activeWidth = 0
@@ -66,16 +67,18 @@ end function
 
 /// Releases every cached GPU texture while keeping the scene canvas active.
 function resetTextures()
-  global retained, retainedCount
+  global retained, retainedCount, textureGeneration
   if not active then return end if
   mpGpuResetTextures()
   retained = array(4096)
   retainedCount = 0
+  textureGeneration = textureGeneration + 1
 end function
 
 /// @internal
 function texture(image)
-  global retained, retainedCount
+  global retained, retainedCount, textureGeneration
+  if image.gpuTextureGeneration == textureGeneration and image.gpuTextureId > 0 then return image.gpuTextureId end if
   id = mpGpuTexture(image.pixels, image.width, image.height, image.opaque)
   if id > 0 then
     // Keep the allocation alive so its pointer cannot be reused as a cache key.
@@ -89,7 +92,12 @@ function texture(image)
     retained[retainedCount] = image
     retainedCount = retainedCount + 1
   end if
-  return mt.abs(id)
+  id = mt.abs(id)
+  if id > 0 then
+    image.gpuTextureId = id
+    image.gpuTextureGeneration = textureGeneration
+  end if
+  return id
 end function
 
 /// Uploads changed pixels for an image that has already been drawn by the GPU canvas.
@@ -251,7 +259,7 @@ function create(window, width, height, vsync)
   activeHeight = height
   win.setRenderSize(window, width, height)
   window.renderer = "opengl-scene"
-  return GpuCanvas(width, height, sp.Image(1, 1, bytes(4, 255), "gpu-view", true))
+  return GpuCanvas(width, height, sp.Image(1, 1, bytes(4, 255), "gpu-view", true, 0, 0))
 end function
 
 /// Starts one GPU scene frame.
@@ -309,7 +317,7 @@ end function
 
 /// Releases the GPU scene canvas and its cached textures.
 function shutdown()
-  global active, activeWindow, activeWidth, activeHeight, retained, retainedCount
+  global active, activeWindow, activeWidth, activeHeight, retained, retainedCount, textureGeneration
   if active then mpGpuShutdown() end if
   active = false
   activeWindow = void
@@ -317,6 +325,7 @@ function shutdown()
   activeHeight = 0
   retained = array(4096)
   retainedCount = 0
+  textureGeneration = textureGeneration + 1
 end function
 
 #else
