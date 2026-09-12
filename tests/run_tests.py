@@ -227,6 +227,7 @@ def create_protected_asset_fixture() -> Path:
         "main": "src/main.ml",
         "window": {"width": 32, "height": 32, "scale": 1},
         "assetProtection": {"enabled": True, "signingKey": ".minipixels/asset-signing-key.pem"},
+        "assetLoading": {"mode": "resident", "batchBytes": 65536},
         "localization": {"defaultLocale": "de"},
         "assets": [
             {"id": "de", "type": "text", "locale": "de", "path": "assets/de.json"},
@@ -438,6 +439,13 @@ def run_python_tests() -> None:
         assert first_codec in (mod.PACK_CODEC_DEFLATE, mod.PACK_CODEC_RLE), first_codec
         assert (first_offset, first_size) == (second_offset, second_size)
         assert len(duplicate_data) < len(repeated), len(duplicate_data)
+        raw_codec, raw_payload = mod.compress_pack_payload(repeated, "none")
+        assert raw_codec == mod.PACK_CODEC_NONE and raw_payload == repeated
+        fast_codec, fast_payload = mod.compress_pack_payload(repeated, "fast")
+        assert fast_codec == mod.PACK_CODEC_DEFLATE and len(fast_payload) < len(repeated)
+        small_codec, small_payload = mod.compress_pack_payload(repeated, "small")
+        assert small_codec in (mod.PACK_CODEC_DEFLATE, mod.PACK_CODEC_RLE)
+        assert len(small_payload) <= len(fast_payload)
         key_dir = tmp_path / ".minipixels"
         mod.generate_signing_key(key_dir / "private.pem", key_dir / "public.pem")
         signing_key = mod.load_signing_key(tmp_path, {"signingKey": ".minipixels/private.pem"})
@@ -505,6 +513,31 @@ def run_python_tests() -> None:
         assert "package generated.levels" in generated, generated
         assert "function enemyMinX" in generated, generated
         assert "fill(data, w, 0, 2, 4, 1)" in generated, generated
+        source_dir = tmp_path / "src"
+        source_dir.mkdir()
+        (source_dir / "main.ml").write_text("function main(args) return 0 end function\n", encoding="utf-8")
+        loading_manifest = tmp_path / "minipixels.json"
+        loading_manifest.write_text(
+            json.dumps(
+                {
+                    "name": "loading-profiles",
+                    "main": "src/main.ml",
+                    "window": {"width": 32, "height": 32, "scale": 1},
+                    "assetLoading": {"mode": "resident", "compression": "fast", "batchBytes": 65536},
+                    "assets": [
+                        {"id": "same_a", "type": "file", "path": "assets/same.txt", "preload": "level-1"},
+                        {"id": "same_b", "type": "file", "path": "assets/same.txt", "preload": True, "compression": "none"},
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+        generated_assets_dir = tmp_path / "build" / "generated" / "generated"
+        mod.generate(loading_manifest, generated_assets_dir)
+        generated_assets = (generated_assets_dir / "assets.ml").read_text(encoding="utf-8")
+        assert "resident = try(mp.preloadAssetPack(opened, 65536))" in generated_assets, generated_assets
+        assert "function preloadGroup(group)" in generated_assets, generated_assets
+        assert 'group == "boot"' in generated_assets and 'group == "level-1"' in generated_assets
         sdk_zip = package_mod.package_sdk(tmp_path / "dist")
         assert sdk_zip.exists(), sdk_zip
         assert (sdk_zip.parent / f"{sdk_zip.name}.sha256").exists(), sdk_zip
@@ -644,6 +677,7 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
                 "  a.assertTrue(stats.lazyFile, \"MPX3 payloads remain file-backed\")",
                 "  a.assertEq(stats.payloadMisses, 3, \"each decoded payload read once\")",
                 "  a.assertEq(stats.cachedPayloadBytes, 0, \"decoded payload bytes released\")",
+                "  a.assertEq(stats.bulkReads, 1, \"resident MPX3 uses one bulk read\")",
                 "  a.assertTrue(gen.preload(), \"preload reuses generated caches\")",
                 "  a.assertEq(balance.PLAYER_SPEED, 120, \"compiled scalar constant\")",
                 "  a.assertEq(balance.ENEMIES_SLIME_HEALTH, 3, \"compiled nested constant\")",

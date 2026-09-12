@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added target-native zlib/Deflate decoding into exact destination buffers for PNG and MPX payloads, retaining the MiniLang decoder as a validation fallback.
+- Replaced per-entry MPX1 index I/O with bounded bulk index parsing.
+- Added bounded file-order bulk preloading, optional resident packs, named preload groups, decoded-buffer reuse for deduplicated entries, and physical/logical I/O telemetry.
+- Added global and per-asset `auto`, `fast`, `small`, and `none` compression profiles plus an asset-loading benchmark.
+
 ## 0.14.0 - 2026-09-11
 
 - Reworked CPU canvas hot paths with covered-dirty-region elision, direct color packing, specialized straight-alpha blending, allocation-free image-region blits, and incremental scaled/rotated sprite sampling.

@@ -12,7 +12,7 @@ struct Huffman
 Canonical Deflate Huffman decoding table.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L38)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L46)
 
 ## Members
 
@@ -26,7 +26,7 @@ counts
 Number of symbols for each bit length.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L40)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L48)
 
 <a id="field-field-minipixels-assets-png-huffman-symbols-symbols-src-minipixels-assets-png-ml-30670934"></a>
 ### symbols
@@ -38,7 +38,7 @@ symbols
 Symbols ordered by bit length and canonical code.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L42)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L50)
 
 <a id="field-field-minipixels-assets-png-huffman-valid-valid-src-minipixels-assets-png-ml-1838877562"></a>
 ### valid
@@ -50,4 +50,4 @@ valid
 Whether the table is valid.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L44)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L52)

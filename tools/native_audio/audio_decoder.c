@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
-// MiniPixels MP3 decoder bridge. dr_mp3 is fetched at a pinned revision by
-// tools/build_audio_runtime.py and remains available under its own license.
+// MiniPixels native audio, asset-decoding, and pixel-conversion bridge.
+// Third-party single-header dependencies are fetched at pinned revisions by
+// tools/build_audio_runtime.py and remain available under their own licenses.
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -9,6 +10,16 @@
 #define DR_MP3_IMPLEMENTATION
 #define DR_MP3_NO_STDIO
 #include "dr_mp3.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_ZLIB
+#define STBI_SUPPORT_ZLIB
+#define STBI_NO_STDIO
+#define STBI_NO_SIMD
+#define STBI_NO_LINEAR
+#define STBI_NO_HDR
+#define STBI_NO_FAILURE_STRINGS
+#include "stb_image.h"
 
 #if defined(_WIN32)
 #define MP_API __declspec(dllexport)
@@ -78,6 +89,24 @@ MP_API void mpAudioMp3Close(void* handle)
     if (value == NULL) return;
     drmp3_uninit(&value->decoder);
     free(value);
+}
+
+MP_API int32_t mpAssetInflateZlib(
+    void* destination,
+    uint64_t destination_size,
+    const void* source,
+    uint64_t source_offset,
+    uint64_t source_size)
+{
+    int result;
+    if (destination == NULL || source == NULL || destination_size > INT32_MAX || source_size > INT32_MAX) return 0;
+    if (destination_size == 0) return source_size == 0 ? 1 : 0;
+    result = stbi_zlib_decode_buffer(
+        (char*)destination,
+        (int)destination_size,
+        (const char*)source + source_offset,
+        (int)source_size);
+    return result == (int)destination_size ? 1 : 0;
 }
 
 /* Pixel presentation helpers live in the already-required native runtime so

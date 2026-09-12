@@ -8,6 +8,7 @@
 
 ## Symbols
 
+- [`minipixels.assets.png._inflateZlibPortable`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-inflatezlibportable-function-inflatezlibportable-data-expectedsize-src-minipixels-assets-png-ml-171444575) — function
 - [`minipixels.assets.png.adler32`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-adler32-function-adler32-data-src-minipixels-assets-png-ml-1397005228) — function
 - [`minipixels.assets.png.alignBits`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-alignbits-function-alignbits-reader-src-minipixels-assets-png-ml-1129393079) — function
 - [`minipixels.assets.png.BitReader`](Type-minipixels-assets-png-bitreader-15679877.md) — struct
@@ -29,6 +30,7 @@
 - [`minipixels.assets.png.Huffman`](Type-minipixels-assets-png-huffman-1510650536.md) — struct
 - [`minipixels.assets.png.inflateStored`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-inflatestored-function-inflatestored-data-src-minipixels-assets-png-ml-1748811902) — function
 - [`minipixels.assets.png.inflateZlib`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-inflatezlib-function-inflatezlib-data-expectedsize-src-minipixels-assets-png-ml-1810611263) — function
+- [`minipixels.assets.png.inflateZlibRange`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-inflatezlibrange-function-inflatezlibrange-data-offset-size-expectedsize-src-minipixels-assets-png-ml-384763157) — function
 - [`minipixels.assets.png.integerCeilDivide`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-integerceildivide-function-integerceildivide-value-divisor-src-minipixels-assets-png-ml-381045095) — function
 - [`minipixels.assets.png.integerDivide`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-integerdivide-function-integerdivide-value-divisor-src-minipixels-assets-png-ml-2000646097) — function
 - [`minipixels.assets.png.isPng`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-ispng-function-ispng-data-src-minipixels-assets-png-ml-1327530400) — function
@@ -37,6 +39,7 @@
 - [`minipixels.assets.png.load`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-load-function-load-path-src-minipixels-assets-png-ml-863741217) — function
 - [`minipixels.assets.png.MAX_BITS`](File-src-minipixels-assets-png-ml-1155821131.md#constant-constant-minipixels-assets-png-max-bits-const-max-bits-15-src-minipixels-assets-png-ml-770777689) — constant
 - [`minipixels.assets.png.MAX_IMAGE_PIXELS`](File-src-minipixels-assets-png-ml-1155821131.md#constant-constant-minipixels-assets-png-max-image-pixels-const-max-image-pixels-67108864-src-minipixels-assets-png-ml-268515669) — constant
+- [`minipixels.assets.png.mpAssetInflateZlib`](File-src-minipixels-assets-png-ml-1155821131.md#extern_function-extern-function-minipixels-assets-png-mpassetinflatezlib-extern-function-mpassetinflatezlib-destination-as-bytes-destinationsize-as-u64-source-as-bytes-sourceoffset-as-u64-sourcesize-as-u64-from-minipixels-audio-dll-returns-i32-src-minipixels-assets-png-ml-109598038) — extern_function
 - [`minipixels.assets.png.paeth`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-paeth-function-paeth-a-b-c-src-minipixels-assets-png-ml-2136968420) — function
 - [`minipixels.assets.png.paletteIndex`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-paletteindex-function-paletteindex-scanlines-rowstart-x-bitdepth-src-minipixels-assets-png-ml-364938678) — function
 - [`minipixels.assets.png.PNG_ERR`](File-src-minipixels-assets-png-ml-1155821131.md#constant-constant-minipixels-assets-png-png-err-const-png-err-9301-src-minipixels-assets-png-ml-1680279242) — constant

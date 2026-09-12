@@ -17,6 +17,23 @@ Reachable from entry: **yes**
 
 ## Declarations
 
+<a id="function-function-minipixels-assets-png-inflatezlibportable-function-inflatezlibportable-data-expectedsize-src-minipixels-assets-png-ml-171444575"></a>
+### _inflateZlibPortable
+
+```ml
+function _inflateZlibPortable(data, expectedSize)
+```
+
+Portable fallback for zlib/Deflate streams rejected by the native bridge.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `data` | `dynamic` | — | Complete zlib stream. |
+| `expectedSize` | `dynamic` | — | Required uncompressed byte count. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L309)
+
 <a id="function-function-minipixels-assets-png-adler32-function-adler32-data-src-minipixels-assets-png-ml-1397005228"></a>
 ### adler32
 
@@ -31,7 +48,7 @@ Computes an Adler-32 checksum over decoded zlib output.
 | `data` | `dynamic` | — | Uncompressed byte sequence. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L287)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L295)
 
 <a id="function-function-minipixels-assets-png-alignbits-function-alignbits-reader-src-minipixels-assets-png-ml-1129393079"></a>
 ### alignBits
@@ -47,7 +64,7 @@ Aligns a Deflate reader to the next byte boundary.
 | `reader` | `dynamic` | — | Mutable bit reader. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L118)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L126)
 
 - [minipixels.assets.png.BitReader](Type-minipixels-assets-png-bitreader-15679877.md) — struct
 <a id="function-function-minipixels-assets-png-buildhuffman-function-buildhuffman-lengths-src-minipixels-assets-png-ml-1855213401"></a>
@@ -64,7 +81,7 @@ Builds a canonical Huffman table from symbol bit lengths.
 | `lengths` | `dynamic` | — | Bit length for every symbol. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L125)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L133)
 
 <a id="function-function-minipixels-assets-png-chunkis-function-chunkis-data-position-a-b-c-d-src-minipixels-assets-png-ml-1376687399"></a>
 ### chunkIs
@@ -85,7 +102,7 @@ Returns whether a PNG chunk type matches four ASCII bytes.
 | `d` | `dynamic` | — | Fourth chunk-type byte. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L90)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L98)
 
 <a id="function-function-minipixels-assets-png-decode-function-decode-data-name-src-minipixels-assets-png-ml-856797033"></a>
 ### decode
@@ -102,7 +119,7 @@ Decodes a non-interlaced PNG byte sequence.
 | `name` | `dynamic` | — | Name assigned to the decoded image. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L529)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L562)
 
 <a id="function-function-minipixels-assets-png-decodesymbol-function-decodesymbol-reader-table-src-minipixels-assets-png-ml-675811497"></a>
 ### decodeSymbol
@@ -119,7 +136,7 @@ Decodes one symbol from a canonical Deflate table.
 | `table` | `dynamic` | — | Canonical decoding table. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L157)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L165)
 
 <a id="function-function-minipixels-assets-png-distancebase-function-distancebase-index-src-minipixels-assets-png-ml-501581944"></a>
 ### distanceBase
@@ -135,7 +152,7 @@ Returns the RFC 1951 base distance for a distance symbol.
 | `index` | `dynamic` | — | Zero-based distance-code index. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L273)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L281)
 
 <a id="function-function-minipixels-assets-png-distanceextra-function-distanceextra-index-src-minipixels-assets-png-ml-300853202"></a>
 ### distanceExtra
@@ -151,7 +168,7 @@ Returns the RFC 1951 extra-bit count for a distance symbol.
 | `index` | `dynamic` | — | Zero-based distance-code index. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L280)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L288)
 
 <a id="function-function-minipixels-assets-png-dynamictables-function-dynamictables-reader-src-minipixels-assets-png-ml-1811664705"></a>
 ### dynamicTables
@@ -167,7 +184,7 @@ Reads dynamic Deflate Huffman tables.
 | `reader` | `dynamic` | — | Mutable bit reader positioned after the block type. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L202)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L210)
 
 <a id="function-function-minipixels-assets-png-encodechunk-function-encodechunk-chunktype-payload-src-minipixels-assets-png-ml-421197257"></a>
 ### encodeChunk
@@ -184,7 +201,7 @@ Creates one PNG chunk including its CRC-32 checksum.
 | `payload` | `dynamic` | — | Chunk payload bytes. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L642)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L675)
 
 <a id="function-function-minipixels-assets-png-encodergba-function-encodergba-width-height-pixels-src-minipixels-assets-png-ml-1336251350"></a>
 ### encodeRgba
@@ -202,7 +219,7 @@ Encodes RGBA8888 pixels as a deterministic non-interlaced PNG.
 | `pixels` | `dynamic` | — | Width-times-height RGBA byte buffer. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L655)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L688)
 
 <a id="function-function-minipixels-assets-png-encodestoredzlib-function-encodestoredzlib-raw-src-minipixels-assets-png-ml-1654783034"></a>
 ### encodeStoredZlib
@@ -218,7 +235,7 @@ Wraps raw bytes in a zlib stream made from deterministic stored blocks.
 | `raw` | `dynamic` | — | Uncompressed payload. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L616)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L649)
 
 <a id="global-global-minipixels-assets-png-fixeddistancecache-fixeddistancecache-src-minipixels-assets-png-ml-2015354274"></a>
 ### fixedDistanceCache
@@ -230,7 +247,7 @@ fixedDistanceCache
 Lazily initialized fixed Deflate distance table.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L21)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L29)
 
 <a id="function-function-minipixels-assets-png-fixeddistancetable-function-fixeddistancetable-src-minipixels-assets-png-ml-1889289050"></a>
 ### fixedDistanceTable
@@ -242,7 +259,7 @@ function fixedDistanceTable()
 Creates the fixed Deflate distance table.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L193)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L201)
 
 <a id="global-global-minipixels-assets-png-fixedliteralcache-fixedliteralcache-src-minipixels-assets-png-ml-1525254432"></a>
 ### fixedLiteralCache
@@ -254,7 +271,7 @@ fixedLiteralCache
 Lazily initialized fixed Deflate literal/length table.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L19)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L27)
 
 <a id="function-function-minipixels-assets-png-fixedliteraltable-function-fixedliteraltable-src-minipixels-assets-png-ml-79156372"></a>
 ### fixedLiteralTable
@@ -266,7 +283,7 @@ function fixedLiteralTable()
 Creates the fixed Deflate literal/length table.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L180)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L188)
 
 <a id="function-function-minipixels-assets-png-hasrange-function-hasrange-data-offset-size-src-minipixels-assets-png-ml-438379508"></a>
 ### hasRange
@@ -284,7 +301,7 @@ Returns whether an exact byte range is available.
 | `size` | `dynamic` | — | Required byte count. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L57)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L65)
 
 - [minipixels.assets.png.Huffman](Type-minipixels-assets-png-huffman-1510650536.md) — struct
 <a id="function-function-minipixels-assets-png-inflatestored-function-inflatestored-data-src-minipixels-assets-png-ml-1748811902"></a>
@@ -301,7 +318,7 @@ Inflates a stored-block zlib stream for backward compatibility.
 | `data` | `dynamic` | — | Complete zlib stream using stored blocks. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L375)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L408)
 
 <a id="function-function-minipixels-assets-png-inflatezlib-function-inflatezlib-data-expectedsize-src-minipixels-assets-png-ml-1810611263"></a>
 ### inflateZlib
@@ -310,7 +327,7 @@ Inflates a stored-block zlib stream for backward compatibility.
 function inflateZlib(data, expectedSize)
 ```
 
-Inflates a zlib-wrapped Deflate stream into an exact-sized output buffer.
+Inflates a complete zlib-wrapped Deflate stream.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -318,7 +335,26 @@ Inflates a zlib-wrapped Deflate stream into an exact-sized output buffer.
 | `expectedSize` | `dynamic` | — | Required uncompressed byte count. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L300)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L401)
+
+<a id="function-function-minipixels-assets-png-inflatezlibrange-function-inflatezlibrange-data-offset-size-expectedsize-src-minipixels-assets-png-ml-384763157"></a>
+### inflateZlibRange
+
+```ml
+function inflateZlibRange(data, offset, size, expectedSize)
+```
+
+Inflates a zlib-wrapped Deflate range directly into an exact-sized buffer. The normal path runs in the native runtime and avoids slicing the compressed source. The portable decoder retains precise validation diagnostics.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `data` | `dynamic` | — | Byte sequence containing the zlib stream. |
+| `offset` | `dynamic` | — | Start of the complete zlib stream. |
+| `size` | `dynamic` | — | Compressed stream size. |
+| `expectedSize` | `dynamic` | — | Required uncompressed byte count. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L389)
 
 <a id="function-function-minipixels-assets-png-integerceildivide-function-integerceildivide-value-divisor-src-minipixels-assets-png-ml-381045095"></a>
 ### integerCeilDivide
@@ -335,7 +371,7 @@ Divides non-negative integers and rounds up while retaining an integer result.
 | `divisor` | `dynamic` | — | Positive divisor. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L71)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L79)
 
 <a id="function-function-minipixels-assets-png-integerdivide-function-integerdivide-value-divisor-src-minipixels-assets-png-ml-2000646097"></a>
 ### integerDivide
@@ -352,7 +388,7 @@ Divides non-negative integers while retaining an integer result.
 | `divisor` | `dynamic` | — | Positive divisor. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L64)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L72)
 
 <a id="function-function-minipixels-assets-png-ispng-function-ispng-data-src-minipixels-assets-png-ml-1327530400"></a>
 ### isPng
@@ -368,7 +404,7 @@ Returns whether bytes begin with the PNG signature.
 | `data` | `dynamic` | — | Complete candidate byte buffer. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L78)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L86)
 
 <a id="function-function-minipixels-assets-png-lengthbase-function-lengthbase-index-src-minipixels-assets-png-ml-1325145232"></a>
 ### lengthBase
@@ -384,7 +420,7 @@ Returns the RFC 1951 base length for a length symbol.
 | `index` | `dynamic` | — | Zero-based length-code index. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L259)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L267)
 
 <a id="function-function-minipixels-assets-png-lengthextra-function-lengthextra-index-src-minipixels-assets-png-ml-2103720004"></a>
 ### lengthExtra
@@ -400,7 +436,7 @@ Returns the RFC 1951 extra-bit count for a length symbol.
 | `index` | `dynamic` | — | Zero-based length-code index. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L266)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L274)
 
 <a id="function-function-minipixels-assets-png-load-function-load-path-src-minipixels-assets-png-ml-863741217"></a>
 ### load
@@ -416,7 +452,7 @@ Loads and decodes a PNG directly from disk.
 | `path` | `dynamic` | — | PNG file path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L608)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L641)
 
 <a id="constant-constant-minipixels-assets-png-max-bits-const-max-bits-15-src-minipixels-assets-png-ml-770777689"></a>
 ### MAX_BITS
@@ -428,7 +464,7 @@ const MAX_BITS = 15
 Maximum canonical Deflate Huffman code length.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L15)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L23)
 
 <a id="constant-constant-minipixels-assets-png-max-image-pixels-const-max-image-pixels-67108864-src-minipixels-assets-png-ml-268515669"></a>
 ### MAX_IMAGE_PIXELS
@@ -440,7 +476,25 @@ const MAX_IMAGE_PIXELS = 67108864
 Maximum decoded pixel count accepted from untrusted PNG metadata.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L17)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L25)
+
+<a id="extern_function-extern-function-minipixels-assets-png-mpassetinflatezlib-extern-function-mpassetinflatezlib-destination-as-bytes-destinationsize-as-u64-source-as-bytes-sourceoffset-as-u64-sourcesize-as-u64-from-minipixels-audio-dll-returns-i32-src-minipixels-assets-png-ml-109598038"></a>
+### mpAssetInflateZlib
+
+```ml
+extern function mpAssetInflateZlib(destination as bytes, destinationSize as u64, source as bytes, sourceOffset as u64, sourceSize as u64) from "minipixels_audio.dll" returns i32
+```
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `destination` | `bytes` | — |  |
+| `destinationSize` | `u64` | — |  |
+| `source` | `bytes` | — |  |
+| `sourceOffset` | `u64` | — |  |
+| `sourceSize` | `u64` | — |  |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L14)
 
 <a id="function-function-minipixels-assets-png-paeth-function-paeth-a-b-c-src-minipixels-assets-png-ml-2136968420"></a>
 ### paeth
@@ -458,7 +512,7 @@ Returns the PNG Paeth predictor for three neighboring bytes.
 | `c` | `dynamic` | — | Upper-left byte. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L401)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L434)
 
 <a id="function-function-minipixels-assets-png-paletteindex-function-paletteindex-scanlines-rowstart-x-bitdepth-src-minipixels-assets-png-ml-364938678"></a>
 ### paletteIndex
@@ -477,7 +531,7 @@ Returns an indexed-color palette entry for bit depths 1, 2, 4, or 8.
 | `bitDepth` | `dynamic` | — | Indexed sample bit depth. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L450)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L483)
 
 <a id="constant-constant-minipixels-assets-png-png-err-const-png-err-9301-src-minipixels-assets-png-ml-1680279242"></a>
 ### PNG_ERR
@@ -489,7 +543,7 @@ const PNG_ERR = 9301
 PNG decoding error code.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L13)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L21)
 
 <a id="function-function-minipixels-assets-png-pngerror-function-pngerror-message-src-minipixels-assets-png-ml-691109243"></a>
 ### pngError
@@ -505,7 +559,7 @@ Creates a consistent PNG error value.
 | `message` | `dynamic` | — | Human-readable decoding failure. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L49)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L57)
 
 <a id="function-function-minipixels-assets-png-readbits-function-readbits-reader-count-src-minipixels-assets-png-ml-1894129290"></a>
 ### readBits
@@ -522,7 +576,7 @@ Reads bits from a Deflate stream.
 | `count` | `dynamic` | — | Number of low-order bits to consume. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L98)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L106)
 
 <a id="function-function-minipixels-assets-png-savergba-function-savergba-path-width-height-pixels-src-minipixels-assets-png-ml-905033295"></a>
 ### saveRgba
@@ -541,7 +595,7 @@ Saves RGBA8888 pixels to a PNG file.
 | `pixels` | `dynamic` | — | Width-times-height RGBA byte buffer. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L701)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L734)
 
 <a id="function-function-minipixels-assets-png-torgba-function-torgba-scanlines-width-height-colortype-bitdepth-palette-transparency-src-minipixels-assets-png-ml-1963512957"></a>
 ### toRgba
@@ -563,7 +617,7 @@ Converts reconstructed PNG samples into RGBA8888 pixels.
 | `transparency` | `dynamic` | — | Optional tRNS payload. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L466)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L499)
 
 <a id="function-function-minipixels-assets-png-unfilter-function-unfilter-raw-widthbytes-height-bytesperpixel-src-minipixels-assets-png-ml-1290320574"></a>
 ### unfilter
@@ -582,4 +636,4 @@ Reconstructs PNG scanlines for filter types 0 through 4.
 | `bytesPerPixel` | `dynamic` | — | Filter predictor byte stride. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L419)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/png.ml#L452)

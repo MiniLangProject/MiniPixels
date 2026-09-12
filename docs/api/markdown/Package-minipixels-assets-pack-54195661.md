@@ -9,6 +9,7 @@
 ## Symbols
 
 - [`minipixels.assets.pack._decodePayload`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-decodepayload-function-decodepayload-codec-payload-expectedsize-src-minipixels-assets-pack-ml-207727389) — function
+- [`minipixels.assets.pack._decodePayloadRange`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-decodepayloadrange-function-decodepayloadrange-codec-payload-offset-storedsize-expectedsize-src-minipixels-assets-pack-ml-1474227622) — function
 - [`minipixels.assets.pack._openFile1`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-openfile1-function-openfile1-path-file-header-src-minipixels-assets-pack-ml-407372790) — function
 - [`minipixels.assets.pack._openProtected3`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-openprotected3-function-openprotected3-path-file-header-key-publickey-expectedkeyid-src-minipixels-assets-pack-ml-1178717239) — function
 - [`minipixels.assets.pack._readRange`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-readrange-function-readrange-file-offset-size-src-minipixels-assets-pack-ml-949562066) — function
@@ -20,6 +21,7 @@
 - [`minipixels.assets.pack.CODEC_DEFLATE`](File-src-minipixels-assets-pack-ml-1157891367.md#constant-constant-minipixels-assets-pack-codec-deflate-const-codec-deflate-1-src-minipixels-assets-pack-ml-32061680) — constant
 - [`minipixels.assets.pack.CODEC_NONE`](File-src-minipixels-assets-pack-ml-1157891367.md#constant-constant-minipixels-assets-pack-codec-none-const-codec-none-0-src-minipixels-assets-pack-ml-1584000011) — constant
 - [`minipixels.assets.pack.CODEC_RLE`](File-src-minipixels-assets-pack-ml-1157891367.md#constant-constant-minipixels-assets-pack-codec-rle-const-codec-rle-2-src-minipixels-assets-pack-ml-1407839533) — constant
+- [`minipixels.assets.pack.DEFAULT_PRELOAD_BATCH_BYTES`](File-src-minipixels-assets-pack-ml-1157891367.md#constant-constant-minipixels-assets-pack-default-preload-batch-bytes-const-default-preload-batch-bytes-16777216-src-minipixels-assets-pack-ml-446836290) — constant
 - [`minipixels.assets.pack.dropPayloadAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-droppayloadat-function-droppayloadat-pack-index-src-minipixels-assets-pack-ml-776792881) — function
 - [`minipixels.assets.pack.find`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-find-function-find-pack-name-src-minipixels-assets-pack-ml-234838308) — function
 - [`minipixels.assets.pack.getBytes`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getbytes-function-getbytes-pack-name-src-minipixels-assets-pack-ml-1640220432) — function
@@ -36,5 +38,7 @@
 - [`minipixels.assets.pack.openProtected`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-openprotected-function-openprotected-path-key-publickey-expectedkeyid-src-minipixels-assets-pack-ml-449955844) — function
 - [`minipixels.assets.pack.PACK_ERR`](File-src-minipixels-assets-pack-ml-1157891367.md#constant-constant-minipixels-assets-pack-pack-err-const-pack-err-9302-src-minipixels-assets-pack-ml-666599551) — constant
 - [`minipixels.assets.pack.packError`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-packerror-function-packerror-message-src-minipixels-assets-pack-ml-16473987) — function
+- [`minipixels.assets.pack.preloadAll`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-preloadall-function-preloadall-pack-maxbatchbytes-src-minipixels-assets-pack-ml-1162912906) — function
+- [`minipixels.assets.pack.preloadSlots`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-preloadslots-function-preloadslots-pack-slots-maxbatchbytes-src-minipixels-assets-pack-ml-820413723) — function
 - [`minipixels.assets.pack.stats`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-stats-function-stats-pack-src-minipixels-assets-pack-ml-122627519) — function
 - [`minipixels.assets.pack.unload`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-unload-function-unload-pack-name-src-minipixels-assets-pack-ml-1325636868) — function

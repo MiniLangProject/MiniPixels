@@ -37,7 +37,7 @@ diagnostics as failures.
 - MiniLang Compiler 1.2.7 or newer in a sibling checkout; lazy MPX I/O uses `std.io.file` and protected builds use `std.crypto.ecdsa_p256`
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
 - The Python packages in `requirements.txt` for protected builds and WAV-to-MP3 asset transcoding
-- Visual Studio C++ Build Tools on Windows, or GCC on Linux, for the small native audio/presentation bridge
+- Visual Studio C++ Build Tools on Windows, or GCC on Linux, for the small native audio/asset/presentation bridge
 
 Expected sibling layout during local development:
 
@@ -52,7 +52,7 @@ Install the build dependencies once before packing protected assets or WAV audio
 python -m pip install -r requirements.txt
 ```
 
-The normal `build` and `run` commands also build and copy the target-specific native runtime automatically. It provides MP3 decoding on both targets and accelerated XImage color conversion/scaling on Linux. On its first build, the helper downloads the checksum-verified `dr_mp3` single-header source at a pinned revision and caches it under `build/native-audio`.
+The normal `build` and `run` commands also build and copy the target-specific native runtime automatically. It provides MP3 and zlib/Deflate decoding on both targets and accelerated XImage color conversion/scaling on Linux. On its first build, the helper downloads checksum-verified `dr_mp3` and `stb_image` single-header sources at pinned revisions and caches them under `build/native-audio`.
 
 ## Quickstart
 
@@ -155,6 +155,7 @@ Optional CPU-canvas, sprite, and presenter benchmarks:
 python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\canvas_bench.ml build\benchmarks\canvas_bench.exe -I src -I ..\MiniLangCompilerPy
 python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\sprite_bench.ml build\benchmarks\sprite_bench.exe -I src -I ..\MiniLangCompilerPy
 python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\renderer_bench.ml build\benchmarks\renderer_bench.exe -I src -I ..\MiniLangCompilerPy
+python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\asset_loading_bench.ml build\benchmarks\asset_loading_bench.exe -I src -I ..\MiniLangCompilerPy
 build\benchmarks\canvas_bench.exe
 build\benchmarks\sprite_bench.exe
 build\benchmarks\renderer_bench.exe
@@ -396,7 +397,7 @@ python tools\minipixels.py security status path\to\minipixels.json
 
 The default private key is `.minipixels/asset-signing-key.pem` and is added to the project's `.gitignore`. CI can provide `MINIPIXELS_ASSET_SIGNING_KEY` or `MINIPIXELS_ASSET_SIGNING_KEY_FILE` instead. This deliberately raises the effort needed for casual extraction and gives strong modification detection; it cannot make a client-side decryption key impossible to recover from a determined attacker.
 
-The runtime decodes stored, fixed, and dynamic Deflate streams, PNG filters 0 through 4, grayscale, RGB, indexed, grayscale-alpha, and RGBA data. Current decoding is non-interlaced. The Python packer validates and preserves compatible source PNG bytes, while generated images use actual Deflate rather than uncompressed PNG blocks. File, text, and JSON data entries select Deflate or RLE only when the complete encoded payload is meaningfully smaller. Identical encoded payloads share one block transparently.
+The runtime decodes stored, fixed, and dynamic Deflate streams, PNG filters 0 through 4, grayscale, RGB, indexed, grayscale-alpha, and RGBA data. Current decoding is non-interlaced. Deflate now runs in the target-native runtime directly into the final output buffer; a checked MiniLang implementation remains as the format-validation fallback. The Python packer validates and preserves compatible source PNG bytes, while generated images use actual Deflate rather than uncompressed PNG blocks. File, text, and JSON data entries select Deflate or RLE only when the complete encoded payload is meaningfully smaller. Identical encoded payloads share one stored block and one decoded runtime buffer transparently.
 
 PCM WAV assets are converted to MP3 during Python builds when the result is smaller. Mono defaults to 96 kbit/s, stereo to 128 kbit/s, and LAME quality 2. Set `mp3Bitrate` (32–320), `mp3Quality` (0–9), or `"transcode": false` on an audio asset to override this behavior. Existing MP3 sources remain byte-for-byte unchanged.
 
@@ -411,9 +412,27 @@ kind = mp.assetKindFromPack(pack, "coin_sfx")
 slot = mp.assetSlotFromPack(pack, "player")
 fastImage = mp.loadPngFromPackSlot(pack, slot)
 stats = mp.assetPackStats(pack)
+mp.preloadAssetPackSlots(pack, [slot], 16777216)
 ```
 
-Generated helpers use numeric slots automatically, cache decoded sprites, text catalogs, localization services and JSON text, and release PNG/text/data source bytes after successful decoding. Call `gen.preload()` during a loading screen when predictable first-frame latency is more important than fully lazy loading.
+Generated helpers use numeric slots automatically, cache decoded sprites, text catalogs, localization services and JSON text, and release PNG/text/data source bytes after successful decoding. `gen.preload()` now warms the complete pack through bounded contiguous reads before constructing assets; `gen.preloadGroup("level-1")` does the same for entries tagged with that group. `assetPackStats()` additionally reports physical `storedBytesRead`, logical `decodedBytes`, and `bulkReads`.
+
+Loading and container compression are configured without changing game code:
+
+```json
+{
+  "assetLoading": {
+    "mode": "lazy",
+    "compression": "auto",
+    "batchBytes": 16777216
+  },
+  "assets": [
+    { "id": "world_1", "type": "file", "path": "assets/world_1.sprites", "preload": "level-1", "compression": "none" }
+  ]
+}
+```
+
+`lazy` remains the memory-efficient default. `resident` bulk-loads and decompresses the complete pack on first open, useful when the game repeatedly touches most assets and has the RAM budget. `compression` accepts `auto`, `fast`, `small`, and `none`, globally or per asset. In particular, `none` is appropriate for large prepared `.sprites`/`.rgba` payloads when minimum load latency matters more than installed size; the default `auto` keeps the pack compact and benefits from native decompression.
 
 `asset-report.json` records `sourceBytes`, `logicalBytes`, `storedBytes`, the selected `codec`/`transform`, and whether an entry was deduplicated. Its totals count shared payload blocks only once.
 

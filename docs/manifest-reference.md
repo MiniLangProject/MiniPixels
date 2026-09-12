@@ -21,6 +21,11 @@ MiniPixels projects are described by `minipixels.json`.
     "enabled": true,
     "signingKey": ".minipixels/asset-signing-key.pem"
   },
+  "assetLoading": {
+    "mode": "lazy",
+    "compression": "auto",
+    "batchBytes": 16777216
+  },
   "localization": {
     "defaultLocale": "de"
   },
@@ -53,6 +58,13 @@ MiniPixels projects are described by `minipixels.json`.
       "id": "balance",
       "type": "constants",
       "path": "assets/data/balance.json"
+    },
+    {
+      "id": "world_1",
+      "type": "file",
+      "path": "assets/data/world_1.sprites",
+      "preload": "level-1",
+      "compression": "none"
     }
   ]
 }
@@ -74,6 +86,12 @@ Assets with `sheet` metadata also get generated helpers such as `gen.sheet_playe
 
 Both generators write `build/assets.mpx`; the Python build additionally copies it next to the executable. The runtime accepts ordinary non-interlaced grayscale, RGB, indexed, grayscale-alpha, and RGBA PNGs. Compression and identical-payload deduplication are transparent to generated code. Python builds convert PCM WAV entries to MP3 only when the encoded result is smaller. `mp3Bitrate` accepts 32–320 kbit/s, `mp3Quality` accepts 0–9, and `"transcode": false` preserves WAV bytes.
 
+`assetLoading.mode` is `lazy` by default. `resident` reads and decompresses every payload into the slot cache when the generated module first opens the pack. `batchBytes` bounds each temporary contiguous read and defaults to 16 MiB; accepted values range from 64 KiB to 512 MiB. Bulk buffers are released after their entries have been decoded, so the entire stored MPX representation is not retained as a second copy.
+
+`assetLoading.compression` sets the default for packable assets, while an asset-level `compression` overrides it. `auto` uses the smallest worthwhile Deflate/RLE representation, `fast` uses Deflate level 1, `small` accepts any space saving from maximum Deflate/RLE compression, and `none` stores the logical bytes directly. Python builds apply this outer compression to `file`, `text`, and `data`; PNG and MP3 payloads already carry their own compression. The native generator supports the same profile names with raw/RLE output.
+
+Set `preload` to `true` for the generated `boot` group or to a group name such as `"level-1"`. `generated.assets.preloadGroup("level-1")` resolves that group's slots, performs bounded file-order reads, and constructs the corresponding cached assets. `generated.assets.preload()` still loads every asset, but now uses the same bulk path.
+
 ## Protected Asset Builds
 
 Initialize a persistent signing identity once:
@@ -89,7 +107,7 @@ MPX3 version 4 keeps only a fixed 64-byte transport header in clear text. Names,
 
 The embedded AES key is deliberate obfuscation against trivial extraction, not a hardware-backed secret. The signing private key is the actual modification boundary and is never emitted into generated code or the asset pack.
 
-Generated accessors cache decoded sprites, text catalogs, localization state and JSON text. They use pre-resolved entry slots rather than hashing the asset id on every call. Call `generated.assets.preload()` explicitly from a loading scene to warm every generated asset; otherwise loading remains lazy.
+Generated accessors cache decoded sprites, text catalogs, localization state and JSON text. They use pre-resolved entry slots rather than hashing the asset id on every call. Loading remains lazy unless `assetLoading.mode` is `resident`, `preload()` is called, or a configured `preloadGroup()` is requested.
 
 ## Localization and Constants
 

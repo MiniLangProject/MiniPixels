@@ -448,6 +448,15 @@ function assetSlotFromPack(assetPack, name) return pack.find(assetPack, name) en
 /// @param assetPack Open asset pack.
 /// @param slot Pre-resolved entry slot.
 function loadBytesFromPackSlot(assetPack, slot) return pack.getBytesAt(assetPack, slot) end function
+/// Preloads selected asset slots using bounded contiguous reads.
+/// @param assetPack Open asset pack.
+/// @param slots Array of pre-resolved entry slots.
+/// @param batchBytes Maximum temporary read size, or a non-positive value for the default.
+function preloadAssetPackSlots(assetPack, slots, batchBytes) return pack.preloadSlots(assetPack, slots, batchBytes) end function
+/// Preloads every payload using bounded contiguous reads.
+/// @param assetPack Open asset pack.
+/// @param batchBytes Maximum temporary read size, or a non-positive value for the default.
+function preloadAssetPack(assetPack, batchBytes) return pack.preloadAll(assetPack, batchBytes) end function
 /// Releases cached raw bytes for a pre-resolved slot while keeping decoded objects.
 /// @param assetPack Open asset pack.
 /// @param slot Pre-resolved entry slot.

@@ -89,6 +89,26 @@ def validate(project_file: Path) -> dict:
     if int(window.get("scale", 1)) <= 0:
         errors.append(f"{project_file}: window.scale must be greater than zero")
 
+    loading = data.get("assetLoading", {})
+    if not isinstance(loading, dict):
+        errors.append(f"{project_file}: assetLoading must be an object")
+        loading = {}
+    mode_value = loading.get("mode", "lazy")
+    mode = mode_value.lower() if isinstance(mode_value, str) else ""
+    if mode not in ("lazy", "resident"):
+        errors.append(f"{project_file}: assetLoading.mode must be lazy or resident")
+    compression_value = loading.get("compression", "auto")
+    default_compression = compression_value.lower() if isinstance(compression_value, str) else ""
+    if default_compression not in ("auto", "none", "fast", "small"):
+        errors.append(f"{project_file}: assetLoading.compression must be auto, none, fast, or small")
+    batch_value = loading.get("batchBytes", 16 * 1024 * 1024)
+    if isinstance(batch_value, int) and not isinstance(batch_value, bool):
+        batch_bytes = batch_value
+        if batch_bytes < 65536 or batch_bytes > 536870912:
+            errors.append(f"{project_file}: assetLoading.batchBytes must be between 65536 and 536870912")
+    else:
+        errors.append(f"{project_file}: assetLoading.batchBytes must be an integer")
+
     root = project_root(project_file)
     main = data.get("main")
     if isinstance(main, str) and not (root / main).exists():
@@ -117,6 +137,15 @@ def validate(project_file: Path) -> dict:
         kind = str(asset.get("type", "image")).lower()
         if kind not in ("image", "procedural", "audio", "file", "text", "data", "constants"):
             errors.append(f"{project_file}: asset '{aid}' has unsupported type '{kind}'")
+        asset_compression = asset.get("compression", default_compression)
+        compression = asset_compression.lower() if isinstance(asset_compression, str) else ""
+        if compression not in ("auto", "none", "fast", "small"):
+            errors.append(f"{project_file}: asset '{aid}' compression must be auto, none, fast, or small")
+        preload = asset.get("preload", False)
+        if not isinstance(preload, (bool, str)):
+            errors.append(f"{project_file}: asset '{aid}' preload must be a boolean or group name")
+        elif isinstance(preload, str) and not preload.strip():
+            errors.append(f"{project_file}: asset '{aid}' preload group must not be empty")
         if kind == "audio":
             try:
                 bitrate = int(asset.get("mp3Bitrate", 128))
@@ -573,11 +602,18 @@ def transcode_wav_to_mp3(data: bytes, asset: dict) -> bytes:
     return encoder.encode(pcm16) + encoder.flush()
 
 
-def compress_pack_payload(payload: bytes) -> tuple[int, bytes]:
-    """Return a compressed payload only when its complete envelope is smaller."""
-    if len(payload) < 32:
+def compress_pack_payload(payload: bytes, profile: str = "auto") -> tuple[int, bytes]:
+    """Select a container representation for one logical payload."""
+    profile = str(profile).lower()
+    if profile == "none" or len(payload) < 32:
         return PACK_CODEC_NONE, payload
-    deflated = PACK_COMPRESSED_MAGIC + struct.pack("<I", len(payload)) + zlib.compress(payload, level=9)
+    level = 1 if profile == "fast" else 9
+    deflated = PACK_COMPRESSED_MAGIC + struct.pack("<I", len(payload)) + zlib.compress(payload, level=level)
+    if profile == "fast":
+        minimum_saving = max(8, len(payload) // 100)
+        if len(deflated) + minimum_saving <= len(payload):
+            return PACK_CODEC_DEFLATE, deflated
+        return PACK_CODEC_NONE, payload
     rle = bytearray(PACK_RLE_MAGIC + struct.pack("<I", len(payload)))
     position = 0
     while position < len(payload):
@@ -602,13 +638,13 @@ def compress_pack_payload(payload: bytes) -> tuple[int, bytes]:
         rle.extend(literal)
     candidates = [(PACK_CODEC_DEFLATE, deflated), (PACK_CODEC_RLE, bytes(rle))]
     codec, candidate = min(candidates, key=lambda item: len(item[1]))
-    minimum_saving = max(8, len(payload) // 100)
+    minimum_saving = 1 if profile == "small" else max(8, len(payload) // 100)
     if len(candidate) + minimum_saving <= len(payload):
         return codec, candidate
     return PACK_CODEC_NONE, payload
 
 
-def asset_pack_payload(asset: dict, root: Path) -> dict | None:
+def asset_pack_payload(asset: dict, root: Path, default_compression: str = "auto") -> dict | None:
     """Build one logical asset and select its compact on-disk representation."""
     kind = str(asset.get("type", "image")).lower()
     source_size = 0
@@ -679,9 +715,12 @@ def asset_pack_payload(asset: dict, root: Path) -> dict | None:
     codec = PACK_CODEC_NONE
     stored = payload
     if kind in ("file", "text", "data"):
-        codec, stored = compress_pack_payload(payload)
+        profile = str(asset.get("compression", default_compression)).lower()
+        codec, stored = compress_pack_payload(payload, profile)
         if codec == PACK_CODEC_DEFLATE:
-            transform += "+deflate"
+            transform += "+deflate" if profile == "auto" else "+deflate-" + profile
+        elif codec == PACK_CODEC_RLE:
+            transform += "+rle"
     if source_size == 0:
         source_size = logical_size
     return {
@@ -1080,8 +1119,9 @@ def write_asset_pack(data: dict, root: Path, output: Path, security_module: Path
     output.parent.mkdir(parents=True, exist_ok=True)
     entries: list[dict] = []
 
+    default_compression = str(data.get("assetLoading", {}).get("compression", "auto")).lower()
     for asset in sorted(data.get("assets", []), key=lambda a: a["id"]):
-        built = asset_pack_payload(asset, root)
+        built = asset_pack_payload(asset, root, default_compression)
         if built is None:
             continue
         entries.append(
@@ -1162,6 +1202,9 @@ def generate(project_file: Path, out_dir: Path) -> Path:
     text_assets = sorted((asset for asset in pack_assets if str(asset.get("type", "")).lower() == "text"), key=lambda a: a["id"])
     data_assets = sorted((asset for asset in pack_assets if str(asset.get("type", "")).lower() == "data"), key=lambda a: a["id"])
     file_assets = sorted((asset for asset in pack_assets if str(asset.get("type", "")).lower() == "file"), key=lambda a: a["id"])
+    asset_loading = data.get("assetLoading", {})
+    loading_mode = str(asset_loading.get("mode", "lazy")).lower()
+    preload_batch_bytes = int(asset_loading.get("batchBytes", 16 * 1024 * 1024))
     if pack_assets:
         lines.extend(
             [
@@ -1170,8 +1213,20 @@ def generate(project_file: Path, out_dir: Path) -> Path:
                 "function assetPack()",
                 "  global assetPackCache",
                 "  if assetPackCache == void then",
-                ('    assetPackCache = try(mp.openProtectedAssetPack("assets.mpx", security.aesKey(), security.publicKey(), security.keyId()))' if protection is not None else '    assetPackCache = try(mp.openAssetPack("assets.mpx"))'),
-                ('    if typeof(assetPackCache) == "error" then assetPackCache = try(mp.openProtectedAssetPack("build/assets.mpx", security.aesKey(), security.publicKey(), security.keyId())) end if' if protection is not None else '    if typeof(assetPackCache) == "error" then assetPackCache = try(mp.openAssetPack("build/assets.mpx")) end if'),
+                ('    opened = try(mp.openProtectedAssetPack("assets.mpx", security.aesKey(), security.publicKey(), security.keyId()))' if protection is not None else '    opened = try(mp.openAssetPack("assets.mpx"))'),
+                ('    if typeof(opened) == "error" then opened = try(mp.openProtectedAssetPack("build/assets.mpx", security.aesKey(), security.publicKey(), security.keyId())) end if' if protection is not None else '    if typeof(opened) == "error" then opened = try(mp.openAssetPack("build/assets.mpx")) end if'),
+                *(
+                    [
+                        f"    resident = try(mp.preloadAssetPack(opened, {preload_batch_bytes}))",
+                        "    if typeof(resident) == \"error\" then",
+                        "      mp.closeAssetPack(opened)",
+                        "      return resident",
+                        "    end if",
+                    ]
+                    if loading_mode == "resident"
+                    else []
+                ),
+                "    assetPackCache = opened",
                 "  end if",
                 "  return assetPackCache",
                 "end function",
@@ -1279,6 +1334,10 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         lines.append("")
     if pack_assets:
         lines.append("function preload()")
+        lines.append("  opened = assetPack()")
+        lines.append("  if typeof(opened) == \"error\" then return opened end if")
+        lines.append(f"  loaded = try(mp.preloadAssetPack(opened, {preload_batch_bytes}))")
+        lines.append("  if typeof(loaded) == \"error\" then return loaded end if")
         for asset in pack_assets:
             aid = asset["id"]
             kind = str(asset.get("type", "image")).lower()
@@ -1295,6 +1354,41 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         lines.append("  return true")
         lines.append("end function")
         lines.append("")
+
+        preload_groups: dict[str, list[dict]] = {}
+        for asset in pack_assets:
+            group = asset.get("preload")
+            if group is True:
+                group = "boot"
+            if isinstance(group, str):
+                preload_groups.setdefault(group, []).append(asset)
+        if preload_groups:
+            lines.append("function preloadGroup(group)")
+            for group, grouped_assets in sorted(preload_groups.items()):
+                slot_calls = ", ".join(f"slot_{asset['id']}()" for asset in grouped_assets)
+                lines.append(f"  if group == {json.dumps(group)} then")
+                lines.append("    opened = assetPack()")
+                lines.append("    if typeof(opened) == \"error\" then return opened end if")
+                lines.append(f"    loaded = try(mp.preloadAssetPackSlots(opened, [{slot_calls}], {preload_batch_bytes}))")
+                lines.append("    if typeof(loaded) == \"error\" then return loaded end if")
+                for asset in grouped_assets:
+                    aid = asset["id"]
+                    kind = str(asset.get("type", "image")).lower()
+                    if kind in ("image", "procedural"):
+                        lines.append(f"    make_{aid}()")
+                    elif kind == "audio":
+                        lines.append(f"    audio_{aid}()")
+                    elif kind == "text":
+                        lines.append(f"    text_{aid}()")
+                    elif kind == "data":
+                        lines.append(f"    data_{aid}()")
+                    elif kind == "file":
+                        lines.append(f"    file_{aid}()")
+                lines.append("    return true")
+                lines.append("  end if")
+            lines.append("  return false")
+            lines.append("end function")
+            lines.append("")
     lines.append("function registry()")
     lines.append("  reg = assets.create(64)")
     for asset in image_assets:
@@ -1334,6 +1428,7 @@ def asset_report(data: dict, root: Path) -> dict:
     levels = load_levels(data)
     if levels is not None:
         report["levels"] = {"count": len(validate_levels(levels, data["levels"].get("_absolute_path", "levels")))}
+    default_compression = str(data.get("assetLoading", {}).get("compression", "auto")).lower()
     for asset in sorted(data.get("assets", []), key=lambda a: a["id"]):
         raw_path = asset.get("path", "")
         path = root / raw_path if raw_path else None
@@ -1351,7 +1446,7 @@ def asset_report(data: dict, root: Path) -> dict:
         if kind in ("image", "procedural", "audio", "file", "text", "data"):
             built = None
             if kind == "procedural" or (path is not None and path.is_file()):
-                built = asset_pack_payload(asset, root)
+                built = asset_pack_payload(asset, root, default_compression)
             if built is not None:
                 stored_size = len(built["data"])
                 entry["sourceBytes"] = built["sourceSize"]

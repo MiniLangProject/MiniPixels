@@ -9,6 +9,14 @@ import std.checksum.crc32 as crc
 import std.fs as fs
 import minipixels.graphics.sprite as sp
 
+#if TARGET_OS == "windows"
+/// @internal
+extern function mpAssetInflateZlib(destination as bytes, destinationSize as u64, source as bytes, sourceOffset as u64, sourceSize as u64) from "minipixels_audio.dll" returns i32
+#else
+/// @internal
+extern function mpAssetInflateZlib(destination as bytes, destinationSize as u64, source as bytes, sourceOffset as u64, sourceSize as u64) from "./libminipixels_audio.so" returns i32
+#endif
+
 /// PNG decoding error code.
 const PNG_ERR = 9301
 /// Maximum canonical Deflate Huffman code length.
@@ -294,10 +302,11 @@ function adler32(data)
   return (b << 16) | a
 end function
 
-/// Inflates a zlib-wrapped Deflate stream into an exact-sized output buffer.
+/// Portable fallback for zlib/Deflate streams rejected by the native bridge.
 /// @param data Complete zlib stream.
 /// @param expectedSize Required uncompressed byte count.
-function inflateZlib(data, expectedSize)
+/// @internal
+function _inflateZlibPortable(data, expectedSize)
   if not hasRange(data, 0, 6) then return pngError("png zlib stream too small") end if
   cmf = data[0]
   flags = data[1]
@@ -368,6 +377,30 @@ function inflateZlib(data, expectedSize)
   expectedAdler = by.readU32BE(data, len(data) - 4)
   if typeof(expectedAdler) == "int" and adler32(output) != expectedAdler then return pngError("png zlib checksum failed") end if
   return output
+end function
+
+/// Inflates a zlib-wrapped Deflate range directly into an exact-sized buffer.
+/// The normal path runs in the native runtime and avoids slicing the compressed
+/// source. The portable decoder retains precise validation diagnostics.
+/// @param data Byte sequence containing the zlib stream.
+/// @param offset Start of the complete zlib stream.
+/// @param size Compressed stream size.
+/// @param expectedSize Required uncompressed byte count.
+function inflateZlibRange(data, offset, size, expectedSize)
+  if not hasRange(data, offset, size) or size < 6 then return pngError("png zlib stream too small") end if
+  if typeof(expectedSize) != "int" or expectedSize < 0 then return pngError("png inflated size invalid") end if
+  output = bytes(expectedSize, 0)
+  if mpAssetInflateZlib(output, expectedSize, data, offset, size) != 0 then return output end if
+  stream = slice(data, offset, size)
+  return _inflateZlibPortable(stream, expectedSize)
+end function
+
+/// Inflates a complete zlib-wrapped Deflate stream.
+/// @param data Complete zlib stream.
+/// @param expectedSize Required uncompressed byte count.
+function inflateZlib(data, expectedSize)
+  if typeof(data) != "bytes" then return pngError("png zlib stream too small") end if
+  return inflateZlibRange(data, 0, len(data), expectedSize)
 end function
 
 /// Inflates a stored-block zlib stream for backward compatibility.

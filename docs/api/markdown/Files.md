@@ -4,11 +4,11 @@
 
 | File | Package | Reachable | Symbols |
 | --- | --- | --- | ---: |
-| [src/minipixels.ml](File-src-minipixels-ml-1730909391.md) | `minipixels` | yes | 154 |
+| [src/minipixels.ml](File-src-minipixels-ml-1730909391.md) | `minipixels` | yes | 156 |
 | [src/minipixels/animation/animation.ml](File-src-minipixels-animation-animation-ml-2065983051.md) | `minipixels.animation.animation` | yes | 28 |
 | [src/minipixels/assets/assets.ml](File-src-minipixels-assets-assets-ml-652120143.md) | `minipixels.assets.assets` | yes | 24 |
-| [src/minipixels/assets/pack.ml](File-src-minipixels-assets-pack-ml-1157891367.md) | `minipixels.assets.pack` | yes | 62 |
-| [src/minipixels/assets/png.ml](File-src-minipixels-assets-png-ml-1155821131.md) | `minipixels.assets.png` | yes | 45 |
+| [src/minipixels/assets/pack.ml](File-src-minipixels-assets-pack-ml-1157891367.md) | `minipixels.assets.pack` | yes | 73 |
+| [src/minipixels/assets/png.ml](File-src-minipixels-assets-png-ml-1155821131.md) | `minipixels.assets.png` | yes | 48 |
 | [src/minipixels/assets/text.ml](File-src-minipixels-assets-text-ml-1300721413.md) | `minipixels.assets.text` | yes | 21 |
 | [src/minipixels/audio/audio.ml](File-src-minipixels-audio-audio-ml-660527635.md) | `minipixels.audio.audio` | yes | 168 |
 | [src/minipixels/collision/collision.ml](File-src-minipixels-collision-collision-ml-1544745439.md) | `minipixels.collision.collision` | yes | 14 |
@@ -26,7 +26,7 @@
 | [src/minipixels/tools/fsutil.ml](File-src-minipixels-tools-fsutil-ml-605704885.md) | `minipixels.tools.fsutil` | no | 8 |
 | [src/minipixels/tools/generator.ml](File-src-minipixels-tools-generator-ml-920573533.md) | `minipixels.tools.generator` | no | 61 |
 | [src/minipixels/tools/json.ml](File-src-minipixels-tools-json-ml-388493918.md) | `minipixels.tools.json` | no | 45 |
-| [src/minipixels/tools/manifest.ml](File-src-minipixels-tools-manifest-ml-1067201239.md) | `minipixels.tools.manifest` | no | 32 |
+| [src/minipixels/tools/manifest.ml](File-src-minipixels-tools-manifest-ml-1067201239.md) | `minipixels.tools.manifest` | no | 33 |
 | [src/minipixels/world/camera.ml](File-src-minipixels-world-camera-ml-397830650.md) | `minipixels.world.camera` | yes | 19 |
 | [src/minipixels/world/entity.ml](File-src-minipixels-world-entity-ml-1855953718.md) | `minipixels.world.entity` | no | 16 |
 | [src/minipixels/world/tilemap.ml](File-src-minipixels-world-tilemap-ml-2079329797.md) | `minipixels.world.tilemap` | yes | 32 |

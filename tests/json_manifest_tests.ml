@@ -36,6 +36,11 @@ function main(args)
   a.assertFalse(mani.isValid(invalidAsset), "invalid asset type fails")
   a.assertTrue(len(invalidAsset.errors) > 0, "invalid asset type reports errors")
 
+  loading = mani.parseText("{\"name\":\"loading\",\"main\":\"README.md\",\"window\":{\"width\":320,\"height\":180},\"assetLoading\":{\"mode\":\"resident\",\"compression\":\"fast\",\"batchBytes\":65536}}", "inline", ".")
+  a.assertTrue(mani.isValid(loading), "asset loading configuration is valid")
+  invalidLoading = mani.parseText("{\"name\":\"loading\",\"main\":\"README.md\",\"window\":{\"width\":320,\"height\":180},\"assetLoading\":{\"mode\":\"eager\",\"compression\":\"zip\",\"batchBytes\":1}}", "inline", ".")
+  a.assertFalse(mani.isValid(invalidLoading), "invalid asset loading configuration fails")
+
   print "=== JSON MANIFEST TESTS DONE ==="
   return 0
 end function

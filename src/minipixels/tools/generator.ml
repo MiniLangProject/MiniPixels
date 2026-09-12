@@ -374,11 +374,13 @@ end function
 
 /// Selects native RLE only when its complete envelope produces a useful saving.
 /// @internal
-function compactPayload(data)
+function compactPayload(data, profile)
+  if profile == "none" then return PackedPayload(0, data) end if
   if len(data) < 32 then return PackedPayload(0, data) end if
   encoded = rlePayload(data)
   minimumSaving = integerDivide(len(data), 100)
   if minimumSaving < 8 then minimumSaving = 8 end if
+  if profile == "small" then minimumSaving = 1 end if
   if len(encoded) + minimumSaving <= len(data) then return PackedPayload(2, encoded) end if
   return PackedPayload(0, data)
 end function
@@ -390,6 +392,9 @@ end function
 /// @param r Generation result receiving diagnostics.
 function writeAssetPack(root, projectRoot, path, r)
   sourceAssets = sortedAssets(root)
+  loading = objectField(root, "assetLoading")
+  defaultCompression = "auto"
+  if typeof(loading) != "void" then defaultCompression = stringField(loading, "compression", "auto") end if
   count = len(sourceAssets)
   ids = array(count)
   kinds = array(count, 0)
@@ -407,7 +412,7 @@ function writeAssetPack(root, projectRoot, path, r)
         addError(r, logicalPayload.message)
         return false
       end if
-      packed = compactPayload(logicalPayload)
+      packed = compactPayload(logicalPayload, stringField(asset, "compression", defaultCompression))
       payload = packed.data
       encodedId = identifierBytes(id)
       ids[index] = encodedId
@@ -499,9 +504,17 @@ function sheetModule(asset, id)
 end function
 
 /// Performs the assetsHeader operation for the minipixels tools generator module.
+/// @param root Parsed project root.
 /// @param fallbackPackPath Project-relative fallback path to the generated pack.
-function assetsHeader(fallbackPackPath)
+function assetsHeader(root, fallbackPackPath)
   code = sb.StringBuilder.withCapacity(2048)
+  loading = objectField(root, "assetLoading")
+  mode = "lazy"
+  batchBytes = 16777216
+  if typeof(loading) != "void" then
+    mode = stringField(loading, "mode", "lazy")
+    batchBytes = numberField(loading, "batchBytes", 16777216)
+  end if
   code.appendLine("package generated.assets")
   code.appendLine("")
   code.appendLine("import minipixels as mp")
@@ -512,9 +525,17 @@ function assetsHeader(fallbackPackPath)
   code.appendLine("function assetPack()")
   code.appendLine("  global assetPackCache")
   code.appendLine("  if assetPackCache == void then")
-  code.appendLine("    assetPackCache = try(mp.openAssetPack(\"assets.mpx\"))")
-  code.appendLine("    if typeof(assetPackCache) == \"error\" then assetPackCache = try(mp.openAssetPack(\"build/assets.mpx\")) end if")
-  code.appendLine("    if typeof(assetPackCache) == \"error\" then assetPackCache = mp.openAssetPack(" + quotePath(fallbackPackPath) + ") end if")
+  code.appendLine("    opened = try(mp.openAssetPack(\"assets.mpx\"))")
+  code.appendLine("    if typeof(opened) == \"error\" then opened = try(mp.openAssetPack(\"build/assets.mpx\")) end if")
+  code.appendLine("    if typeof(opened) == \"error\" then opened = mp.openAssetPack(" + quotePath(fallbackPackPath) + ") end if")
+  if mode == "resident" then
+    code.appendLine("    resident = try(mp.preloadAssetPack(opened, " + batchBytes + "))")
+    code.appendLine("    if typeof(resident) == \"error\" then")
+    code.appendLine("      mp.closeAssetPack(opened)")
+    code.appendLine("      return resident")
+    code.appendLine("    end if")
+  end if
+  code.appendLine("    assetPackCache = opened")
   code.appendLine("  end if")
   code.appendLine("  return assetPackCache")
   code.appendLine("end function")
@@ -596,8 +617,11 @@ end function
 /// @param r r value consumed by this operation.
 function assetsModule(root, fallbackPackPath, r)
   code = sb.StringBuilder.withCapacity(4096)
-  code.appendString(assetsHeader(fallbackPackPath))
+  code.appendString(assetsHeader(root, fallbackPackPath))
   assets = sortedAssets(root)
+  loading = objectField(root, "assetLoading")
+  batchBytes = 16777216
+  if typeof(loading) != "void" then batchBytes = numberField(loading, "batchBytes", 16777216) end if
   embedded = []
   if len(assets) > 0 then
     for i = 0 to len(assets) - 1
@@ -625,6 +649,10 @@ function assetsModule(root, fallbackPackPath, r)
   end if
   if len(assets) > 0 then
     code.appendLine("function preload()")
+    code.appendLine("  opened = assetPack()")
+    code.appendLine("  if typeof(opened) == \"error\" then return opened end if")
+    code.appendLine("  loaded = try(mp.preloadAssetPack(opened, " + batchBytes + "))")
+    code.appendLine("  if typeof(loaded) == \"error\" then return loaded end if")
     for i = 0 to len(assets) - 1
       asset = assets[i]
       typ = stringField(asset, "type", "image")
@@ -638,6 +666,59 @@ function assetsModule(root, fallbackPackPath, r)
     code.appendLine("  return true")
     code.appendLine("end function")
     code.appendLine("")
+
+    groups = []
+    for i = 0 to len(assets) - 1
+      preloadValue = json.get(assets[i], "preload")
+      group = ""
+      if typeof(preloadValue) != "void" and preloadValue.kind == "bool" and preloadValue.boolValue then group = "boot" end if
+      if typeof(preloadValue) != "void" and preloadValue.kind == "string" then group = preloadValue.stringValue end if
+      if group != "" and not arr.contains(groups, group) then groups = arr.append(groups, group) end if
+    end for
+    if len(groups) > 0 then
+      sorting.sort(groups)
+      code.appendLine("function preloadGroup(group)")
+      for groupIndex = 0 to len(groups) - 1
+        group = groups[groupIndex]
+        slots = ""
+        for i = 0 to len(assets) - 1
+          preloadValue = json.get(assets[i], "preload")
+          assetGroup = ""
+          if typeof(preloadValue) != "void" and preloadValue.kind == "bool" and preloadValue.boolValue then assetGroup = "boot" end if
+          if typeof(preloadValue) != "void" and preloadValue.kind == "string" then assetGroup = preloadValue.stringValue end if
+          if assetGroup == group then
+            if slots != "" then slots = slots + ", " end if
+            slots = slots + "slot_" + stringField(assets[i], "id", "asset") + "()"
+          end if
+        end for
+        code.appendLine("  if group == " + quote(group) + " then")
+        code.appendLine("    opened = assetPack()")
+        code.appendLine("    if typeof(opened) == \"error\" then return opened end if")
+        code.appendLine("    loaded = try(mp.preloadAssetPackSlots(opened, [" + slots + "], " + batchBytes + "))")
+        code.appendLine("    if typeof(loaded) == \"error\" then return loaded end if")
+        for i = 0 to len(assets) - 1
+          asset = assets[i]
+          preloadValue = json.get(asset, "preload")
+          assetGroup = ""
+          if typeof(preloadValue) != "void" and preloadValue.kind == "bool" and preloadValue.boolValue then assetGroup = "boot" end if
+          if typeof(preloadValue) != "void" and preloadValue.kind == "string" then assetGroup = preloadValue.stringValue end if
+          if assetGroup == group then
+            typ = stringField(asset, "type", "image")
+            id = stringField(asset, "id", "asset")
+            if typ == "image" or typ == "procedural" then code.appendLine("    make_" + id + "()") end if
+            if typ == "audio" then code.appendLine("    audio_" + id + "()") end if
+            if typ == "text" then code.appendLine("    text_" + id + "()") end if
+            if typ == "data" then code.appendLine("    data_" + id + "()") end if
+            if typ == "file" then code.appendLine("    file_" + id + "()") end if
+          end if
+        end for
+        code.appendLine("    return true")
+        code.appendLine("  end if")
+      end for
+      code.appendLine("  return false")
+      code.appendLine("end function")
+      code.appendLine("")
+    end if
   end if
   code.appendLine("function registry()")
   code.appendLine("  reg = assets.create(64)")

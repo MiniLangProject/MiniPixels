@@ -165,6 +165,12 @@ function numberField(m, obj, key, required, fallback)
   return v.numberValue
 end function
 
+/// Returns whether a container compression profile is supported.
+/// @internal
+function validCompressionProfile(value)
+  return value == "auto" or value == "none" or value == "fast" or value == "small"
+end function
+
 /// Validates asset for the minipixels tools manifest workflow.
 /// @param m m value consumed by this operation.
 /// @param asset asset value consumed by this operation.
@@ -188,6 +194,19 @@ function validateAsset(m, asset, seen)
   if typ == "" then typ = "image" end if
   if typ != "image" and typ != "procedural" and typ != "audio" and typ != "file" and typ != "text" and typ != "data" and typ != "constants" then
     addError(m, "asset '" + id + "' type must be image, procedural, audio, file, text, data, or constants")
+  end if
+  compression = json.get(asset, "compression")
+  if typeof(compression) != "void" then
+    if compression.kind != "string" or not validCompressionProfile(compression.stringValue) then
+      addError(m, "asset '" + id + "' compression must be auto, none, fast, or small")
+    end if
+  end if
+  preload = json.get(asset, "preload")
+  if typeof(preload) != "void" and preload.kind != "bool" and preload.kind != "string" then
+    addError(m, "asset '" + id + "' preload must be a boolean or group name")
+  end if
+  if typeof(preload) != "void" and preload.kind == "string" and preload.stringValue == "" then
+    addError(m, "asset '" + id + "' preload group must not be empty")
   end if
   path = stringField(m, asset, "path", false)
   if path != "" and fs.exists(join(m.root, path)) == false then
@@ -281,6 +300,20 @@ function validateRoot(m, root)
   if m.width <= 0 then addError(m, "window.width must be greater than zero") end if
   if m.height <= 0 then addError(m, "window.height must be greater than zero") end if
   if m.scale <= 0 then addError(m, "window.scale must be greater than zero") end if
+
+  loading = json.get(root, "assetLoading")
+  if typeof(loading) != "void" then
+    if loading.kind != "object" then
+      addError(m, "'assetLoading' must be an object")
+    else
+      mode = stringField(m, loading, "mode", false)
+      if mode != "" and mode != "lazy" and mode != "resident" then addError(m, "assetLoading.mode must be lazy or resident") end if
+      compression = stringField(m, loading, "compression", false)
+      if compression != "" and not validCompressionProfile(compression) then addError(m, "assetLoading.compression must be auto, none, fast, or small") end if
+      batchBytes = numberField(m, loading, "batchBytes", false, 16777216)
+      if batchBytes < 65536 or batchBytes > 536870912 then addError(m, "assetLoading.batchBytes must be between 65536 and 536870912") end if
+    end if
+  end if
 
   validateAssets(m, root)
   validateLevels(m, root)
