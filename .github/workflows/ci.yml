@@ -145,6 +145,7 @@ jobs:
         working-directory: MiniPixels
         run: |
           New-Item -ItemType Directory -Force build\tools | Out-Null
+          Copy-Item build\tests\minipixels_audio.dll build\tools\minipixels_audio.dll
           python ..\MiniLangCompilerPy\mlc_win64.py tools\minipixels_cli.ml build\tools\minipixels.exe -I src -I ..\MiniLangCompilerPy
           .\build\tools\minipixels.exe info
           .\build\tools\minipixels.exe doctor
@@ -164,6 +165,7 @@ jobs:
           if (Test-Path $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force }
           New-Item -ItemType Directory -Force $tmp | Out-Null
           Copy-Item build\tools\minipixels.exe $tmp\minipixels.exe
+          Copy-Item build\tools\minipixels_audio.dll $tmp\minipixels_audio.dll
           Push-Location $tmp
           try {
             foreach ($tpl in @("basic", "platformer", "pixel-art")) {
