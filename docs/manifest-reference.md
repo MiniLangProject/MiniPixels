@@ -64,7 +64,7 @@ MiniPixels projects are described by `minipixels.json`.
       "type": "file",
       "path": "assets/data/world_1.sprites",
       "preload": "level-1",
-      "compression": "none"
+      "compression": "fast"
     }
   ]
 }
@@ -75,11 +75,11 @@ Asset types:
 | Type | Meaning | Python CLI | Native CLI `generate` |
 | --- | --- | --- | --- |
 | `image` | non-interlaced PNG image asset | validates and preserves source PNG bytes | stores source PNG bytes |
-| `procedural` | generated checker/player/tile sprite data from manifest fields | renders a Deflate-compressed PNG | renders a deterministic PNG and applies pack RLE when useful |
+| `procedural` | generated checker/player/tile sprite data from manifest fields | renders a Deflate-compressed PNG | renders a deterministic PNG and applies pack LZ4/RLE when useful |
 | `audio` | runtime PCM WAV or MP3 file | transcodes WAV to MP3 when smaller and generates a lazy memory-clip helper | stores original payload and generates a lazy memory-clip helper |
-| `file` | runtime data file | selects Deflate/RLE when smaller | selects RLE when smaller |
-| `text` | UTF-8 JSON translation catalog | validates, encodes MPT1, and compresses when useful | encodes MPT1 and applies RLE when useful |
-| `data` | structured runtime JSON data | canonicalizes JSON and compresses when useful | stores JSON and applies RLE when useful |
+| `file` | runtime data file | selects Deflate/RLE by default or LZ4 with `fast` | selects LZ4/RLE when useful |
+| `text` | UTF-8 JSON translation catalog | validates, encodes MPT1, and compresses when useful | encodes MPT1 and applies LZ4/RLE when useful |
+| `data` | structured runtime JSON data | canonicalizes JSON and compresses when useful | stores JSON and applies LZ4/RLE when useful |
 | `constants` | build-time game configuration | generates scalar constants plus a structured `data()` accessor | requires the Python build driver |
 
 Assets with `sheet` metadata also get generated helpers such as `gen.sheet_player()`.
@@ -88,7 +88,7 @@ Both generators write `build/assets.mpx`; the Python build additionally copies i
 
 `assetLoading.mode` is `lazy` by default. `resident` reads and decompresses every payload into the slot cache when the generated module first opens the pack. `batchBytes` bounds each temporary contiguous read and defaults to 16 MiB; accepted values range from 64 KiB to 512 MiB. Bulk buffers are released after their entries have been decoded, so the entire stored MPX representation is not retained as a second copy.
 
-`assetLoading.compression` sets the default for packable assets, while an asset-level `compression` overrides it. `auto` uses the smallest worthwhile Deflate/RLE representation, `fast` uses Deflate level 1, `small` accepts any space saving from maximum Deflate/RLE compression, and `none` stores the logical bytes directly. Python builds apply this outer compression to `file`, `text`, and `data`; PNG and MP3 payloads already carry their own compression. The native generator supports the same profile names with raw/RLE output.
+`assetLoading.compression` sets the default for packable assets, while an asset-level `compression` overrides it. In Python builds, `auto` uses LZ4 for `.sprites`/`.rgba` file assets of at least 64 KiB and the smallest worthwhile Deflate/RLE representation otherwise; `fast` uses a standard LZ4 block in an MPX size envelope and falls back to raw bytes when compression is not worthwhile; `small` accepts any saving from maximum Deflate/RLE compression; `none` stores the logical bytes directly. Python builds apply this outer compression to `file`, `text`, and `data`; PNG and MP3 payloads already carry their own compression. The native generator chooses LZ4/RLE for `auto`/`small`, LZ4 for `fast`, or raw for `none`. Existing Deflate/RLE packs still load; the LZ4 decoder requires MiniLang Compiler 1.2.9 or newer. Protected MPX3 packs encrypt and authenticate the compressed block as before.
 
 Set `preload` to `true` for the generated `boot` group or to a group name such as `"level-1"`. `generated.assets.preloadGroup("level-1")` resolves that group's slots, performs bounded file-order reads, and constructs the corresponding cached assets. `generated.assets.preload()` still loads every asset, but now uses the same bulk path.
 

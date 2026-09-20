@@ -10,6 +10,7 @@ import std.crypto as crypto
 import std.crypto.aes_gcm as aes
 import std.crypto.ecdsa_p256 as ecdsa
 import std.ds.hashmap as hm
+import std.compress.lz4 as lz4
 import minipixels.assets.png as png
 
 /// Defines the pack err constant used by the minipixels assets pack module.
@@ -22,6 +23,8 @@ const CODEC_NONE = 0
 const CODEC_DEFLATE = 1
 /// MPR1 byte-run compression used by the native MiniLang packer.
 const CODEC_RLE = 2
+/// MPL1-wrapped LZ4 block compression for latency-sensitive assets.
+const CODEC_LZ4 = 3
 /// Maximum logical size of one decompressed asset.
 const MAX_DECOMPRESSED_ASSET_SIZE = 536870912
 /// Default upper bound for one temporary contiguous preload read.
@@ -134,17 +137,23 @@ function _decodePayloadRange(codec, payload, offset, storedSize, expectedSize)
     if offset == 0 and storedSize == len(payload) then return payload end if
     return slice(payload, offset, storedSize)
   end if
-  if codec != CODEC_DEFLATE and codec != CODEC_RLE then return packError("unsupported asset compression codec") end if
+  if codec != CODEC_DEFLATE and codec != CODEC_RLE and codec != CODEC_LZ4 then return packError("unsupported asset compression codec") end if
   if storedSize < 8 or payload[offset] != 77 or payload[offset + 1] != 80 then
     return packError("compressed asset envelope is invalid")
   end if
   if codec == CODEC_DEFLATE and (payload[offset + 2] != 67 or payload[offset + 3] != 49) then return packError("compressed asset envelope is invalid") end if
   if codec == CODEC_RLE and (payload[offset + 2] != 82 or payload[offset + 3] != 49) then return packError("compressed asset envelope is invalid") end if
+  if codec == CODEC_LZ4 and (payload[offset + 2] != 76 or payload[offset + 3] != 49) then return packError("compressed asset envelope is invalid") end if
   logicalSize = by.readU32LE(payload, offset + 4)
   if logicalSize < 0 or logicalSize > MAX_DECOMPRESSED_ASSET_SIZE then return packError("compressed asset size exceeds limit") end if
   if expectedSize >= 0 and logicalSize != expectedSize then return packError("compressed asset size mismatch") end if
   if codec == CODEC_DEFLATE then
     decoded = try(png.inflateZlibRange(payload, offset + 8, storedSize - 8, logicalSize))
+    if typeof(decoded) == "error" then return packError("asset decompression failed") end if
+    return decoded
+  end if
+  if codec == CODEC_LZ4 then
+    decoded = try(lz4.decode(slice(payload, offset + 8, storedSize - 8), logicalSize))
     if typeof(decoded) == "error" then return packError("asset decompression failed") end if
     return decoded
   end if
@@ -265,7 +274,7 @@ function _openFile1(path, file, header)
     end if
     kind = indexData[pos + nameLen + 2]
     codec = indexData[pos + nameLen + 3]
-    if codec != CODEC_NONE and codec != CODEC_DEFLATE and codec != CODEC_RLE then
+    if codec != CODEC_NONE and codec != CODEC_DEFLATE and codec != CODEC_RLE and codec != CODEC_LZ4 then
       fileio.close(file)
       return packError("unsupported asset compression codec")
     end if
@@ -429,7 +438,7 @@ function _openProtected3(path, file, header, key, publicKey, expectedKeyId)
     pos = pos + nameLen
     kind = indexData[pos]
     codec = indexData[pos + 1]
-    if codec != CODEC_NONE and codec != CODEC_DEFLATE and codec != CODEC_RLE then
+    if codec != CODEC_NONE and codec != CODEC_DEFLATE and codec != CODEC_RLE and codec != CODEC_LZ4 then
       fileio.close(file)
       crypto.secureZero(key)
       return packError("unsupported MPX3 asset compression codec")

@@ -16,6 +16,7 @@ Reachable from entry: **no**
 - `minipixels/tools/manifest.ml` as `manifest` → [src/minipixels/tools/manifest.ml](File-src-minipixels-tools-manifest-ml-1067201239.md)
 - `std/array.ml` as `arr` → `../MiniLangCompilerML/std/array.ml` — external dependency
 - `std/bytes.ml` as `by` → `../MiniLangCompilerML/std/bytes.ml` — external dependency
+- `std/compress/lz4.ml` as `lz4` → `../MiniLangCompilerML/std/compress/lz4.ml` — external dependency
 - `std/fs.ml` as `fs` → `../MiniLangCompilerML/std/fs.ml` — external dependency
 - `std/sort.ml` as `sorting` → `../MiniLangCompilerML/std/sort.ml` — external dependency
 - `std/string.ml` as `strings` → `../MiniLangCompilerML/std/string.ml` — external dependency
@@ -38,7 +39,7 @@ Adds error to the state managed by the minipixels tools generator module.
 | `msg` | `dynamic` | — | msg value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L52)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L53)
 
 <a id="function-function-minipixels-tools-generator-addwarning-function-addwarning-r-msg-src-minipixels-tools-generator-ml-1682824801"></a>
 ### addWarning
@@ -55,7 +56,7 @@ Adds warning to the state managed by the minipixels tools generator module.
 | `msg` | `dynamic` | — | msg value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L45)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L46)
 
 <a id="function-function-minipixels-tools-generator-arrayfield-function-arrayfield-obj-key-src-minipixels-tools-generator-ml-223697808"></a>
 ### arrayField
@@ -72,7 +73,7 @@ Performs the arrayField operation for the minipixels tools generator module.
 | `key` | `dynamic` | — | key value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L165)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L166)
 
 <a id="function-function-minipixels-tools-generator-assetheight-function-assetheight-asset-src-minipixels-tools-generator-ml-1926826956"></a>
 ### assetHeight
@@ -88,7 +89,7 @@ Performs the assetHeight operation for the minipixels tools generator module.
 | `asset` | `dynamic` | — | asset value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L219)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L220)
 
 <a id="function-function-minipixels-tools-generator-assetkind-function-assetkind-asset-src-minipixels-tools-generator-ml-918138226"></a>
 ### assetKind
@@ -104,7 +105,7 @@ Returns the MPX kind identifier for an asset type.
 | `asset` | `dynamic` | — | Manifest asset object. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L266)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L267)
 
 <a id="function-function-minipixels-tools-generator-assetless-function-assetless-left-right-src-minipixels-tools-generator-ml-1903155175"></a>
 ### assetLess
@@ -121,7 +122,7 @@ Orders manifest assets by stable id for reproducible output.
 | `right` | `dynamic` | — | Second asset object. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L118)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L119)
 
 <a id="function-function-minipixels-tools-generator-assetmodule-function-assetmodule-asset-r-slot-src-minipixels-tools-generator-ml-2002425790"></a>
 ### assetModule
@@ -139,7 +140,7 @@ Performs the assetModule operation for the minipixels tools generator module.
 | `slot` | `dynamic` | — | Stable pack slot generated for the asset. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L550)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L579)
 
 <a id="function-function-minipixels-tools-generator-assetpayload-function-assetpayload-asset-projectroot-src-minipixels-tools-generator-ml-731560131"></a>
 ### assetPayload
@@ -156,7 +157,7 @@ Loads or generates a payload for native MPX packaging.
 | `projectRoot` | `dynamic` | — | Project directory. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L320)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L321)
 
 <a id="function-function-minipixels-tools-generator-assetsheader-function-assetsheader-root-fallbackpackpath-src-minipixels-tools-generator-ml-262383568"></a>
 ### assetsHeader
@@ -173,7 +174,7 @@ Performs the assetsHeader operation for the minipixels tools generator module.
 | `fallbackPackPath` | `dynamic` | — | Project-relative fallback path to the generated pack. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L509)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L538)
 
 <a id="function-function-minipixels-tools-generator-assetsmodule-function-assetsmodule-root-fallbackpackpath-r-src-minipixels-tools-generator-ml-222974424"></a>
 ### assetsModule
@@ -191,7 +192,7 @@ Performs the assetsModule operation for the minipixels tools generator module.
 | `r` | `dynamic` | — | r value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L618)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L647)
 
 <a id="function-function-minipixels-tools-generator-assetwidth-function-assetwidth-asset-src-minipixels-tools-generator-ml-1180867762"></a>
 ### assetWidth
@@ -207,7 +208,7 @@ Performs the assetWidth operation for the minipixels tools generator module.
 | `asset` | `dynamic` | — | asset value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L213)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L214)
 
 <a id="function-function-minipixels-tools-generator-colorpart-function-colorpart-asset-key-index-fallback-src-minipixels-tools-generator-ml-3280331"></a>
 ### colorPart
@@ -226,7 +227,7 @@ Performs the colorPart operation for the minipixels tools generator module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L185)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L186)
 
 <a id="function-function-minipixels-tools-generator-compactpayload-function-compactpayload-data-profile-src-minipixels-tools-generator-ml-91830941"></a>
 ### compactPayload
@@ -235,7 +236,7 @@ Performs the colorPart operation for the minipixels tools generator module.
 function compactPayload(data, profile)
 ```
 
-Selects native RLE only when its complete envelope produces a useful saving.
+Uses LZ4 for fast loading, or selects the smaller native LZ4/RLE block.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -243,7 +244,7 @@ Selects native RLE only when its complete envelope produces a useful saving.
 | `profile` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L377)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L393)
 
 <a id="function-function-minipixels-tools-generator-defaultoutdir-function-defaultoutdir-projectpath-src-minipixels-tools-generator-ml-2064768812"></a>
 ### defaultOutDir
@@ -259,7 +260,7 @@ Performs the defaultOutDir operation for the minipixels tools generator module.
 | `projectPath` | `dynamic` | — | Path associated with project. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L59)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L60)
 
 <a id="function-function-minipixels-tools-generator-emitcollectioncount-function-emitcollectioncount-levels-name-key-src-minipixels-tools-generator-ml-713427575"></a>
 ### emitCollectionCount
@@ -277,7 +278,7 @@ Performs the emitCollectionCount operation for the minipixels tools generator mo
 | `key` | `dynamic` | — | key value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L849)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L878)
 
 <a id="function-function-minipixels-tools-generator-emitcollectionfield-function-emitcollectionfield-levels-name-key-field-functionsuffix-src-minipixels-tools-generator-ml-1571531614"></a>
 ### emitCollectionField
@@ -297,7 +298,7 @@ Performs the emitCollectionField operation for the minipixels tools generator mo
 | `functionSuffix` | `dynamic` | — | functionSuffix value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L870)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L899)
 
 <a id="function-function-minipixels-tools-generator-emitlevelscalar-function-emitlevelscalar-levels-fnname-key-subkey-src-minipixels-tools-generator-ml-470272978"></a>
 ### emitLevelScalar
@@ -316,7 +317,7 @@ Performs the emitLevelScalar operation for the minipixels tools generator module
 | `subkey` | `dynamic` | — | subkey value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L785)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L814)
 
 <a id="function-function-minipixels-tools-generator-emittiledata-function-emittiledata-levels-src-minipixels-tools-generator-ml-846711985"></a>
 ### emitTileData
@@ -332,7 +333,7 @@ Performs the emitTileData operation for the minipixels tools generator module.
 | `levels` | `dynamic` | — | levels value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L809)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L838)
 
 <a id="function-function-minipixels-tools-generator-generate-function-generate-projectpath-outdir-src-minipixels-tools-generator-ml-1953884477"></a>
 ### generate
@@ -349,7 +350,7 @@ Generates generate for the minipixels tools generator workflow.
 | `outDir` | `dynamic` | — | outDir value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L1172)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L1201)
 
 - [minipixels.tools.generator.GenerateResult](Type-minipixels-tools-generator-generateresult-1764755755.md) — struct
 <a id="function-function-minipixels-tools-generator-hassheet-function-hassheet-asset-src-minipixels-tools-generator-ml-823313442"></a>
@@ -366,7 +367,7 @@ Returns whether sheet is available.
 | `asset` | `dynamic` | — | asset value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L477)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L506)
 
 <a id="function-function-minipixels-tools-generator-identifierbytes-function-identifierbytes-text-src-minipixels-tools-generator-ml-60354221"></a>
 ### identifierBytes
@@ -382,7 +383,7 @@ Encodes the manifest's ASCII-safe identifiers as bytes.
 | `text` | `dynamic` | — | Validated MiniLang identifier. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L93)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L94)
 
 <a id="function-function-minipixels-tools-generator-identifiercode-function-identifiercode-ch-src-minipixels-tools-generator-ml-5394993"></a>
 ### identifierCode
@@ -398,7 +399,7 @@ Returns the ASCII code of one validated identifier character.
 | `ch` | `dynamic` | — | One-character string. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L78)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L79)
 
 <a id="function-function-minipixels-tools-generator-integerdivide-function-integerdivide-value-divisor-src-minipixels-tools-generator-ml-530124181"></a>
 ### integerDivide
@@ -415,7 +416,7 @@ Divides non-negative integers while retaining an integer result.
 | `divisor` | `dynamic` | — | Positive divisor. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L111)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L112)
 
 <a id="function-function-minipixels-tools-generator-join-function-join-root-rel-src-minipixels-tools-generator-ml-709731783"></a>
 ### join
@@ -432,7 +433,7 @@ Joins join for the minipixels tools generator workflow.
 | `rel` | `dynamic` | — | rel value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L104)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L105)
 
 <a id="function-function-minipixels-tools-generator-jsonpoint-function-jsonpoint-x-y-src-minipixels-tools-generator-ml-893405233"></a>
 ### jsonPoint
@@ -449,7 +450,7 @@ Creates a two-dimensional JSON point object.
 | `y` | `dynamic` | — | Point y coordinate. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L962)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L991)
 
 <a id="function-function-minipixels-tools-generator-jsontrue-function-jsontrue-value-src-minipixels-tools-generator-ml-1528192013"></a>
 ### jsonTrue
@@ -465,7 +466,7 @@ Returns whether a JSON value represents true.
 | `value` | `dynamic` | — | JSON value to inspect. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L929)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L958)
 
 <a id="function-function-minipixels-tools-generator-levelfield-function-levelfield-level-key-fallback-src-minipixels-tools-generator-ml-2126640141"></a>
 ### levelField
@@ -483,7 +484,7 @@ Performs the levelField operation for the minipixels tools generator module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L765)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L794)
 
 <a id="function-function-minipixels-tools-generator-levelsmodule-function-levelsmodule-m-r-src-minipixels-tools-generator-ml-2022266397"></a>
 ### levelsModule
@@ -500,7 +501,7 @@ Performs the levelsModule operation for the minipixels tools generator module.
 | `r` | `dynamic` | — | r value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L1078)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L1107)
 
 <a id="function-function-minipixels-tools-generator-levelsstubmodule-function-levelsstubmodule-src-minipixels-tools-generator-ml-164104188"></a>
 ### levelsStubModule
@@ -512,7 +513,7 @@ function levelsStubModule()
 Performs the levelsStubModule operation for the minipixels tools generator module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L738)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L767)
 
 <a id="function-function-minipixels-tools-generator-loadjson-function-loadjson-path-r-src-minipixels-tools-generator-ml-1466955895"></a>
 ### loadJson
@@ -529,7 +530,23 @@ Loads json for the minipixels tools generator module.
 | `r` | `dynamic` | — | r value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L1155)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L1184)
+
+<a id="function-function-minipixels-tools-generator-lz4payload-function-lz4payload-data-src-minipixels-tools-generator-ml-212372756"></a>
+### lz4Payload
+
+```ml
+function lz4Payload(data)
+```
+
+Wraps a standard LZ4 block with the MPX logical-size envelope.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `data` | `dynamic` | — |  |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L378)
 
 <a id="function-function-minipixels-tools-generator-normalizetiled-function-normalizetiled-document-r-source-src-minipixels-tools-generator-ml-462824314"></a>
 ### normalizeTiled
@@ -547,7 +564,7 @@ Normalizes one finite CSV-encoded Tiled map into the MiniPixels level model.
 | `source` | `dynamic` | — | Source path used in diagnostics. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L970)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L999)
 
 <a id="function-function-minipixels-tools-generator-numberfield-function-numberfield-obj-key-fallback-src-minipixels-tools-generator-ml-1771873920"></a>
 ### numberField
@@ -565,7 +582,7 @@ Performs the numberField operation for the minipixels tools generator module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L150)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L151)
 
 <a id="function-function-minipixels-tools-generator-objectfield-function-objectfield-obj-key-src-minipixels-tools-generator-ml-1804342438"></a>
 ### objectField
@@ -582,7 +599,7 @@ Performs the objectField operation for the minipixels tools generator module.
 | `key` | `dynamic` | — | key value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L174)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L175)
 
 - [minipixels.tools.generator.PackedPayload](Type-minipixels-tools-generator-packedpayload-439377361.md) — struct
 <a id="function-function-minipixels-tools-generator-pointfield-function-pointfield-level-key-xfallback-yfallback-src-minipixels-tools-generator-ml-1095341450"></a>
@@ -602,7 +619,7 @@ Performs the pointField operation for the minipixels tools generator module.
 | `yFallback` | `dynamic` | — | yFallback value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L774)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L803)
 
 <a id="function-function-minipixels-tools-generator-printresult-function-printresult-r-src-minipixels-tools-generator-ml-1897932440"></a>
 ### printResult
@@ -618,7 +635,7 @@ Prints result for the minipixels tools generator workflow.
 | `r` | `dynamic` | — | r value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L1221)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L1250)
 
 <a id="function-function-minipixels-tools-generator-quote-function-quote-text-src-minipixels-tools-generator-ml-156979913"></a>
 ### quote
@@ -634,7 +651,7 @@ Performs the quote operation for the minipixels tools generator module.
 | `text` | `dynamic` | — | Text consumed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L66)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L67)
 
 <a id="function-function-minipixels-tools-generator-quotepath-function-quotepath-text-src-minipixels-tools-generator-ml-1974716931"></a>
 ### quotePath
@@ -650,7 +667,7 @@ Quotes a generated source path after normalizing directory separators.
 | `text` | `dynamic` | — | Path text. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L72)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L73)
 
 <a id="function-function-minipixels-tools-generator-renderproceduralpixels-function-renderproceduralpixels-asset-src-minipixels-tools-generator-ml-337733938"></a>
 ### renderProceduralPixels
@@ -666,7 +683,7 @@ Renders one procedural manifest asset into RGBA8888 pixels.
 | `asset` | `dynamic` | — | Procedural asset object. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L225)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L226)
 
 <a id="function-function-minipixels-tools-generator-result-function-result-outdir-src-minipixels-tools-generator-ml-1337540733"></a>
 ### result
@@ -682,7 +699,7 @@ Performs the result operation for the minipixels tools generator module.
 | `outDir` | `dynamic` | — | outDir value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L38)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L39)
 
 <a id="function-function-minipixels-tools-generator-rlepayload-function-rlepayload-data-src-minipixels-tools-generator-ml-2005714208"></a>
 ### rlePayload
@@ -698,7 +715,7 @@ Encodes repeated byte runs and bounded literal spans into an MPR1 envelope.
 | `data` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L333)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L334)
 
 <a id="function-function-minipixels-tools-generator-runtimeassetmodule-function-runtimeassetmodule-asset-slot-src-minipixels-tools-generator-ml-326770682"></a>
 ### runtimeAssetModule
@@ -715,7 +732,7 @@ Emits an audio or generic-file accessor backed by the generated pack.
 | `slot` | `dynamic` | — | Stable pack slot generated for the asset. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L571)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L600)
 
 <a id="function-function-minipixels-tools-generator-sheetheight-function-sheetheight-asset-fallback-src-minipixels-tools-generator-ml-1862805064"></a>
 ### sheetHeight
@@ -732,7 +749,7 @@ Performs the sheetHeight operation for the minipixels tools generator module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L205)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L206)
 
 <a id="function-function-minipixels-tools-generator-sheetmodule-function-sheetmodule-asset-id-src-minipixels-tools-generator-ml-1662660675"></a>
 ### sheetModule
@@ -749,7 +766,7 @@ Performs the sheetModule operation for the minipixels tools generator module.
 | `id` | `dynamic` | — | Stable identifier of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L484)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L513)
 
 <a id="function-function-minipixels-tools-generator-sheetwidth-function-sheetwidth-asset-fallback-src-minipixels-tools-generator-ml-998700800"></a>
 ### sheetWidth
@@ -766,7 +783,7 @@ Performs the sheetWidth operation for the minipixels tools generator module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L196)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L197)
 
 <a id="function-function-minipixels-tools-generator-sortedassets-function-sortedassets-root-src-minipixels-tools-generator-ml-445878164"></a>
 ### sortedAssets
@@ -782,7 +799,7 @@ Returns a sorted copy of a JSON asset array.
 | `root` | `dynamic` | — | Parsed project root. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L134)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L135)
 
 <a id="function-function-minipixels-tools-generator-stringfield-function-stringfield-obj-key-fallback-src-minipixels-tools-generator-ml-1788441524"></a>
 ### stringField
@@ -800,7 +817,7 @@ Performs the stringField operation for the minipixels tools generator module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L158)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L159)
 
 <a id="function-function-minipixels-tools-generator-textcatalogpayload-function-textcatalogpayload-path-src-minipixels-tools-generator-ml-539791437"></a>
 ### textCatalogPayload
@@ -816,7 +833,7 @@ Converts a JSON string catalog into the deterministic MPT1 payload format.
 | `path` | `dynamic` | — | Source JSON file path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L277)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L278)
 
 <a id="function-function-minipixels-tools-generator-tiledlayerissolid-function-tiledlayerissolid-layer-src-minipixels-tools-generator-ml-175429249"></a>
 ### tiledLayerIsSolid
@@ -832,7 +849,7 @@ Returns whether a Tiled tile layer is explicitly marked as collision data.
 | `layer` | `dynamic` | — | Tiled layer object. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L935)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L964)
 
 <a id="function-function-minipixels-tools-generator-tilednumber-function-tilednumber-obj-key-fallback-src-minipixels-tools-generator-ml-1865193444"></a>
 ### tiledNumber
@@ -850,7 +867,7 @@ Reads an integer-valued Tiled field or property.
 | `fallback` | `dynamic` | — | Value used when absent. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L955)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L984)
 
 <a id="function-function-minipixels-tools-generator-tiledobjectkind-function-tiledobjectkind-obj-src-minipixels-tools-generator-ml-266644527"></a>
 ### tiledObjectKind
@@ -866,7 +883,7 @@ Returns a normalized Tiled object kind.
 | `obj` | `dynamic` | — | Tiled object. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L943)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L972)
 
 <a id="function-function-minipixels-tools-generator-tiledproperty-function-tiledproperty-obj-key-src-minipixels-tools-generator-ml-428731166"></a>
 ### tiledProperty
@@ -883,7 +900,7 @@ Returns a named Tiled property or a direct object field.
 | `key` | `dynamic` | — | Property name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L916)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L945)
 
 <a id="function-function-minipixels-tools-generator-validatelevels-function-validatelevels-r-levelsdoc-source-src-minipixels-tools-generator-ml-1441010220"></a>
 ### validateLevels
@@ -901,7 +918,7 @@ Validates levels for the minipixels tools generator workflow.
 | `source` | `dynamic` | — | source value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L895)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L924)
 
 <a id="function-function-minipixels-tools-generator-writeassetpack-function-writeassetpack-root-projectroot-path-r-src-minipixels-tools-generator-ml-209076684"></a>
 ### writeAssetPack
@@ -920,4 +937,4 @@ Writes a deterministic native MiniPixels asset pack.
 | `r` | `dynamic` | — | Generation result receiving diagnostics. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L393)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/generator.ml#L418)

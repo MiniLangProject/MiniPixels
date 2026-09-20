@@ -1,5 +1,6 @@
 import minipixels.tools.generator as gen
 import minipixels.assets.pack as assetPack
+import minipixels.tools.json as json
 import std.assert as a
 import std.fs as fs
 
@@ -43,6 +44,20 @@ function main(args)
   a.assertTrue(stringIndexOf(tiledLevels, "return 30", 0) >= 0, "native Tiled map width")
   a.assertTrue(stringIndexOf(tiledLevels, "return 858", 0) >= 0, "native Tiled exit object")
   a.assertTrue(stringIndexOf(tiledLevels, "function coinX", 0) >= 0, "native Tiled object accessors")
+
+  fastSource = ""
+  for i = 0 to 255
+    fastSource = fastSource + "native-LZ4-frame-0123456789"
+  end for
+  a.assertTrue(fs.writeAllText("build/tests/native_fast_source.txt", fastSource), "native LZ4 fixture written")
+  fastManifest = json.parse("{\"assets\":[{\"id\":\"fast_file\",\"type\":\"file\",\"path\":\"build/tests/native_fast_source.txt\",\"compression\":\"fast\"}]}")
+  fastResult = gen.result("build/tests")
+  a.assertTrue(gen.writeAssetPack(fastManifest, ".", "build/tests/native_fast.mpx", fastResult), "native packer writes LZ4")
+  fastPack = assetPack.open("build/tests/native_fast.mpx")
+  a.assertTrue(typeof(fastPack) != "error", "native LZ4 pack opens")
+  a.assertEq(fastPack.codecs[0], assetPack.CODEC_LZ4, "native fast profile selects LZ4")
+  a.assertEq(assetPack.getBytes(fastPack, "fast_file"), bytes(fastSource), "native LZ4 payload round-trips")
+  assetPack.close(fastPack)
 
   print "=== GENERATOR TESTS DONE ==="
   return 0

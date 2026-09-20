@@ -154,6 +154,7 @@ def create_asset_pack_fixture() -> None:
     (fixture_assets / "tone.wav").write_bytes(bytes([82, 73, 73, 70, 1, 2, 3, 4]))
     repeated = ("MiniPixels compressed and deduplicated payload.\n" * 64).encode("utf-8")
     (fixture_assets / "repeated.txt").write_bytes(repeated)
+    (fixture_assets / "fast.txt").write_bytes((b"sprite-frame-0011223344556677" * 256) + repeated)
     png_fixtures = ROOT / "build" / "tests" / "png"
     png_fixtures.mkdir(parents=True, exist_ok=True)
     dynamic_png = filtered_rgba_png(64, 32)
@@ -196,6 +197,8 @@ def create_asset_pack_fixture() -> None:
                 {"id": "generated", "type": "procedural", "kind": "checker", "width": 4, "height": 2},
                 {"id": "repeated_a", "type": "file", "path": "assets/repeated.txt"},
                 {"id": "repeated_b", "type": "file", "path": "assets/repeated.txt"},
+                {"id": "fast_a", "type": "file", "path": "assets/fast.txt", "compression": "fast"},
+                {"id": "fast_b", "type": "file", "path": "assets/fast.txt", "compression": "fast"},
                 {"id": "tone", "type": "audio", "path": "assets/tone.wav", "transcode": False},
                 {"id": "tone_mp3", "type": "audio", "path": "assets/tone_long.wav"},
             ]
@@ -219,6 +222,7 @@ def create_protected_asset_fixture() -> Path:
     (assets / "de.json").write_text(json.dumps({"menu.start": "Start", "coins": "Münzen: {0}"}, ensure_ascii=False), encoding="utf-8")
     (assets / "en.json").write_text(json.dumps({"menu.start": "Start", "coins": "Coins: {0}"}), encoding="utf-8")
     (assets / "world.json").write_text(json.dumps({"map": [1, 2, 3], "enemy": {"health": 7}}), encoding="utf-8")
+    (assets / "terrain.bin").write_bytes(b"terrain-chunk-0123456789" * 512)
     (assets / "balance.json").write_text(json.dumps({"player": {"speed": 120}, "enemies": {"slime": {"health": 3}}, "waves": [2, 4, 8]}), encoding="utf-8")
     key_dir = project / ".minipixels"
     mod.generate_signing_key(key_dir / "asset-signing-key.pem", key_dir / "asset-signing-public.pem")
@@ -233,6 +237,7 @@ def create_protected_asset_fixture() -> Path:
             {"id": "de", "type": "text", "locale": "de", "path": "assets/de.json"},
             {"id": "en", "type": "text", "locale": "en", "path": "assets/en.json"},
             {"id": "world", "type": "data", "path": "assets/world.json"},
+            {"id": "terrain", "type": "file", "path": "assets/terrain.bin", "compression": "fast"},
             {"id": "balance", "type": "constants", "path": "assets/balance.json"},
         ],
     }
@@ -269,7 +274,7 @@ def run_python_tests() -> None:
         raise RuntimeError("could not load tools/minipixels.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    assert mod.VERSION == "0.14.0", mod.VERSION
+    assert mod.VERSION == "0.15.0", mod.VERSION
     with tempfile.TemporaryDirectory(prefix="minipixels_security_") as td:
         security_root = Path(td)
         security_manifest = security_root / "minipixels.json"
@@ -442,10 +447,16 @@ def run_python_tests() -> None:
         raw_codec, raw_payload = mod.compress_pack_payload(repeated, "none")
         assert raw_codec == mod.PACK_CODEC_NONE and raw_payload == repeated
         fast_codec, fast_payload = mod.compress_pack_payload(repeated, "fast")
-        assert fast_codec == mod.PACK_CODEC_DEFLATE and len(fast_payload) < len(repeated)
+        assert fast_codec == mod.PACK_CODEC_LZ4 and fast_payload.startswith(mod.PACK_LZ4_MAGIC)
+        assert len(fast_payload) < len(repeated)
+        (asset_dir / "prepared.sprites").write_bytes(repeated * 40)
+        auto_prepared = mod.asset_pack_payload({"type": "file", "path": "assets/prepared.sprites"}, tmp_path)
+        assert auto_prepared["codec"] == mod.PACK_CODEC_LZ4, auto_prepared["codec"]
+        raw_prepared = mod.asset_pack_payload({"type": "file", "path": "assets/prepared.sprites", "compression": "none"}, tmp_path)
+        assert raw_prepared["codec"] == mod.PACK_CODEC_NONE, raw_prepared["codec"]
         small_codec, small_payload = mod.compress_pack_payload(repeated, "small")
         assert small_codec in (mod.PACK_CODEC_DEFLATE, mod.PACK_CODEC_RLE)
-        assert len(small_payload) <= len(fast_payload)
+        assert len(small_payload) < len(repeated)
         key_dir = tmp_path / ".minipixels"
         mod.generate_signing_key(key_dir / "private.pem", key_dir / "public.pem")
         signing_key = mod.load_signing_key(tmp_path, {"signingKey": ".minipixels/private.pem"})
@@ -545,6 +556,7 @@ def run_python_tests() -> None:
             names = set(zf.namelist())
             assert any(name.endswith("/README.md") for name in names), names
             assert any(name.endswith("/src/minipixels.ml") for name in names), names
+            assert any(name.endswith("/tools/lz4_block.py") for name in names), names
             assert any(name.endswith("/sdk-manifest.json") for name in names), names
     print("Python tool tests passed")
 
@@ -673,9 +685,13 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
                 "  world = gen.data_world()",
                 "  a.assertTrue(typeof(world) == \"string\" and len(world) > 0, \"packed JSON data\")",
                 "  a.assertEq(gen.data_world(), world, \"decoded JSON is cached\")",
+                "  terrain = mp.loadBytesFromPack(pack, \"terrain\")",
+                "  a.assertEq(len(terrain), 12288, \"protected LZ4 file expands\")",
+                "  a.assertEq(terrain[0], 116, \"protected LZ4 file content\")",
+                "  mp.releasePackedAssetBytesSlot(pack, mp.assetSlotFromPack(pack, \"terrain\"))",
                 "  stats = mp.assetPackStats(pack)",
                 "  a.assertTrue(stats.lazyFile, \"MPX3 payloads remain file-backed\")",
-                "  a.assertEq(stats.payloadMisses, 3, \"each decoded payload read once\")",
+                "  a.assertEq(stats.payloadMisses, 4, \"each decoded payload read once\")",
                 "  a.assertEq(stats.cachedPayloadBytes, 0, \"decoded payload bytes released\")",
                 "  a.assertEq(stats.bulkReads, 1, \"resident MPX3 uses one bulk read\")",
                 "  a.assertTrue(gen.preload(), \"preload reuses generated caches\")",

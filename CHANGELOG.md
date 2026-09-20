@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 0.15.0 - 2026-09-20
+
+- Used MiniLang Compiler 1.2.9's portable LZ4 decoder for MPX assets; `fast` now produces LZ4 blocks in both packers, and Python `auto` selects LZ4 for large prepared `.sprites`/`.rgba` files while remaining compact for other assets. Existing Deflate/RLE packs remain readable.
 - Added target-native zlib/Deflate decoding into exact destination buffers for PNG and MPX payloads, retaining the MiniLang decoder as a validation fallback.
 - Replaced per-entry MPX1 index I/O with bounded bulk index parsing.
 - Added bounded file-order bulk preloading, optional resident packs, named preload groups, decoded-buffer reuse for deduplicated entries, and physical/logical I/O telemetry.

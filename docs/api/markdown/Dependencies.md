@@ -9,6 +9,7 @@ These MiniLang source files are reachable through imports but are outside the co
 | 2 | `std.array` | `../MiniLangCompilerML/std/array.ml` |
 | 5 | `std.bytes` | `../MiniLangCompilerML/std/bytes.ml` |
 | 1 | `std.checksum.crc32` | `../MiniLangCompilerML/std/checksum/crc32.ml` |
+| 2 | `std.compress.lz4` | `../MiniLangCompilerML/std/compress/lz4.ml` |
 | 1 | `std.crypto` | `../MiniLangCompilerML/std/crypto.ml` |
 | 0 | `std.crypto._cng` | `../MiniLangCompilerML/std/crypto/_cng.ml` |
 | 1 | `std.crypto.aes_gcm` | `../MiniLangCompilerML/std/crypto/aes_gcm.ml` |
@@ -22,6 +23,7 @@ These MiniLang source files are reachable through imports but are outside the co
 | 3 | `std.math` | `../MiniLangCompilerML/std/math.ml` |
 | 0 | `std.path` | `../MiniLangCompilerML/std/path.ml` |
 | 0 | `std.platform` | `../MiniLangCompilerML/std/platform.ml` |
+| 0 | `std.result` | `../MiniLangCompilerML/std/result.ml` |
 | 1 | `std.sort` | `../MiniLangCompilerML/std/sort.ml` |
 | 5 | `std.string` | `../MiniLangCompilerML/std/string.ml` |
 | 2 | `std.string_builder` | `../MiniLangCompilerML/std/string_builder.ml` |

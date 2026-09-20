@@ -3,11 +3,11 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.14.0`
+Current version: `0.15.0`
 
-See the [0.14.0 release notes](RELEASE_NOTES_0.14.0.md) for faster CPU drawing, native Linux presentation, reduced per-frame platform overhead, and improved GPU texture and primitive batching.
+See the [0.15.0 release notes](RELEASE_NOTES_0.15.0.md) for faster packed-asset loading, LZ4 compression, bounded bulk preloading, and resident asset packs.
 
-MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.7 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
+MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.9 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
 MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, fixed/native/scaled framebuffers, OpenGL/WGL, GDI and XImage presentation, an optional batched Windows GPU scene canvas, configurable keyboard/mouse actions, sprites and rotated render targets, signed and optionally encrypted asset packs, localized text and generated game data, scene stacks, swept tile collision, bitmap text, multi-voice WAV/MP3 audio through waveOut or ALSA, headless tests, and example projects.
 
@@ -34,7 +34,7 @@ diagnostics as failures.
 ## Requirements
 
 - Windows x64 or Linux x64 with glibc, X11 (`libX11.so.6`) and ALSA (`libasound.so.2`)
-- MiniLang Compiler 1.2.7 or newer in a sibling checkout; lazy MPX I/O uses `std.io.file` and protected builds use `std.crypto.ecdsa_p256`
+- MiniLang Compiler 1.2.9 or newer in a sibling checkout; lazy MPX I/O uses `std.io.file`, fast MPX assets use `std.compress.lz4`, and protected builds use `std.crypto.ecdsa_p256`
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
 - The Python packages in `requirements.txt` for protected builds and WAV-to-MP3 asset transcoding
 - Visual Studio C++ Build Tools on Windows, or GCC on Linux, for the small native audio/asset/presentation bridge
@@ -427,12 +427,12 @@ Loading and container compression are configured without changing game code:
     "batchBytes": 16777216
   },
   "assets": [
-    { "id": "world_1", "type": "file", "path": "assets/world_1.sprites", "preload": "level-1", "compression": "none" }
+    { "id": "world_1", "type": "file", "path": "assets/world_1.sprites", "preload": "level-1", "compression": "fast" }
   ]
 }
 ```
 
-`lazy` remains the memory-efficient default. `resident` bulk-loads and decompresses the complete pack on first open, useful when the game repeatedly touches most assets and has the RAM budget. `compression` accepts `auto`, `fast`, `small`, and `none`, globally or per asset. In particular, `none` is appropriate for large prepared `.sprites`/`.rgba` payloads when minimum load latency matters more than installed size; the default `auto` keeps the pack compact and benefits from native decompression.
+`lazy` remains the memory-efficient default. `resident` bulk-loads and decompresses the complete pack on first open, useful when the game repeatedly touches most assets and has the RAM budget. `compression` accepts `auto`, `fast`, `small`, and `none`, globally or per asset. `fast` now stores compressible file assets as LZ4 blocks. The default `auto` uses LZ4 for `.sprites`/`.rgba` files of at least 64 KiB and keeps other file/text/data assets compact with Deflate/RLE. `none` avoids even LZ4 decoding when minimum latency matters more than installed size. An explicit asset-level choice takes precedence.
 
 `asset-report.json` records `sourceBytes`, `logicalBytes`, `storedBytes`, the selected `codec`/`transform`, and whether an entry was deduplicated. Its totals count shared payload blocks only once.
 

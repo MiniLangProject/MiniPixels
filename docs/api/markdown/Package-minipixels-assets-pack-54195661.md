@@ -19,6 +19,7 @@
 - [`minipixels.assets.pack.clearCache`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-clearcache-function-clearcache-pack-src-minipixels-assets-pack-ml-1435924141) — function
 - [`minipixels.assets.pack.close`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-close-function-close-pack-src-minipixels-assets-pack-ml-1838684689) — function
 - [`minipixels.assets.pack.CODEC_DEFLATE`](File-src-minipixels-assets-pack-ml-1157891367.md#constant-constant-minipixels-assets-pack-codec-deflate-const-codec-deflate-1-src-minipixels-assets-pack-ml-32061680) — constant
+- [`minipixels.assets.pack.CODEC_LZ4`](File-src-minipixels-assets-pack-ml-1157891367.md#constant-constant-minipixels-assets-pack-codec-lz4-const-codec-lz4-3-src-minipixels-assets-pack-ml-706826662) — constant
 - [`minipixels.assets.pack.CODEC_NONE`](File-src-minipixels-assets-pack-ml-1157891367.md#constant-constant-minipixels-assets-pack-codec-none-const-codec-none-0-src-minipixels-assets-pack-ml-1584000011) — constant
 - [`minipixels.assets.pack.CODEC_RLE`](File-src-minipixels-assets-pack-ml-1157891367.md#constant-constant-minipixels-assets-pack-codec-rle-const-codec-rle-2-src-minipixels-assets-pack-ml-1407839533) — constant
 - [`minipixels.assets.pack.DEFAULT_PRELOAD_BATCH_BYTES`](File-src-minipixels-assets-pack-ml-1157891367.md#constant-constant-minipixels-assets-pack-default-preload-batch-bytes-const-default-preload-batch-bytes-16777216-src-minipixels-assets-pack-ml-446836290) — constant

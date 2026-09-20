@@ -10,6 +10,7 @@ import minipixels.tools.manifest as manifest
 import minipixels.assets.png as png
 import std.array as arr
 import std.bytes as by
+import std.compress.lz4 as lz4
 import std.fs as fs
 import std.sort as sorting
 import std.string as strings
@@ -372,16 +373,40 @@ function rlePayload(data)
   return slice(output, 0, target)
 end function
 
-/// Selects native RLE only when its complete envelope produces a useful saving.
+/// Wraps a standard LZ4 block with the MPX logical-size envelope.
+/// @internal
+function lz4Payload(data)
+  block = try(lz4.encode(data))
+  if typeof(block) == "error" then return block end if
+  output = bytes(len(block) + 8, 0)
+  output[0] = 77
+  output[1] = 80
+  output[2] = 76
+  output[3] = 49
+  by.writeU32LE(output, 4, len(data))
+  copyBytes(output, 8, block, 0, len(block))
+  return output
+end function
+
+/// Uses LZ4 for fast loading, or selects the smaller native LZ4/RLE block.
 /// @internal
 function compactPayload(data, profile)
   if profile == "none" then return PackedPayload(0, data) end if
   if len(data) < 32 then return PackedPayload(0, data) end if
-  encoded = rlePayload(data)
+  encoded = try(lz4Payload(data))
+  if typeof(encoded) == "error" then return encoded end if
+  codec = 3
+  if profile != "fast" then
+    rle = rlePayload(data)
+    if len(rle) < len(encoded) then
+      encoded = rle
+      codec = 2
+    end if
+  end if
   minimumSaving = integerDivide(len(data), 100)
   if minimumSaving < 8 then minimumSaving = 8 end if
   if profile == "small" then minimumSaving = 1 end if
-  if len(encoded) + minimumSaving <= len(data) then return PackedPayload(2, encoded) end if
+  if len(encoded) + minimumSaving <= len(data) then return PackedPayload(codec, encoded) end if
   return PackedPayload(0, data)
 end function
 
@@ -412,7 +437,11 @@ function writeAssetPack(root, projectRoot, path, r)
         addError(r, logicalPayload.message)
         return false
       end if
-      packed = compactPayload(logicalPayload, stringField(asset, "compression", defaultCompression))
+      packed = try(compactPayload(logicalPayload, stringField(asset, "compression", defaultCompression)))
+      if typeof(packed) == "error" then
+        addError(r, packed.message)
+        return false
+      end if
       payload = packed.data
       encodedId = identifierBytes(id)
       ids[index] = encodedId

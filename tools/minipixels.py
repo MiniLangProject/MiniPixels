@@ -22,18 +22,21 @@ if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 from asset_security import generate_signing_key, key_id, load_signing_key, protect_pack, raw_public_key
 from build_audio_runtime import ensure_audio_runtime
+from lz4_block import encode as encode_lz4
 
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 ASSET_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-VERSION = "0.14.0"
+VERSION = "0.15.0"
 DEFAULT_TARGET = "windows-x64" if os.name == "nt" else "linux-x64"
 PACK_CODEC_NONE = 0
 PACK_CODEC_DEFLATE = 1
 PACK_CODEC_RLE = 2
+PACK_CODEC_LZ4 = 3
 PACK_COMPRESSED_MAGIC = b"MPC1"
 PACK_RLE_MAGIC = b"MPR1"
+PACK_LZ4_MAGIC = b"MPL1"
 
 
 def asset_protection(data: dict) -> dict | None:
@@ -607,13 +610,13 @@ def compress_pack_payload(payload: bytes, profile: str = "auto") -> tuple[int, b
     profile = str(profile).lower()
     if profile == "none" or len(payload) < 32:
         return PACK_CODEC_NONE, payload
-    level = 1 if profile == "fast" else 9
-    deflated = PACK_COMPRESSED_MAGIC + struct.pack("<I", len(payload)) + zlib.compress(payload, level=level)
+    minimum_saving = max(8, len(payload) // 100)
     if profile == "fast":
-        minimum_saving = max(8, len(payload) // 100)
-        if len(deflated) + minimum_saving <= len(payload):
-            return PACK_CODEC_DEFLATE, deflated
+        packed = PACK_LZ4_MAGIC + struct.pack("<I", len(payload)) + encode_lz4(payload)
+        if len(packed) + minimum_saving <= len(payload):
+            return PACK_CODEC_LZ4, packed
         return PACK_CODEC_NONE, payload
+    deflated = PACK_COMPRESSED_MAGIC + struct.pack("<I", len(payload)) + zlib.compress(payload, level=9)
     rle = bytearray(PACK_RLE_MAGIC + struct.pack("<I", len(payload)))
     position = 0
     while position < len(payload):
@@ -716,11 +719,16 @@ def asset_pack_payload(asset: dict, root: Path, default_compression: str = "auto
     stored = payload
     if kind in ("file", "text", "data"):
         profile = str(asset.get("compression", default_compression)).lower()
-        codec, stored = compress_pack_payload(payload, profile)
+        effective_profile = profile
+        if kind == "file" and profile == "auto" and path.suffix.lower() in (".sprites", ".rgba") and logical_size >= 65536:
+            effective_profile = "fast"
+        codec, stored = compress_pack_payload(payload, effective_profile)
         if codec == PACK_CODEC_DEFLATE:
             transform += "+deflate" if profile == "auto" else "+deflate-" + profile
         elif codec == PACK_CODEC_RLE:
             transform += "+rle"
+        elif codec == PACK_CODEC_LZ4:
+            transform += "+lz4"
     if source_size == 0:
         source_size = logical_size
     return {
@@ -1453,7 +1461,7 @@ def asset_report(data: dict, root: Path) -> dict:
                 entry["logicalBytes"] = built["logicalSize"]
                 entry["storedBytes"] = stored_size
                 entry["bytes"] = stored_size
-                codec_names = {PACK_CODEC_NONE: "none", PACK_CODEC_DEFLATE: "deflate", PACK_CODEC_RLE: "rle"}
+                codec_names = {PACK_CODEC_NONE: "none", PACK_CODEC_DEFLATE: "deflate", PACK_CODEC_RLE: "rle", PACK_CODEC_LZ4: "lz4"}
                 entry["codec"] = codec_names[built["codec"]]
                 entry["transform"] = built["transform"]
                 key = (built["codec"], built["data"])

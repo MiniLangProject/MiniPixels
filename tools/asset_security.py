@@ -25,8 +25,10 @@ MPX3_SIGNATURE_ECDSA_P256_SHA256 = 1
 PACK_CODEC_NONE = 0
 PACK_CODEC_DEFLATE = 1
 PACK_CODEC_RLE = 2
+PACK_CODEC_LZ4 = 3
 PACK_COMPRESSED_MAGIC = b"MPC1"
 PACK_RLE_MAGIC = b"MPR1"
+PACK_LZ4_MAGIC = b"MPL1"
 
 
 def _crypto():
@@ -135,7 +137,7 @@ def protect_pack(plaintext: bytes, private_key) -> ProtectedPack:
         kind = plaintext[position]
         codec = plaintext[position + 1]
         position += 2
-        if codec not in (PACK_CODEC_NONE, PACK_CODEC_DEFLATE, PACK_CODEC_RLE):
+        if codec not in (PACK_CODEC_NONE, PACK_CODEC_DEFLATE, PACK_CODEC_RLE, PACK_CODEC_LZ4):
             raise ValueError("MPX1 asset uses an unsupported compression codec")
         offset, size = struct.unpack_from("<II", plaintext, position)
         position += 8
@@ -144,7 +146,7 @@ def protect_pack(plaintext: bytes, private_key) -> ProtectedPack:
         payload = plaintext[offset : offset + size]
         logical_size = len(payload)
         if codec != PACK_CODEC_NONE:
-            expected_magic = PACK_COMPRESSED_MAGIC if codec == PACK_CODEC_DEFLATE else PACK_RLE_MAGIC
+            expected_magic = {PACK_CODEC_DEFLATE: PACK_COMPRESSED_MAGIC, PACK_CODEC_RLE: PACK_RLE_MAGIC, PACK_CODEC_LZ4: PACK_LZ4_MAGIC}[codec]
             if len(payload) < 8 or payload[:4] != expected_magic:
                 raise ValueError("MPX1 compressed asset envelope is invalid")
             logical_size = struct.unpack_from("<I", payload, 4)[0]
