@@ -15,6 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "tools" / "native_audio" / "audio_decoder.c"
+MEDIA_SOURCE = ROOT / "tools" / "native_audio" / "media_stream.c"
 DR_MP3_COMMIT = "dfe8377631000664666519fdb83da193fd8037f4"
 DR_MP3_URL = f"https://raw.githubusercontent.com/mackron/dr_libs/{DR_MP3_COMMIT}/dr_mp3.h"
 DR_MP3_SHA256 = "997b7ee18de6e6b81e2a83f1ea9fc62aef25c62b28d48db95635f49e65de0a2f"
@@ -90,19 +91,23 @@ def _wsl_path(path: Path) -> str:
 
 def _build_windows(build_dir: Path, headers: list[Path]) -> Path:
     output = build_dir / "minipixels_audio.dll"
-    dependencies = [SOURCE, Path(__file__), *headers]
+    dependencies = [SOURCE, MEDIA_SOURCE, Path(__file__), *headers]
     if output.is_file() and output.stat().st_mtime >= _newest_mtime(dependencies):
         return output
     vcvars = _visual_studio_root() / "VC" / "Auxiliary" / "Build" / "vcvars64.bat"
     obj = build_dir / "audio_decoder.obj"
+    media_obj = build_dir / "media_stream.obj"
     lib = build_dir / "minipixels_audio.lib"
     command_file = build_dir / "build_audio.cmd"
     command_file.write_text(
         "@echo off\n"
         f'call "{vcvars}" >nul\n'
         "if errorlevel 1 exit /b %errorlevel%\n"
-        f'cl /nologo /O2 /MT /LD /TC "{SOURCE}" {_include_flags(headers)} /Fo"{obj}" '
-        f'/link /OUT:"{output}" /IMPLIB:"{lib}"\n',
+        f'cl /nologo /O2 /MT /TC /c "{SOURCE}" {_include_flags(headers)} /Fo"{obj}"\n'
+        "if errorlevel 1 exit /b %errorlevel%\n"
+        f'cl /nologo /O2 /MT /TC /c "{MEDIA_SOURCE}" /Fo"{media_obj}"\n'
+        "if errorlevel 1 exit /b %errorlevel%\n"
+        f'link /nologo /DLL /OUT:"{output}" /IMPLIB:"{lib}" "{obj}" "{media_obj}" ws2_32.lib bcrypt.lib\n',
         encoding="utf-8",
     )
     subprocess.run(["cmd.exe", "/d", "/c", str(command_file)], check=True)
@@ -111,20 +116,20 @@ def _build_windows(build_dir: Path, headers: list[Path]) -> Path:
 
 def _build_linux(build_dir: Path, headers: list[Path]) -> Path:
     output = build_dir / "libminipixels_audio.so"
-    dependencies = [SOURCE, Path(__file__), *headers]
+    dependencies = [SOURCE, MEDIA_SOURCE, Path(__file__), *headers]
     if output.is_file() and output.stat().st_mtime >= _newest_mtime(dependencies):
         return output
-    args = ["gcc", "-std=c99", "-O3", "-fPIC", "-fvisibility=hidden", "-shared", str(SOURCE)]
+    args = ["gcc", "-std=c99", "-O3", "-fPIC", "-fvisibility=hidden", "-shared", str(SOURCE), str(MEDIA_SOURCE)]
     args.extend(f"-I{header.parent}" for header in headers)
-    args.extend(["-o", str(output)])
+    args.extend(["-pthread", "-lcrypto", "-o", str(output)])
     if os.name == "nt":
         distro = os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu")
         args = [
             "wsl.exe", "-d", distro, "--", "gcc", "-std=c99", "-O3", "-fPIC", "-fvisibility=hidden", "-shared",
-            _wsl_path(SOURCE),
+            _wsl_path(SOURCE), _wsl_path(MEDIA_SOURCE),
         ]
         args.extend(f"-I{_wsl_path(header.parent)}" for header in headers)
-        args.extend(["-o", _wsl_path(output)])
+        args.extend(["-pthread", "-lcrypto", "-o", _wsl_path(output)])
     subprocess.run(args, check=True)
     return output
 

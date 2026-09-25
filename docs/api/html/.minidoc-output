@@ -19,6 +19,7 @@ file-src-minipixels-graphics-gpu-ml-159526452.html
 file-src-minipixels-graphics-sprite-ml-1992064667.html
 file-src-minipixels-input-input-ml-1476207415.html
 file-src-minipixels-math-types-ml-311947336.html
+file-src-minipixels-media-media-ml-194127391.html
 file-src-minipixels-ml-1730909391.html
 file-src-minipixels-platform-linux-ml-1856075630.html
 file-src-minipixels-platform-windows-ml-1027159307.html
@@ -51,6 +52,7 @@ package-minipixels-graphics-gpu-1856137742.html
 package-minipixels-graphics-sprite-484808201.html
 package-minipixels-input-input-1057851307.html
 package-minipixels-math-types-2130299542.html
+package-minipixels-media-media-1865358103.html
 package-minipixels-platform-linux-1505480356.html
 package-minipixels-platform-windows-647622739.html
 package-minipixels-scene-scene-2050449523.html
@@ -69,6 +71,7 @@ type-minipixels-animation-animation-animation-206177259.html
 type-minipixels-assets-assets-assetregistry-891835752.html
 type-minipixels-assets-pack-assetpack-1256806610.html
 type-minipixels-assets-pack-assetpackstats-1911604225.html
+type-minipixels-assets-pack-assetstreaminfo-1535683411.html
 type-minipixels-assets-png-bitreader-15679877.html
 type-minipixels-assets-png-huffman-1510650536.html
 type-minipixels-assets-text-localization-191735638.html
@@ -95,6 +98,9 @@ type-minipixels-math-types-timer-1595408457.html
 type-minipixels-math-types-transform2d-753406466.html
 type-minipixels-math-types-vector2-666003535.html
 type-minipixels-math-types-vector2int-1351615520.html
+type-minipixels-media-media-packedaudio-106545843.html
+type-minipixels-media-media-packedmediasource-266006340.html
+type-minipixels-media-media-packedvideo-1505809434.html
 type-minipixels-platform-linux-window-788017826.html
 type-minipixels-platform-windows-window-369528407.html
 type-minipixels-scene-scene-scene-727861925.html

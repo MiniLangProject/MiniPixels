@@ -18,6 +18,7 @@
 - [minipixels.graphics.sprite](Package-minipixels-graphics-sprite-484808201.md)
 - [minipixels.input.input](Package-minipixels-input-input-1057851307.md)
 - [minipixels.math.types](Package-minipixels-math-types-2130299542.md)
+- [minipixels.media.media](Package-minipixels-media-media-1865358103.md)
 - [minipixels.platform.linux](Package-minipixels-platform-linux-1505480356.md)
 - [minipixels.platform.windows](Package-minipixels-platform-windows-647622739.md)
 - [minipixels.scene.scene](Package-minipixels-scene-scene-2050449523.md)

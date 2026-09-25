@@ -14,7 +14,7 @@ from pathlib import Path
 
 
 MPX3_MAGIC = b"MPX3"
-MPX3_VERSION = 4
+MPX3_VERSION = 5
 MPX3_HEADER_SIZE = 64
 MPX3_INDEX_MAGIC = b"MPI3"
 MPX3_NONCE_SIZE = 12
@@ -26,9 +26,13 @@ PACK_CODEC_NONE = 0
 PACK_CODEC_DEFLATE = 1
 PACK_CODEC_RLE = 2
 PACK_CODEC_LZ4 = 3
+PACK_CODEC_STREAM = 4
 PACK_COMPRESSED_MAGIC = b"MPC1"
 PACK_RLE_MAGIC = b"MPR1"
 PACK_LZ4_MAGIC = b"MPL1"
+PACK_STREAM_MAGIC = b"MPS1"
+PACK_STREAM_CHUNK_SIZE = 256 * 1024
+PACK_STREAM_HEADER_SIZE = 24
 
 
 def _crypto():
@@ -160,15 +164,39 @@ def protect_pack(plaintext: bytes, private_key) -> ProtectedPack:
     block_indices: dict[tuple[int, bytes], int] = {}
     sealed_entries: list[tuple[bytes, int, int, int, int]] = []
     for name, kind, codec, logical_size, payload in source_entries:
-        block_key = (codec, payload)
+        # Streamed audio/video stays seekable inside MPX3. Each fixed-size
+        # block is authenticated independently, so playback only decrypts the
+        # ranges requested by the native media backend.
+        stream_payload = kind in (2, 6) and codec == PACK_CODEC_NONE
+        output_codec = PACK_CODEC_STREAM if stream_payload else codec
+        block_key = (output_codec, payload)
         block_index = block_indices.get(block_key)
         if block_index is None:
             nonce = os.urandom(MPX3_NONCE_SIZE)
-            sealed = cipher.encrypt(nonce, payload, None)
+            if stream_payload:
+                chunk_count = (len(payload) + PACK_STREAM_CHUNK_SIZE - 1) // PACK_STREAM_CHUNK_SIZE
+                envelope = bytearray(PACK_STREAM_MAGIC)
+                envelope.extend(struct.pack("<IQII", PACK_STREAM_CHUNK_SIZE, len(payload), chunk_count, 0))
+                for chunk_index in range(chunk_count):
+                    start = chunk_index * PACK_STREAM_CHUNK_SIZE
+                    chunk = payload[start : start + PACK_STREAM_CHUNK_SIZE]
+                    chunk_nonce = bytearray(nonce)
+                    counter = int.from_bytes(chunk_nonce[4:12], "little") ^ chunk_index
+                    chunk_nonce[4:12] = counter.to_bytes(8, "little")
+                    aad = PACK_STREAM_MAGIC + nonce + struct.pack("<QI", len(payload), chunk_index)
+                    sealed_chunk = cipher.encrypt(bytes(chunk_nonce), chunk, aad)
+                    envelope.extend(sealed_chunk[-MPX3_TAG_SIZE:])
+                    envelope.extend(sealed_chunk[:-MPX3_TAG_SIZE])
+                ciphertext = bytes(envelope)
+                tag = bytes(MPX3_TAG_SIZE)
+            else:
+                sealed = cipher.encrypt(nonce, payload, None)
+                ciphertext = sealed[:-MPX3_TAG_SIZE]
+                tag = sealed[-MPX3_TAG_SIZE:]
             block_index = len(sealed_blocks)
             block_indices[block_key] = block_index
-            sealed_blocks.append((nonce, sealed[:-MPX3_TAG_SIZE], sealed[-MPX3_TAG_SIZE:]))
-        sealed_entries.append((name, kind, codec, logical_size, block_index))
+            sealed_blocks.append((nonce, ciphertext, tag))
+        sealed_entries.append((name, kind, output_codec, logical_size, block_index))
 
     index_size = 8 + sum(56 + len(name) for name, _, _, _, _ in sealed_entries)
     payload_offset = MPX3_HEADER_SIZE + index_size + MPX3_TAG_SIZE + MPX3_SIGNATURE_SIZE
@@ -214,7 +242,7 @@ def inspect_header(data: bytes) -> dict:
     if len(data) < MPX3_HEADER_SIZE + MPX3_TAG_SIZE + MPX3_SIGNATURE_SIZE:
         raise ValueError("MPX3 file is truncated")
     if data[:4] != MPX3_MAGIC or data[4] != MPX3_VERSION:
-        raise ValueError("not a supported MPX3 version-4 file")
+        raise ValueError("not a supported MPX3 version-5 file")
     header_size, reserved, index_size, index_cipher_size, file_size = struct.unpack_from("<HHQQQ", data, 8)
     if header_size != MPX3_HEADER_SIZE or reserved != 0:
         raise ValueError("unsupported MPX3 header")

@@ -46,7 +46,7 @@ build\tools\minipixels.exe validate examples\jump-and-run\minipixels.json
 build\tools\minipixels.exe generate examples\jump-and-run\minipixels.json examples\jump-and-run\build\generated\generated
 ```
 
-Native `generate` writes unprotected image/procedural/audio/file/text/data packs and MiniPixels or Tiled/TMJ level modules. The Python CLI remains the recommended end-to-end driver: it also builds, emits reports, compiles constants, and creates signed/encrypted packs.
+Native `generate` writes unprotected image/procedural/audio/video/file/text/data packs and MiniPixels or Tiled/TMJ level modules. Audio marked with `"stream": true` and every video asset are exposed as closeable, file-backed players instead of being copied completely into memory. The Python CLI remains the recommended end-to-end driver: it also builds, emits reports, compiles constants, and creates signed/encrypted packs.
 
 To keep ordinary game development unchanged while protecting release assets, initialize protection once and continue using the normal `build`, `run`, and `package` commands:
 

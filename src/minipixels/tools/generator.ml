@@ -12,6 +12,7 @@ import std.array as arr
 import std.bytes as by
 import std.compress.lz4 as lz4
 import std.fs as fs
+import std.path as pathUtil
 import std.sort as sorting
 import std.string as strings
 import std.string_builder as sb
@@ -160,6 +161,16 @@ function stringField(obj, key, fallback)
   return json.asString(json.get(obj, key), fallback)
 end function
 
+/// Returns a JSON boolean field or a fallback.
+/// @param obj JSON object to inspect.
+/// @param key Field name.
+/// @param fallback Value returned for a missing or non-boolean field.
+function boolField(obj, key, fallback)
+  value = json.get(obj, key)
+  if typeof(value) == "void" or value.kind != "bool" then return fallback end if
+  return value.boolValue
+end function
+
 /// Performs the arrayField operation for the minipixels tools generator module.
 /// @param obj obj value consumed by this operation.
 /// @param key key value consumed by this operation.
@@ -267,6 +278,7 @@ end function
 function assetKind(asset)
   typ = stringField(asset, "type", "image")
   if typ == "audio" then return 2 end if
+  if typ == "video" then return 6 end if
   if typ == "file" then return 3 end if
   if typ == "text" then return 4 end if
   if typ == "data" then return 5 end if
@@ -437,7 +449,10 @@ function writeAssetPack(root, projectRoot, path, r)
         addError(r, logicalPayload.message)
         return false
       end if
-      packed = try(compactPayload(logicalPayload, stringField(asset, "compression", defaultCompression)))
+      profile = stringField(asset, "compression", defaultCompression)
+      typ = stringField(asset, "type", "image")
+      if typ == "audio" or typ == "video" then profile = "none" end if
+      packed = try(compactPayload(logicalPayload, profile))
       if typeof(packed) == "error" then
         addError(r, packed.message)
         return false
@@ -537,6 +552,7 @@ end function
 /// @param fallbackPackPath Project-relative fallback path to the generated pack.
 function assetsHeader(root, fallbackPackPath)
   code = sb.StringBuilder.withCapacity(2048)
+  sourceAssets = sortedAssets(root)
   loading = objectField(root, "assetLoading")
   mode = "lazy"
   batchBytes = 16777216
@@ -548,6 +564,13 @@ function assetsHeader(root, fallbackPackPath)
   code.appendLine("")
   code.appendLine("import minipixels as mp")
   code.appendLine("import minipixels.assets.assets as assets")
+  hasMedia = false
+  if len(sourceAssets) > 0 then
+    for i = 0 to len(sourceAssets) - 1
+      if isStreamedMedia(sourceAssets[i]) then hasMedia = true end if
+    end for
+  end if
+  if hasMedia then code.appendLine("import minipixels.media.media as packedMedia") end if
   code.appendLine("")
   code.appendLine("assetPackCache = void")
   code.appendLine("")
@@ -558,11 +581,22 @@ function assetsHeader(root, fallbackPackPath)
   code.appendLine("    if typeof(opened) == \"error\" then opened = try(mp.openAssetPack(\"build/assets.mpx\")) end if")
   code.appendLine("    if typeof(opened) == \"error\" then opened = mp.openAssetPack(" + quotePath(fallbackPackPath) + ") end if")
   if mode == "resident" then
-    code.appendLine("    resident = try(mp.preloadAssetPack(opened, " + batchBytes + "))")
-    code.appendLine("    if typeof(resident) == \"error\" then")
-    code.appendLine("      mp.closeAssetPack(opened)")
-    code.appendLine("      return resident")
-    code.appendLine("    end if")
+    residentSlots = ""
+    if len(sourceAssets) > 0 then
+      for i = 0 to len(sourceAssets) - 1
+        if not isStreamedMedia(sourceAssets[i]) then
+          if residentSlots != "" then residentSlots = residentSlots + ", " end if
+          residentSlots = residentSlots + i
+        end if
+      end for
+    end if
+    if residentSlots != "" then
+      code.appendLine("    resident = try(mp.preloadAssetPackSlots(opened, [" + residentSlots + "], " + batchBytes + "))")
+      code.appendLine("    if typeof(resident) == \"error\" then")
+      code.appendLine("      mp.closeAssetPack(opened)")
+      code.appendLine("      return resident")
+      code.appendLine("    end if")
+    end if
   end if
   code.appendLine("    assetPackCache = opened")
   code.appendLine("  end if")
@@ -594,6 +628,39 @@ function assetModule(asset, r, slot)
   return code.toString()
 end function
 
+/// Returns the content type advertised to the platform media decoder.
+/// @param asset Manifest media asset.
+function mediaMime(asset)
+  suffix = strings.toLowerAscii(pathUtil.extension(stringField(asset, "path", "media.bin")))
+  if suffix == ".mp3" then return "audio/mpeg" end if
+  if suffix == ".wav" or suffix == ".wave" then return "audio/wav" end if
+  if suffix == ".mid" or suffix == ".midi" then return "audio/midi" end if
+  if suffix == ".ogg" then return "audio/ogg" end if
+  if suffix == ".flac" then return "audio/flac" end if
+  if suffix == ".mp4" or suffix == ".m4v" then return "video/mp4" end if
+  if suffix == ".webm" then return "video/webm" end if
+  if suffix == ".ogv" then return "video/ogg" end if
+  if suffix == ".mkv" then return "video/x-matroska" end if
+  if suffix == ".avi" then return "video/x-msvideo" end if
+  if suffix == ".mov" then return "video/quicktime" end if
+  return "application/octet-stream"
+end function
+
+/// Returns a safe filename suffix for decoder format detection.
+/// @param asset Manifest media asset.
+function mediaSuffix(asset)
+  suffix = strings.toLowerAscii(pathUtil.extension(stringField(asset, "path", "media.bin")))
+  if suffix == "" then return ".bin" end if
+  return suffix
+end function
+
+/// Returns whether an asset must remain lazy for bounded-memory playback.
+/// @param asset Manifest asset to inspect.
+function isStreamedMedia(asset)
+  typ = stringField(asset, "type", "image")
+  return typ == "video" or (typ == "audio" and boolField(asset, "stream", false))
+end function
+
 /// Emits an audio or generic-file accessor backed by the generated pack.
 /// @param asset Manifest asset object.
 /// @param slot Stable pack slot generated for the asset.
@@ -602,12 +669,22 @@ function runtimeAssetModule(asset, slot)
   typ = stringField(asset, "type", "file")
   code = sb.StringBuilder.withCapacity(256)
   if typ == "audio" then
-    code.appendLine("audio_" + id + "_cache = void")
-    code.appendLine("")
-    code.appendLine("function audio_" + id + "()")
-    code.appendLine("  global audio_" + id + "_cache")
-    code.appendLine("  if audio_" + id + "_cache == void then audio_" + id + "_cache = mp.audioClipFromBytes(mp.loadBytesFromPackSlot(assetPack(), " + slot + "), " + quote(id) + ") end if")
-    code.appendLine("  return audio_" + id + "_cache")
+    if boolField(asset, "stream", false) then
+      code.appendLine("function audio_" + id + "(options = void)")
+      code.appendLine("  return packedMedia.openAudioAt(assetPack(), " + slot + ", " + quote(mediaMime(asset)) + ", " + quote(mediaSuffix(asset)) + ", options)")
+      code.appendLine("end function")
+    else
+      code.appendLine("audio_" + id + "_cache = void")
+      code.appendLine("")
+      code.appendLine("function audio_" + id + "()")
+      code.appendLine("  global audio_" + id + "_cache")
+      code.appendLine("  if audio_" + id + "_cache == void then audio_" + id + "_cache = mp.audioClipFromBytes(mp.loadBytesFromPackSlot(assetPack(), " + slot + "), " + quote(id) + ") end if")
+      code.appendLine("  return audio_" + id + "_cache")
+      code.appendLine("end function")
+    end if
+  else if typ == "video" then
+    code.appendLine("function video_" + id + "(options = void)")
+    code.appendLine("  return packedMedia.openVideoAt(assetPack(), " + slot + ", " + quote(mediaMime(asset)) + ", " + quote(mediaSuffix(asset)) + ", options)")
     code.appendLine("end function")
   else if typ == "text" then
     locale = stringField(asset, "locale", id)
@@ -677,17 +754,26 @@ function assetsModule(root, fallbackPackPath, r)
     end for
   end if
   if len(assets) > 0 then
+    preloadSlots = ""
+    for i = 0 to len(assets) - 1
+      if not isStreamedMedia(assets[i]) then
+        if preloadSlots != "" then preloadSlots = preloadSlots + ", " end if
+        preloadSlots = preloadSlots + "slot_" + stringField(assets[i], "id", "asset") + "()"
+      end if
+    end for
     code.appendLine("function preload()")
     code.appendLine("  opened = assetPack()")
     code.appendLine("  if typeof(opened) == \"error\" then return opened end if")
-    code.appendLine("  loaded = try(mp.preloadAssetPack(opened, " + batchBytes + "))")
-    code.appendLine("  if typeof(loaded) == \"error\" then return loaded end if")
+    if preloadSlots != "" then
+      code.appendLine("  loaded = try(mp.preloadAssetPackSlots(opened, [" + preloadSlots + "], " + batchBytes + "))")
+      code.appendLine("  if typeof(loaded) == \"error\" then return loaded end if")
+    end if
     for i = 0 to len(assets) - 1
       asset = assets[i]
       typ = stringField(asset, "type", "image")
       id = stringField(asset, "id", "asset")
       if typ == "image" or typ == "procedural" then code.appendLine("  make_" + id + "()") end if
-      if typ == "audio" then code.appendLine("  audio_" + id + "()") end if
+      if typ == "audio" and not isStreamedMedia(asset) then code.appendLine("  audio_" + id + "()") end if
       if typ == "text" then code.appendLine("  text_" + id + "()") end if
       if typ == "data" then code.appendLine("  data_" + id + "()") end if
       if typ == "file" then code.appendLine("  file_" + id + "()") end if
@@ -715,7 +801,7 @@ function assetsModule(root, fallbackPackPath, r)
           assetGroup = ""
           if typeof(preloadValue) != "void" and preloadValue.kind == "bool" and preloadValue.boolValue then assetGroup = "boot" end if
           if typeof(preloadValue) != "void" and preloadValue.kind == "string" then assetGroup = preloadValue.stringValue end if
-          if assetGroup == group then
+          if assetGroup == group and not isStreamedMedia(assets[i]) then
             if slots != "" then slots = slots + ", " end if
             slots = slots + "slot_" + stringField(assets[i], "id", "asset") + "()"
           end if
@@ -723,15 +809,17 @@ function assetsModule(root, fallbackPackPath, r)
         code.appendLine("  if group == " + quote(group) + " then")
         code.appendLine("    opened = assetPack()")
         code.appendLine("    if typeof(opened) == \"error\" then return opened end if")
-        code.appendLine("    loaded = try(mp.preloadAssetPackSlots(opened, [" + slots + "], " + batchBytes + "))")
-        code.appendLine("    if typeof(loaded) == \"error\" then return loaded end if")
+        if slots != "" then
+          code.appendLine("    loaded = try(mp.preloadAssetPackSlots(opened, [" + slots + "], " + batchBytes + "))")
+          code.appendLine("    if typeof(loaded) == \"error\" then return loaded end if")
+        end if
         for i = 0 to len(assets) - 1
           asset = assets[i]
           preloadValue = json.get(asset, "preload")
           assetGroup = ""
           if typeof(preloadValue) != "void" and preloadValue.kind == "bool" and preloadValue.boolValue then assetGroup = "boot" end if
           if typeof(preloadValue) != "void" and preloadValue.kind == "string" then assetGroup = preloadValue.stringValue end if
-          if assetGroup == group then
+          if assetGroup == group and not isStreamedMedia(asset) then
             typ = stringField(asset, "type", "image")
             id = stringField(asset, "id", "asset")
             if typ == "image" or typ == "procedural" then code.appendLine("    make_" + id + "()") end if

@@ -192,8 +192,8 @@ function validateAsset(m, asset, seen)
   end if
   typ = stringField(m, asset, "type", false)
   if typ == "" then typ = "image" end if
-  if typ != "image" and typ != "procedural" and typ != "audio" and typ != "file" and typ != "text" and typ != "data" and typ != "constants" then
-    addError(m, "asset '" + id + "' type must be image, procedural, audio, file, text, data, or constants")
+  if typ != "image" and typ != "procedural" and typ != "audio" and typ != "video" and typ != "file" and typ != "text" and typ != "data" and typ != "constants" then
+    addError(m, "asset '" + id + "' type must be image, procedural, audio, video, file, text, data, or constants")
   end if
   compression = json.get(asset, "compression")
   if typeof(compression) != "void" then
@@ -208,7 +208,12 @@ function validateAsset(m, asset, seen)
   if typeof(preload) != "void" and preload.kind == "string" and preload.stringValue == "" then
     addError(m, "asset '" + id + "' preload group must not be empty")
   end if
+  stream = json.get(asset, "stream")
+  if typ == "audio" and typeof(stream) != "void" and stream.kind != "bool" then
+    addError(m, "asset '" + id + "' stream must be boolean")
+  end if
   path = stringField(m, asset, "path", false)
+  if typ == "video" and path == "" then addError(m, "video asset '" + id + "' requires a path") end if
   if path != "" and fs.exists(join(m.root, path)) == false then
     addError(m, "asset '" + id + "' path does not exist: " + path)
   end if

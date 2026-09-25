@@ -37,7 +37,7 @@ Expands one authenticated/read payload according to its index codec.
 | `expectedSize` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L190)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L211)
 
 <a id="function-function-minipixels-assets-pack-decodepayloadrange-function-decodepayloadrange-codec-payload-offset-storedsize-expectedsize-src-minipixels-assets-pack-ml-1474227622"></a>
 ### _decodePayloadRange
@@ -57,7 +57,26 @@ Expands a stored payload range according to its index codec. Deflate reads direc
 | `expectedSize` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L133)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L154)
+
+<a id="function-function-minipixels-assets-pack-decodestreampayload-function-decodestreampayload-payload-key-basenonce-expectedsize-src-minipixels-assets-pack-ml-593086342"></a>
+### _decodeStreamPayload
+
+```ml
+function _decodeStreamPayload(payload, key, baseNonce, expectedSize)
+```
+
+Decrypts a complete MPS1 payload for callers that explicitly request bytes. Normal media playback uses AssetStreamInfo and never takes this path.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `payload` | `dynamic` | — |  |
+| `key` | `dynamic` | — |  |
+| `baseNonce` | `dynamic` | — |  |
+| `expectedSize` | `dynamic` | — |  |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L227)
 
 <a id="function-function-minipixels-assets-pack-openfile1-function-openfile1-path-file-header-src-minipixels-assets-pack-ml-407372790"></a>
 ### _openFile1
@@ -75,7 +94,7 @@ Opens an MPX1 index while leaving its payloads file-backed and lazy.
 | `header` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L205)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L272)
 
 <a id="function-function-minipixels-assets-pack-openprotected3-function-openprotected3-path-file-header-key-publickey-expectedkeyid-src-minipixels-assets-pack-ml-1178717239"></a>
 ### _openProtected3
@@ -96,7 +115,7 @@ Opens an MPX3 pack by authenticating and decrypting only its compact index. Payl
 | `expectedKeyId` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L351)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L418)
 
 <a id="function-function-minipixels-assets-pack-readrange-function-readrange-file-offset-size-src-minipixels-assets-pack-ml-949562066"></a>
 ### _readRange
@@ -114,7 +133,7 @@ Reads an exact byte range from an open random-access file.
 | `size` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L340)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L407)
 
 <a id="function-function-minipixels-assets-pack-readu64le-function-readu64le-data-offset-src-minipixels-assets-pack-ml-400441839"></a>
 ### _readU64LE
@@ -131,10 +150,11 @@ Reads one unsigned little-endian 64-bit size from an MPX3 header or index.
 | `offset` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L196)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L217)
 
 - [minipixels.assets.pack.AssetPack](Type-minipixels-assets-pack-assetpack-1256806610.md) — struct
 - [minipixels.assets.pack.AssetPackStats](Type-minipixels-assets-pack-assetpackstats-1911604225.md) — struct
+- [minipixels.assets.pack.AssetStreamInfo](Type-minipixels-assets-pack-assetstreaminfo-1535683411.md) — struct
 <a id="function-function-minipixels-assets-pack-clearcache-function-clearcache-pack-src-minipixels-assets-pack-ml-1435924141"></a>
 ### clearCache
 
@@ -149,7 +169,7 @@ Clears every derived payload and image cache while retaining the pack index.
 | `pack` | `dynamic` | — | Asset pack whose caches are cleared. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L797)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L904)
 
 <a id="function-function-minipixels-assets-pack-close-function-close-pack-src-minipixels-assets-pack-ml-1838684689"></a>
 ### close
@@ -165,7 +185,7 @@ Closes a lazy pack and wipes its retained AES key.
 | `pack` | `dynamic` | — | Asset pack to close. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L819)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L926)
 
 <a id="constant-constant-minipixels-assets-pack-codec-deflate-const-codec-deflate-1-src-minipixels-assets-pack-ml-32061680"></a>
 ### CODEC_DEFLATE
@@ -215,6 +235,18 @@ MPR1 byte-run compression used by the native MiniLang packer.
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L25)
 
+<a id="constant-constant-minipixels-assets-pack-codec-stream-const-codec-stream-4-src-minipixels-assets-pack-ml-2044050799"></a>
+### CODEC_STREAM
+
+```ml
+const CODEC_STREAM = 4
+```
+
+MPS1 chunked AES-GCM payload used for seekable protected media.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L29)
+
 <a id="constant-constant-minipixels-assets-pack-default-preload-batch-bytes-const-default-preload-batch-bytes-16777216-src-minipixels-assets-pack-ml-446836290"></a>
 ### DEFAULT_PRELOAD_BATCH_BYTES
 
@@ -225,7 +257,7 @@ const DEFAULT_PRELOAD_BATCH_BYTES = 16777216
 Default upper bound for one temporary contiguous preload read.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L31)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L35)
 
 <a id="function-function-minipixels-assets-pack-droppayloadat-function-droppayloadat-pack-index-src-minipixels-assets-pack-ml-776792881"></a>
 ### dropPayloadAt
@@ -242,7 +274,7 @@ Releases only cached raw bytes for one pre-resolved slot.
 | `index` | `dynamic` | — | Pre-resolved entry slot. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L775)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L882)
 
 <a id="function-function-minipixels-assets-pack-find-function-find-pack-name-src-minipixels-assets-pack-ml-234838308"></a>
 ### find
@@ -259,7 +291,7 @@ Finds find used by the minipixels assets pack module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L548)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L615)
 
 <a id="function-function-minipixels-assets-pack-getbytes-function-getbytes-pack-name-src-minipixels-assets-pack-ml-1640220432"></a>
 ### getBytes
@@ -276,7 +308,7 @@ Returns bytes for a named entry while retaining the compatible string API.
 | `name` | `dynamic` | — | Stable asset name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L719)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L794)
 
 <a id="function-function-minipixels-assets-pack-getbytesat-function-getbytesat-pack-index-src-minipixels-assets-pack-ml-2026220673"></a>
 ### getBytesAt
@@ -293,7 +325,7 @@ Returns bytes maintained by the minipixels assets pack module.
 | `index` | `dynamic` | — | Pre-resolved entry slot. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L559)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L626)
 
 <a id="function-function-minipixels-assets-pack-getkind-function-getkind-pack-name-src-minipixels-assets-pack-ml-1649210420"></a>
 ### getKind
@@ -310,7 +342,7 @@ Returns kind maintained by the minipixels assets pack module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L728)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L803)
 
 <a id="function-function-minipixels-assets-pack-getkindat-function-getkindat-pack-index-src-minipixels-assets-pack-ml-1226468023"></a>
 ### getKindAt
@@ -327,7 +359,7 @@ Returns the type code of a pre-resolved asset slot.
 | `index` | `dynamic` | — | Pre-resolved entry slot. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L737)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L812)
 
 <a id="function-function-minipixels-assets-pack-hasrange-function-hasrange-data-offset-size-src-minipixels-assets-pack-ml-769445656"></a>
 ### hasRange
@@ -345,7 +377,24 @@ Returns whether range is available.
 | `size` | `dynamic` | — | Size in the units required by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L119)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L134)
+
+<a id="function-function-minipixels-assets-pack-integerdivide-function-integerdivide-value-divisor-src-minipixels-assets-pack-ml-1632794547"></a>
+### integerDivide
+
+```ml
+function integerDivide(value, divisor)
+```
+
+Divides non-negative integers while retaining an integer result.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `dynamic` | — |  |
+| `divisor` | `dynamic` | — |  |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L140)
 
 <a id="function-function-minipixels-assets-pack-ispack-function-ispack-data-src-minipixels-assets-pack-ml-36756322"></a>
 ### isPack
@@ -361,7 +410,7 @@ Returns whether pack satisfies the required condition.
 | `data` | `dynamic` | — | Input data consumed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L125)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L146)
 
 <a id="function-function-minipixels-assets-pack-loadpng-function-loadpng-pack-name-src-minipixels-assets-pack-ml-1158601410"></a>
 ### loadPng
@@ -378,7 +427,7 @@ Loads and caches a named PNG image.
 | `name` | `dynamic` | — | Stable asset name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L766)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L873)
 
 <a id="function-function-minipixels-assets-pack-loadpngat-function-loadpngat-pack-index-src-minipixels-assets-pack-ml-1529602909"></a>
 ### loadPngAt
@@ -395,7 +444,7 @@ Loads png for the minipixels assets pack module.
 | `index` | `dynamic` | — | Pre-resolved entry slot. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L745)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L852)
 
 <a id="constant-constant-minipixels-assets-pack-max-decompressed-asset-size-const-max-decompressed-asset-size-536870912-src-minipixels-assets-pack-ml-301720972"></a>
 ### MAX_DECOMPRESSED_ASSET_SIZE
@@ -407,7 +456,7 @@ const MAX_DECOMPRESSED_ASSET_SIZE = 536870912
 Maximum logical size of one decompressed asset.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L29)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L33)
 
 <a id="constant-constant-minipixels-assets-pack-max-index-size-const-max-index-size-67108864-src-minipixels-assets-pack-ml-1174233929"></a>
 ### MAX_INDEX_SIZE
@@ -435,7 +484,7 @@ Opens an ordinary MPX1 asset pack with lazy random-access payload reads.
 | `path` | `dynamic` | — | Path to the asset pack. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L327)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L394)
 
 <a id="function-function-minipixels-assets-pack-openprotected-function-openprotected-path-key-publickey-expectedkeyid-src-minipixels-assets-pack-ml-449955844"></a>
 ### openProtected
@@ -444,7 +493,7 @@ Opens an ordinary MPX1 asset pack with lazy random-access payload reads.
 function openProtected(path, key, publicKey, expectedKeyId)
 ```
 
-Opens an authenticated MPX3 version-4 pack. Only its index is verified and decrypted up front; caller-owned AES key bytes are always wiped.
+Opens an authenticated MPX3 version-5 pack. Only its index is verified and decrypted up front; caller-owned AES key bytes are always wiped.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -454,7 +503,7 @@ Opens an authenticated MPX3 version-4 pack. Only its index is verified and decry
 | `expectedKeyId` | `dynamic` | — | Embedded 8-byte public-key fingerprint prefix. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L516)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L583)
 
 <a id="constant-constant-minipixels-assets-pack-pack-err-const-pack-err-9302-src-minipixels-assets-pack-ml-666599551"></a>
 ### PACK_ERR
@@ -482,7 +531,7 @@ Performs the packError operation for the minipixels assets pack module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L111)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L126)
 
 <a id="function-function-minipixels-assets-pack-preloadall-function-preloadall-pack-maxbatchbytes-src-minipixels-assets-pack-ml-1162912906"></a>
 ### preloadAll
@@ -499,7 +548,7 @@ Preloads every payload in an asset pack through bounded contiguous reads.
 | `maxBatchBytes` | `dynamic` | — | Maximum temporary read size, or a non-positive value for the default. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L705)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L780)
 
 <a id="function-function-minipixels-assets-pack-preloadslots-function-preloadslots-pack-slots-maxbatchbytes-src-minipixels-assets-pack-ml-820413723"></a>
 ### preloadSlots
@@ -517,7 +566,7 @@ Preloads selected asset slots with contiguous, bounded file reads. Already cache
 | `maxBatchBytes` | `dynamic` | — | Maximum temporary read size, or a non-positive value for the default. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L608)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L679)
 
 <a id="function-function-minipixels-assets-pack-stats-function-stats-pack-src-minipixels-assets-pack-ml-122627519"></a>
 ### stats
@@ -533,7 +582,53 @@ Returns current cache hit/miss and resident-byte counters.
 | `pack` | `dynamic` | — | Asset pack to inspect. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L812)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L919)
+
+<a id="constant-constant-minipixels-assets-pack-stream-header-size-const-stream-header-size-24-src-minipixels-assets-pack-ml-384965321"></a>
+### STREAM_HEADER_SIZE
+
+```ml
+const STREAM_HEADER_SIZE = 24
+```
+
+Fixed header size of one MPS1 chunked media envelope.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L31)
+
+<a id="function-function-minipixels-assets-pack-streaminfo-function-streaminfo-pack-name-src-minipixels-assets-pack-ml-1018612080"></a>
+### streamInfo
+
+```ml
+function streamInfo(pack, name)
+```
+
+Resolves a named file-backed audio/video stream.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `pack` | `dynamic` | — | Open asset pack. |
+| `name` | `dynamic` | — | Stable asset name. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L843)
+
+<a id="function-function-minipixels-assets-pack-streaminfoat-function-streaminfoat-pack-index-src-minipixels-assets-pack-ml-862290221"></a>
+### streamInfoAt
+
+```ml
+function streamInfoAt(pack, index)
+```
+
+Returns the file-backed range needed for native audio/video streaming. The returned key is consumed immediately by the native stream server and is never used as a complete decrypted media buffer.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `pack` | `dynamic` | — | Open asset pack. |
+| `index` | `dynamic` | — | Pre-resolved audio or video slot. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L822)
 
 <a id="function-function-minipixels-assets-pack-unload-function-unload-pack-name-src-minipixels-assets-pack-ml-1325636868"></a>
 ### unload
@@ -550,4 +645,4 @@ Removes cached payload and decoded image data for one entry.
 | `name` | `dynamic` | — | Stable asset name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L786)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L893)

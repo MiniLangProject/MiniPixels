@@ -9,9 +9,11 @@ import subprocess
 import sys
 import importlib.util
 import binascii
+import ctypes
 import json
 import struct
 import tempfile
+import urllib.request
 import zipfile
 import zlib
 from pathlib import Path
@@ -32,10 +34,15 @@ TESTS = [
     "json_manifest_tests.ml",
     "generator_tests.ml",
     "foundation_tests.ml",
+    "media_stream_tests.ml",
 ]
 
 STEREO_MP3_FIXTURE = base64.b64decode(
     "//OAZAAKvDNQH6eMAA2oWqx/TAACC9bbduh6Hoeh6HqNnkYEPLePWJuJuQs0zTJ2JoPQXBDGR48BAHwfB8/lHZcP8o6c5fwxwG/SGOA36Qxy7+c6fd/Jggcy5/u6f//KAMHwfB+AAQBDWD4Ft322w4Xr169ff2FhLEMCYAYBwPk+xwJYlmb7/P5R3B8/wxKe/o8/ynn+j39Hv////wfB/R71DAAECEEDAoGAQnAoBaVltJ6mKRQYGb7WDIgmKAYYiihosEGBwQLUJbhj8GOSE//zgkQuDWivTLvONAAZyRall5qgAlBXQnv4nwjQjX5NHqPUy/yWHsYl0u/+ZF4vGJdLqX/+kZLBURBX/gqIgqCoiPHf/yoiCoaLf//+1VpaEgaAHAAQggggYEAgESf7//2VPr9X1ppomSCwUBLzSDLjANIDEei5QBm47mAGjGaiBDnDnfkBHNGVJr/IsQIxLpM/+ZF4vIl0unvywVBURBX/gqIgqCoiCp3/8qIgqCoied///2qtLQkDSoAiFbff/7//x3cdoZCAXAgcDgCJDIIy//OCRBcJVCVCn+4IARbIejr/3jAAP4qcyILysCRprU/ShVxMkDDGnXd/5cx/7f55KFUK6DlkX/7ke2z//px8UbS7cSoWXf//TJgAAAKw2bE2+fv/7QUdy+rINADDgAQFAtMFQBURhOmHss4fjinZl8jZGPyD0YIICxgQAhmBgAmHAEl5kkr7gFGukv31/fv1O9/+7J07f+r9n/U/6vJfq///9roby33a7bf+GFh2xwIRUDzB8EzCwTDFgGjsgfDF0JxgBEFFNJLlu+cqWpt/d+r/84JELQi4KTw/rogBEXBegv9bGAJXaK/Z/blafv7//Lfu3Ru7+jRot++r9b+qEMAACf3e+7f6///W6enwqYytrbvAwCMewDs4UyIGIhdpcH3gxB9mql5wWzPp0x1ien/+19X//3/9t/v6XdGzfo+ltv4oytrYl6UgcMQ4lCwJMTwZdZl0xmHBIZ4ZJoYKBZZFF9AyaNBBMw4hQOWHE/HgOWQJ0iYGdBAFJQu7ldE3BvEGqRkvPsm4lIXKRYXN+m9yAk0QIomX999yaLJwyOmBl//zgmRdD6TZRgDOUAAgkR7Kf56wIv/+ZmBwzMFA4z/8uGAcMhg0Z//8waMmHnSrP//+LLYLZvYNCGQFAFQaDUbAcDgCbEAEUPlgBBUKFxgnAEmGCcoYR4LpoIovxALABhwUABB1MNAAcwPACULUMgNzhLgMPQIQRAaA2xGTAwDgAIKQQOOKvNFp/3pukjS+xufZNakl/5uAzQfCooLM+9MeEAcEYQ//g4CYYAhkw///oMmDQbALAlUKRtwA/hbiFM5bS4pAE0AJhMWQ5jqUUMvo//OCZBkK9F02D+eYABOQbkAd2RgAkohq2SkTUyYiujKU0Qo0JRatIgFJ5xq8ka4KvsKgtxKDQNPqBo9lgaqPCJ8RKPVHhFiJR6o8nEXUe4i6j3EQcjwBBEY5QGOYGYA5kApyGa4ctBpFqhZUmMisptCnRUxUCTGUGZdTv6/t6mBYGg6JQ3wVfrOyzwVPawWBo9lg7wafESj1R4RYiUeqPJxETEFNRTMuMTAwqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqo="
+)
+
+TINY_MP4_FIXTURE = base64.b64decode(
+    "AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAN0bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAAMgAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAp90cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAAMgAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAABAAAAAQAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAADIAAAEAAABAAAAAAIXbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAyAAAACgBVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABwm1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAYJzdGJsAAAAvnN0c2QAAAAAAAAAAQAAAK5hdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAABAAEABIAAAASAAAAAAAAAABFExhdmM2My4xLjEwMSBsaWJ4MjY0AAAAAAAAAAAAAAAAGP//AAAANGF2Y0MBZAAK/+EAF2dkAAqs2V7ARAAAAwAEAAADAMg8SJZYAQAGaOvjyyLA/fj4AAAAABBwYXNwAAAAAQAAAAEAAAAUYnRydAAAAAAAAHZIAAAAAAAAABhzdHRzAAAAAAAAAAEAAAAFAAACAAAAABRzdHNzAAAAAAAAAAEAAAABAAAAOGN0dHMAAAAAAAAABQAAAAEAAAQAAAAAAQAACgAAAAABAAAEAAAAAAEAAAAAAAAAAQAAAgAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAUAAAABAAAAKHN0c3oAAAAAAAAAAAAAAAUAAALFAAAADAAAAAwAAAAMAAAADAAAABRzdGNvAAAAAAAAAAEAAAOkAAAAYXVkdGEAAABZbWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAsaWxzdAAAACSpdG9vAAAAHGRhdGEAAAABAAAAAExhdmY2My4xLjEwMQAAAAhmcmVlAAAC/W1kYXQAAAKuBgX//6rcRem95tlIt5Ys2CDZI+7veDI2NCAtIGNvcmUgMTY1IHIzMjIzIDA0ODBjYjAgLSBILjI2NC9NUEVHLTQgQVZDIGNvZGVjIC0gQ29weWxlZnQgMjAwMy0yMDI1IC0gaHR0cDovL3d3dy52aWRlb2xhbi5vcmcveDI2NC5odG1sIC0gb3B0aW9uczogY2FiYWM9MSByZWY9MyBkZWJsb2NrPTE6MDowIGFuYWx5c2U9MHgzOjB4MTEzIG1lPWhleCBzdWJtZT03IHBzeT0xIHBzeV9yZD0xLjAwOjAuMDAgbWl4ZWRfcmVmPTEgbWVfcmFuZ2U9MTYgY2hyb21hX21lPTEgdHJlbGxpcz0xIDh4OGRjdD0xIGNxbT0wIGRlYWR6b25lPTIxLDExIGZhc3RfcHNraXA9MSBjaHJvbWFfcXBfb2Zmc2V0PS0yIHRocmVhZHM9MSBsb29rYWhlYWRfdGhyZWFkcz0xIHNsaWNlZF90aHJlYWRzPTAgbnI9MCBkZWNpbWF0ZT0xIGludGVybGFjZWQ9MCBibHVyYXlfY29tcGF0PTAgY29uc3RyYWluZWRfaW50cmE9MCBiZnJhbWVzPTMgYl9weXJhbWlkPTIgYl9hZGFwdD0xIGJfYmlhcz0wIGRpcmVjdD0xIHdlaWdodGI9MSBvcGVuX2dvcD0wIHdlaWdodHA9MiBrZXlpbnQ9MjUwIGtleWludF9taW49MjUgc2NlbmVjdXQ9NDAgaW50cmFfcmVmcmVzaD0wIHJjX2xvb2thaGVhZD00MCByYz1jcmYgbWJ0cmVlPTEgY3JmPTIzLjAgcWNvbXA9MC42MCBxcG1pbj0wIHFwbWF4PTY5IHFwc3RlcD00IGlwX3JhdGlvPTEuNDAgYXE9MToxLjAwAIAAAAAPZYiEADP//vbsvgU2FMjBAAAACEGaJGxCv/7AAAAACEGeQniF/8GBAAAACAGeYXRCv8SAAAAACAGeY2pCv8SB"
 )
 
 
@@ -78,6 +85,77 @@ def run_test_executable(exe: Path, target: str, args: list[str] | None = None) -
         raise subprocess.CalledProcessError(result.returncode, cmd)
     if "[FAIL]" in result.stdout:
         raise RuntimeError(f"MiniLang assertions failed in {exe.name}")
+
+
+def test_media_range_runtime(runtime: Path, target: str) -> None:
+    """Exercise plain and chunk-authenticated HTTP range reads in the native bridge."""
+    if (target == "linux-x64") != (os.name != "nt"):
+        return
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+
+    library = ctypes.CDLL(str(runtime))
+    open_stream = library.mpMediaStreamOpen
+    open_stream.restype = ctypes.c_void_p
+    open_stream.argtypes = [
+        ctypes.c_char_p, ctypes.c_uint64, ctypes.c_uint64, ctypes.c_uint64, ctypes.c_int32,
+        ctypes.c_void_p, ctypes.c_uint64, ctypes.c_void_p, ctypes.c_uint64,
+        ctypes.c_char_p, ctypes.c_char_p, ctypes.c_void_p, ctypes.c_int32,
+    ]
+    close_stream = library.mpMediaStreamClose
+    close_stream.argtypes = [ctypes.c_void_p]
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+
+    def open_native(path: Path, offset: int, stored: int, logical: int, codec: int, key: bytes = b"", nonce: bytes = b""):
+        url = ctypes.create_string_buffer(192)
+        key_buffer = ctypes.create_string_buffer(key) if key else None
+        nonce_buffer = ctypes.create_string_buffer(nonce) if nonce else None
+        handle = open_stream(
+            os.fsencode(path), offset, stored, logical, codec,
+            key_buffer, len(key), nonce_buffer, len(nonce),
+            b"application/octet-stream", b".bin", url, len(url),
+        )
+        assert handle, "native media range source did not open"
+        return handle, url.value.decode("ascii")
+
+    with tempfile.TemporaryDirectory(prefix="minipixels_media_range_") as td:
+        directory = Path(td)
+        payload = bytes((index * 31 + 7) & 0xFF for index in range(700_123))
+        plain_path = directory / "plain.bin"
+        plain_path.write_bytes(b"prefix-data" + payload + b"suffix-data")
+        handle, url = open_native(plain_path, 11, len(payload), len(payload), 0)
+        try:
+            request = urllib.request.Request(url, headers={"Range": "bytes=262120-262200"})
+            with opener.open(request, timeout=5) as response:
+                assert response.status == 206
+                assert response.read() == payload[262120:262201]
+        finally:
+            close_stream(handle)
+
+        key = os.urandom(32)
+        base_nonce = os.urandom(12)
+        chunk_size = 256 * 1024
+        chunk_count = (len(payload) + chunk_size - 1) // chunk_size
+        envelope = bytearray(b"MPS1" + struct.pack("<IQII", chunk_size, len(payload), chunk_count, 0))
+        cipher = AESGCM(key)
+        for chunk_index in range(chunk_count):
+            chunk = payload[chunk_index * chunk_size : (chunk_index + 1) * chunk_size]
+            chunk_nonce = bytearray(base_nonce)
+            chunk_nonce[4:12] = (int.from_bytes(chunk_nonce[4:12], "little") ^ chunk_index).to_bytes(8, "little")
+            aad = b"MPS1" + base_nonce + struct.pack("<QI", len(payload), chunk_index)
+            sealed = cipher.encrypt(bytes(chunk_nonce), chunk, aad)
+            envelope.extend(sealed[-16:])
+            envelope.extend(sealed[:-16])
+        protected_path = directory / "protected.bin"
+        protected_path.write_bytes(envelope)
+        handle, url = open_native(protected_path, 0, len(envelope), len(payload), 4, key, base_nonce)
+        try:
+            request = urllib.request.Request(url, headers={"Range": "bytes=262120-262200"})
+            with opener.open(request, timeout=5) as response:
+                assert response.status == 206
+                assert response.read() == payload[262120:262201]
+        finally:
+            close_stream(handle)
+    print("Native MPX media range tests passed")
 
 
 def png_chunk(kind: bytes, payload: bytes) -> bytes:
@@ -189,6 +267,7 @@ def create_asset_pack_fixture() -> None:
     )
     (fixture_assets / "tone_long.wav").write_bytes(long_wav)
     (ROOT / "build" / "tests" / "tone_stereo.mp3").write_bytes(STEREO_MP3_FIXTURE)
+    (fixture_assets / "tiny.mp4").write_bytes(TINY_MP4_FIXTURE)
     mod.write_asset_pack(
         {
             "assets": [
@@ -201,6 +280,7 @@ def create_asset_pack_fixture() -> None:
                 {"id": "fast_b", "type": "file", "path": "assets/fast.txt", "compression": "fast"},
                 {"id": "tone", "type": "audio", "path": "assets/tone.wav", "transcode": False},
                 {"id": "tone_mp3", "type": "audio", "path": "assets/tone_long.wav"},
+                {"id": "intro", "type": "video", "path": "assets/tiny.mp4"},
             ]
         },
         fixture_root,
@@ -223,6 +303,8 @@ def create_protected_asset_fixture() -> Path:
     (assets / "en.json").write_text(json.dumps({"menu.start": "Start", "coins": "Coins: {0}"}), encoding="utf-8")
     (assets / "world.json").write_text(json.dumps({"map": [1, 2, 3], "enemy": {"health": 7}}), encoding="utf-8")
     (assets / "terrain.bin").write_bytes(b"terrain-chunk-0123456789" * 512)
+    (assets / "music.mp3").write_bytes(STEREO_MP3_FIXTURE)
+    (assets / "intro.mp4").write_bytes(TINY_MP4_FIXTURE)
     (assets / "balance.json").write_text(json.dumps({"player": {"speed": 120}, "enemies": {"slime": {"health": 3}}, "waves": [2, 4, 8]}), encoding="utf-8")
     key_dir = project / ".minipixels"
     mod.generate_signing_key(key_dir / "asset-signing-key.pem", key_dir / "asset-signing-public.pem")
@@ -238,6 +320,8 @@ def create_protected_asset_fixture() -> Path:
             {"id": "en", "type": "text", "locale": "en", "path": "assets/en.json"},
             {"id": "world", "type": "data", "path": "assets/world.json"},
             {"id": "terrain", "type": "file", "path": "assets/terrain.bin", "compression": "fast"},
+            {"id": "music", "type": "audio", "path": "assets/music.mp3", "stream": True},
+            {"id": "intro", "type": "video", "path": "assets/intro.mp4"},
             {"id": "balance", "type": "constants", "path": "assets/balance.json"},
         ],
     }
@@ -249,7 +333,7 @@ def create_protected_asset_fixture() -> Path:
     pack = project / "build" / "assets.mpx"
     data = pack.read_bytes()
     assert data.startswith(b"MPX3"), data[:4]
-    assert data[4] == 4, data[4]
+    assert data[4] == 5, data[4]
     assert b"menu.start" not in data and b"world" not in data and b"MPT1" not in data
     tampered = bytearray(data)
     tampered[80] ^= 1
@@ -260,6 +344,9 @@ def create_protected_asset_fixture() -> Path:
     old_version = bytearray(data)
     old_version[4] = 3
     (project / "build" / "assets-version3.mpx").write_bytes(old_version)
+    previous_version = bytearray(data)
+    previous_version[4] = 4
+    (project / "build" / "assets-version4.mpx").write_bytes(previous_version)
     old_container = bytearray(data)
     old_container[:4] = b"MPX2"
     (project / "build" / "assets-mpx2.mpx").write_bytes(old_container)
@@ -546,7 +633,7 @@ def run_python_tests() -> None:
         generated_assets_dir = tmp_path / "build" / "generated" / "generated"
         mod.generate(loading_manifest, generated_assets_dir)
         generated_assets = (generated_assets_dir / "assets.ml").read_text(encoding="utf-8")
-        assert "resident = try(mp.preloadAssetPack(opened, 65536))" in generated_assets, generated_assets
+        assert "resident = try(mp.preloadAssetPackSlots(opened, [0, 1], 65536))" in generated_assets, generated_assets
         assert "function preloadGroup(group)" in generated_assets, generated_assets
         assert 'group == "boot"' in generated_assets and 'group == "level-1"' in generated_assets
         sdk_zip = package_mod.package_sdk(tmp_path / "dist")
@@ -676,6 +763,14 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
                 "  a.assertTrue(typeof(pack) != \"error\", \"protected MPX3 opens\")",
                 "  a.assertEq(mp.assetKindFromPack(pack, \"de\"), 4, \"text kind\")",
                 "  a.assertEq(mp.assetKindFromPack(pack, \"world\"), 5, \"data kind\")",
+                "  a.assertEq(mp.assetKindFromPack(pack, \"music\"), 2, \"streamed audio kind\")",
+                "  a.assertEq(mp.assetKindFromPack(pack, \"intro\"), 6, \"streamed video kind\")",
+                "  music = gen.audio_music()",
+                "  a.assertTrue(typeof(music) != \"error\", \"protected audio stream opens\")",
+                "  a.assertTrue(music.close(), \"protected audio stream closes\")",
+                "  intro = gen.video_intro()",
+                "  a.assertTrue(typeof(intro) != \"error\", \"protected video stream opens\")",
+                "  a.assertTrue(intro.close(), \"protected video stream closes\")",
                 "  i18n = gen.localization()",
                 "  a.assertEq(i18n.text(\"menu.start\"), \"Start\", \"default locale\")",
                 "  a.assertEq(i18n.format(\"coins\", [5]), \"Münzen: 5\", \"text formatting\")",
@@ -712,6 +807,8 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
                 "  mp.closeAssetPack(lazyTamper)",
                 "  rejectedV3 = try(mp.openProtectedAssetPack(\"build/assets-version3.mpx\", security.aesKey(), security.publicKey(), security.keyId()))",
                 "  a.assertTrue(typeof(rejectedV3) == \"error\", \"MPX3 version 3 rejected\")",
+                "  rejectedV4 = try(mp.openProtectedAssetPack(\"build/assets-version4.mpx\", security.aesKey(), security.publicKey(), security.keyId()))",
+                "  a.assertTrue(typeof(rejectedV4) == \"error\", \"MPX3 version 4 rejected\")",
                 "  rejectedMpx2 = try(mp.openProtectedAssetPack(\"build/assets-mpx2.mpx\", security.aesKey(), security.publicKey(), security.keyId()))",
                 "  a.assertTrue(typeof(rejectedMpx2) == \"error\", \"MPX2 rejected\")",
                 "  print \"=== PROTECTED ASSET SMOKE DONE ===\"",
@@ -771,9 +868,26 @@ def main(argv: list[str] | None = None) -> int:
     build = ROOT / "build" / "tests"
     build.mkdir(parents=True, exist_ok=True)
     runtime = ensure_audio_runtime(target, build)
+    test_media_range_runtime(runtime, target)
     root_runtime = ROOT / runtime.name
     if root_runtime.resolve() != runtime.resolve():
         shutil.copy2(runtime, root_runtime)
+    media_name = "minilang_video.dll" if target == "windows-x64" else "libminilang_video.so"
+    compiler_root = ROOT.parent / "MiniLangCompilerPy"
+    media_runtime = compiler_root / "build" / "native" / "video" / target / media_name
+    if not media_runtime.is_file():
+        if target == "windows-x64":
+            subprocess.check_call([
+                "powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+                str(compiler_root / "native" / "video" / "windows" / "build.ps1"),
+            ])
+        else:
+            script = compiler_root / "native" / "video" / "linux" / "build.sh"
+            command = ["sh", str(script)]
+            if os.name == "nt":
+                command = ["wsl.exe", "-d", os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"), "--", "sh", wsl_path(script)]
+            subprocess.check_call(command)
+    shutil.copy2(media_runtime, build / media_name)
     create_asset_pack_fixture()
     protected_project = create_protected_asset_fixture()
     for test in TESTS:

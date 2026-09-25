@@ -8,19 +8,19 @@ Static metrics are calculated from target-specific preprocessed MiniLang files i
 
 | Metric | Value |
 | --- | ---: |
-| Blank lines | 938 |
-| Clone groups | 18 |
-| Cognitive complexity | 2683 (maximum per function: 136) |
-| Comment lines | 3159 |
-| Cyclomatic complexity | 2589 (average: 3.52, maximum: 53) |
-| Documentation coverage | 97.21% (2896 of 2979 documentation items) |
-| Duplicated lines | 136 (1.74%) |
-| Files | 26 |
-| Functions | 735 |
-| Maintainability index | 4.75 / 100 |
-| Physical lines | 11892 |
-| Source lines | 7795 |
-| Statements | 5837 |
+| Blank lines | 990 |
+| Clone groups | 22 |
+| Cognitive complexity | 2826 (maximum per function: 154) |
+| Comment lines | 3285 |
+| Cyclomatic complexity | 2742 (average: 3.51, maximum: 57) |
+| Documentation coverage | 96.76% (2986 of 3086 documentation items) |
+| Duplicated lines | 154 (1.9%) |
+| Files | 27 |
+| Functions | 782 |
+| Maintainability index | 4.82 / 100 |
+| Physical lines | 12377 |
+| Source lines | 8102 |
+| Statements | 6095 |
 
 ## Documentation coverage
 
@@ -28,19 +28,19 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 
 | Category | Documented | Total | Coverage |
 | --- | ---: | ---: | ---: |
-| API declarations | 805 | 805 | 100% |
-| Constants | 68 | 93 | 73.12% |
+| API declarations | 852 | 852 | 100% |
+| Constants | 70 | 96 | 72.92% |
 | Enum variants | 0 | 0 | 100% |
-| Fields | 364 | 414 | 87.92% |
+| Fields | 364 | 430 | 84.65% |
 | Globals | 11 | 19 | 57.89% |
-| Overall | 2896 | 2979 | 97.21% |
-| Parameters | 1648 | 1648 | 100% |
+| Overall | 2986 | 3086 | 96.76% |
+| Parameters | 1689 | 1689 | 100% |
 
 ## Halstead metrics
 
 | Distinct operators | Distinct operands | Total operators | Total operands | Vocabulary | Length | Volume | Difficulty | Effort | Estimated defects |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 52 | 2679 | 35469 | 27429 | 2731 | 62898 | 717994.1 | 266.2 | 191131156.37 | 239.33 |
+| 53 | 2807 | 37173 | 28597 | 2860 | 65770 | 755157.95 | 269.98 | 203873948.76 | 251.72 |
 
 ## Files
 
@@ -49,7 +49,7 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`src/minipixels.ml`](File-src-minipixels-ml-1730909391.md) | 418 | 118 | 214 / 1.81 / 27 | 123 / 44 | 0 (0%) | 38263.2 | 0 |
 | [`src/minipixels/animation/animation.ml`](File-src-minipixels-animation-animation-ml-2065983051.md) | 108 | 17 | 36 / 2.12 / 10 | 27 / 16 | 0 (0%) | 4060.52 | 25.53 |
 | [`src/minipixels/assets/assets.ml`](File-src-minipixels-assets-assets-ml-652120143.md) | 122 | 16 | 36 / 2.25 / 5 | 21 / 4 | 0 (0%) | 5376.9 | 23.52 |
-| [`src/minipixels/assets/pack.ml`](File-src-minipixels-assets-pack-ml-1157891367.md) | 684 | 25 | 249 / 9.96 / 53 | 304 / 66 | 38 (5.56%) | 44716.3 | 0 |
+| [`src/minipixels/assets/pack.ml`](File-src-minipixels-assets-pack-ml-1157891367.md) | 770 | 29 | 289 / 9.97 / 55 | 350 / 68 | 38 (4.94%) | 52389.21 | 0 |
 | [`src/minipixels/assets/png.ml`](File-src-minipixels-assets-png-ml-1155821131.md) | 574 | 32 | 216 / 6.75 / 41 | 343 / 84 | 0 (0%) | 43012.47 | 0 |
 | [`src/minipixels/assets/text.ml`](File-src-minipixels-assets-text-ml-1300721413.md) | 111 | 13 | 45 / 3.46 / 16 | 39 / 19 | 0 (0%) | 6245.68 | 22.75 |
 | [`src/minipixels/audio/audio.ml`](File-src-minipixels-audio-audio-ml-660527635.md) | 754 | 79 | 242 / 3.06 / 24 | 200 / 28 | 14 (1.86%) | 46431.66 | 0 |
@@ -62,13 +62,14 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`src/minipixels/graphics/sprite.ml`](File-src-minipixels-graphics-sprite-ml-1992064667.md) | 144 | 13 | 46 / 3.54 / 12 | 37 / 11 | 0 (0%) | 7847 | 19.46 |
 | [`src/minipixels/input/input.ml`](File-src-minipixels-input-input-ml-1476207415.md) | 283 | 27 | 69 / 2.56 / 11 | 45 / 10 | 0 (0%) | 13982.41 | 8.21 |
 | [`src/minipixels/math/types.ml`](File-src-minipixels-math-types-ml-311947336.md) | 242 | 48 | 80 / 1.67 / 13 | 33 / 12 | 0 (0%) | 12414.68 | 8.57 |
+| [`src/minipixels/media/media.ml`](File-src-minipixels-media-media-ml-194127391.md) | 142 | 39 | 64 / 1.64 / 9 | 25 / 8 | 18 (12.68%) | 9802.3 | 16.49 |
 | [`src/minipixels/platform/linux.ml`](File-src-minipixels-platform-linux-ml-1856075630.md) | 449 | 33 | 156 / 4.73 / 27 | 142 / 32 | 13 (2.9%) | 33516.94 | 0 |
 | [`src/minipixels/platform/windows.ml`](File-src-minipixels-platform-windows-ml-1027159307.md) | 650 | 49 | 147 / 3 / 9 | 114 / 13 | 13 (2%) | 41396.51 | 0 |
 | [`src/minipixels/scene/scene.ml`](File-src-minipixels-scene-scene-ml-552680371.md) | 199 | 24 | 66 / 2.75 / 9 | 49 / 12 | 0 (0%) | 10519.19 | 12.81 |
 | [`src/minipixels/tools/fsutil.ml`](File-src-minipixels-tools-fsutil-ml-605704885.md) | 61 | 7 | 34 / 4.86 / 7 | 31 / 7 | 8 (13.11%) | 3453.67 | 31.71 |
-| [`src/minipixels/tools/generator.ml`](File-src-minipixels-tools-generator-ml-920573533.md) | 1041 | 54 | 294 / 5.44 / 49 | 509 / 136 | 12 (1.15%) | 79062.19 | 0 |
+| [`src/minipixels/tools/generator.ml`](File-src-minipixels-tools-generator-ml-920573533.md) | 1115 | 58 | 337 / 5.81 / 57 | 575 / 154 | 12 (1.08%) | 85854.96 | 0 |
 | [`src/minipixels/tools/json.ml`](File-src-minipixels-tools-json-ml-388493918.md) | 310 | 32 | 119 / 3.72 / 18 | 132 / 46 | 14 (4.52%) | 15496.08 | 0.31 |
-| [`src/minipixels/tools/manifest.ml`](File-src-minipixels-tools-manifest-ml-1067201239.md) | 270 | 20 | 103 / 5.15 / 31 | 104 / 38 | 8 (2.96%) | 15513.78 | 3.77 |
+| [`src/minipixels/tools/manifest.ml`](File-src-minipixels-tools-manifest-ml-1067201239.md) | 275 | 20 | 109 / 5.45 / 37 | 110 / 44 | 8 (2.91%) | 16099.6 | 2.67 |
 | [`src/minipixels/world/camera.ml`](File-src-minipixels-world-camera-ml-397830650.md) | 52 | 9 | 12 / 1.33 / 4 | 3 / 3 | 0 (0%) | 1907.85 | 37.98 |
 | [`src/minipixels/world/entity.ml`](File-src-minipixels-world-entity-ml-1855953718.md) | 20 | 1 | 1 / 1 / 1 | 0 / 0 | 0 (0%) | 366.3 | 53.53 |
 | [`src/minipixels/world/tilemap.ml`](File-src-minipixels-world-tilemap-ml-2079329797.md) | 209 | 13 | 58 / 4.46 / 25 | 91 / 56 | 0 (0%) | 10693.07 | 13.38 |
@@ -116,31 +117,35 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.assets.assets.slotOf`](File-src-minipixels-assets-assets-ml-652120143.md#function-function-minipixels-assets-assets-slotof-function-slotof-reg-name-src-minipixels-assets-assets-ml-1113594587) | `src/minipixels/assets/assets.ml:98` | 6 | 6 | 3 | 2 | 1 | 209.59 | 66.37 |
 | [`minipixels.assets.assets.unload`](File-src-minipixels-assets-assets-ml-652120143.md#function-function-minipixels-assets-assets-unload-function-unload-reg-name-src-minipixels-assets-assets-ml-1253901111) | `src/minipixels/assets/assets.ml:177` | 7 | 6 | 3 | 2 | 1 | 269.21 | 64.15 |
 | [`minipixels.assets.assets.unloadAll`](File-src-minipixels-assets-assets-ml-652120143.md#function-function-minipixels-assets-assets-unloadall-function-unloadall-reg-src-minipixels-assets-assets-ml-117031674) | `src/minipixels/assets/assets.ml:187` | 9 | 6 | 4 | 4 | 2 | 288.44 | 61.42 |
-| [`minipixels.assets.pack._decodePayload`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-decodepayload-function-decodepayload-codec-payload-expectedsize-src-minipixels-assets-pack-ml-207727389) | `src/minipixels/assets/pack.ml:190` | 3 | 1 | 1 | 0 | 0 | 99.91 | 75.46 |
-| [`minipixels.assets.pack._decodePayloadRange`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-decodepayloadrange-function-decodepayloadrange-codec-payload-offset-storedsize-expectedsize-src-minipixels-assets-pack-ml-1474227622) | `src/minipixels/assets/pack.ml:133` | 54 | 58 | 38 | 48 | 3 | 3422.61 | 32.35 |
-| [`minipixels.assets.pack._openFile1`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-openfile1-function-openfile1-path-file-header-src-minipixels-assets-pack-ml-407372790) | `src/minipixels/assets/pack.ml:205` | 119 | 94 | 37 | 55 | 3 | 5924.73 | 23.33 |
-| [`minipixels.assets.pack._openProtected3`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-openprotected3-function-openprotected3-path-file-header-key-publickey-expectedkeyid-src-minipixels-assets-pack-ml-1178717239) | `src/minipixels/assets/pack.ml:351` | 158 | 135 | 53 | 66 | 4 | 9494.91 | 17.06 |
-| [`minipixels.assets.pack._readRange`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-readrange-function-readrange-file-offset-size-src-minipixels-assets-pack-ml-949562066) | `src/minipixels/assets/pack.ml:340` | 7 | 7 | 4 | 3 | 1 | 330.34 | 63.39 |
-| [`minipixels.assets.pack._readU64LE`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-readu64le-function-readu64le-data-offset-src-minipixels-assets-pack-ml-400441839) | `src/minipixels/assets/pack.ml:196` | 6 | 5 | 3 | 2 | 1 | 271.03 | 65.59 |
-| [`minipixels.assets.pack.clearCache`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-clearcache-function-clearcache-pack-src-minipixels-assets-pack-ml-1435924141) | `src/minipixels/assets/pack.ml:797` | 12 | 9 | 4 | 4 | 2 | 372.92 | 57.91 |
-| [`minipixels.assets.pack.close`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-close-function-close-pack-src-minipixels-assets-pack-ml-1838684689) | `src/minipixels/assets/pack.ml:819` | 15 | 14 | 4 | 4 | 2 | 432.36 | 55.35 |
-| [`minipixels.assets.pack.dropPayloadAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-droppayloadat-function-droppayloadat-pack-index-src-minipixels-assets-pack-ml-776792881) | `src/minipixels/assets/pack.ml:775` | 7 | 6 | 6 | 5 | 1 | 408.6 | 62.47 |
-| [`minipixels.assets.pack.find`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-find-function-find-pack-name-src-minipixels-assets-pack-ml-234838308) | `src/minipixels/assets/pack.ml:548` | 7 | 8 | 4 | 3 | 1 | 275.1 | 63.95 |
-| [`minipixels.assets.pack.getBytes`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getbytes-function-getbytes-pack-name-src-minipixels-assets-pack-ml-1640220432) | `src/minipixels/assets/pack.ml:719` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
-| [`minipixels.assets.pack.getBytesAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getbytesat-function-getbytesat-pack-index-src-minipixels-assets-pack-ml-2026220673) | `src/minipixels/assets/pack.ml:559` | 41 | 42 | 17 | 20 | 2 | 2739.45 | 38.46 |
-| [`minipixels.assets.pack.getKind`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getkind-function-getkind-pack-name-src-minipixels-assets-pack-ml-1649210420) | `src/minipixels/assets/pack.ml:728` | 5 | 4 | 2 | 1 | 1 | 151.62 | 69.21 |
-| [`minipixels.assets.pack.getKindAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getkindat-function-getkindat-pack-index-src-minipixels-assets-pack-ml-1226468023) | `src/minipixels/assets/pack.ml:737` | 4 | 3 | 5 | 4 | 1 | 221.14 | 69.78 |
-| [`minipixels.assets.pack.hasRange`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-hasrange-function-hasrange-data-offset-size-src-minipixels-assets-pack-ml-769445656) | `src/minipixels/assets/pack.ml:119` | 3 | 1 | 1 | 0 | 0 | 148.68 | 74.25 |
-| [`minipixels.assets.pack.isPack`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-ispack-function-ispack-data-src-minipixels-assets-pack-ml-36756322) | `src/minipixels/assets/pack.ml:125` | 4 | 3 | 2 | 1 | 1 | 235.02 | 70 |
-| [`minipixels.assets.pack.loadPng`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-loadpng-function-loadpng-pack-name-src-minipixels-assets-pack-ml-1158601410) | `src/minipixels/assets/pack.ml:766` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
-| [`minipixels.assets.pack.loadPngAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-loadpngat-function-loadpngat-pack-index-src-minipixels-assets-pack-ml-1529602909) | `src/minipixels/assets/pack.ml:745` | 17 | 15 | 8 | 7 | 1 | 791.62 | 51.79 |
-| [`minipixels.assets.pack.open`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-open-function-open-path-src-minipixels-assets-pack-ml-569822995) | `src/minipixels/assets/pack.ml:327` | 10 | 8 | 3 | 2 | 1 | 293.44 | 60.5 |
-| [`minipixels.assets.pack.openProtected`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-openprotected-function-openprotected-path-key-publickey-expectedkeyid-src-minipixels-assets-pack-ml-449955844) | `src/minipixels/assets/pack.ml:516` | 28 | 22 | 13 | 12 | 1 | 1201.55 | 45.12 |
-| [`minipixels.assets.pack.packError`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-packerror-function-packerror-message-src-minipixels-assets-pack-ml-16473987) | `src/minipixels/assets/pack.ml:111` | 3 | 1 | 1 | 0 | 0 | 46.51 | 77.78 |
-| [`minipixels.assets.pack.preloadAll`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-preloadall-function-preloadall-pack-maxbatchbytes-src-minipixels-assets-pack-ml-1162912906) | `src/minipixels/assets/pack.ml:705` | 10 | 7 | 4 | 4 | 2 | 346.79 | 59.86 |
-| [`minipixels.assets.pack.preloadSlots`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-preloadslots-function-preloadslots-pack-slots-maxbatchbytes-src-minipixels-assets-pack-ml-820413723) | `src/minipixels/assets/pack.ml:608` | 89 | 84 | 31 | 59 | 5 | 5061.68 | 27.37 |
-| [`minipixels.assets.pack.stats`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-stats-function-stats-pack-src-minipixels-assets-pack-ml-122627519) | `src/minipixels/assets/pack.ml:812` | 4 | 3 | 2 | 1 | 1 | 394.66 | 68.42 |
-| [`minipixels.assets.pack.unload`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-unload-function-unload-pack-name-src-minipixels-assets-pack-ml-1325636868) | `src/minipixels/assets/pack.ml:786` | 8 | 7 | 2 | 1 | 1 | 229.25 | 63.5 |
+| [`minipixels.assets.pack._decodePayload`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-decodepayload-function-decodepayload-codec-payload-expectedsize-src-minipixels-assets-pack-ml-207727389) | `src/minipixels/assets/pack.ml:211` | 3 | 1 | 1 | 0 | 0 | 99.91 | 75.46 |
+| [`minipixels.assets.pack._decodePayloadRange`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-decodepayloadrange-function-decodepayloadrange-codec-payload-offset-storedsize-expectedsize-src-minipixels-assets-pack-ml-1474227622) | `src/minipixels/assets/pack.ml:154` | 54 | 58 | 38 | 48 | 3 | 3422.61 | 32.35 |
+| [`minipixels.assets.pack._decodeStreamPayload`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-decodestreampayload-function-decodestreampayload-payload-key-basenonce-expectedsize-src-minipixels-assets-pack-ml-593086342) | `src/minipixels/assets/pack.ml:227` | 42 | 40 | 18 | 20 | 2 | 2726.28 | 38.11 |
+| [`minipixels.assets.pack._openFile1`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-openfile1-function-openfile1-path-file-header-src-minipixels-assets-pack-ml-407372790) | `src/minipixels/assets/pack.ml:272` | 119 | 94 | 37 | 55 | 3 | 5924.73 | 23.33 |
+| [`minipixels.assets.pack._openProtected3`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-openprotected3-function-openprotected3-path-file-header-key-publickey-expectedkeyid-src-minipixels-assets-pack-ml-1178717239) | `src/minipixels/assets/pack.ml:418` | 158 | 135 | 55 | 68 | 4 | 9565.25 | 16.77 |
+| [`minipixels.assets.pack._readRange`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-readrange-function-readrange-file-offset-size-src-minipixels-assets-pack-ml-949562066) | `src/minipixels/assets/pack.ml:407` | 7 | 7 | 4 | 3 | 1 | 330.34 | 63.39 |
+| [`minipixels.assets.pack._readU64LE`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-readu64le-function-readu64le-data-offset-src-minipixels-assets-pack-ml-400441839) | `src/minipixels/assets/pack.ml:217` | 6 | 5 | 3 | 2 | 1 | 271.03 | 65.59 |
+| [`minipixels.assets.pack.clearCache`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-clearcache-function-clearcache-pack-src-minipixels-assets-pack-ml-1435924141) | `src/minipixels/assets/pack.ml:904` | 12 | 9 | 4 | 4 | 2 | 372.92 | 57.91 |
+| [`minipixels.assets.pack.close`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-close-function-close-pack-src-minipixels-assets-pack-ml-1838684689) | `src/minipixels/assets/pack.ml:926` | 15 | 14 | 4 | 4 | 2 | 432.36 | 55.35 |
+| [`minipixels.assets.pack.dropPayloadAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-droppayloadat-function-droppayloadat-pack-index-src-minipixels-assets-pack-ml-776792881) | `src/minipixels/assets/pack.ml:882` | 7 | 6 | 6 | 5 | 1 | 408.6 | 62.47 |
+| [`minipixels.assets.pack.find`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-find-function-find-pack-name-src-minipixels-assets-pack-ml-234838308) | `src/minipixels/assets/pack.ml:615` | 7 | 8 | 4 | 3 | 1 | 275.1 | 63.95 |
+| [`minipixels.assets.pack.getBytes`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getbytes-function-getbytes-pack-name-src-minipixels-assets-pack-ml-1640220432) | `src/minipixels/assets/pack.ml:794` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
+| [`minipixels.assets.pack.getBytesAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getbytesat-function-getbytesat-pack-index-src-minipixels-assets-pack-ml-2026220673) | `src/minipixels/assets/pack.ml:626` | 45 | 45 | 19 | 24 | 3 | 3061.26 | 36.97 |
+| [`minipixels.assets.pack.getKind`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getkind-function-getkind-pack-name-src-minipixels-assets-pack-ml-1649210420) | `src/minipixels/assets/pack.ml:803` | 5 | 4 | 2 | 1 | 1 | 151.62 | 69.21 |
+| [`minipixels.assets.pack.getKindAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getkindat-function-getkindat-pack-index-src-minipixels-assets-pack-ml-1226468023) | `src/minipixels/assets/pack.ml:812` | 4 | 3 | 5 | 4 | 1 | 221.14 | 69.78 |
+| [`minipixels.assets.pack.hasRange`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-hasrange-function-hasrange-data-offset-size-src-minipixels-assets-pack-ml-769445656) | `src/minipixels/assets/pack.ml:134` | 3 | 1 | 1 | 0 | 0 | 148.68 | 74.25 |
+| [`minipixels.assets.pack.integerDivide`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-integerdivide-function-integerdivide-value-divisor-src-minipixels-assets-pack-ml-1632794547) | `src/minipixels/assets/pack.ml:140` | 3 | 1 | 1 | 0 | 0 | 75.28 | 76.32 |
+| [`minipixels.assets.pack.isPack`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-ispack-function-ispack-data-src-minipixels-assets-pack-ml-36756322) | `src/minipixels/assets/pack.ml:146` | 4 | 3 | 2 | 1 | 1 | 235.02 | 70 |
+| [`minipixels.assets.pack.loadPng`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-loadpng-function-loadpng-pack-name-src-minipixels-assets-pack-ml-1158601410) | `src/minipixels/assets/pack.ml:873` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
+| [`minipixels.assets.pack.loadPngAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-loadpngat-function-loadpngat-pack-index-src-minipixels-assets-pack-ml-1529602909) | `src/minipixels/assets/pack.ml:852` | 17 | 15 | 8 | 7 | 1 | 791.62 | 51.79 |
+| [`minipixels.assets.pack.open`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-open-function-open-path-src-minipixels-assets-pack-ml-569822995) | `src/minipixels/assets/pack.ml:394` | 10 | 8 | 3 | 2 | 1 | 293.44 | 60.5 |
+| [`minipixels.assets.pack.openProtected`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-openprotected-function-openprotected-path-key-publickey-expectedkeyid-src-minipixels-assets-pack-ml-449955844) | `src/minipixels/assets/pack.ml:583` | 28 | 22 | 13 | 12 | 1 | 1201.55 | 45.12 |
+| [`minipixels.assets.pack.packError`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-packerror-function-packerror-message-src-minipixels-assets-pack-ml-16473987) | `src/minipixels/assets/pack.ml:126` | 3 | 1 | 1 | 0 | 0 | 46.51 | 77.78 |
+| [`minipixels.assets.pack.preloadAll`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-preloadall-function-preloadall-pack-maxbatchbytes-src-minipixels-assets-pack-ml-1162912906) | `src/minipixels/assets/pack.ml:780` | 10 | 7 | 4 | 4 | 2 | 346.79 | 59.86 |
+| [`minipixels.assets.pack.preloadSlots`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-preloadslots-function-preloadslots-pack-slots-maxbatchbytes-src-minipixels-assets-pack-ml-820413723) | `src/minipixels/assets/pack.ml:679` | 93 | 86 | 32 | 65 | 6 | 5331.11 | 26.66 |
+| [`minipixels.assets.pack.stats`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-stats-function-stats-pack-src-minipixels-assets-pack-ml-122627519) | `src/minipixels/assets/pack.ml:919` | 4 | 3 | 2 | 1 | 1 | 394.66 | 68.42 |
+| [`minipixels.assets.pack.streamInfo`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-streaminfo-function-streaminfo-pack-name-src-minipixels-assets-pack-ml-1018612080) | `src/minipixels/assets/pack.ml:843` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
+| [`minipixels.assets.pack.streamInfoAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-streaminfoat-function-streaminfoat-pack-index-src-minipixels-assets-pack-ml-862290221) | `src/minipixels/assets/pack.ml:822` | 17 | 19 | 14 | 13 | 1 | 1241.89 | 49.61 |
+| [`minipixels.assets.pack.unload`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-unload-function-unload-pack-name-src-minipixels-assets-pack-ml-1325636868) | `src/minipixels/assets/pack.ml:893` | 8 | 7 | 2 | 1 | 1 | 229.25 | 63.5 |
 | [`minipixels.assets.png._inflateZlibPortable`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-inflatezlibportable-function-inflatezlibportable-data-expectedsize-src-minipixels-assets-png-ml-171444575) | `src/minipixels/assets/png.ml:309` | 72 | 76 | 34 | 84 | 6 | 4242.15 | 29.51 |
 | [`minipixels.assets.png.adler32`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-adler32-function-adler32-data-src-minipixels-assets-png-ml-1397005228) | `src/minipixels/assets/png.ml:295` | 9 | 6 | 2 | 1 | 1 | 255.41 | 62.06 |
 | [`minipixels.assets.png.alignBits`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-alignbits-function-alignbits-reader-src-minipixels-assets-png-ml-1129393079) | `src/minipixels/assets/png.ml:126` | 4 | 2 | 1 | 0 | 0 | 58.81 | 74.34 |
@@ -505,6 +510,45 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.math.types.vector2Multiply`](File-src-minipixels-math-types-ml-311947336.md#function-function-minipixels-math-types-vector2multiply-function-vector2multiply-a-s-src-minipixels-math-types-ml-501697406) | `src/minipixels/math/types.ml:295` | 3 | 1 | 1 | 0 | 0 | 91.38 | 75.73 |
 | [`minipixels.math.types.vector2Normalize`](File-src-minipixels-math-types-ml-311947336.md#function-function-minipixels-math-types-vector2normalize-function-vector2normalize-a-src-minipixels-math-types-ml-1235573287) | `src/minipixels/math/types.ml:307` | 5 | 4 | 2 | 1 | 1 | 181.52 | 68.67 |
 | [`minipixels.math.types.vector2Subtract`](File-src-minipixels-math-types-ml-311947336.md#function-function-minipixels-math-types-vector2subtract-function-vector2subtract-a-b-src-minipixels-math-types-ml-1097010229) | `src/minipixels/math/types.ml:288` | 3 | 1 | 1 | 0 | 0 | 106.61 | 75.26 |
+| [`minipixels.media.media._error`](File-src-minipixels-media-media-ml-194127391.md#function-function-minipixels-media-media-error-function-error-message-src-minipixels-media-media-ml-725740719) | `src/minipixels/media/media.ml:62` | 3 | 1 | 1 | 0 | 0 | 46.51 | 77.78 |
+| [`minipixels.media.media._openSource`](File-src-minipixels-media-media-ml-194127391.md#function-function-minipixels-media-media-opensource-function-opensource-info-mime-suffix-src-minipixels-media-media-ml-1721162251) | `src/minipixels/media/media.ml:195` | 27 | 15 | 9 | 8 | 1 | 1010.5 | 46.53 |
+| [`minipixels.media.media.openAudio`](File-src-minipixels-media-media-ml-194127391.md#function-function-minipixels-media-media-openaudio-function-openaudio-pack-name-mime-audio-mpeg-suffix-mp3-options-void-src-minipixels-media-media-ml-1460667144) | `src/minipixels/media/media.ml:249` | 5 | 4 | 2 | 1 | 1 | 278.83 | 67.36 |
+| [`minipixels.media.media.openAudioAt`](File-src-minipixels-media-media-ml-194127391.md#function-function-minipixels-media-media-openaudioat-function-openaudioat-pack-slot-mime-audio-mpeg-suffix-mp3-options-void-src-minipixels-media-media-ml-360541171) | `src/minipixels/media/media.ml:229` | 13 | 18 | 6 | 5 | 1 | 981.33 | 53.94 |
+| [`minipixels.media.media.openVideo`](File-src-minipixels-media-media-ml-194127391.md#function-function-minipixels-media-media-openvideo-function-openvideo-pack-name-mime-video-mp4-suffix-mp4-options-void-src-minipixels-media-media-ml-1401851240) | `src/minipixels/media/media.ml:281` | 5 | 4 | 2 | 1 | 1 | 278.83 | 67.36 |
+| [`minipixels.media.media.openVideoAt`](File-src-minipixels-media-media-ml-194127391.md#function-function-minipixels-media-media-openvideoat-function-openvideoat-pack-slot-mime-video-mp4-suffix-mp4-options-void-src-minipixels-media-media-ml-424155165) | `src/minipixels/media/media.ml:261` | 13 | 18 | 6 | 5 | 1 | 981.33 | 53.94 |
+| [`minipixels.media.media.PackedAudio.close`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-close-function-close-src-minipixels-media-media-ml-1140121697) | `src/minipixels/media/media.ml:122` | 8 | 8 | 3 | 2 | 1 | 229.06 | 63.37 |
+| [`minipixels.media.media.PackedAudio.duration`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-duration-function-duration-src-minipixels-media-media-ml-1326806933) | `src/minipixels/media/media.ml:101` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedAudio.hasAudio`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-hasaudio-function-hasaudio-src-minipixels-media-media-ml-439836221) | `src/minipixels/media/media.ml:105` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedAudio.pause`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-pause-function-pause-src-minipixels-media-media-ml-1605000957) | `src/minipixels/media/media.ml:92` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedAudio.play`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-play-function-play-src-minipixels-media-media-ml-443831549) | `src/minipixels/media/media.ml:90` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedAudio.pollEvent`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-pollevent-function-pollevent-src-minipixels-media-media-ml-240631491) | `src/minipixels/media/media.ml:119` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedAudio.position`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-position-function-position-src-minipixels-media-media-ml-1594558425) | `src/minipixels/media/media.ml:99` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedAudio.seek`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-seek-function-seek-milliseconds-src-minipixels-media-media-ml-1954995491) | `src/minipixels/media/media.ml:97` | 1 | 1 | 1 | 0 | 0 | 53.15 | 87.78 |
+| [`minipixels.media.media.PackedAudio.setLoop`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-setloop-function-setloop-enabled-src-minipixels-media-media-ml-97114894) | `src/minipixels/media/media.ml:117` | 1 | 1 | 1 | 0 | 0 | 53.15 | 87.78 |
+| [`minipixels.media.media.PackedAudio.setMuted`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-setmuted-function-setmuted-muted-src-minipixels-media-media-ml-1176508216) | `src/minipixels/media/media.ml:111` | 1 | 1 | 1 | 0 | 0 | 53.15 | 87.78 |
+| [`minipixels.media.media.PackedAudio.setPlaybackRate`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-setplaybackrate-function-setplaybackrate-rate-src-minipixels-media-media-ml-1965883301) | `src/minipixels/media/media.ml:114` | 1 | 1 | 1 | 0 | 0 | 53.15 | 87.78 |
+| [`minipixels.media.media.PackedAudio.setVolume`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-setvolume-function-setvolume-volume-src-minipixels-media-media-ml-777929739) | `src/minipixels/media/media.ml:108` | 1 | 1 | 1 | 0 | 0 | 53.15 | 87.78 |
+| [`minipixels.media.media.PackedAudio.state`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-state-function-state-src-minipixels-media-media-ml-455829007) | `src/minipixels/media/media.ml:103` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedAudio.stop`](Type-minipixels-media-media-packedaudio-106545843.md#method-method-minipixels-media-media-packedaudio-stop-function-stop-src-minipixels-media-media-ml-2037000945) | `src/minipixels/media/media.ml:94` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedMediaSource.close`](Type-minipixels-media-media-packedmediasource-266006340.md#method-method-minipixels-media-media-packedmediasource-close-function-close-src-minipixels-media-media-ml-1894217064) | `src/minipixels/media/media.ml:73` | 8 | 7 | 2 | 1 | 1 | 144 | 64.92 |
+| [`minipixels.media.media.PackedVideo.attach`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-attach-function-attach-windowhandle-src-minipixels-media-media-ml-792850344) | `src/minipixels/media/media.ml:140` | 1 | 1 | 1 | 0 | 0 | 53.15 | 87.78 |
+| [`minipixels.media.media.PackedVideo.close`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-close-function-close-src-minipixels-media-media-ml-1448024954) | `src/minipixels/media/media.ml:180` | 8 | 8 | 3 | 2 | 1 | 229.06 | 63.37 |
+| [`minipixels.media.media.PackedVideo.duration`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-duration-function-duration-src-minipixels-media-media-ml-237413034) | `src/minipixels/media/media.ml:153` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedVideo.hasAudio`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-hasaudio-function-hasaudio-src-minipixels-media-media-ml-225646466) | `src/minipixels/media/media.ml:157` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedVideo.hasVideo`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-hasvideo-function-hasvideo-src-minipixels-media-media-ml-1878030482) | `src/minipixels/media/media.ml:159` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedVideo.pause`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-pause-function-pause-src-minipixels-media-media-ml-1516739230) | `src/minipixels/media/media.ml:144` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedVideo.play`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-play-function-play-src-minipixels-media-media-ml-326160994) | `src/minipixels/media/media.ml:142` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedVideo.pollEvent`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-pollevent-function-pollevent-src-minipixels-media-media-ml-2055105472) | `src/minipixels/media/media.ml:177` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedVideo.position`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-position-function-position-src-minipixels-media-media-ml-955998150) | `src/minipixels/media/media.ml:151` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedVideo.seek`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-seek-function-seek-milliseconds-src-minipixels-media-media-ml-792649568) | `src/minipixels/media/media.ml:149` | 1 | 1 | 1 | 0 | 0 | 53.15 | 87.78 |
+| [`minipixels.media.media.PackedVideo.setLoop`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-setloop-function-setloop-enabled-src-minipixels-media-media-ml-530716307) | `src/minipixels/media/media.ml:175` | 1 | 1 | 1 | 0 | 0 | 53.15 | 87.78 |
+| [`minipixels.media.media.PackedVideo.setMuted`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-setmuted-function-setmuted-muted-src-minipixels-media-media-ml-931409493) | `src/minipixels/media/media.ml:169` | 1 | 1 | 1 | 0 | 0 | 53.15 | 87.78 |
+| [`minipixels.media.media.PackedVideo.setPlaybackRate`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-setplaybackrate-function-setplaybackrate-rate-src-minipixels-media-media-ml-563065634) | `src/minipixels/media/media.ml:172` | 1 | 1 | 1 | 0 | 0 | 53.15 | 87.78 |
+| [`minipixels.media.media.PackedVideo.setVolume`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-setvolume-function-setvolume-volume-src-minipixels-media-media-ml-228705196) | `src/minipixels/media/media.ml:166` | 1 | 1 | 1 | 0 | 0 | 53.15 | 87.78 |
+| [`minipixels.media.media.PackedVideo.state`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-state-function-state-src-minipixels-media-media-ml-158619428) | `src/minipixels/media/media.ml:155` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedVideo.stop`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-stop-function-stop-src-minipixels-media-media-ml-1647671830) | `src/minipixels/media/media.ml:146` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedVideo.videoHeight`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-videoheight-function-videoheight-src-minipixels-media-media-ml-1716028242) | `src/minipixels/media/media.ml:163` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
+| [`minipixels.media.media.PackedVideo.videoWidth`](Type-minipixels-media-media-packedvideo-1505809434.md#method-method-minipixels-media-media-packedvideo-videowidth-function-videowidth-src-minipixels-media-media-ml-1338987938) | `src/minipixels/media/media.ml:161` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
 | [`minipixels.mixerPlayMusic`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-mixerplaymusic-function-mixerplaymusic-mixer-clip-src-minipixels-ml-680020851) | `src/minipixels.ml:736` | 1 | 1 | 1 | 0 | 0 | 62.27 | 87.3 |
 | [`minipixels.mixerPlaySfx`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-mixerplaysfx-function-mixerplaysfx-mixer-clip-src-minipixels-ml-1261022307) | `src/minipixels.ml:732` | 1 | 1 | 1 | 0 | 0 | 62.27 | 87.3 |
 | [`minipixels.mixerStopAll`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-mixerstopall-function-mixerstopall-mixer-src-minipixels-ml-1666561493) | `src/minipixels.ml:739` | 1 | 1 | 1 | 0 | 0 | 44.38 | 88.33 |
@@ -671,60 +715,64 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.tools.fsutil.mkdir`](File-src-minipixels-tools-fsutil-ml-605704885.md#function-function-minipixels-tools-fsutil-mkdir-function-mkdir-path-src-minipixels-tools-fsutil-ml-1993442249) | `src/minipixels/tools/fsutil.ml:22` | 4 | 3 | 2 | 1 | 1 | 124 | 71.94 |
 | [`minipixels.tools.fsutil.writeBytes`](File-src-minipixels-tools-fsutil-ml-605704885.md#function-function-minipixels-tools-fsutil-writebytes-function-writebytes-path-data-src-minipixels-tools-fsutil-ml-1097382007) | `src/minipixels/tools/fsutil.ml:78` | 12 | 13 | 7 | 7 | 2 | 625.13 | 55.94 |
 | [`minipixels.tools.fsutil.writeText`](File-src-minipixels-tools-fsutil-ml-605704885.md#function-function-minipixels-tools-fsutil-writetext-function-writetext-path-text-src-minipixels-tools-fsutil-ml-719235936) | `src/minipixels/tools/fsutil.ml:94` | 11 | 11 | 6 | 6 | 2 | 498.57 | 57.59 |
-| [`minipixels.tools.generator.addError`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-adderror-function-adderror-r-msg-src-minipixels-tools-generator-ml-1026990381) | `src/minipixels/tools/generator.ml:53` | 4 | 2 | 1 | 0 | 0 | 109.39 | 72.46 |
-| [`minipixels.tools.generator.addWarning`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-addwarning-function-addwarning-r-msg-src-minipixels-tools-generator-ml-1682824801) | `src/minipixels/tools/generator.ml:46` | 3 | 1 | 1 | 0 | 0 | 85.11 | 75.94 |
-| [`minipixels.tools.generator.arrayField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-arrayfield-function-arrayfield-obj-key-src-minipixels-tools-generator-ml-223697808) | `src/minipixels/tools/generator.ml:166` | 5 | 4 | 3 | 2 | 1 | 197.42 | 68.28 |
-| [`minipixels.tools.generator.assetHeight`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetheight-function-assetheight-asset-src-minipixels-tools-generator-ml-1926826956) | `src/minipixels/tools/generator.ml:220` | 3 | 1 | 1 | 0 | 0 | 75.28 | 76.32 |
-| [`minipixels.tools.generator.assetKind`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetkind-function-assetkind-asset-src-minipixels-tools-generator-ml-918138226) | `src/minipixels/tools/generator.ml:267` | 8 | 10 | 5 | 4 | 1 | 255.41 | 62.77 |
-| [`minipixels.tools.generator.assetLess`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetless-function-assetless-left-right-src-minipixels-tools-generator-ml-1903155175) | `src/minipixels/tools/generator.ml:119` | 13 | 13 | 5 | 6 | 2 | 544.36 | 55.87 |
-| [`minipixels.tools.generator.assetModule`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetmodule-function-assetmodule-asset-r-slot-src-minipixels-tools-generator-ml-2002425790) | `src/minipixels/tools/generator.ml:579` | 17 | 15 | 1 | 0 | 0 | 808.51 | 52.66 |
-| [`minipixels.tools.generator.assetPayload`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetpayload-function-assetpayload-asset-projectroot-src-minipixels-tools-generator-ml-731560131) | `src/minipixels/tools/generator.ml:321` | 10 | 9 | 4 | 3 | 1 | 581.39 | 58.29 |
-| [`minipixels.tools.generator.assetsHeader`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetsheader-function-assetsheader-root-fallbackpackpath-src-minipixels-tools-generator-ml-262383568) | `src/minipixels/tools/generator.ml:538` | 36 | 32 | 3 | 2 | 1 | 1329.05 | 43.78 |
-| [`minipixels.tools.generator.assetsModule`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetsmodule-function-assetsmodule-root-fallbackpackpath-r-src-minipixels-tools-generator-ml-222974424) | `src/minipixels/tools/generator.ml:647` | 117 | 118 | 49 | 136 | 6 | 7722.66 | 21.07 |
-| [`minipixels.tools.generator.assetWidth`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetwidth-function-assetwidth-asset-src-minipixels-tools-generator-ml-1180867762) | `src/minipixels/tools/generator.ml:214` | 3 | 1 | 1 | 0 | 0 | 75.28 | 76.32 |
-| [`minipixels.tools.generator.colorPart`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-colorpart-function-colorpart-asset-key-index-fallback-src-minipixels-tools-generator-ml-3280331) | `src/minipixels/tools/generator.ml:186` | 7 | 7 | 4 | 3 | 1 | 360 | 63.13 |
-| [`minipixels.tools.generator.compactPayload`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-compactpayload-function-compactpayload-data-profile-src-minipixels-tools-generator-ml-91830941) | `src/minipixels/tools/generator.ml:393` | 19 | 21 | 9 | 9 | 2 | 824.52 | 50.48 |
-| [`minipixels.tools.generator.defaultOutDir`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-defaultoutdir-function-defaultoutdir-projectpath-src-minipixels-tools-generator-ml-2064768812) | `src/minipixels/tools/generator.ml:60` | 4 | 2 | 1 | 0 | 0 | 155.32 | 71.39 |
-| [`minipixels.tools.generator.emitCollectionCount`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-emitcollectioncount-function-emitcollectioncount-levels-name-key-src-minipixels-tools-generator-ml-713427575) | `src/minipixels/tools/generator.ml:878` | 14 | 11 | 2 | 1 | 1 | 569.45 | 55.44 |
-| [`minipixels.tools.generator.emitCollectionField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-emitcollectionfield-function-emitcollectionfield-levels-name-key-field-functionsuffix-src-minipixels-tools-generator-ml-1571531614) | `src/minipixels/tools/generator.ml:899` | 20 | 15 | 4 | 6 | 3 | 890.57 | 50.43 |
-| [`minipixels.tools.generator.emitLevelScalar`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-emitlevelscalar-function-emitlevelscalar-levels-fnname-key-subkey-src-minipixels-tools-generator-ml-470272978) | `src/minipixels/tools/generator.ml:814` | 21 | 16 | 3 | 3 | 2 | 769.22 | 50.55 |
-| [`minipixels.tools.generator.emitTileData`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-emittiledata-function-emittiledata-levels-src-minipixels-tools-generator-ml-846711985) | `src/minipixels/tools/generator.ml:838` | 35 | 28 | 8 | 13 | 4 | 1924.87 | 42.24 |
-| [`minipixels.tools.generator.generate`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-generate-function-generate-projectpath-outdir-src-minipixels-tools-generator-ml-1953884477) | `src/minipixels/tools/generator.ml:1201` | 46 | 38 | 16 | 22 | 3 | 2345.74 | 37.98 |
-| [`minipixels.tools.generator.hasSheet`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-hassheet-function-hassheet-asset-src-minipixels-tools-generator-ml-823313442) | `src/minipixels/tools/generator.ml:506` | 3 | 1 | 1 | 0 | 0 | 70.31 | 76.52 |
-| [`minipixels.tools.generator.identifierBytes`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-identifierbytes-function-identifierbytes-text-src-minipixels-tools-generator-ml-60354221) | `src/minipixels/tools/generator.ml:94` | 7 | 4 | 2 | 1 | 1 | 197.65 | 65.22 |
-| [`minipixels.tools.generator.identifierCode`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-identifiercode-function-identifiercode-ch-src-minipixels-tools-generator-ml-5394993) | `src/minipixels/tools/generator.ml:79` | 12 | 13 | 4 | 3 | 1 | 418.24 | 57.57 |
-| [`minipixels.tools.generator.integerDivide`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-integerdivide-function-integerdivide-value-divisor-src-minipixels-tools-generator-ml-530124181) | `src/minipixels/tools/generator.ml:112` | 3 | 1 | 1 | 0 | 0 | 75.28 | 76.32 |
-| [`minipixels.tools.generator.join`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-join-function-join-root-rel-src-minipixels-tools-generator-ml-709731783) | `src/minipixels/tools/generator.ml:105` | 3 | 1 | 1 | 0 | 0 | 64.53 | 76.79 |
-| [`minipixels.tools.generator.jsonPoint`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-jsonpoint-function-jsonpoint-x-y-src-minipixels-tools-generator-ml-893405233) | `src/minipixels/tools/generator.ml:991` | 3 | 1 | 1 | 0 | 0 | 147.15 | 74.28 |
-| [`minipixels.tools.generator.jsonTrue`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-jsontrue-function-jsontrue-value-src-minipixels-tools-generator-ml-1528192013) | `src/minipixels/tools/generator.ml:958` | 3 | 1 | 1 | 0 | 0 | 96 | 75.58 |
-| [`minipixels.tools.generator.levelField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-levelfield-function-levelfield-level-key-fallback-src-minipixels-tools-generator-ml-2126640141) | `src/minipixels/tools/generator.ml:794` | 3 | 1 | 1 | 0 | 0 | 69.19 | 76.57 |
-| [`minipixels.tools.generator.levelsModule`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-levelsmodule-function-levelsmodule-m-r-src-minipixels-tools-generator-ml-2022266397) | `src/minipixels/tools/generator.ml:1107` | 73 | 68 | 8 | 10 | 3 | 4261.48 | 32.86 |
-| [`minipixels.tools.generator.levelsStubModule`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-levelsstubmodule-function-levelsstubmodule-src-minipixels-tools-generator-ml-164104188) | `src/minipixels/tools/generator.ml:767` | 22 | 1 | 1 | 0 | 0 | 218.72 | 54.2 |
-| [`minipixels.tools.generator.loadJson`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-loadjson-function-loadjson-path-r-src-minipixels-tools-generator-ml-1466955895) | `src/minipixels/tools/generator.ml:1184` | 13 | 9 | 3 | 2 | 1 | 360.55 | 57.39 |
-| [`minipixels.tools.generator.lz4Payload`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-lz4payload-function-lz4payload-data-src-minipixels-tools-generator-ml-212372756) | `src/minipixels/tools/generator.ml:378` | 12 | 11 | 2 | 1 | 1 | 509.05 | 57.24 |
-| [`minipixels.tools.generator.normalizeTiled`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-normalizetiled-function-normalizetiled-document-r-source-src-minipixels-tools-generator-ml-462824314) | `src/minipixels/tools/generator.ml:999` | 104 | 80 | 35 | 113 | 8 | 6005.57 | 24.84 |
-| [`minipixels.tools.generator.numberField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-numberfield-function-numberfield-obj-key-fallback-src-minipixels-tools-generator-ml-1771873920) | `src/minipixels/tools/generator.ml:151` | 3 | 1 | 1 | 0 | 0 | 102.8 | 75.37 |
-| [`minipixels.tools.generator.objectField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-objectfield-function-objectfield-obj-key-src-minipixels-tools-generator-ml-1804342438) | `src/minipixels/tools/generator.ml:175` | 5 | 4 | 3 | 2 | 1 | 178.81 | 68.58 |
-| [`minipixels.tools.generator.pointField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-pointfield-function-pointfield-level-key-xfallback-yfallback-src-minipixels-tools-generator-ml-1095341450) | `src/minipixels/tools/generator.ml:803` | 5 | 4 | 2 | 1 | 1 | 261.34 | 67.56 |
-| [`minipixels.tools.generator.printResult`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-printresult-function-printresult-r-src-minipixels-tools-generator-ml-1897932440) | `src/minipixels/tools/generator.ml:1250` | 19 | 11 | 6 | 7 | 2 | 507.8 | 52.35 |
-| [`minipixels.tools.generator.quote`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-quote-function-quote-text-src-minipixels-tools-generator-ml-156979913) | `src/minipixels/tools/generator.ml:67` | 3 | 1 | 1 | 0 | 0 | 41.21 | 78.15 |
-| [`minipixels.tools.generator.quotePath`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-quotepath-function-quotepath-text-src-minipixels-tools-generator-ml-1974716931) | `src/minipixels/tools/generator.ml:73` | 3 | 1 | 1 | 0 | 0 | 79.95 | 76.13 |
-| [`minipixels.tools.generator.renderProceduralPixels`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-renderproceduralpixels-function-renderproceduralpixels-asset-src-minipixels-tools-generator-ml-337733938) | `src/minipixels/tools/generator.ml:226` | 38 | 31 | 16 | 37 | 4 | 2396.02 | 39.72 |
-| [`minipixels.tools.generator.result`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-result-function-result-outdir-src-minipixels-tools-generator-ml-1337540733) | `src/minipixels/tools/generator.ml:39` | 3 | 1 | 1 | 0 | 0 | 71.7 | 76.47 |
-| [`minipixels.tools.generator.rlePayload`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-rlepayload-function-rlepayload-data-src-minipixels-tools-generator-ml-2005714208) | `src/minipixels/tools/generator.ml:334` | 41 | 35 | 13 | 25 | 4 | 1630.33 | 40.58 |
-| [`minipixels.tools.generator.runtimeAssetModule`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-runtimeassetmodule-function-runtimeassetmodule-asset-slot-src-minipixels-tools-generator-ml-326770682) | `src/minipixels/tools/generator.ml:600` | 42 | 36 | 4 | 3 | 1 | 2373.18 | 40.42 |
-| [`minipixels.tools.generator.sheetHeight`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-sheetheight-function-sheetheight-asset-fallback-src-minipixels-tools-generator-ml-1862805064) | `src/minipixels/tools/generator.ml:206` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
-| [`minipixels.tools.generator.sheetModule`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-sheetmodule-function-sheetmodule-asset-id-src-minipixels-tools-generator-ml-1662660675) | `src/minipixels/tools/generator.ml:513` | 21 | 20 | 2 | 1 | 1 | 1167.28 | 49.41 |
-| [`minipixels.tools.generator.sheetWidth`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-sheetwidth-function-sheetwidth-asset-fallback-src-minipixels-tools-generator-ml-998700800) | `src/minipixels/tools/generator.ml:197` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
-| [`minipixels.tools.generator.sortedAssets`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-sortedassets-function-sortedassets-root-src-minipixels-tools-generator-ml-445878164) | `src/minipixels/tools/generator.ml:135` | 11 | 8 | 4 | 6 | 3 | 423.93 | 58.35 |
-| [`minipixels.tools.generator.stringField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-stringfield-function-stringfield-obj-key-fallback-src-minipixels-tools-generator-ml-1788441524) | `src/minipixels/tools/generator.ml:159` | 3 | 1 | 1 | 0 | 0 | 102.8 | 75.37 |
-| [`minipixels.tools.generator.textCatalogPayload`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-textcatalogpayload-function-textcatalogpayload-path-src-minipixels-tools-generator-ml-539791437) | `src/minipixels/tools/generator.ml:278` | 39 | 38 | 11 | 16 | 3 | 2246.27 | 40.35 |
-| [`minipixels.tools.generator.tiledLayerIsSolid`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-tiledlayerissolid-function-tiledlayerissolid-layer-src-minipixels-tools-generator-ml-175429249) | `src/minipixels/tools/generator.ml:964` | 5 | 4 | 5 | 4 | 1 | 299.56 | 66.74 |
-| [`minipixels.tools.generator.tiledNumber`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-tilednumber-function-tilednumber-obj-key-fallback-src-minipixels-tools-generator-ml-1865193444) | `src/minipixels/tools/generator.ml:984` | 3 | 1 | 1 | 0 | 0 | 95.18 | 75.6 |
-| [`minipixels.tools.generator.tiledObjectKind`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-tiledobjectkind-function-tiledobjectkind-obj-src-minipixels-tools-generator-ml-266644527) | `src/minipixels/tools/generator.ml:972` | 7 | 8 | 4 | 3 | 1 | 389.72 | 62.89 |
-| [`minipixels.tools.generator.tiledProperty`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-tiledproperty-function-tiledproperty-obj-key-src-minipixels-tools-generator-ml-428731166) | `src/minipixels/tools/generator.ml:945` | 10 | 7 | 4 | 6 | 3 | 396.82 | 59.45 |
-| [`minipixels.tools.generator.validateLevels`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-validatelevels-function-validatelevels-r-levelsdoc-source-src-minipixels-tools-generator-ml-1441010220) | `src/minipixels/tools/generator.ml:924` | 17 | 13 | 9 | 13 | 3 | 931.24 | 51.16 |
-| [`minipixels.tools.generator.writeAssetPack`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-writeassetpack-function-writeassetpack-root-projectroot-path-r-src-minipixels-tools-generator-ml-209076684) | `src/minipixels/tools/generator.ml:418` | 85 | 77 | 19 | 43 | 5 | 4221.28 | 29.97 |
+| [`minipixels.tools.generator.addError`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-adderror-function-adderror-r-msg-src-minipixels-tools-generator-ml-1026990381) | `src/minipixels/tools/generator.ml:54` | 4 | 2 | 1 | 0 | 0 | 109.39 | 72.46 |
+| [`minipixels.tools.generator.addWarning`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-addwarning-function-addwarning-r-msg-src-minipixels-tools-generator-ml-1682824801) | `src/minipixels/tools/generator.ml:47` | 3 | 1 | 1 | 0 | 0 | 85.11 | 75.94 |
+| [`minipixels.tools.generator.arrayField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-arrayfield-function-arrayfield-obj-key-src-minipixels-tools-generator-ml-223697808) | `src/minipixels/tools/generator.ml:177` | 5 | 4 | 3 | 2 | 1 | 197.42 | 68.28 |
+| [`minipixels.tools.generator.assetHeight`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetheight-function-assetheight-asset-src-minipixels-tools-generator-ml-1926826956) | `src/minipixels/tools/generator.ml:231` | 3 | 1 | 1 | 0 | 0 | 75.28 | 76.32 |
+| [`minipixels.tools.generator.assetKind`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetkind-function-assetkind-asset-src-minipixels-tools-generator-ml-918138226) | `src/minipixels/tools/generator.ml:278` | 9 | 12 | 6 | 5 | 1 | 304.31 | 60.99 |
+| [`minipixels.tools.generator.assetLess`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetless-function-assetless-left-right-src-minipixels-tools-generator-ml-1903155175) | `src/minipixels/tools/generator.ml:120` | 13 | 13 | 5 | 6 | 2 | 544.36 | 55.87 |
+| [`minipixels.tools.generator.assetModule`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetmodule-function-assetmodule-asset-r-slot-src-minipixels-tools-generator-ml-2002425790) | `src/minipixels/tools/generator.ml:613` | 17 | 15 | 1 | 0 | 0 | 808.51 | 52.66 |
+| [`minipixels.tools.generator.assetPayload`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetpayload-function-assetpayload-asset-projectroot-src-minipixels-tools-generator-ml-731560131) | `src/minipixels/tools/generator.ml:333` | 10 | 9 | 4 | 3 | 1 | 581.39 | 58.29 |
+| [`minipixels.tools.generator.assetsHeader`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetsheader-function-assetsheader-root-fallbackpackpath-src-minipixels-tools-generator-ml-262383568) | `src/minipixels/tools/generator.ml:553` | 55 | 48 | 12 | 25 | 5 | 2206.27 | 37.01 |
+| [`minipixels.tools.generator.assetsModule`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetsmodule-function-assetsmodule-root-fallbackpackpath-r-src-minipixels-tools-generator-ml-222974424) | `src/minipixels/tools/generator.ml:724` | 128 | 126 | 57 | 154 | 6 | 8443.06 | 18.87 |
+| [`minipixels.tools.generator.assetWidth`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-assetwidth-function-assetwidth-asset-src-minipixels-tools-generator-ml-1180867762) | `src/minipixels/tools/generator.ml:225` | 3 | 1 | 1 | 0 | 0 | 75.28 | 76.32 |
+| [`minipixels.tools.generator.boolField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-boolfield-function-boolfield-obj-key-fallback-src-minipixels-tools-generator-ml-1436692678) | `src/minipixels/tools/generator.ml:168` | 5 | 4 | 3 | 2 | 1 | 199.69 | 68.24 |
+| [`minipixels.tools.generator.colorPart`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-colorpart-function-colorpart-asset-key-index-fallback-src-minipixels-tools-generator-ml-3280331) | `src/minipixels/tools/generator.ml:197` | 7 | 7 | 4 | 3 | 1 | 360 | 63.13 |
+| [`minipixels.tools.generator.compactPayload`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-compactpayload-function-compactpayload-data-profile-src-minipixels-tools-generator-ml-91830941) | `src/minipixels/tools/generator.ml:405` | 19 | 21 | 9 | 9 | 2 | 824.52 | 50.48 |
+| [`minipixels.tools.generator.defaultOutDir`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-defaultoutdir-function-defaultoutdir-projectpath-src-minipixels-tools-generator-ml-2064768812) | `src/minipixels/tools/generator.ml:61` | 4 | 2 | 1 | 0 | 0 | 155.32 | 71.39 |
+| [`minipixels.tools.generator.emitCollectionCount`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-emitcollectioncount-function-emitcollectioncount-levels-name-key-src-minipixels-tools-generator-ml-713427575) | `src/minipixels/tools/generator.ml:966` | 14 | 11 | 2 | 1 | 1 | 569.45 | 55.44 |
+| [`minipixels.tools.generator.emitCollectionField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-emitcollectionfield-function-emitcollectionfield-levels-name-key-field-functionsuffix-src-minipixels-tools-generator-ml-1571531614) | `src/minipixels/tools/generator.ml:987` | 20 | 15 | 4 | 6 | 3 | 890.57 | 50.43 |
+| [`minipixels.tools.generator.emitLevelScalar`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-emitlevelscalar-function-emitlevelscalar-levels-fnname-key-subkey-src-minipixels-tools-generator-ml-470272978) | `src/minipixels/tools/generator.ml:902` | 21 | 16 | 3 | 3 | 2 | 769.22 | 50.55 |
+| [`minipixels.tools.generator.emitTileData`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-emittiledata-function-emittiledata-levels-src-minipixels-tools-generator-ml-846711985) | `src/minipixels/tools/generator.ml:926` | 35 | 28 | 8 | 13 | 4 | 1924.87 | 42.24 |
+| [`minipixels.tools.generator.generate`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-generate-function-generate-projectpath-outdir-src-minipixels-tools-generator-ml-1953884477) | `src/minipixels/tools/generator.ml:1289` | 46 | 38 | 16 | 22 | 3 | 2345.74 | 37.98 |
+| [`minipixels.tools.generator.hasSheet`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-hassheet-function-hassheet-asset-src-minipixels-tools-generator-ml-823313442) | `src/minipixels/tools/generator.ml:521` | 3 | 1 | 1 | 0 | 0 | 70.31 | 76.52 |
+| [`minipixels.tools.generator.identifierBytes`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-identifierbytes-function-identifierbytes-text-src-minipixels-tools-generator-ml-60354221) | `src/minipixels/tools/generator.ml:95` | 7 | 4 | 2 | 1 | 1 | 197.65 | 65.22 |
+| [`minipixels.tools.generator.identifierCode`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-identifiercode-function-identifiercode-ch-src-minipixels-tools-generator-ml-5394993) | `src/minipixels/tools/generator.ml:80` | 12 | 13 | 4 | 3 | 1 | 418.24 | 57.57 |
+| [`minipixels.tools.generator.integerDivide`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-integerdivide-function-integerdivide-value-divisor-src-minipixels-tools-generator-ml-530124181) | `src/minipixels/tools/generator.ml:113` | 3 | 1 | 1 | 0 | 0 | 75.28 | 76.32 |
+| [`minipixels.tools.generator.isStreamedMedia`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-isstreamedmedia-function-isstreamedmedia-asset-src-minipixels-tools-generator-ml-1003272140) | `src/minipixels/tools/generator.ml:659` | 4 | 2 | 1 | 0 | 0 | 158.12 | 71.33 |
+| [`minipixels.tools.generator.join`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-join-function-join-root-rel-src-minipixels-tools-generator-ml-709731783) | `src/minipixels/tools/generator.ml:106` | 3 | 1 | 1 | 0 | 0 | 64.53 | 76.79 |
+| [`minipixels.tools.generator.jsonPoint`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-jsonpoint-function-jsonpoint-x-y-src-minipixels-tools-generator-ml-893405233) | `src/minipixels/tools/generator.ml:1079` | 3 | 1 | 1 | 0 | 0 | 147.15 | 74.28 |
+| [`minipixels.tools.generator.jsonTrue`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-jsontrue-function-jsontrue-value-src-minipixels-tools-generator-ml-1528192013) | `src/minipixels/tools/generator.ml:1046` | 3 | 1 | 1 | 0 | 0 | 96 | 75.58 |
+| [`minipixels.tools.generator.levelField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-levelfield-function-levelfield-level-key-fallback-src-minipixels-tools-generator-ml-2126640141) | `src/minipixels/tools/generator.ml:882` | 3 | 1 | 1 | 0 | 0 | 69.19 | 76.57 |
+| [`minipixels.tools.generator.levelsModule`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-levelsmodule-function-levelsmodule-m-r-src-minipixels-tools-generator-ml-2022266397) | `src/minipixels/tools/generator.ml:1195` | 73 | 68 | 8 | 10 | 3 | 4261.48 | 32.86 |
+| [`minipixels.tools.generator.levelsStubModule`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-levelsstubmodule-function-levelsstubmodule-src-minipixels-tools-generator-ml-164104188) | `src/minipixels/tools/generator.ml:855` | 22 | 1 | 1 | 0 | 0 | 218.72 | 54.2 |
+| [`minipixels.tools.generator.loadJson`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-loadjson-function-loadjson-path-r-src-minipixels-tools-generator-ml-1466955895) | `src/minipixels/tools/generator.ml:1272` | 13 | 9 | 3 | 2 | 1 | 360.55 | 57.39 |
+| [`minipixels.tools.generator.lz4Payload`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-lz4payload-function-lz4payload-data-src-minipixels-tools-generator-ml-212372756) | `src/minipixels/tools/generator.ml:390` | 12 | 11 | 2 | 1 | 1 | 509.05 | 57.24 |
+| [`minipixels.tools.generator.mediaMime`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-mediamime-function-mediamime-asset-src-minipixels-tools-generator-ml-2095120610) | `src/minipixels/tools/generator.ml:633` | 15 | 24 | 15 | 14 | 1 | 781.89 | 52.07 |
+| [`minipixels.tools.generator.mediaSuffix`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-mediasuffix-function-mediasuffix-asset-src-minipixels-tools-generator-ml-767660640) | `src/minipixels/tools/generator.ml:651` | 5 | 4 | 2 | 1 | 1 | 171.9 | 68.83 |
+| [`minipixels.tools.generator.normalizeTiled`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-normalizetiled-function-normalizetiled-document-r-source-src-minipixels-tools-generator-ml-462824314) | `src/minipixels/tools/generator.ml:1087` | 104 | 80 | 35 | 113 | 8 | 6005.57 | 24.84 |
+| [`minipixels.tools.generator.numberField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-numberfield-function-numberfield-obj-key-fallback-src-minipixels-tools-generator-ml-1771873920) | `src/minipixels/tools/generator.ml:152` | 3 | 1 | 1 | 0 | 0 | 102.8 | 75.37 |
+| [`minipixels.tools.generator.objectField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-objectfield-function-objectfield-obj-key-src-minipixels-tools-generator-ml-1804342438) | `src/minipixels/tools/generator.ml:186` | 5 | 4 | 3 | 2 | 1 | 178.81 | 68.58 |
+| [`minipixels.tools.generator.pointField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-pointfield-function-pointfield-level-key-xfallback-yfallback-src-minipixels-tools-generator-ml-1095341450) | `src/minipixels/tools/generator.ml:891` | 5 | 4 | 2 | 1 | 1 | 261.34 | 67.56 |
+| [`minipixels.tools.generator.printResult`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-printresult-function-printresult-r-src-minipixels-tools-generator-ml-1897932440) | `src/minipixels/tools/generator.ml:1338` | 19 | 11 | 6 | 7 | 2 | 507.8 | 52.35 |
+| [`minipixels.tools.generator.quote`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-quote-function-quote-text-src-minipixels-tools-generator-ml-156979913) | `src/minipixels/tools/generator.ml:68` | 3 | 1 | 1 | 0 | 0 | 41.21 | 78.15 |
+| [`minipixels.tools.generator.quotePath`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-quotepath-function-quotepath-text-src-minipixels-tools-generator-ml-1974716931) | `src/minipixels/tools/generator.ml:74` | 3 | 1 | 1 | 0 | 0 | 79.95 | 76.13 |
+| [`minipixels.tools.generator.renderProceduralPixels`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-renderproceduralpixels-function-renderproceduralpixels-asset-src-minipixels-tools-generator-ml-337733938) | `src/minipixels/tools/generator.ml:237` | 38 | 31 | 16 | 37 | 4 | 2396.02 | 39.72 |
+| [`minipixels.tools.generator.result`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-result-function-result-outdir-src-minipixels-tools-generator-ml-1337540733) | `src/minipixels/tools/generator.ml:40` | 3 | 1 | 1 | 0 | 0 | 71.7 | 76.47 |
+| [`minipixels.tools.generator.rlePayload`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-rlepayload-function-rlepayload-data-src-minipixels-tools-generator-ml-2005714208) | `src/minipixels/tools/generator.ml:346` | 41 | 35 | 13 | 25 | 4 | 1630.33 | 40.58 |
+| [`minipixels.tools.generator.runtimeAssetModule`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-runtimeassetmodule-function-runtimeassetmodule-asset-slot-src-minipixels-tools-generator-ml-326770682) | `src/minipixels/tools/generator.ml:667` | 52 | 43 | 6 | 6 | 2 | 3161.72 | 37.25 |
+| [`minipixels.tools.generator.sheetHeight`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-sheetheight-function-sheetheight-asset-fallback-src-minipixels-tools-generator-ml-1862805064) | `src/minipixels/tools/generator.ml:217` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
+| [`minipixels.tools.generator.sheetModule`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-sheetmodule-function-sheetmodule-asset-id-src-minipixels-tools-generator-ml-1662660675) | `src/minipixels/tools/generator.ml:528` | 21 | 20 | 2 | 1 | 1 | 1167.28 | 49.41 |
+| [`minipixels.tools.generator.sheetWidth`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-sheetwidth-function-sheetwidth-asset-fallback-src-minipixels-tools-generator-ml-998700800) | `src/minipixels/tools/generator.ml:208` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
+| [`minipixels.tools.generator.sortedAssets`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-sortedassets-function-sortedassets-root-src-minipixels-tools-generator-ml-445878164) | `src/minipixels/tools/generator.ml:136` | 11 | 8 | 4 | 6 | 3 | 423.93 | 58.35 |
+| [`minipixels.tools.generator.stringField`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-stringfield-function-stringfield-obj-key-fallback-src-minipixels-tools-generator-ml-1788441524) | `src/minipixels/tools/generator.ml:160` | 3 | 1 | 1 | 0 | 0 | 102.8 | 75.37 |
+| [`minipixels.tools.generator.textCatalogPayload`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-textcatalogpayload-function-textcatalogpayload-path-src-minipixels-tools-generator-ml-539791437) | `src/minipixels/tools/generator.ml:290` | 39 | 38 | 11 | 16 | 3 | 2246.27 | 40.35 |
+| [`minipixels.tools.generator.tiledLayerIsSolid`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-tiledlayerissolid-function-tiledlayerissolid-layer-src-minipixels-tools-generator-ml-175429249) | `src/minipixels/tools/generator.ml:1052` | 5 | 4 | 5 | 4 | 1 | 299.56 | 66.74 |
+| [`minipixels.tools.generator.tiledNumber`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-tilednumber-function-tilednumber-obj-key-fallback-src-minipixels-tools-generator-ml-1865193444) | `src/minipixels/tools/generator.ml:1072` | 3 | 1 | 1 | 0 | 0 | 95.18 | 75.6 |
+| [`minipixels.tools.generator.tiledObjectKind`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-tiledobjectkind-function-tiledobjectkind-obj-src-minipixels-tools-generator-ml-266644527) | `src/minipixels/tools/generator.ml:1060` | 7 | 8 | 4 | 3 | 1 | 389.72 | 62.89 |
+| [`minipixels.tools.generator.tiledProperty`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-tiledproperty-function-tiledproperty-obj-key-src-minipixels-tools-generator-ml-428731166) | `src/minipixels/tools/generator.ml:1033` | 10 | 7 | 4 | 6 | 3 | 396.82 | 59.45 |
+| [`minipixels.tools.generator.validateLevels`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-validatelevels-function-validatelevels-r-levelsdoc-source-src-minipixels-tools-generator-ml-1441010220) | `src/minipixels/tools/generator.ml:1012` | 17 | 13 | 9 | 13 | 3 | 931.24 | 51.16 |
+| [`minipixels.tools.generator.writeAssetPack`](File-src-minipixels-tools-generator-ml-920573533.md#function-function-minipixels-tools-generator-writeassetpack-function-writeassetpack-root-projectroot-path-r-src-minipixels-tools-generator-ml-209076684) | `src/minipixels/tools/generator.ml:430` | 88 | 81 | 21 | 47 | 5 | 4463.93 | 29.2 |
 | [`minipixels.tools.json.advance`](File-src-minipixels-tools-json-ml-388493918.md#function-function-minipixels-tools-json-advance-function-advance-p-src-minipixels-tools-json-ml-1670467414) | `src/minipixels/tools/json.ml:105` | 5 | 3 | 1 | 0 | 0 | 91.38 | 70.89 |
 | [`minipixels.tools.json.array`](File-src-minipixels-tools-json-ml-388493918.md#function-function-minipixels-tools-json-array-function-array-items-src-minipixels-tools-json-ml-864087716) | `src/minipixels/tools/json.ml:66` | 1 | 1 | 1 | 0 | 0 | 101.58 | 85.81 |
 | [`minipixels.tools.json.asBool`](File-src-minipixels-tools-json-ml-388493918.md#function-function-minipixels-tools-json-asbool-function-asbool-v-fallback-src-minipixels-tools-json-ml-420557818) | `src/minipixels/tools/json.ml:426` | 4 | 3 | 3 | 2 | 1 | 118.94 | 71.93 |
@@ -763,19 +811,19 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.tools.manifest.dirname`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-dirname-function-dirname-path-src-minipixels-tools-manifest-ml-264369667) | `src/minipixels/tools/manifest.ml:77` | 8 | 8 | 3 | 2 | 1 | 343.13 | 62.14 |
 | [`minipixels.tools.manifest.isValid`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-isvalid-function-isvalid-m-src-minipixels-tools-manifest-ml-1577894917) | `src/minipixels/tools/manifest.ml:63` | 3 | 1 | 1 | 0 | 0 | 78.14 | 76.2 |
 | [`minipixels.tools.manifest.join`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-join-function-join-root-rel-src-minipixels-tools-manifest-ml-2078359205) | `src/minipixels/tools/manifest.ml:89` | 3 | 1 | 1 | 0 | 0 | 64.53 | 76.79 |
-| [`minipixels.tools.manifest.load`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-load-function-load-path-src-minipixels-tools-manifest-ml-1065554379) | `src/minipixels/tools/manifest.ml:339` | 10 | 7 | 2 | 1 | 1 | 302.86 | 60.54 |
+| [`minipixels.tools.manifest.load`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-load-function-load-path-src-minipixels-tools-manifest-ml-1065554379) | `src/minipixels/tools/manifest.ml:344` | 10 | 7 | 2 | 1 | 1 | 302.86 | 60.54 |
 | [`minipixels.tools.manifest.maxInt`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-maxint-function-maxint-a-b-src-minipixels-tools-manifest-ml-529438451) | `src/minipixels/tools/manifest.ml:70` | 4 | 3 | 2 | 1 | 1 | 71.7 | 73.61 |
 | [`minipixels.tools.manifest.newManifest`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-newmanifest-function-newmanifest-path-root-src-minipixels-tools-manifest-ml-1555835233) | `src/minipixels/tools/manifest.ml:43` | 3 | 1 | 1 | 0 | 0 | 148.46 | 74.25 |
 | [`minipixels.tools.manifest.numberField`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-numberfield-function-numberfield-m-obj-key-required-fallback-src-minipixels-tools-manifest-ml-1096271560) | `src/minipixels/tools/manifest.ml:155` | 12 | 9 | 4 | 4 | 2 | 381.47 | 57.85 |
-| [`minipixels.tools.manifest.parseText`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-parsetext-function-parsetext-text-source-root-src-minipixels-tools-manifest-ml-1441810850) | `src/minipixels/tools/manifest.ml:327` | 9 | 6 | 2 | 1 | 1 | 267.93 | 61.91 |
-| [`minipixels.tools.manifest.printReport`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-printreport-function-printreport-m-src-minipixels-tools-manifest-ml-960629759) | `src/minipixels/tools/manifest.ml:352` | 24 | 17 | 7 | 8 | 2 | 850.86 | 48.44 |
+| [`minipixels.tools.manifest.parseText`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-parsetext-function-parsetext-text-source-root-src-minipixels-tools-manifest-ml-1441810850) | `src/minipixels/tools/manifest.ml:332` | 9 | 6 | 2 | 1 | 1 | 267.93 | 61.91 |
+| [`minipixels.tools.manifest.printReport`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-printreport-function-printreport-m-src-minipixels-tools-manifest-ml-960629759) | `src/minipixels/tools/manifest.ml:357` | 24 | 17 | 7 | 8 | 2 | 850.86 | 48.44 |
 | [`minipixels.tools.manifest.requireField`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-requirefield-function-requirefield-m-obj-key-src-minipixels-tools-manifest-ml-138594909) | `src/minipixels/tools/manifest.ml:123` | 7 | 4 | 2 | 1 | 1 | 173.92 | 65.61 |
 | [`minipixels.tools.manifest.safeIdentifier`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-safeidentifier-function-safeidentifier-id-src-minipixels-tools-manifest-ml-2025223973) | `src/minipixels/tools/manifest.ml:95` | 11 | 12 | 6 | 6 | 2 | 454 | 57.87 |
 | [`minipixels.tools.manifest.stringField`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-stringfield-function-stringfield-m-obj-key-required-src-minipixels-tools-manifest-ml-438859378) | `src/minipixels/tools/manifest.ml:136` | 12 | 9 | 4 | 4 | 2 | 371.56 | 57.93 |
-| [`minipixels.tools.manifest.validateAsset`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-validateasset-function-validateasset-m-asset-seen-src-minipixels-tools-manifest-ml-1965574238) | `src/minipixels/tools/manifest.ml:178` | 56 | 40 | 31 | 38 | 3 | 3083.63 | 33.27 |
-| [`minipixels.tools.manifest.validateAssets`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-validateassets-function-validateassets-m-root-src-minipixels-tools-manifest-ml-88321205) | `src/minipixels/tools/manifest.ml:238` | 14 | 12 | 5 | 4 | 1 | 528.54 | 55.26 |
-| [`minipixels.tools.manifest.validateLevels`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-validatelevels-function-validatelevels-m-root-src-minipixels-tools-manifest-ml-1903826297) | `src/minipixels/tools/manifest.ml:256` | 13 | 10 | 5 | 4 | 1 | 493.31 | 56.17 |
-| [`minipixels.tools.manifest.validateRoot`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-validateroot-function-validateroot-m-root-src-minipixels-tools-manifest-ml-1770268961) | `src/minipixels/tools/manifest.ml:273` | 45 | 42 | 19 | 25 | 3 | 2625.67 | 37.44 |
+| [`minipixels.tools.manifest.validateAsset`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-validateasset-function-validateasset-m-asset-seen-src-minipixels-tools-manifest-ml-1965574238) | `src/minipixels/tools/manifest.ml:178` | 61 | 45 | 37 | 44 | 3 | 3555.88 | 31.21 |
+| [`minipixels.tools.manifest.validateAssets`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-validateassets-function-validateassets-m-root-src-minipixels-tools-manifest-ml-88321205) | `src/minipixels/tools/manifest.ml:243` | 14 | 12 | 5 | 4 | 1 | 528.54 | 55.26 |
+| [`minipixels.tools.manifest.validateLevels`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-validatelevels-function-validatelevels-m-root-src-minipixels-tools-manifest-ml-1903826297) | `src/minipixels/tools/manifest.ml:261` | 13 | 10 | 5 | 4 | 1 | 493.31 | 56.17 |
+| [`minipixels.tools.manifest.validateRoot`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-validateroot-function-validateroot-m-root-src-minipixels-tools-manifest-ml-1770268961) | `src/minipixels/tools/manifest.ml:278` | 45 | 42 | 19 | 25 | 3 | 2625.67 | 37.44 |
 | [`minipixels.tools.manifest.validCompressionProfile`](File-src-minipixels-tools-manifest-ml-1067201239.md#function-function-minipixels-tools-manifest-validcompressionprofile-function-validcompressionprofile-value-src-minipixels-tools-manifest-ml-1793777077) | `src/minipixels/tools/manifest.ml:170` | 3 | 1 | 1 | 0 | 0 | 85.11 | 75.94 |
 | [`minipixels.unbindAction`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-unbindaction-function-unbindaction-input-action-src-minipixels-ml-1669983920) | `src/minipixels.ml:662` | 1 | 1 | 1 | 0 | 0 | 64.53 | 87.19 |
 | [`minipixels.unloadPackedAsset`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-unloadpackedasset-function-unloadpackedasset-assetpack-name-src-minipixels-ml-2057674390) | `src/minipixels.ml:503` | 1 | 1 | 1 | 0 | 0 | 64.53 | 87.19 |
@@ -817,7 +865,7 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 
 A clone group is an exact sequence of 6 normalized, contiguous code lines found more than once. Comments and formatting whitespace are ignored. Duplicated-line totals count overlapping windows only once.
 
-Found 18 clone group(s). At most 18 groups are shown.
+Found 22 clone group(s). At most 22 groups are shown.
 
 <details>
 <summary>Clone 1 — 2 occurrences</summary>
@@ -829,8 +877,8 @@ Found 18 clone group(s). At most 18 groups are shown.
     offsets = array ( count , 0 )
     sizes = array ( count , 0 )
 
-- [`src/minipixels/assets/pack.ml:215`](File-src-minipixels-assets-pack-ml-1157891367.md)
-- [`src/minipixels/assets/pack.ml:406`](File-src-minipixels-assets-pack-ml-1157891367.md)
+- [`src/minipixels/assets/pack.ml:282`](File-src-minipixels-assets-pack-ml-1157891367.md)
+- [`src/minipixels/assets/pack.ml:473`](File-src-minipixels-assets-pack-ml-1157891367.md)
 
 </details>
 
@@ -844,8 +892,8 @@ Found 18 clone group(s). At most 18 groups are shown.
     offsets [ i ] = offset
     sizes [ i ] = size
 
-- [`src/minipixels/assets/pack.ml:286`](File-src-minipixels-assets-pack-ml-1157891367.md)
-- [`src/minipixels/assets/pack.ml:468`](File-src-minipixels-assets-pack-ml-1157891367.md)
+- [`src/minipixels/assets/pack.ml:353`](File-src-minipixels-assets-pack-ml-1157891367.md)
+- [`src/minipixels/assets/pack.ml:535`](File-src-minipixels-assets-pack-ml-1157891367.md)
 
 </details>
 
@@ -859,8 +907,8 @@ Found 18 clone group(s). At most 18 groups are shown.
     end if
     end for
 
-- [`src/minipixels/assets/pack.ml:315`](File-src-minipixels-assets-pack-ml-1157891367.md)
-- [`src/minipixels/assets/pack.ml:498`](File-src-minipixels-assets-pack-ml-1157891367.md)
+- [`src/minipixels/assets/pack.ml:382`](File-src-minipixels-assets-pack-ml-1157891367.md)
+- [`src/minipixels/assets/pack.ml:565`](File-src-minipixels-assets-pack-ml-1157891367.md)
 
 </details>
 
@@ -874,8 +922,8 @@ Found 18 clone group(s). At most 18 groups are shown.
     end for
     end if
 
-- [`src/minipixels/assets/pack.ml:316`](File-src-minipixels-assets-pack-ml-1157891367.md)
-- [`src/minipixels/assets/pack.ml:499`](File-src-minipixels-assets-pack-ml-1157891367.md)
+- [`src/minipixels/assets/pack.ml:383`](File-src-minipixels-assets-pack-ml-1157891367.md)
+- [`src/minipixels/assets/pack.ml:566`](File-src-minipixels-assets-pack-ml-1157891367.md)
 
 </details>
 
@@ -957,6 +1005,66 @@ Found 18 clone group(s). At most 18 groups are shown.
 <details>
 <summary>Clone 10 — 2 occurrences</summary>
 
+    function close ( )
+    if this . closed then return true end if
+    result = try ( this . player . close ( ) )
+    this . source . close ( )
+    this . closed = true
+    if typeof ( result ) == "error" then return result end if
+
+- [`src/minipixels/media/media.ml:122`](File-src-minipixels-media-media-ml-194127391.md)
+- [`src/minipixels/media/media.ml:180`](File-src-minipixels-media-media-ml-194127391.md)
+
+</details>
+
+<details>
+<summary>Clone 11 — 2 occurrences</summary>
+
+    if this . closed then return true end if
+    result = try ( this . player . close ( ) )
+    this . source . close ( )
+    this . closed = true
+    if typeof ( result ) == "error" then return result end if
+    return true
+
+- [`src/minipixels/media/media.ml:123`](File-src-minipixels-media-media-ml-194127391.md)
+- [`src/minipixels/media/media.ml:181`](File-src-minipixels-media-media-ml-194127391.md)
+
+</details>
+
+<details>
+<summary>Clone 12 — 2 occurrences</summary>
+
+    result = try ( this . player . close ( ) )
+    this . source . close ( )
+    this . closed = true
+    if typeof ( result ) == "error" then return result end if
+    return true
+    end function
+
+- [`src/minipixels/media/media.ml:124`](File-src-minipixels-media-media-ml-194127391.md)
+- [`src/minipixels/media/media.ml:182`](File-src-minipixels-media-media-ml-194127391.md)
+
+</details>
+
+<details>
+<summary>Clone 13 — 2 occurrences</summary>
+
+    this . source . close ( )
+    this . closed = true
+    if typeof ( result ) == "error" then return result end if
+    return true
+    end function
+    end struct
+
+- [`src/minipixels/media/media.ml:125`](File-src-minipixels-media-media-ml-194127391.md)
+- [`src/minipixels/media/media.ml:183`](File-src-minipixels-media-media-ml-194127391.md)
+
+</details>
+
+<details>
+<summary>Clone 14 — 2 occurrences</summary>
+
     if w is not Window or width < 1 or height < 1 then return false end if
     width = mt . floorInt ( width )
     height = mt . floorInt ( height )
@@ -970,7 +1078,7 @@ Found 18 clone group(s). At most 18 groups are shown.
 </details>
 
 <details>
-<summary>Clone 11 — 2 occurrences</summary>
+<summary>Clone 15 — 2 occurrences</summary>
 
     return
     end if
@@ -985,7 +1093,7 @@ Found 18 clone group(s). At most 18 groups are shown.
 </details>
 
 <details>
-<summary>Clone 12 — 2 occurrences</summary>
+<summary>Clone 16 — 2 occurrences</summary>
 
     end if
     if input . actionCount > 0 then
@@ -1000,7 +1108,7 @@ Found 18 clone group(s). At most 18 groups are shown.
 </details>
 
 <details>
-<summary>Clone 13 — 2 occurrences</summary>
+<summary>Clone 17 — 2 occurrences</summary>
 
     function dirname ( path )
     lastSlash = str . lastIndexOf ( path , "\\" )
@@ -1015,7 +1123,7 @@ Found 18 clone group(s). At most 18 groups are shown.
 </details>
 
 <details>
-<summary>Clone 14 — 2 occurrences</summary>
+<summary>Clone 18 — 2 occurrences</summary>
 
     lastSlash = str . lastIndexOf ( path , "\\" )
     lastForward = str . lastIndexOf ( path , "/" )
@@ -1030,7 +1138,7 @@ Found 18 clone group(s). At most 18 groups are shown.
 </details>
 
 <details>
-<summary>Clone 15 — 2 occurrences</summary>
+<summary>Clone 19 — 2 occurrences</summary>
 
     lastForward = str . lastIndexOf ( path , "/" )
     last = maxInt ( lastSlash , lastForward )
@@ -1045,7 +1153,7 @@ Found 18 clone group(s). At most 18 groups are shown.
 </details>
 
 <details>
-<summary>Clone 16 — 2 occurrences</summary>
+<summary>Clone 20 — 2 occurrences</summary>
 
     end for
     code . appendLine ( "  return " + fallback )
@@ -1054,13 +1162,13 @@ Found 18 clone group(s). At most 18 groups are shown.
     return code . toString ( )
     end function
 
-- [`src/minipixels/tools/generator.ml:829`](File-src-minipixels-tools-generator-ml-920573533.md)
-- [`src/minipixels/tools/generator.ml:886`](File-src-minipixels-tools-generator-ml-920573533.md)
+- [`src/minipixels/tools/generator.ml:917`](File-src-minipixels-tools-generator-ml-920573533.md)
+- [`src/minipixels/tools/generator.ml:974`](File-src-minipixels-tools-generator-ml-920573533.md)
 
 </details>
 
 <details>
-<summary>Clone 17 — 2 occurrences</summary>
+<summary>Clone 21 — 2 occurrences</summary>
 
     return
     end if
@@ -1075,7 +1183,7 @@ Found 18 clone group(s). At most 18 groups are shown.
 </details>
 
 <details>
-<summary>Clone 18 — 2 occurrences</summary>
+<summary>Clone 22 — 2 occurrences</summary>
 
     end if
     p . pos = p . pos + 1

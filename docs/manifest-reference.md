@@ -49,6 +49,17 @@ MiniPixels projects are described by `minipixels.json`.
       "mp3Quality": 2
     },
     {
+      "id": "theme",
+      "type": "audio",
+      "path": "assets/audio/theme.mp3",
+      "stream": true
+    },
+    {
+      "id": "intro",
+      "type": "video",
+      "path": "assets/video/intro.mp4"
+    },
+    {
       "id": "de",
       "type": "text",
       "locale": "de",
@@ -76,7 +87,8 @@ Asset types:
 | --- | --- | --- | --- |
 | `image` | non-interlaced PNG image asset | validates and preserves source PNG bytes | stores source PNG bytes |
 | `procedural` | generated checker/player/tile sprite data from manifest fields | renders a Deflate-compressed PNG | renders a deterministic PNG and applies pack LZ4/RLE when useful |
-| `audio` | runtime PCM WAV or MP3 file | transcodes WAV to MP3 when smaller and generates a lazy memory-clip helper | stores original payload and generates a lazy memory-clip helper |
+| `audio` | runtime PCM WAV or MP3 file | transcodes WAV to MP3 when smaller; `stream: true` generates a seekable file-backed player instead of a memory clip | same behavior without WAV transcoding |
+| `video` | encoded media, normally MP4 | generates a seekable file-backed `std.video` player | same behavior |
 | `file` | runtime data file | selects Deflate/RLE by default or LZ4 with `fast` | selects LZ4/RLE when useful |
 | `text` | UTF-8 JSON translation catalog | validates, encodes MPT1, and compresses when useful | encodes MPT1 and applies LZ4/RLE when useful |
 | `data` | structured runtime JSON data | canonicalizes JSON and compresses when useful | stores JSON and applies LZ4/RLE when useful |
@@ -84,13 +96,13 @@ Asset types:
 
 Assets with `sheet` metadata also get generated helpers such as `gen.sheet_player()`.
 
-Both generators write `build/assets.mpx`; the Python build additionally copies it next to the executable. The runtime accepts ordinary non-interlaced grayscale, RGB, indexed, grayscale-alpha, and RGBA PNGs. Compression and identical-payload deduplication are transparent to generated code. Python builds convert PCM WAV entries to MP3 only when the encoded result is smaller. `mp3Bitrate` accepts 32–320 kbit/s, `mp3Quality` accepts 0–9, and `"transcode": false` preserves WAV bytes.
+Both generators write `build/assets.mpx`; the Python build additionally copies it next to the executable. The runtime accepts ordinary non-interlaced grayscale, RGB, indexed, grayscale-alpha, and RGBA PNGs. Compression and identical-payload deduplication are transparent to generated code. Python builds convert PCM WAV entries to MP3 only when the encoded result is smaller. `mp3Bitrate` accepts 32–320 kbit/s, `mp3Quality` accepts 0–9, and `"transcode": false` preserves WAV bytes. `stream` is a boolean valid only for audio; video always streams.
 
-`assetLoading.mode` is `lazy` by default. `resident` reads and decompresses every payload into the slot cache when the generated module first opens the pack. `batchBytes` bounds each temporary contiguous read and defaults to 16 MiB; accepted values range from 64 KiB to 512 MiB. Bulk buffers are released after their entries have been decoded, so the entire stored MPX representation is not retained as a second copy.
+`assetLoading.mode` is `lazy` by default. `resident` reads and decompresses every non-streaming payload into the slot cache when the generated module first opens the pack. Streamed audio and video always remain file-backed. `batchBytes` bounds each temporary contiguous read and defaults to 16 MiB; accepted values range from 64 KiB to 512 MiB. Bulk buffers are released after their entries have been decoded, so the entire stored MPX representation is not retained as a second copy.
 
-`assetLoading.compression` sets the default for packable assets, while an asset-level `compression` overrides it. In Python builds, `auto` uses LZ4 for `.sprites`/`.rgba` file assets of at least 64 KiB and the smallest worthwhile Deflate/RLE representation otherwise; `fast` uses a standard LZ4 block in an MPX size envelope and falls back to raw bytes when compression is not worthwhile; `small` accepts any saving from maximum Deflate/RLE compression; `none` stores the logical bytes directly. Python builds apply this outer compression to `file`, `text`, and `data`; PNG and MP3 payloads already carry their own compression. The native generator chooses LZ4/RLE for `auto`/`small`, LZ4 for `fast`, or raw for `none`. Existing Deflate/RLE packs still load; the LZ4 decoder requires MiniLang Compiler 1.2.9 or newer. Protected MPX3 packs encrypt and authenticate the compressed block as before.
+`assetLoading.compression` sets the default for packable assets, while an asset-level `compression` overrides it. In Python builds, `auto` uses LZ4 for `.sprites`/`.rgba` file assets of at least 64 KiB and the smallest worthwhile Deflate/RLE representation otherwise; `fast` uses a standard LZ4 block in an MPX size envelope and falls back to raw bytes when compression is not worthwhile; `small` accepts any saving from maximum Deflate/RLE compression; `none` stores the logical bytes directly. Python builds apply this outer compression to `file`, `text`, and `data`; PNG, MP3, and video payloads already carry their own compression. The native generator chooses LZ4/RLE for `auto`/`small`, LZ4 for `fast`, or raw for `none`. Existing Deflate/RLE packs still load; the LZ4 decoder requires MiniLang Compiler 1.2.11 or newer. Protected MPX3 packs authenticate the selected representation.
 
-Set `preload` to `true` for the generated `boot` group or to a group name such as `"level-1"`. `generated.assets.preloadGroup("level-1")` resolves that group's slots, performs bounded file-order reads, and constructs the corresponding cached assets. `generated.assets.preload()` still loads every asset, but now uses the same bulk path.
+Set `preload` to `true` for the generated `boot` group or to a group name such as `"level-1"`. `generated.assets.preloadGroup("level-1")` resolves that group's non-streaming slots, performs bounded file-order reads, and constructs the corresponding cached assets. `generated.assets.preload()` loads every non-streaming asset through the same bulk path. Media streams are excluded even if tagged.
 
 ## Protected Asset Builds
 
@@ -103,11 +115,11 @@ python tools\minipixels.py security status path\to\game\minipixels.json
 
 `security init` creates an unencrypted P-256 PKCS#8 private PEM below `.minipixels`, writes the public PEM beside it, adds the private path to the game's `.gitignore`, and enables `assetProtection`. Subsequent `generate`, `pack`, `build`, and `run` commands create MPX3 automatically. In CI, supply the PEM through `MINIPIXELS_ASSET_SIGNING_KEY` or point `MINIPIXELS_ASSET_SIGNING_KEY_FILE` at a secret file. A protected build fails when the private key is unavailable.
 
-MPX3 version 4 keeps only a fixed 64-byte transport header in clear text. Names, kinds, codecs, logical/stored sizes, ranges, per-entry nonces and tags live in an AES-256-GCM encrypted index; each unique compressed/raw payload is a separate AES-256-GCM block. MiniPixels signs `header || encrypted-index || index-tag` with ECDSA-P256-SHA256. Because the signed index authenticates each payload's GCM material, changing an asset is detected on first access and valid replacement still requires the signing key. Generated code embeds the public verification key, its key id, and a per-build masked/permuted AES key. The protected loader accepts only MPX3 version 4 and rejects MPX1, MPX2, and older MPX3 versions.
+MPX3 version 5 keeps only a fixed 64-byte transport header in clear text. Names, kinds, codecs, logical/stored sizes, ranges, per-entry nonces and tags live in an AES-256-GCM encrypted index. Ordinary unique compressed/raw payloads are separate AES-256-GCM blocks. Audio and video payloads use an `MPS1` envelope with independently authenticated 256 KiB chunks so seeking decrypts only the requested region. MiniPixels signs `header || encrypted-index || index-tag` with ECDSA-P256-SHA256. The signed index authenticates every payload's GCM material; the stream nonce and chunk number additionally bind each media chunk against reordering or transplantation. Generated code embeds the public verification key, its key id, and a per-build masked/permuted AES key. The protected loader accepts only MPX3 version 5 and rejects MPX1, MPX2, and older MPX3 versions.
 
 The embedded AES key is deliberate obfuscation against trivial extraction, not a hardware-backed secret. The signing private key is the actual modification boundary and is never emitted into generated code or the asset pack.
 
-Generated accessors cache decoded sprites, text catalogs, localization state and JSON text. They use pre-resolved entry slots rather than hashing the asset id on every call. Loading remains lazy unless `assetLoading.mode` is `resident`, `preload()` is called, or a configured `preloadGroup()` is requested.
+Generated accessors cache decoded sprites, short audio clips, text catalogs, localization state and JSON text. They use pre-resolved entry slots rather than hashing the asset id on every call. `audio_<id>()` returns a memory clip by default or a `PackedAudio` player when `stream` is true; `video_<id>()` returns a `PackedVideo` player. A packed player owns a loopback-only HTTP range source and must be closed before the generated asset pack is closed. No plaintext temporary file or complete media-sized RAM copy is created.
 
 ## Localization and Constants
 

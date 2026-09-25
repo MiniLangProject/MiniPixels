@@ -117,9 +117,9 @@ function initialize(game)
 end function
 ```
 
-Project generation writes image, procedural, audio, file, text, and JSON data assets into `build/assets.mpx` and emits lazy MiniLang loader functions. Constants become generated MiniLang code rather than runtime pack entries. Compatible source PNGs are retained, generated PNGs use real Deflate, WAV assets become MP3 when smaller, and structured/file payloads select configurable `auto`, `fast`, `small`, or `none` compression. Identical stored payloads share both one pack block and one decoded runtime buffer. Opening reads only the pack index; payload ranges are authenticated, read, and decompressed on first use. Deflate runs in the target-native bridge directly into the final buffer. Generated accessors use pre-resolved numeric slots, cache decoded images/text/data, and release source bytes when the decoded object no longer needs them. `gen.preload()` warms all assets with bounded contiguous reads, while configured `gen.preloadGroup(name)` and `assetLoading.mode: "resident"` cover grouped and complete resident loading. The non-interlaced PNG decoder supports stored/fixed/dynamic Deflate, all PNG scanline filters, and grayscale, RGB, indexed, grayscale-alpha, and RGBA color types. `mp.loadPng(path)` also hot-loads ordinary PNG files directly.
+Project generation writes image, procedural, audio, video, file, text, and JSON data assets into `build/assets.mpx` and emits lazy MiniLang loader functions. Constants become generated MiniLang code rather than runtime pack entries. Compatible source PNGs are retained, generated PNGs use real Deflate, WAV assets become MP3 when smaller, and structured/file payloads select configurable `auto`, `fast`, `small`, or `none` compression. Identical stored payloads share both one pack block and one decoded runtime buffer. Opening reads only the pack index; payload ranges are authenticated, read, and decompressed on first use. Deflate runs in the target-native bridge directly into the final buffer. Generated accessors use pre-resolved numeric slots, cache decoded images/text/data, and release source bytes when the decoded object no longer needs them. `gen.preload()` and configured preload groups warm non-streaming assets with bounded contiguous reads; streamed audio/video stays file-backed even in `resident` mode. The non-interlaced PNG decoder supports stored/fixed/dynamic Deflate, all PNG scanline filters, and grayscale, RGB, indexed, grayscale-alpha, and RGBA color types. `mp.loadPng(path)` also hot-loads ordinary PNG files directly.
 
-The Python driver writes protected assets as random-access MPX3 version 4. It signs an encrypted index and stores every payload as an independent AES-256-GCM block, so startup does not read or decrypt the whole pack. `python tools/minipixels.py security init <manifest>` creates the build-only P-256 signing key and enables protection. Generated game code reconstructs the obfuscated AES key and performs verification/decryption transparently. MPX2 and older MPX3 versions are rejected.
+The Python driver writes protected assets as random-access MPX3 version 5. It signs an encrypted index, stores ordinary payloads as independent AES-256-GCM blocks, and stores audio/video in independently authenticated 256 KiB `MPS1` chunks. Startup does not read or decrypt the whole pack, and seeking media decrypts only the requested chunks. `python tools/minipixels.py security init <manifest>` creates the build-only P-256 signing key and enables protection. Generated game code reconstructs the obfuscated AES key and performs verification/decryption transparently. MPX2 and older MPX3 versions are rejected.
 
 ```json
 {
@@ -264,7 +264,7 @@ game.audio.playMusic(mp.musicClip("assets\\audio\\theme.mp3", "theme"))
 game.audio.mute()
 ```
 
-Generated packed-audio helpers retain the original compressed bytes, so WAV and MP3 files can stay inside `assets.mpx`:
+Generated short-audio helpers retain the original compressed bytes, so WAV and MP3 effects can stay inside `assets.mpx`:
 
 ```ml
 coin = gen.audio_coin_sfx()
@@ -284,6 +284,26 @@ mixer.stopAll()
 ```
 
 PCM WAV input supports mono/stereo 8/16/24/32-bit samples. During Python asset builds, PCM WAV entries are automatically transcoded to MP3 when smaller; `mp3Bitrate`, `mp3Quality`, and `transcode` configure or disable this build-time step. MP3 input is decoded lazily to signed 16-bit PCM for sound effects and incrementally for the dedicated music voice, so packed music remains compressed in memory. Both formats preserve independent left/right channels and use nearest-rate conversion to 44.1 kHz stereo, looping, master/bus/clip/channel volume, and pan. `mp.audioSupportsMp3()` and `mp.audioSupportsStereo()` expose the capabilities. The legacy `playSound*` helpers remain WAV-only.
+
+For long music or video, mark audio with `"stream": true` or declare a `video` asset. The generated accessor returns a closeable player backed by the MPX file:
+
+```ml
+music = gen.audio_theme()
+music.play()
+
+movie = gen.video_intro()
+#if TARGET_OS == "windows"
+movie.attach(game.window.hwnd)
+#else
+movie.attach(game.window.id)
+#endif
+movie.play()
+
+movie.close()
+music.close()
+```
+
+MiniPixels exposes the entry through a loopback-only, tokenized HTTP range source understood by `std.audio` and `std.video`. Range reads stay inside the MPX, protected chunks are authenticated before delivery, one decrypted chunk is cached for adjacent decoder requests, and no plaintext temporary file is written. Close media players before closing `generated.assets`, because each player owns its private range source.
 
 ## Releases
 

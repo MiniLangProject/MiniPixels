@@ -25,6 +25,10 @@ const CODEC_DEFLATE = 1
 const CODEC_RLE = 2
 /// MPL1-wrapped LZ4 block compression for latency-sensitive assets.
 const CODEC_LZ4 = 3
+/// MPS1 chunked AES-GCM payload used for seekable protected media.
+const CODEC_STREAM = 4
+/// Fixed header size of one MPS1 chunked media envelope.
+const STREAM_HEADER_SIZE = 24
 /// Maximum logical size of one decompressed asset.
 const MAX_DECOMPRESSED_ASSET_SIZE = 536870912
 /// Default upper bound for one temporary contiguous preload read.
@@ -106,6 +110,17 @@ struct AssetPackStats
   bulkReads
 end struct
 
+/// File-backed media range that can be served without materializing the asset.
+struct AssetStreamInfo
+  path
+  offset
+  storedSize
+  logicalSize
+  codec
+  key
+  nonce
+end struct
+
 /// Performs the packError operation for the minipixels assets pack module.
 /// @param message Human-readable message associated with the operation.
 function packError(message)
@@ -118,6 +133,12 @@ end function
 /// @param size Size in the units required by the operation.
 function hasRange(data, offset, size)
   return typeof(data) == "bytes" and offset >= 0 and size >= 0 and offset + size <= len(data)
+end function
+
+/// Divides non-negative integers while retaining an integer result.
+/// @internal
+function integerDivide(value, divisor)
+  return (value - (value % divisor)) / divisor
 end function
 
 /// Returns whether pack satisfies the required condition.
@@ -198,6 +219,52 @@ function _readU64LE(data, offset)
   high = by.readU32LE(data, offset + 4)
   if typeof(low) != "int" or typeof(high) != "int" then return -1 end if
   return low + high * 4294967296
+end function
+
+/// Decrypts a complete MPS1 payload for callers that explicitly request bytes.
+/// Normal media playback uses AssetStreamInfo and never takes this path.
+/// @internal
+function _decodeStreamPayload(payload, key, baseNonce, expectedSize)
+  if not hasRange(payload, 0, STREAM_HEADER_SIZE) or payload[0] != 77 or payload[1] != 80 or payload[2] != 83 or payload[3] != 49 then
+    return packError("chunked media envelope is invalid")
+  end if
+  chunkSize = by.readU32LE(payload, 4)
+  logicalSize = _readU64LE(payload, 8)
+  chunkCount = by.readU32LE(payload, 16)
+  reserved = by.readU32LE(payload, 20)
+  if chunkSize <= 0 or logicalSize < 0 or chunkCount < 0 or reserved != 0 or logicalSize != expectedSize then
+    return packError("chunked media metadata is invalid")
+  end if
+  expectedChunks = integerDivide(logicalSize + chunkSize - 1, chunkSize)
+  if chunkCount != expectedChunks or len(payload) != STREAM_HEADER_SIZE + logicalSize + chunkCount * 16 then
+    return packError("chunked media size is invalid")
+  end if
+  result = bytes(logicalSize, 0)
+  source = STREAM_HEADER_SIZE
+  for chunkIndex = 0 to chunkCount - 1
+    plainSize = chunkSize
+    remaining = logicalSize - chunkIndex * chunkSize
+    if remaining < plainSize then plainSize = remaining end if
+    tag = slice(payload, source, 16)
+    ciphertext = slice(payload, source + 16, plainSize)
+    nonce = slice(baseNonce, 0, len(baseNonce))
+    counter = chunkIndex
+    for byteIndex = 0 to 7
+      nonce[4 + byteIndex] = nonce[4 + byteIndex] ^ (counter & 255)
+      counter = counter >> 8
+    end for
+    aad = bytes(28, 0)
+    aad[0] = 77; aad[1] = 80; aad[2] = 83; aad[3] = 49
+    copyBytes(aad, 4, baseNonce, 0, 12)
+    by.writeU32LE(aad, 16, logicalSize & 4294967295)
+    by.writeU32LE(aad, 20, integerDivide(logicalSize, 4294967296))
+    by.writeU32LE(aad, 24, chunkIndex)
+    plain = try(aes.decrypt(key, nonce, ciphertext, tag, aad))
+    if typeof(plain) == "error" or len(plain) != plainSize then return packError("chunked media authentication failed") end if
+    copyBytes(result, chunkIndex * chunkSize, plain, 0, plainSize)
+    source = source + 16 + plainSize
+  end for
+  return result
 end function
 
 /// Opens an MPX1 index while leaving its payloads file-backed and lazy.
@@ -349,7 +416,7 @@ end function
 /// Payload blocks remain encrypted on disk until first access.
 /// @internal
 function _openProtected3(path, file, header, key, publicKey, expectedKeyId)
-  if header[4] != 4 or header[5] != 0 or header[6] != 1 or header[7] != 1 or by.readU16LE(header, 8) != 64 or by.readU16LE(header, 10) != 0 then
+  if header[4] != 5 or header[5] != 0 or header[6] != 1 or header[7] != 1 or by.readU16LE(header, 8) != 64 or by.readU16LE(header, 10) != 0 then
     fileio.close(file)
     crypto.secureZero(key)
     return packError("unsupported MPX3 header or algorithm suite")
@@ -438,7 +505,7 @@ function _openProtected3(path, file, header, key, publicKey, expectedKeyId)
     pos = pos + nameLen
     kind = indexData[pos]
     codec = indexData[pos + 1]
-    if codec != CODEC_NONE and codec != CODEC_DEFLATE and codec != CODEC_RLE and codec != CODEC_LZ4 then
+    if codec != CODEC_NONE and codec != CODEC_DEFLATE and codec != CODEC_RLE and codec != CODEC_LZ4 and codec != CODEC_STREAM then
       fileio.close(file)
       crypto.secureZero(key)
       return packError("unsupported MPX3 asset compression codec")
@@ -461,7 +528,7 @@ function _openProtected3(path, file, header, key, publicKey, expectedKeyId)
       crypto.secureZero(key)
       return packError("MPX3 payload size is invalid")
     end if
-    if codec != CODEC_NONE and size > MAX_DECOMPRESSED_ASSET_SIZE then
+    if codec != CODEC_NONE and codec != CODEC_STREAM and size > MAX_DECOMPRESSED_ASSET_SIZE then
       fileio.close(file)
       crypto.secureZero(key)
       return packError("MPX3 decompressed asset size exceeds limit")
@@ -507,7 +574,7 @@ function _openProtected3(path, file, header, key, publicKey, expectedKeyId)
   return AssetPack(path, void, file, true, true, keyCopy, names, kinds, codecs, offsets, sizes, storedSizes, nonces, tags, owners, count, nameIndex, array(count, false), array(count, false), array(count, false), array(count, false), 0, 0, 0, 0, 0, 0, 0, 0)
 end function
 
-/// Opens an authenticated MPX3 version-4 pack. Only its index is verified and
+/// Opens an authenticated MPX3 version-5 pack. Only its index is verified and
 /// decrypted up front; caller-owned AES key bytes are always wiped.
 /// @param path Path to the protected pack.
 /// @param key Obfuscated build key reconstructed by generated game code.
@@ -578,8 +645,12 @@ function getBytesAt(pack, index)
     ciphertext = _readRange(pack.file, pack.offsets[index], pack.storedSizes[index])
     if typeof(ciphertext) == "error" then return ciphertext end if
     pack.storedBytesRead = pack.storedBytesRead + pack.storedSizes[index]
-    payload = try(aes.decrypt(pack.key, pack.nonces[index], ciphertext, pack.tags[index], bytes(0, 0)))
-    if typeof(payload) == "error" then return packError("MPX3 asset authentication failed: " + pack.names[index]) end if
+    if pack.codecs[index] == CODEC_STREAM then
+      payload = _decodeStreamPayload(ciphertext, pack.key, pack.nonces[index], pack.sizes[index])
+    else
+      payload = try(aes.decrypt(pack.key, pack.nonces[index], ciphertext, pack.tags[index], bytes(0, 0)))
+      if typeof(payload) == "error" then return packError("MPX3 asset authentication failed: " + pack.names[index]) end if
+    end if
   else if pack.fileBacked then
     payload = _readRange(pack.file, pack.offsets[index], pack.storedSizes[index])
     if typeof(payload) == "error" then return payload end if
@@ -589,7 +660,7 @@ function getBytesAt(pack, index)
   end if
   expectedSize = -1
   if pack.protected then expectedSize = pack.sizes[index] end if
-  payload = _decodePayload(pack.codecs[index], payload, expectedSize)
+  if pack.codecs[index] != CODEC_STREAM then payload = _decodePayload(pack.codecs[index], payload, expectedSize) end if
   if typeof(payload) == "error" then return payload end if
   pack.payloadCache[index] = payload
   pack.payloadLoaded[index] = true
@@ -668,9 +739,13 @@ function preloadSlots(pack, slots, maxBatchBytes)
         payload = void
         if pack.protected then
           stored = slice(region, relativeOffset, pack.storedSizes[slot])
-          payload = try(aes.decrypt(pack.key, pack.nonces[slot], stored, pack.tags[slot], bytes(0, 0)))
-          if typeof(payload) == "error" then return packError("MPX3 asset authentication failed: " + pack.names[slot]) end if
-          payload = _decodePayload(pack.codecs[slot], payload, pack.sizes[slot])
+          if pack.codecs[slot] == CODEC_STREAM then
+            payload = _decodeStreamPayload(stored, pack.key, pack.nonces[slot], pack.sizes[slot])
+          else
+            payload = try(aes.decrypt(pack.key, pack.nonces[slot], stored, pack.tags[slot], bytes(0, 0)))
+            if typeof(payload) == "error" then return packError("MPX3 asset authentication failed: " + pack.names[slot]) end if
+            payload = _decodePayload(pack.codecs[slot], payload, pack.sizes[slot])
+          end if
         else
           payload = _decodePayloadRange(pack.codecs[slot], region, relativeOffset, pack.storedSizes[slot], -1)
         end if
@@ -737,6 +812,38 @@ end function
 function getKindAt(pack, index)
   if not (pack is AssetPack) or typeof(index) != "int" or index < 0 or index >= pack.count then return -1 end if
   return pack.kinds[index]
+end function
+
+/// Returns the file-backed range needed for native audio/video streaming.
+/// The returned key is consumed immediately by the native stream server and is
+/// never used as a complete decrypted media buffer.
+/// @param pack Open asset pack.
+/// @param index Pre-resolved audio or video slot.
+function streamInfoAt(pack, index)
+  if not (pack is AssetPack) or typeof(index) != "int" or index < 0 or index >= pack.count then return packError("invalid asset slot") end if
+  if not pack.fileBacked or typeof(pack.path) != "string" then return packError("media streaming requires a file-backed asset pack") end if
+  owner = pack.owners[index]
+  kind = pack.kinds[index]
+  if kind != 2 and kind != 6 then return packError("asset is not audio or video: " + pack.names[index]) end if
+  codec = pack.codecs[owner]
+  if codec != CODEC_NONE and codec != CODEC_STREAM then return packError("media asset is not stored in a streamable representation") end if
+  if pack.protected and codec != CODEC_STREAM then return packError("protected media asset is not chunk-authenticated") end if
+  key = bytes(0, 0)
+  nonce = bytes(0, 0)
+  if codec == CODEC_STREAM then
+    key = pack.key
+    nonce = pack.nonces[owner]
+  end if
+  return AssetStreamInfo(pack.path, pack.offsets[owner], pack.storedSizes[owner], pack.sizes[owner], codec, key, nonce)
+end function
+
+/// Resolves a named file-backed audio/video stream.
+/// @param pack Open asset pack.
+/// @param name Stable asset name.
+function streamInfo(pack, name)
+  index = find(pack, name)
+  if index < 0 then return packError("asset not found: " + name) end if
+  return streamInfoAt(pack, index)
 end function
 
 /// Loads png for the minipixels assets pack module.

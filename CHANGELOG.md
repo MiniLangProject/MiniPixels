@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added generated `video` assets and opt-in streamed audio backed by MiniLang's `std.video` and `std.audio` players, including automatic target runtime packaging.
+- Added seekable MPX media delivery through a loopback-only, tokenized HTTP range source without plaintext temporary files or complete media-sized RAM copies.
+- Upgraded protected packs to MPX3 version 5 with independently authenticated 256 KiB `MPS1` audio/video chunks for bounded random-access decryption.
+
 ## 0.15.0 - 2026-09-20
 
 - Used MiniLang Compiler 1.2.9's portable LZ4 decoder for MPX assets; `fast` now produces LZ4 blocks in both packers, and Python `auto` selects LZ4 for large prepared `.sprites`/`.rgba` files while remaining compact for other assets. Existing Deflate/RLE packs remain readable.

@@ -34,6 +34,7 @@ PACK_CODEC_NONE = 0
 PACK_CODEC_DEFLATE = 1
 PACK_CODEC_RLE = 2
 PACK_CODEC_LZ4 = 3
+PACK_CODEC_STREAM = 4
 PACK_COMPRESSED_MAGIC = b"MPC1"
 PACK_RLE_MAGIC = b"MPR1"
 PACK_LZ4_MAGIC = b"MPL1"
@@ -138,7 +139,7 @@ def validate(project_file: Path) -> dict:
         if path:
             asset["_absolute_path"] = str((root / path).resolve())
         kind = str(asset.get("type", "image")).lower()
-        if kind not in ("image", "procedural", "audio", "file", "text", "data", "constants"):
+        if kind not in ("image", "procedural", "audio", "video", "file", "text", "data", "constants"):
             errors.append(f"{project_file}: asset '{aid}' has unsupported type '{kind}'")
         asset_compression = asset.get("compression", default_compression)
         compression = asset_compression.lower() if isinstance(asset_compression, str) else ""
@@ -150,6 +151,8 @@ def validate(project_file: Path) -> dict:
         elif isinstance(preload, str) and not preload.strip():
             errors.append(f"{project_file}: asset '{aid}' preload group must not be empty")
         if kind == "audio":
+            if not isinstance(asset.get("stream", False), bool):
+                errors.append(f"{project_file}: asset '{aid}' stream must be boolean")
             try:
                 bitrate = int(asset.get("mp3Bitrate", 128))
                 quality = int(asset.get("mp3Quality", 2))
@@ -162,6 +165,8 @@ def validate(project_file: Path) -> dict:
             transcode = asset.get("transcode", "mp3")
             if transcode not in (True, False, "mp3", "none", "wav"):
                 errors.append(f"{project_file}: asset '{aid}' transcode must be mp3, none, wav, true, or false")
+        if kind == "video" and not path:
+            errors.append(f"{project_file}: video asset '{aid}' requires a path")
         if kind in ("text", "constants") and path and (root / path).is_file():
             try:
                 structured = json.loads((root / path).read_text(encoding="utf-8"))
@@ -685,6 +690,15 @@ def asset_pack_payload(asset: dict, root: Path, default_compression: str = "auto
                 transform = "wav-source-smaller"
         else:
             transform = path.suffix.lower().lstrip(".") or "audio"
+    elif kind == "video":
+        raw_path = asset.get("path")
+        if not raw_path:
+            return None
+        path = root / raw_path
+        payload = path.read_bytes()
+        source_size = len(payload)
+        type_code = 6
+        transform = path.suffix.lower().lstrip(".") or "video"
     elif kind == "file":
         raw_path = asset.get("path")
         if not raw_path:
@@ -788,12 +802,38 @@ def container_assets(data: dict) -> list[dict]:
     return [
         asset
         for asset in data.get("assets", [])
-        if str(asset.get("type", "image")).lower() in ("image", "procedural", "audio", "file", "text", "data")
+        if str(asset.get("type", "image")).lower() in ("image", "procedural", "audio", "video", "file", "text", "data")
     ]
 
 
 def container_audio_assets(data: dict) -> list[dict]:
     return [asset for asset in data.get("assets", []) if str(asset.get("type", "image")).lower() == "audio"]
+
+
+def container_video_assets(data: dict) -> list[dict]:
+    return [asset for asset in data.get("assets", []) if str(asset.get("type", "image")).lower() == "video"]
+
+
+def media_descriptor(asset: dict) -> tuple[str, str]:
+    """Return the HTTP content type and filename suffix exposed to the OS decoder."""
+    suffix = Path(str(asset.get("path", "media.bin"))).suffix.lower() or ".bin"
+    mime_by_suffix = {
+        ".mp3": "audio/mpeg",
+        ".wav": "audio/wav",
+        ".wave": "audio/wav",
+        ".mid": "audio/midi",
+        ".midi": "audio/midi",
+        ".ogg": "audio/ogg",
+        ".flac": "audio/flac",
+        ".mp4": "video/mp4",
+        ".m4v": "video/mp4",
+        ".webm": "video/webm",
+        ".ogv": "video/ogg",
+        ".mkv": "video/x-matroska",
+        ".avi": "video/x-msvideo",
+        ".mov": "video/quicktime",
+    }
+    return mime_by_suffix.get(suffix, "application/octet-stream"), suffix
 
 
 def text_catalog_payload(path: Path) -> bytes:
@@ -1207,12 +1247,21 @@ def generate(project_file: Path, out_dir: Path) -> Path:
     pack_assets = sorted(container_assets(data), key=lambda a: a["id"])
     image_assets = sorted(container_image_assets(data), key=lambda a: a["id"])
     audio_assets = sorted(container_audio_assets(data), key=lambda a: a["id"])
+    video_assets = sorted(container_video_assets(data), key=lambda a: a["id"])
+    if video_assets or any(asset.get("stream", False) for asset in audio_assets):
+        lines.insert(4, "import minipixels.media.media as packedMedia")
     text_assets = sorted((asset for asset in pack_assets if str(asset.get("type", "")).lower() == "text"), key=lambda a: a["id"])
     data_assets = sorted((asset for asset in pack_assets if str(asset.get("type", "")).lower() == "data"), key=lambda a: a["id"])
     file_assets = sorted((asset for asset in pack_assets if str(asset.get("type", "")).lower() == "file"), key=lambda a: a["id"])
     asset_loading = data.get("assetLoading", {})
     loading_mode = str(asset_loading.get("mode", "lazy")).lower()
     preload_batch_bytes = int(asset_loading.get("batchBytes", 16 * 1024 * 1024))
+    resident_slots = [
+        index
+        for index, asset in enumerate(pack_assets)
+        if str(asset.get("type", "image")).lower() != "video"
+        and not (str(asset.get("type", "image")).lower() == "audio" and asset.get("stream", False))
+    ]
     if pack_assets:
         lines.extend(
             [
@@ -1225,13 +1274,13 @@ def generate(project_file: Path, out_dir: Path) -> Path:
                 ('    if typeof(opened) == "error" then opened = try(mp.openProtectedAssetPack("build/assets.mpx", security.aesKey(), security.publicKey(), security.keyId())) end if' if protection is not None else '    if typeof(opened) == "error" then opened = try(mp.openAssetPack("build/assets.mpx")) end if'),
                 *(
                     [
-                        f"    resident = try(mp.preloadAssetPack(opened, {preload_batch_bytes}))",
+                        f"    resident = try(mp.preloadAssetPackSlots(opened, {json.dumps(resident_slots)}, {preload_batch_bytes}))",
                         "    if typeof(resident) == \"error\" then",
                         "      mp.closeAssetPack(opened)",
                         "      return resident",
                         "    end if",
                     ]
-                    if loading_mode == "resident"
+                    if loading_mode == "resident" and resident_slots
                     else []
                 ),
                 "    assetPackCache = opened",
@@ -1281,6 +1330,13 @@ def generate(project_file: Path, out_dir: Path) -> Path:
             lines.append("")
     for asset in audio_assets:
         aid = asset["id"]
+        if asset.get("stream", False):
+            mime, suffix = media_descriptor(asset)
+            lines.append(f"function audio_{aid}(options = void)")
+            lines.append(f"  return packedMedia.openAudioAt(assetPack(), slot_{aid}(), {json.dumps(mime)}, {json.dumps(suffix)}, options)")
+            lines.append("end function")
+            lines.append("")
+            continue
         lines.append(f"audio_{aid}_cache = void")
         lines.append("")
         lines.append(f"function audio_{aid}()")
@@ -1289,6 +1345,13 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         lines.append(f'    audio_{aid}_cache = mp.audioClipFromBytes(mp.loadBytesFromPackSlot(assetPack(), slot_{aid}()), "{aid}")')
         lines.append("  end if")
         lines.append(f"  return audio_{aid}_cache")
+        lines.append("end function")
+        lines.append("")
+    for asset in video_assets:
+        aid = asset["id"]
+        mime, suffix = media_descriptor(asset)
+        lines.append(f"function video_{aid}(options = void)")
+        lines.append(f"  return packedMedia.openVideoAt(assetPack(), slot_{aid}(), {json.dumps(mime)}, {json.dumps(suffix)}, options)")
         lines.append("end function")
         lines.append("")
     for asset in text_assets:
@@ -1341,17 +1404,24 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         lines.append("end function")
         lines.append("")
     if pack_assets:
+        preload_assets = [
+            asset for asset in pack_assets
+            if str(asset.get("type", "image")).lower() != "video"
+            and not (str(asset.get("type", "image")).lower() == "audio" and asset.get("stream", False))
+        ]
         lines.append("function preload()")
         lines.append("  opened = assetPack()")
         lines.append("  if typeof(opened) == \"error\" then return opened end if")
-        lines.append(f"  loaded = try(mp.preloadAssetPack(opened, {preload_batch_bytes}))")
-        lines.append("  if typeof(loaded) == \"error\" then return loaded end if")
-        for asset in pack_assets:
+        if preload_assets:
+            slot_calls = ", ".join(f"slot_{asset['id']}()" for asset in preload_assets)
+            lines.append(f"  loaded = try(mp.preloadAssetPackSlots(opened, [{slot_calls}], {preload_batch_bytes}))")
+            lines.append("  if typeof(loaded) == \"error\" then return loaded end if")
+        for asset in preload_assets:
             aid = asset["id"]
             kind = str(asset.get("type", "image")).lower()
             if kind in ("image", "procedural"):
                 lines.append(f"  make_{aid}()")
-            elif kind == "audio":
+            elif kind == "audio" and not asset.get("stream", False):
                 lines.append(f"  audio_{aid}()")
             elif kind == "text":
                 lines.append(f"  text_{aid}()")
@@ -1373,18 +1443,24 @@ def generate(project_file: Path, out_dir: Path) -> Path:
         if preload_groups:
             lines.append("function preloadGroup(group)")
             for group, grouped_assets in sorted(preload_groups.items()):
-                slot_calls = ", ".join(f"slot_{asset['id']}()" for asset in grouped_assets)
+                loadable_assets = [
+                    asset for asset in grouped_assets
+                    if str(asset.get("type", "image")).lower() != "video"
+                    and not (str(asset.get("type", "image")).lower() == "audio" and asset.get("stream", False))
+                ]
+                slot_calls = ", ".join(f"slot_{asset['id']}()" for asset in loadable_assets)
                 lines.append(f"  if group == {json.dumps(group)} then")
                 lines.append("    opened = assetPack()")
                 lines.append("    if typeof(opened) == \"error\" then return opened end if")
-                lines.append(f"    loaded = try(mp.preloadAssetPackSlots(opened, [{slot_calls}], {preload_batch_bytes}))")
-                lines.append("    if typeof(loaded) == \"error\" then return loaded end if")
-                for asset in grouped_assets:
+                if loadable_assets:
+                    lines.append(f"    loaded = try(mp.preloadAssetPackSlots(opened, [{slot_calls}], {preload_batch_bytes}))")
+                    lines.append("    if typeof(loaded) == \"error\" then return loaded end if")
+                for asset in loadable_assets:
                     aid = asset["id"]
                     kind = str(asset.get("type", "image")).lower()
                     if kind in ("image", "procedural"):
                         lines.append(f"    make_{aid}()")
-                    elif kind == "audio":
+                    elif kind == "audio" and not asset.get("stream", False):
                         lines.append(f"    audio_{aid}()")
                     elif kind == "text":
                         lines.append(f"    text_{aid}()")
@@ -1451,7 +1527,7 @@ def asset_report(data: dict, root: Path) -> dict:
         if sheet is not None:
             entry["sheet"] = sheet
         kind = str(asset.get("type", "image")).lower()
-        if kind in ("image", "procedural", "audio", "file", "text", "data"):
+        if kind in ("image", "procedural", "audio", "video", "file", "text", "data"):
             built = None
             if kind == "procedural" or (path is not None and path.is_file()):
                 built = asset_pack_payload(asset, root, default_compression)
@@ -1512,7 +1588,7 @@ def copy_runtime_assets(data: dict, root: Path, output: Path) -> None:
 
     for asset in data.get("assets", []):
         kind = str(asset.get("type", "image")).lower()
-        if kind in ("image", "procedural", "audio", "file", "text", "data", "constants"):
+        if kind in ("image", "procedural", "audio", "video", "file", "text", "data", "constants"):
             continue
         raw_path = asset.get("path")
         if not raw_path:
@@ -1522,6 +1598,38 @@ def copy_runtime_assets(data: dict, root: Path, output: Path) -> None:
     pack_target = (output.parent / "assets.mpx").resolve()
     if pack_source.is_file() and pack_source != pack_target:
         shutil.copy2(pack_source, pack_target)
+
+
+def ensure_media_runtime(compiler_root: Path, target: str, output_dir: Path) -> Path:
+    """Copy the std.audio/std.video bridge used by packed media players."""
+    name = "minilang_video.dll" if target == "windows-x64" else "libminilang_video.so"
+    candidates = [
+        compiler_root / name,
+        compiler_root / "runtimes" / target / name,
+        compiler_root / "build" / "native" / "video" / target / name,
+    ]
+    source = next((candidate for candidate in candidates if candidate.is_file()), None)
+    if source is None and (compiler_root / "native" / "video").is_dir():
+        if target == "windows-x64":
+            subprocess.check_call(
+                ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(compiler_root / "native" / "video" / "windows" / "build.ps1")]
+            )
+        else:
+            script = compiler_root / "native" / "video" / "linux" / "build.sh"
+            if os.name == "nt":
+                resolved = script.resolve()
+                drive = resolved.drive.rstrip(":").lower()
+                wsl_script = f"/mnt/{drive}{resolved.as_posix().split(':', 1)[-1]}"
+                subprocess.check_call(["wsl.exe", "-d", os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"), "--", "sh", wsl_script])
+            else:
+                subprocess.check_call(["sh", str(script)])
+        source = next((candidate for candidate in candidates if candidate.is_file()), None)
+    if source is None:
+        die(f"MiniLang media runtime not found for {target}; expected {name} in the compiler distribution")
+    destination = output_dir.resolve() / name
+    if source.resolve() != destination:
+        shutil.copy2(source, destination)
+    return destination
 
 
 def build(
@@ -1552,6 +1660,17 @@ def build(
     compiler_root = compiler.parent
     if not (compiler_root / "std").is_dir() and (compiler_root.parent / "std").is_dir():
         compiler_root = compiler_root.parent
+    needs_media = any(
+        str(asset.get("type", "image")).lower() == "video"
+        or (str(asset.get("type", "image")).lower() == "audio" and asset.get("stream", False))
+        for asset in data.get("assets", [])
+    )
+    if needs_media:
+        media_runtime = ensure_media_runtime(compiler_root, target, output.parent)
+        if target == "linux-x64":
+            development_media = root / media_runtime.name
+            if development_media.resolve() != media_runtime.resolve():
+                shutil.copy2(media_runtime, development_media)
     include_paths = [ROOT / "src", compiler_root, generated_dir.parent]
     compiler_args = ["--profile-calls"] if debug else []
     manifest_lines = [

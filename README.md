@@ -7,9 +7,9 @@ Current version: `0.15.0`
 
 See the [0.15.0 release notes](RELEASE_NOTES_0.15.0.md) for faster packed-asset loading, LZ4 compression, bounded bulk preloading, and resident asset packs.
 
-MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.9 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
+MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.11 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
-MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, fixed/native/scaled framebuffers, OpenGL/WGL, GDI and XImage presentation, an optional batched Windows GPU scene canvas, configurable keyboard/mouse actions, sprites and rotated render targets, signed and optionally encrypted asset packs, localized text and generated game data, scene stacks, swept tile collision, bitmap text, multi-voice WAV/MP3 audio through waveOut or ALSA, headless tests, and example projects.
+MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, fixed/native/scaled framebuffers, OpenGL/WGL, GDI and XImage presentation, an optional batched Windows GPU scene canvas, configurable keyboard/mouse actions, sprites and rotated render targets, signed and optionally encrypted asset packs, localized text and generated game data, scene stacks, swept tile collision, bitmap text, multi-voice WAV/MP3 audio through waveOut or ALSA, streamed MPX audio/video, headless tests, and example projects.
 
 ![Moving Sprite](docs/images/moving-sprite.png)
 
@@ -33,8 +33,8 @@ diagnostics as failures.
 
 ## Requirements
 
-- Windows x64 or Linux x64 with glibc, X11 (`libX11.so.6`) and ALSA (`libasound.so.2`)
-- MiniLang Compiler 1.2.9 or newer in a sibling checkout; lazy MPX I/O uses `std.io.file`, fast MPX assets use `std.compress.lz4`, and protected builds use `std.crypto.ecdsa_p256`
+- Windows x64 or Linux x64 with glibc, X11 (`libX11.so.6`) and ALSA (`libasound.so.2`); streamed video on Linux also needs the GStreamer playback plugins required by `std.video`
+- MiniLang Compiler 1.2.11 or newer in a sibling checkout; lazy MPX I/O uses `std.io.file`, fast MPX assets use `std.compress.lz4`, protected builds use `std.crypto.ecdsa_p256`, and streamed media uses `std.audio`/`std.video`
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
 - The Python packages in `requirements.txt` for protected builds and WAV-to-MP3 asset transcoding
 - Visual Studio C++ Build Tools on Windows, or GCC on Linux, for the small native audio/asset/presentation bridge
@@ -52,7 +52,7 @@ Install the build dependencies once before packing protected assets or WAV audio
 python -m pip install -r requirements.txt
 ```
 
-The normal `build` and `run` commands also build and copy the target-specific native runtime automatically. It provides MP3 and zlib/Deflate decoding on both targets and accelerated XImage color conversion/scaling on Linux. On its first build, the helper downloads checksum-verified `dr_mp3` and `stb_image` single-header sources at pinned revisions and caches them under `build/native-audio`.
+The normal `build` and `run` commands also build and copy the target-specific native runtime automatically. It provides MP3 and zlib/Deflate decoding, a private MPX range source for streamed media on both targets, and accelerated XImage color conversion/scaling on Linux. Projects that declare streamed audio or video also receive the matching MiniLang media bridge automatically. On its first build, the helper downloads checksum-verified `dr_mp3` and `stb_image` single-header sources at pinned revisions and caches them under `build/native-audio`.
 
 ## Quickstart
 
@@ -102,7 +102,7 @@ python3 ../MiniLangCompilerPy/mlc_win64.py tools/minipixels_cli.ml build/tools/m
 build/tools/minipixels info
 ```
 
-The native CLI provides `info`, `doctor`, `validate`, `generate`, and `new`. Native `generate` writes an unprotected deterministic `assets.mpx`, importable `generated.assets` and `generated.levels` modules, and image/procedural/audio/file/text/data helpers. Protected packs and generated constants use the Python project driver, which also launches the compiler and packages the SDK.
+The native CLI provides `info`, `doctor`, `validate`, `generate`, and `new`. Native `generate` writes an unprotected deterministic `assets.mpx`, importable `generated.assets` and `generated.levels` modules, and image/procedural/audio/video/file/text/data helpers. Protected packs and generated constants use the Python project driver, which also launches the compiler and packages the SDK.
 
 Tooling split:
 
@@ -110,7 +110,7 @@ Tooling split:
 | --- | --- | --- |
 | Create a project | `new` | `new` |
 | Inspect/validate manifests | `info`, `doctor`, `validate` | `info`, `doctor`, `validate` |
-| Generate `generated.assets` | image/procedural/audio/file/text/data helpers backed by unprotected `assets.mpx` | all runtime helpers, localization, protection module, and constants |
+| Generate `generated.assets` | image/procedural/audio/video/file/text/data helpers backed by unprotected `assets.mpx` | all runtime helpers, localization, protection module, and constants |
 | Generate `generated.levels` | MiniPixels `levels.json` and Tiled JSON/TMJ | MiniPixels `levels.json` and Tiled JSON/TMJ |
 | Create runtime assets | deterministic MPX1 | MPX1 or signed/encrypted, random-access MPX3 plus build reports |
 | Build/run/package | Not yet | `build`, `run`, `package`, `pack` |
@@ -342,7 +342,7 @@ python tools\minipixels.py run examples\moving-sprite\minipixels.json --compiler
 python tools\minipixels.py package
 ```
 
-The Python CLI validates project JSON, writes asset, localization, constants, and level modules, emits `asset-report.json`, builds the target native runtime bridge, and invokes the MiniLang compiler. Run `security init` once to enable signed and encrypted MPX3 builds. Generated audio helpers create memory-backed WAV/MP3 clips, so games do not need loose sound files next to the executable.
+The Python CLI validates project JSON, writes asset, localization, constants, and level modules, emits `asset-report.json`, builds the target native runtime bridge, and invokes the MiniLang compiler. Run `security init` once to enable signed and encrypted MPX3 builds. Short audio remains available as memory-backed WAV/MP3 clips; audio marked with `"stream": true` and every video asset are read on demand from the MPX, so games do not need loose media files next to the executable.
 
 Windowed Windows games built through `tools\minipixels.py build` or `run` use the GUI PE subsystem by default, so double-clicking the executable opens only the game window and no companion console. Linux builds are normal ELF executables. Use `--headless` for Windows console-subsystem builds that are meant to print test or tool output.
 
@@ -369,7 +369,7 @@ size      field
 2         asset id byte length: u16
 N         asset id as UTF-8 bytes, no terminator
 1         kind: u8
-1         payload codec: u8 (`0` raw, `1` Deflate, `2` RLE)
+1         payload codec: u8 (`0` raw, `1` Deflate, `2` RLE, `3` LZ4)
 4         payload offset from start of file: u32
 4         payload size in bytes: u32
 ```
@@ -383,10 +383,11 @@ Current `kind` values:
 | `3` | `file` | Original bytes after optional container compression |
 | `4` | `text` | Deterministic `MPT1` UTF-8 key/value catalog |
 | `5` | `data` | Canonical UTF-8 JSON |
+| `6` | `video` | Encoded media bytes, normally MP4 |
 
 `constants` assets are intentionally absent from the pack: the generator turns their JSON values into MiniLang constants and a structured `data()` accessor at compile time.
 
-With `assetProtection.enabled`, builds write MPX3 version 4. Its compact encrypted index is signed with ECDSA P-256/SHA-256 and each unique stored payload is an independent AES-256-GCM block. Opening verifies and decrypts only the index; an asset remains encrypted on disk until first use. Compression happens before encryption, and the signed index binds every block's codec, logical/stored size, offset, nonce, and authentication tag. A changed block is rejected when accessed and the pack cannot be repacked without the private signing key. Generated MiniLang code embeds the public verification key plus an obfuscated reconstruction of the per-build AES key. The private key remains build-only. Older MPX2 containers and MPX3 format versions are deliberately rejected.
+With `assetProtection.enabled`, builds write MPX3 version 5. Its compact encrypted index is signed with ECDSA P-256/SHA-256. Ordinary payloads remain independent AES-256-GCM blocks; audio and video use `MPS1`, a sequence of independently authenticated 256 KiB AES-GCM chunks. Opening verifies and decrypts only the index, and streamed playback decrypts only the chunks requested by the decoder. Compression happens before encryption, and the signed index binds every block's codec, logical/stored size, offset, nonce, and authentication data. A changed block or media chunk is rejected when accessed and the pack cannot be repacked without the private signing key. Generated MiniLang code embeds the public verification key plus an obfuscated reconstruction of the per-build AES key. The private key remains build-only. MPX1 remains the unprotected format; MPX2 and older MPX3 versions are deliberately rejected by the protected loader.
 
 Enable it once per project:
 
@@ -415,7 +416,7 @@ stats = mp.assetPackStats(pack)
 mp.preloadAssetPackSlots(pack, [slot], 16777216)
 ```
 
-Generated helpers use numeric slots automatically, cache decoded sprites, text catalogs, localization services and JSON text, and release PNG/text/data source bytes after successful decoding. `gen.preload()` now warms the complete pack through bounded contiguous reads before constructing assets; `gen.preloadGroup("level-1")` does the same for entries tagged with that group. `assetPackStats()` additionally reports physical `storedBytesRead`, logical `decodedBytes`, and `bulkReads`.
+Generated helpers use numeric slots automatically, cache decoded sprites, short audio clips, text catalogs, localization services and JSON text, and release PNG/text/data source bytes after successful decoding. `gen.preload()` warms non-streaming assets through bounded contiguous reads before constructing them; `gen.preloadGroup("level-1")` does the same for non-streaming entries tagged with that group. Audio streams and video are deliberately excluded so preloading never copies an entire movie or music track into memory. `assetPackStats()` additionally reports physical `storedBytesRead`, logical `decodedBytes`, and `bulkReads`.
 
 Loading and container compression are configured without changing game code:
 
@@ -432,7 +433,7 @@ Loading and container compression are configured without changing game code:
 }
 ```
 
-`lazy` remains the memory-efficient default. `resident` bulk-loads and decompresses the complete pack on first open, useful when the game repeatedly touches most assets and has the RAM budget. `compression` accepts `auto`, `fast`, `small`, and `none`, globally or per asset. `fast` now stores compressible file assets as LZ4 blocks. The default `auto` uses LZ4 for `.sprites`/`.rgba` files of at least 64 KiB and keeps other file/text/data assets compact with Deflate/RLE. `none` avoids even LZ4 decoding when minimum latency matters more than installed size. An explicit asset-level choice takes precedence.
+`lazy` remains the memory-efficient default. `resident` bulk-loads and decompresses every non-streaming entry on first open, useful when the game repeatedly touches most assets and has the RAM budget. Streamed media always stays file-backed. `compression` accepts `auto`, `fast`, `small`, and `none`, globally or per asset. `fast` now stores compressible file assets as LZ4 blocks. The default `auto` uses LZ4 for `.sprites`/`.rgba` files of at least 64 KiB and keeps other file/text/data assets compact with Deflate/RLE. `none` avoids even LZ4 decoding when minimum latency matters more than installed size. An explicit asset-level choice takes precedence.
 
 `asset-report.json` records `sourceBytes`, `logicalBytes`, `storedBytes`, the selected `codec`/`transform`, and whether an entry was deduplicated. Its totals count shared payload blocks only once.
 
@@ -482,6 +483,37 @@ clip = gen.audio_coin_sfx()
 mp.playAudio(game.audio, clip)
 ```
 
+Streamed audio and video:
+
+```json
+{
+  "assets": [
+    { "id": "theme", "type": "audio", "path": "assets/audio/theme.mp3", "stream": true },
+    { "id": "intro", "type": "video", "path": "assets/video/intro.mp4" }
+  ]
+}
+```
+
+```ml
+music = gen.audio_theme()
+music.setLoop(true)
+music.play()
+
+intro = gen.video_intro()
+#if TARGET_OS == "windows"
+intro.attach(game.window.hwnd)
+#else
+intro.attach(game.window.id)
+#endif
+intro.play()
+
+// Close the player before closing generated assets/the MPX pack.
+intro.close()
+music.close()
+```
+
+The generated helpers start a loopback-only HTTP range source on a random port and unguessable path. `std.audio` and `std.video` can seek normally, while MiniPixels reads only the requested MPX ranges. Protected media is authenticated and decrypted one 256 KiB chunk at a time and one decrypted chunk is reused for adjacent decoder reads. No plaintext temporary file and no complete media-sized RAM copy are created. Responses disable caching, and closing the packed player immediately stops its private source.
+
 ## Engine Modules
 
 - `minipixels`: public facade and game loop
@@ -491,6 +523,7 @@ mp.playAudio(game.audio, clip)
 - `minipixels.assets.pack`: MiniPixels `.mpx` asset container reader
 - `minipixels.assets.text`: UTF-8 catalogs, locale fallback, and placeholder formatting
 - `minipixels.assets.png`: PNG decoder/encoder and screenshot support
+- `minipixels.media.media`: file-backed MPX range streaming into `std.audio` and `std.video`
 - `minipixels.platform.windows`: Win32 window, input, DIB renderer
 - `minipixels.platform.linux`: X11 window, input, timing, and XImage renderer
 - `minipixels.input.input`: buffered configurable keyboard/mouse actions
@@ -513,12 +546,12 @@ Implemented:
 - Safe pixel operations and primitive drawing
 - MiniPixels `.mpx` generation in both project pipelines with indexed runtime caches
 - General non-interlaced PNG hot-loading plus deterministic screenshot encoding
-- Native MiniLang generation for image/procedural/audio/file/text/data assets and MiniPixels/Tiled levels
+- Native MiniLang generation for image/procedural/audio/video/file/text/data assets and MiniPixels/Tiled levels
 - Python generation for signed/encrypted packs, localized text, canonical JSON data, and compiled constants
 - Cached spritesheets, animation, rotated sprites, render targets, and dirty-region GPU uploads
 - Scene stack with enter/exit/pause/resume/update/render lifecycle
 - Configurable action bindings, pointer coordinates/deltas/buttons, and wheel input
-- Multi-voice WAV/MP3 mixer through waveOut/ALSA with stereo input, bus/clip/channel volume, pan, and streaming MP3 music
+- Multi-voice WAV/MP3 mixer through waveOut/ALSA with stereo input, bus/clip/channel volume and pan, plus seekable MPX audio/video streaming through `std.audio`/`std.video`
 - Build-time SpriteSheet metadata and `asset-report.json`
 - Build-time level JSON generation through `generated.levels`
 - Camera, scrolling, parallax bands

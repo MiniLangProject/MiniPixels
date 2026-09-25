@@ -131,7 +131,7 @@ Loads load for the minipixels tools manifest module.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/manifest.ml#L339)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/manifest.ml#L344)
 
 - [minipixels.tools.manifest.Manifest](Type-minipixels-tools-manifest-manifest-62751308.md) — struct
 <a id="function-function-minipixels-tools-manifest-maxint-function-maxint-a-b-src-minipixels-tools-manifest-ml-529438451"></a>
@@ -204,7 +204,7 @@ Parses text for the minipixels tools manifest workflow.
 | `root` | `dynamic` | — | root value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/manifest.ml#L327)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/manifest.ml#L332)
 
 <a id="function-function-minipixels-tools-manifest-printreport-function-printreport-m-src-minipixels-tools-manifest-ml-960629759"></a>
 ### printReport
@@ -220,7 +220,7 @@ Prints report for the minipixels tools manifest workflow.
 | `m` | `dynamic` | — | m value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/manifest.ml#L352)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/manifest.ml#L357)
 
 <a id="function-function-minipixels-tools-manifest-requirefield-function-requirefield-m-obj-key-src-minipixels-tools-manifest-ml-138594909"></a>
 ### requireField
@@ -308,7 +308,7 @@ Validates assets for the minipixels tools manifest workflow.
 | `root` | `dynamic` | — | root value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/manifest.ml#L238)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/manifest.ml#L243)
 
 <a id="function-function-minipixels-tools-manifest-validatelevels-function-validatelevels-m-root-src-minipixels-tools-manifest-ml-1903826297"></a>
 ### validateLevels
@@ -325,7 +325,7 @@ Validates levels for the minipixels tools manifest workflow.
 | `root` | `dynamic` | — | root value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/manifest.ml#L256)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/manifest.ml#L261)
 
 <a id="function-function-minipixels-tools-manifest-validateroot-function-validateroot-m-root-src-minipixels-tools-manifest-ml-1770268961"></a>
 ### validateRoot
@@ -342,7 +342,7 @@ Validates root for the minipixels tools manifest workflow.
 | `root` | `dynamic` | — | root value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/manifest.ml#L273)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/tools/manifest.ml#L278)
 
 <a id="function-function-minipixels-tools-manifest-validcompressionprofile-function-validcompressionprofile-value-src-minipixels-tools-manifest-ml-1793777077"></a>
 ### validCompressionProfile
