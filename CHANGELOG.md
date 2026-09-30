@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Fixed authenticated stream-cache invalidation after a bad GCM tag and made native HTTP reads/writes cancellable so closing a stalled player cannot hang on a socket.
+- Added complete bounded HTTP header parsing, case-insensitive Range headers, suffix/open-ended ranges, and strict malformed/overflow range rejection.
+- Fixed fresh Windows media-runtime builds with explicit output paths and installed the required GStreamer/OpenSSL dependencies in Linux CI.
+- Enforced preload read-size limits even for oversized first entries, reused single-entry buffers, and stopped sparse preloads from reading skipped media between requested assets.
+- Added cross-platform native media regressions and asset preload I/O tests, including tampered chunks, fragmented headers, stalled connections, aliases and large payloads.
 - Added generated `video` assets and opt-in streamed audio backed by MiniLang's `std.video` and `std.audio` players, including automatic target runtime packaging.
 - Added seekable MPX media delivery through a loopback-only, tokenized HTTP range source without plaintext temporary files or complete media-sized RAM copies.
 - Upgraded protected packs to MPX3 version 5 with independently authenticated 256 KiB `MPS1` audio/video chunks for bounded random-access decryption.

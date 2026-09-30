@@ -9,17 +9,17 @@ import subprocess
 import sys
 import importlib.util
 import binascii
-import ctypes
 import json
 import struct
 import tempfile
-import urllib.request
 import zipfile
 import zlib
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from build_audio_runtime import ensure_audio_runtime
+from minipixels import ensure_media_runtime
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,6 +29,7 @@ TESTS = [
     "canvas_tests.ml",
     "systems_tests.ml",
     "asset_pack_tests.ml",
+    "asset_preload_tests.ml",
     "headless_game_tests.ml",
     "render_regression_tests.ml",
     "json_manifest_tests.ml",
@@ -88,74 +89,13 @@ def run_test_executable(exe: Path, target: str, args: list[str] | None = None) -
 
 
 def test_media_range_runtime(runtime: Path, target: str) -> None:
-    """Exercise plain and chunk-authenticated HTTP range reads in the native bridge."""
-    if (target == "linux-x64") != (os.name != "nt"):
-        return
-    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-
-    library = ctypes.CDLL(str(runtime))
-    open_stream = library.mpMediaStreamOpen
-    open_stream.restype = ctypes.c_void_p
-    open_stream.argtypes = [
-        ctypes.c_char_p, ctypes.c_uint64, ctypes.c_uint64, ctypes.c_uint64, ctypes.c_int32,
-        ctypes.c_void_p, ctypes.c_uint64, ctypes.c_void_p, ctypes.c_uint64,
-        ctypes.c_char_p, ctypes.c_char_p, ctypes.c_void_p, ctypes.c_int32,
-    ]
-    close_stream = library.mpMediaStreamClose
-    close_stream.argtypes = [ctypes.c_void_p]
-    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
-
-    def open_native(path: Path, offset: int, stored: int, logical: int, codec: int, key: bytes = b"", nonce: bytes = b""):
-        url = ctypes.create_string_buffer(192)
-        key_buffer = ctypes.create_string_buffer(key) if key else None
-        nonce_buffer = ctypes.create_string_buffer(nonce) if nonce else None
-        handle = open_stream(
-            os.fsencode(path), offset, stored, logical, codec,
-            key_buffer, len(key), nonce_buffer, len(nonce),
-            b"application/octet-stream", b".bin", url, len(url),
-        )
-        assert handle, "native media range source did not open"
-        return handle, url.value.decode("ascii")
-
-    with tempfile.TemporaryDirectory(prefix="minipixels_media_range_") as td:
-        directory = Path(td)
-        payload = bytes((index * 31 + 7) & 0xFF for index in range(700_123))
-        plain_path = directory / "plain.bin"
-        plain_path.write_bytes(b"prefix-data" + payload + b"suffix-data")
-        handle, url = open_native(plain_path, 11, len(payload), len(payload), 0)
-        try:
-            request = urllib.request.Request(url, headers={"Range": "bytes=262120-262200"})
-            with opener.open(request, timeout=5) as response:
-                assert response.status == 206
-                assert response.read() == payload[262120:262201]
-        finally:
-            close_stream(handle)
-
-        key = os.urandom(32)
-        base_nonce = os.urandom(12)
-        chunk_size = 256 * 1024
-        chunk_count = (len(payload) + chunk_size - 1) // chunk_size
-        envelope = bytearray(b"MPS1" + struct.pack("<IQII", chunk_size, len(payload), chunk_count, 0))
-        cipher = AESGCM(key)
-        for chunk_index in range(chunk_count):
-            chunk = payload[chunk_index * chunk_size : (chunk_index + 1) * chunk_size]
-            chunk_nonce = bytearray(base_nonce)
-            chunk_nonce[4:12] = (int.from_bytes(chunk_nonce[4:12], "little") ^ chunk_index).to_bytes(8, "little")
-            aad = b"MPS1" + base_nonce + struct.pack("<QI", len(payload), chunk_index)
-            sealed = cipher.encrypt(bytes(chunk_nonce), chunk, aad)
-            envelope.extend(sealed[-16:])
-            envelope.extend(sealed[:-16])
-        protected_path = directory / "protected.bin"
-        protected_path.write_bytes(envelope)
-        handle, url = open_native(protected_path, 0, len(envelope), len(payload), 4, key, base_nonce)
-        try:
-            request = urllib.request.Request(url, headers={"Range": "bytes=262120-262200"})
-            with opener.open(request, timeout=5) as response:
-                assert response.status == 206
-                assert response.read() == payload[262120:262201]
-        finally:
-            close_stream(handle)
-    print("Native MPX media range tests passed")
+    """Run native regressions in an isolated, time-bounded process on either target."""
+    script = ROOT / "tests" / "media_range_tests.py"
+    command = [sys.executable, str(script), str(runtime)]
+    if target == "linux-x64" and os.name == "nt":
+        command = ["wsl.exe", "-d", os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"),
+                   "--", "python3", wsl_path(script), wsl_path(runtime)]
+    subprocess.run(command, check=True, timeout=45)
 
 
 def png_chunk(kind: bytes, payload: bytes) -> bytes:
@@ -288,6 +228,24 @@ def create_asset_pack_fixture() -> None:
     )
 
 
+def create_preload_fixture() -> None:
+    from minipixels import write_asset_pack
+    root = ROOT / "build" / "tests" / "preload_fixture"
+    root.mkdir(parents=True, exist_ok=True)
+    for name, payload in (("a.bin", b"A" * 4096), ("b.mp4", b"V" * (8 * 1024 * 1024)),
+                          ("c.bin", b"C" * 4096), ("d.bin", b"D" * (2 * 1024 * 1024 + 17)),
+                          ("empty.bin", b"")):
+        (root / name).write_bytes(payload)
+    write_asset_pack({"assets": [
+        {"id": "a", "type": "file", "path": "a.bin", "compression": "none"},
+        {"id": "b_video", "type": "video", "path": "b.mp4"},
+        {"id": "c", "type": "file", "path": "c.bin", "compression": "none"},
+        {"id": "d_large", "type": "file", "path": "d.bin", "compression": "none"},
+        {"id": "e_alias", "type": "file", "path": "a.bin", "compression": "none"},
+        {"id": "f_empty", "type": "file", "path": "empty.bin", "compression": "none"},
+    ]}, root, ROOT / "build" / "tests" / "preload.mpx")
+
+
 def create_protected_asset_fixture() -> Path:
     spec = importlib.util.spec_from_file_location("minipixels_cli_protected", ROOT / "tools" / "minipixels.py")
     if spec is None or spec.loader is None:
@@ -362,6 +320,29 @@ def run_python_tests() -> None:
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     assert mod.VERSION == "0.15.0", mod.VERSION
+    # A fresh compiler checkout must build exactly where the packager looks,
+    # regardless of the shell's working directory (GitHub runners use another drive).
+    for target, name in (("windows-x64", "minilang_video.dll"), ("linux-x64", "libminilang_video.so")):
+        with tempfile.TemporaryDirectory(prefix="minipixels_media_build_") as td:
+            compiler_root = Path(td) / "compiler checkout"
+            (compiler_root / "native" / "video").mkdir(parents=True)
+            output = compiler_root / "build" / "native" / "video" / target
+
+            def fake_build(command):
+                if target == "windows-x64":
+                    assert command[-2:] == ["-OutputDir", str(output.resolve())], command
+                elif os.name == "nt":
+                    assert command[-1] == wsl_path(output), command
+                else:
+                    assert command[-1] == str(output.resolve()), command
+                output.mkdir(parents=True)
+                (output / name).write_bytes(b"runtime-fixture")
+
+            with mock.patch.object(mod.subprocess, "check_call", side_effect=fake_build) as build_call:
+                result = mod.ensure_media_runtime(compiler_root, target, Path(td) / "game")
+                assert result.read_bytes() == b"runtime-fixture"
+                mod.ensure_media_runtime(compiler_root, target, Path(td) / "game-again")
+                assert build_call.call_count == 1, "existing runtime should not rebuild"
     with tempfile.TemporaryDirectory(prefix="minipixels_security_") as td:
         security_root = Path(td)
         security_manifest = security_root / "minipixels.json"
@@ -788,7 +769,9 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
                 "  a.assertTrue(stats.lazyFile, \"MPX3 payloads remain file-backed\")",
                 "  a.assertEq(stats.payloadMisses, 4, \"each decoded payload read once\")",
                 "  a.assertEq(stats.cachedPayloadBytes, 0, \"decoded payload bytes released\")",
-                "  a.assertEq(stats.bulkReads, 1, \"resident MPX3 uses one bulk read\")",
+                "  a.assertEq(stats.bulkReads, 2, \"resident MPX3 splits at skipped media\")",
+                "  expectedRead = pack.storedSizes[0] + pack.storedSizes[1] + pack.storedSizes[4] + pack.storedSizes[5]",
+                "  a.assertEq(stats.storedBytesRead, expectedRead, \"resident MPX3 does not read skipped media\")",
                 "  a.assertTrue(gen.preload(), \"preload reuses generated caches\")",
                 "  a.assertEq(balance.PLAYER_SPEED, 120, \"compiled scalar constant\")",
                 "  a.assertEq(balance.ENEMIES_SLIME_HEALTH, 3, \"compiled nested constant\")",
@@ -872,23 +855,10 @@ def main(argv: list[str] | None = None) -> int:
     root_runtime = ROOT / runtime.name
     if root_runtime.resolve() != runtime.resolve():
         shutil.copy2(runtime, root_runtime)
-    media_name = "minilang_video.dll" if target == "windows-x64" else "libminilang_video.so"
     compiler_root = ROOT.parent / "MiniLangCompilerPy"
-    media_runtime = compiler_root / "build" / "native" / "video" / target / media_name
-    if not media_runtime.is_file():
-        if target == "windows-x64":
-            subprocess.check_call([
-                "powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
-                str(compiler_root / "native" / "video" / "windows" / "build.ps1"),
-            ])
-        else:
-            script = compiler_root / "native" / "video" / "linux" / "build.sh"
-            command = ["sh", str(script)]
-            if os.name == "nt":
-                command = ["wsl.exe", "-d", os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"), "--", "sh", wsl_path(script)]
-            subprocess.check_call(command)
-    shutil.copy2(media_runtime, build / media_name)
+    ensure_media_runtime(compiler_root, target, build)
     create_asset_pack_fixture()
+    create_preload_fixture()
     protected_project = create_protected_asset_fixture()
     for test in TESTS:
         src = ROOT / "tests" / test

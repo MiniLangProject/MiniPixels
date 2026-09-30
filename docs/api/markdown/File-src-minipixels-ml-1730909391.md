@@ -1207,7 +1207,7 @@ Preloads every payload using bounded contiguous reads.
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
 | `assetPack` | `dynamic` | — | Open asset pack. |
-| `batchBytes` | `dynamic` | — | Maximum temporary read size, or a non-positive value for the default. |
+| `batchBytes` | `dynamic` | — | Maximum physical read/coalescing size, not an asset memory limit; non-positive uses the default. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L459)
@@ -1225,7 +1225,7 @@ Preloads selected asset slots using bounded contiguous reads.
 | --- | --- | --- | --- |
 | `assetPack` | `dynamic` | — | Open asset pack. |
 | `slots` | `dynamic` | — | Array of pre-resolved entry slots. |
-| `batchBytes` | `dynamic` | — | Maximum temporary read size, or a non-positive value for the default. |
+| `batchBytes` | `dynamic` | — | Maximum physical read/coalescing size, not an asset memory limit; non-positive uses the default. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L455)

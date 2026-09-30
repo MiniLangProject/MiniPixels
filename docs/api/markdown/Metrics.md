@@ -8,19 +8,19 @@ Static metrics are calculated from target-specific preprocessed MiniLang files i
 
 | Metric | Value |
 | --- | ---: |
-| Blank lines | 990 |
+| Blank lines | 991 |
 | Clone groups | 22 |
-| Cognitive complexity | 2826 (maximum per function: 154) |
-| Comment lines | 3285 |
-| Cyclomatic complexity | 2742 (average: 3.51, maximum: 57) |
+| Cognitive complexity | 2840 (maximum per function: 154) |
+| Comment lines | 3289 |
+| Cyclomatic complexity | 2749 (average: 3.51, maximum: 57) |
 | Documentation coverage | 96.76% (2986 of 3086 documentation items) |
 | Duplicated lines | 154 (1.9%) |
 | Files | 27 |
-| Functions | 782 |
-| Maintainability index | 4.82 / 100 |
-| Physical lines | 12377 |
-| Source lines | 8102 |
-| Statements | 6095 |
+| Functions | 783 |
+| Maintainability index | 4.81 / 100 |
+| Physical lines | 12398 |
+| Source lines | 8118 |
+| Statements | 6110 |
 
 ## Documentation coverage
 
@@ -40,7 +40,7 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 
 | Distinct operators | Distinct operands | Total operators | Total operands | Vocabulary | Length | Volume | Difficulty | Effort | Estimated defects |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 53 | 2807 | 37173 | 28597 | 2860 | 65770 | 755157.95 | 269.98 | 203873948.76 | 251.72 |
+| 53 | 2808 | 37239 | 28647 | 2861 | 65886 | 756523.07 | 270.35 | 204526738.58 | 252.17 |
 
 ## Files
 
@@ -49,7 +49,7 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`src/minipixels.ml`](File-src-minipixels-ml-1730909391.md) | 418 | 118 | 214 / 1.81 / 27 | 123 / 44 | 0 (0%) | 38263.2 | 0 |
 | [`src/minipixels/animation/animation.ml`](File-src-minipixels-animation-animation-ml-2065983051.md) | 108 | 17 | 36 / 2.12 / 10 | 27 / 16 | 0 (0%) | 4060.52 | 25.53 |
 | [`src/minipixels/assets/assets.ml`](File-src-minipixels-assets-assets-ml-652120143.md) | 122 | 16 | 36 / 2.25 / 5 | 21 / 4 | 0 (0%) | 5376.9 | 23.52 |
-| [`src/minipixels/assets/pack.ml`](File-src-minipixels-assets-pack-ml-1157891367.md) | 770 | 29 | 289 / 9.97 / 55 | 350 / 68 | 38 (4.94%) | 52389.21 | 0 |
+| [`src/minipixels/assets/pack.ml`](File-src-minipixels-assets-pack-ml-1157891367.md) | 786 | 30 | 296 / 9.87 / 55 | 364 / 74 | 38 (4.83%) | 53395.93 | 0 |
 | [`src/minipixels/assets/png.ml`](File-src-minipixels-assets-png-ml-1155821131.md) | 574 | 32 | 216 / 6.75 / 41 | 343 / 84 | 0 (0%) | 43012.47 | 0 |
 | [`src/minipixels/assets/text.ml`](File-src-minipixels-assets-text-ml-1300721413.md) | 111 | 13 | 45 / 3.46 / 16 | 39 / 19 | 0 (0%) | 6245.68 | 22.75 |
 | [`src/minipixels/audio/audio.ml`](File-src-minipixels-audio-audio-ml-660527635.md) | 754 | 79 | 242 / 3.06 / 24 | 200 / 28 | 14 (1.86%) | 46431.66 | 0 |
@@ -122,30 +122,31 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.assets.pack._decodeStreamPayload`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-decodestreampayload-function-decodestreampayload-payload-key-basenonce-expectedsize-src-minipixels-assets-pack-ml-593086342) | `src/minipixels/assets/pack.ml:227` | 42 | 40 | 18 | 20 | 2 | 2726.28 | 38.11 |
 | [`minipixels.assets.pack._openFile1`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-openfile1-function-openfile1-path-file-header-src-minipixels-assets-pack-ml-407372790) | `src/minipixels/assets/pack.ml:272` | 119 | 94 | 37 | 55 | 3 | 5924.73 | 23.33 |
 | [`minipixels.assets.pack._openProtected3`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-openprotected3-function-openprotected3-path-file-header-key-publickey-expectedkeyid-src-minipixels-assets-pack-ml-1178717239) | `src/minipixels/assets/pack.ml:418` | 158 | 135 | 55 | 68 | 4 | 9565.25 | 16.77 |
+| [`minipixels.assets.pack._readPreloadRange`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-readpreloadrange-function-readpreloadrange-pack-offset-size-maxbatchbytes-src-minipixels-assets-pack-ml-1330989338) | `src/minipixels/assets/pack.ml:675` | 14 | 13 | 4 | 5 | 2 | 523.19 | 55.42 |
 | [`minipixels.assets.pack._readRange`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-readrange-function-readrange-file-offset-size-src-minipixels-assets-pack-ml-949562066) | `src/minipixels/assets/pack.ml:407` | 7 | 7 | 4 | 3 | 1 | 330.34 | 63.39 |
 | [`minipixels.assets.pack._readU64LE`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-readu64le-function-readu64le-data-offset-src-minipixels-assets-pack-ml-400441839) | `src/minipixels/assets/pack.ml:217` | 6 | 5 | 3 | 2 | 1 | 271.03 | 65.59 |
-| [`minipixels.assets.pack.clearCache`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-clearcache-function-clearcache-pack-src-minipixels-assets-pack-ml-1435924141) | `src/minipixels/assets/pack.ml:904` | 12 | 9 | 4 | 4 | 2 | 372.92 | 57.91 |
-| [`minipixels.assets.pack.close`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-close-function-close-pack-src-minipixels-assets-pack-ml-1838684689) | `src/minipixels/assets/pack.ml:926` | 15 | 14 | 4 | 4 | 2 | 432.36 | 55.35 |
-| [`minipixels.assets.pack.dropPayloadAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-droppayloadat-function-droppayloadat-pack-index-src-minipixels-assets-pack-ml-776792881) | `src/minipixels/assets/pack.ml:882` | 7 | 6 | 6 | 5 | 1 | 408.6 | 62.47 |
+| [`minipixels.assets.pack.clearCache`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-clearcache-function-clearcache-pack-src-minipixels-assets-pack-ml-1435924141) | `src/minipixels/assets/pack.ml:925` | 12 | 9 | 4 | 4 | 2 | 372.92 | 57.91 |
+| [`minipixels.assets.pack.close`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-close-function-close-pack-src-minipixels-assets-pack-ml-1838684689) | `src/minipixels/assets/pack.ml:947` | 15 | 14 | 4 | 4 | 2 | 432.36 | 55.35 |
+| [`minipixels.assets.pack.dropPayloadAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-droppayloadat-function-droppayloadat-pack-index-src-minipixels-assets-pack-ml-776792881) | `src/minipixels/assets/pack.ml:903` | 7 | 6 | 6 | 5 | 1 | 408.6 | 62.47 |
 | [`minipixels.assets.pack.find`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-find-function-find-pack-name-src-minipixels-assets-pack-ml-234838308) | `src/minipixels/assets/pack.ml:615` | 7 | 8 | 4 | 3 | 1 | 275.1 | 63.95 |
-| [`minipixels.assets.pack.getBytes`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getbytes-function-getbytes-pack-name-src-minipixels-assets-pack-ml-1640220432) | `src/minipixels/assets/pack.ml:794` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
+| [`minipixels.assets.pack.getBytes`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getbytes-function-getbytes-pack-name-src-minipixels-assets-pack-ml-1640220432) | `src/minipixels/assets/pack.ml:815` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
 | [`minipixels.assets.pack.getBytesAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getbytesat-function-getbytesat-pack-index-src-minipixels-assets-pack-ml-2026220673) | `src/minipixels/assets/pack.ml:626` | 45 | 45 | 19 | 24 | 3 | 3061.26 | 36.97 |
-| [`minipixels.assets.pack.getKind`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getkind-function-getkind-pack-name-src-minipixels-assets-pack-ml-1649210420) | `src/minipixels/assets/pack.ml:803` | 5 | 4 | 2 | 1 | 1 | 151.62 | 69.21 |
-| [`minipixels.assets.pack.getKindAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getkindat-function-getkindat-pack-index-src-minipixels-assets-pack-ml-1226468023) | `src/minipixels/assets/pack.ml:812` | 4 | 3 | 5 | 4 | 1 | 221.14 | 69.78 |
+| [`minipixels.assets.pack.getKind`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getkind-function-getkind-pack-name-src-minipixels-assets-pack-ml-1649210420) | `src/minipixels/assets/pack.ml:824` | 5 | 4 | 2 | 1 | 1 | 151.62 | 69.21 |
+| [`minipixels.assets.pack.getKindAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-getkindat-function-getkindat-pack-index-src-minipixels-assets-pack-ml-1226468023) | `src/minipixels/assets/pack.ml:833` | 4 | 3 | 5 | 4 | 1 | 221.14 | 69.78 |
 | [`minipixels.assets.pack.hasRange`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-hasrange-function-hasrange-data-offset-size-src-minipixels-assets-pack-ml-769445656) | `src/minipixels/assets/pack.ml:134` | 3 | 1 | 1 | 0 | 0 | 148.68 | 74.25 |
 | [`minipixels.assets.pack.integerDivide`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-integerdivide-function-integerdivide-value-divisor-src-minipixels-assets-pack-ml-1632794547) | `src/minipixels/assets/pack.ml:140` | 3 | 1 | 1 | 0 | 0 | 75.28 | 76.32 |
 | [`minipixels.assets.pack.isPack`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-ispack-function-ispack-data-src-minipixels-assets-pack-ml-36756322) | `src/minipixels/assets/pack.ml:146` | 4 | 3 | 2 | 1 | 1 | 235.02 | 70 |
-| [`minipixels.assets.pack.loadPng`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-loadpng-function-loadpng-pack-name-src-minipixels-assets-pack-ml-1158601410) | `src/minipixels/assets/pack.ml:873` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
-| [`minipixels.assets.pack.loadPngAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-loadpngat-function-loadpngat-pack-index-src-minipixels-assets-pack-ml-1529602909) | `src/minipixels/assets/pack.ml:852` | 17 | 15 | 8 | 7 | 1 | 791.62 | 51.79 |
+| [`minipixels.assets.pack.loadPng`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-loadpng-function-loadpng-pack-name-src-minipixels-assets-pack-ml-1158601410) | `src/minipixels/assets/pack.ml:894` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
+| [`minipixels.assets.pack.loadPngAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-loadpngat-function-loadpngat-pack-index-src-minipixels-assets-pack-ml-1529602909) | `src/minipixels/assets/pack.ml:873` | 17 | 15 | 8 | 7 | 1 | 791.62 | 51.79 |
 | [`minipixels.assets.pack.open`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-open-function-open-path-src-minipixels-assets-pack-ml-569822995) | `src/minipixels/assets/pack.ml:394` | 10 | 8 | 3 | 2 | 1 | 293.44 | 60.5 |
 | [`minipixels.assets.pack.openProtected`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-openprotected-function-openprotected-path-key-publickey-expectedkeyid-src-minipixels-assets-pack-ml-449955844) | `src/minipixels/assets/pack.ml:583` | 28 | 22 | 13 | 12 | 1 | 1201.55 | 45.12 |
 | [`minipixels.assets.pack.packError`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-packerror-function-packerror-message-src-minipixels-assets-pack-ml-16473987) | `src/minipixels/assets/pack.ml:126` | 3 | 1 | 1 | 0 | 0 | 46.51 | 77.78 |
-| [`minipixels.assets.pack.preloadAll`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-preloadall-function-preloadall-pack-maxbatchbytes-src-minipixels-assets-pack-ml-1162912906) | `src/minipixels/assets/pack.ml:780` | 10 | 7 | 4 | 4 | 2 | 346.79 | 59.86 |
-| [`minipixels.assets.pack.preloadSlots`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-preloadslots-function-preloadslots-pack-slots-maxbatchbytes-src-minipixels-assets-pack-ml-820413723) | `src/minipixels/assets/pack.ml:679` | 93 | 86 | 32 | 65 | 6 | 5331.11 | 26.66 |
-| [`minipixels.assets.pack.stats`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-stats-function-stats-pack-src-minipixels-assets-pack-ml-122627519) | `src/minipixels/assets/pack.ml:919` | 4 | 3 | 2 | 1 | 1 | 394.66 | 68.42 |
-| [`minipixels.assets.pack.streamInfo`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-streaminfo-function-streaminfo-pack-name-src-minipixels-assets-pack-ml-1018612080) | `src/minipixels/assets/pack.ml:843` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
-| [`minipixels.assets.pack.streamInfoAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-streaminfoat-function-streaminfoat-pack-index-src-minipixels-assets-pack-ml-862290221) | `src/minipixels/assets/pack.ml:822` | 17 | 19 | 14 | 13 | 1 | 1241.89 | 49.61 |
-| [`minipixels.assets.pack.unload`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-unload-function-unload-pack-name-src-minipixels-assets-pack-ml-1325636868) | `src/minipixels/assets/pack.ml:893` | 8 | 7 | 2 | 1 | 1 | 229.25 | 63.5 |
+| [`minipixels.assets.pack.preloadAll`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-preloadall-function-preloadall-pack-maxbatchbytes-src-minipixels-assets-pack-ml-1162912906) | `src/minipixels/assets/pack.ml:801` | 10 | 7 | 4 | 4 | 2 | 346.79 | 59.86 |
+| [`minipixels.assets.pack.preloadSlots`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-preloadslots-function-preloadslots-pack-slots-maxbatchbytes-src-minipixels-assets-pack-ml-820413723) | `src/minipixels/assets/pack.ml:698` | 95 | 88 | 35 | 74 | 6 | 5391.32 | 26.02 |
+| [`minipixels.assets.pack.stats`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-stats-function-stats-pack-src-minipixels-assets-pack-ml-122627519) | `src/minipixels/assets/pack.ml:940` | 4 | 3 | 2 | 1 | 1 | 394.66 | 68.42 |
+| [`minipixels.assets.pack.streamInfo`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-streaminfo-function-streaminfo-pack-name-src-minipixels-assets-pack-ml-1018612080) | `src/minipixels/assets/pack.ml:864` | 5 | 4 | 2 | 1 | 1 | 164.23 | 68.97 |
+| [`minipixels.assets.pack.streamInfoAt`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-streaminfoat-function-streaminfoat-pack-index-src-minipixels-assets-pack-ml-862290221) | `src/minipixels/assets/pack.ml:843` | 17 | 19 | 14 | 13 | 1 | 1241.89 | 49.61 |
+| [`minipixels.assets.pack.unload`](File-src-minipixels-assets-pack-ml-1157891367.md#function-function-minipixels-assets-pack-unload-function-unload-pack-name-src-minipixels-assets-pack-ml-1325636868) | `src/minipixels/assets/pack.ml:914` | 8 | 7 | 2 | 1 | 1 | 229.25 | 63.5 |
 | [`minipixels.assets.png._inflateZlibPortable`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-inflatezlibportable-function-inflatezlibportable-data-expectedsize-src-minipixels-assets-png-ml-171444575) | `src/minipixels/assets/png.ml:309` | 72 | 76 | 34 | 84 | 6 | 4242.15 | 29.51 |
 | [`minipixels.assets.png.adler32`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-adler32-function-adler32-data-src-minipixels-assets-png-ml-1397005228) | `src/minipixels/assets/png.ml:295` | 9 | 6 | 2 | 1 | 1 | 255.41 | 62.06 |
 | [`minipixels.assets.png.alignBits`](File-src-minipixels-assets-png-ml-1155821131.md#function-function-minipixels-assets-png-alignbits-function-alignbits-reader-src-minipixels-assets-png-ml-1129393079) | `src/minipixels/assets/png.ml:126` | 4 | 2 | 1 | 0 | 0 | 58.81 | 74.34 |

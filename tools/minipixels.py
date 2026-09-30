@@ -1602,17 +1602,19 @@ def copy_runtime_assets(data: dict, root: Path, output: Path) -> None:
 
 def ensure_media_runtime(compiler_root: Path, target: str, output_dir: Path) -> Path:
     """Copy the std.audio/std.video bridge used by packed media players."""
+    compiler_root = compiler_root.resolve()
+    build_dir = compiler_root / "build" / "native" / "video" / target
     name = "minilang_video.dll" if target == "windows-x64" else "libminilang_video.so"
     candidates = [
         compiler_root / name,
         compiler_root / "runtimes" / target / name,
-        compiler_root / "build" / "native" / "video" / target / name,
+        build_dir / name,
     ]
     source = next((candidate for candidate in candidates if candidate.is_file()), None)
     if source is None and (compiler_root / "native" / "video").is_dir():
         if target == "windows-x64":
             subprocess.check_call(
-                ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(compiler_root / "native" / "video" / "windows" / "build.ps1")]
+                ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(compiler_root / "native" / "video" / "windows" / "build.ps1"), "-OutputDir", str(build_dir)]
             )
         else:
             script = compiler_root / "native" / "video" / "linux" / "build.sh"
@@ -1620,13 +1622,15 @@ def ensure_media_runtime(compiler_root: Path, target: str, output_dir: Path) -> 
                 resolved = script.resolve()
                 drive = resolved.drive.rstrip(":").lower()
                 wsl_script = f"/mnt/{drive}{resolved.as_posix().split(':', 1)[-1]}"
-                subprocess.check_call(["wsl.exe", "-d", os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"), "--", "sh", wsl_script])
+                wsl_output = f"/mnt/{drive}{build_dir.as_posix().split(':', 1)[-1]}"
+                subprocess.check_call(["wsl.exe", "-d", os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"), "--", "sh", wsl_script, wsl_output])
             else:
-                subprocess.check_call(["sh", str(script)])
+                subprocess.check_call(["sh", str(script), str(build_dir)])
         source = next((candidate for candidate in candidates if candidate.is_file()), None)
     if source is None:
         die(f"MiniLang media runtime not found for {target}; expected {name} in the compiler distribution")
     destination = output_dir.resolve() / name
+    destination.parent.mkdir(parents=True, exist_ok=True)
     if source.resolve() != destination:
         shutil.copy2(source, destination)
     return destination

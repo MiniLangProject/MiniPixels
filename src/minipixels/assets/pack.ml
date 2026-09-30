@@ -31,7 +31,7 @@ const CODEC_STREAM = 4
 const STREAM_HEADER_SIZE = 24
 /// Maximum logical size of one decompressed asset.
 const MAX_DECOMPRESSED_ASSET_SIZE = 536870912
-/// Default upper bound for one temporary contiguous preload read.
+/// Default upper bound for one physical preload read and coalesced batch.
 const DEFAULT_PRELOAD_BATCH_BYTES = 16777216
 
 /// Represents the asset pack data used by the minipixels assets pack module.
@@ -669,13 +669,32 @@ function getBytesAt(pack, index)
   return payload
 end function
 
+/// Reads directly into the final region using bounded physical reads.
+/// Large individual assets still require their full storage/decode buffers.
+/// @internal
+function _readPreloadRange(pack, offset, size, maxBatchBytes)
+  result = bytes(size, 0)
+  cursor = 0
+  while cursor < size
+    count = size - cursor
+    if count > maxBatchBytes then count = maxBatchBytes end if
+    actual = fileio.readExactAt(pack.file, offset + cursor, result, cursor, count)
+    if typeof(actual) == "error" then return actual end if
+    pack.bulkReads = pack.bulkReads + 1
+    pack.storedBytesRead = pack.storedBytesRead + count
+    cursor = cursor + count
+  end while
+  return result
+end function
+
 /// Preloads selected asset slots with contiguous, bounded file reads.
 /// Already cached slots are skipped. File-order sorting turns a long sequence of
-/// small random reads into a small number of sequential reads without retaining
-/// the temporary batch buffer.
+/// small random reads into sequential reads without spanning unrequested gaps.
+/// Large single assets are filled directly through bounded reads but still need
+/// their storage/decode buffers; raw single-entry regions become the final cache.
 /// @param pack Open asset pack.
 /// @param slots Array of pre-resolved entry slots.
-/// @param maxBatchBytes Maximum temporary read size, or a non-positive value for the default.
+/// @param maxBatchBytes Maximum physical read/coalescing size, not an asset memory limit; non-positive uses the default.
 function preloadSlots(pack, slots, maxBatchBytes)
   if not (pack is AssetPack) then return packError("invalid asset pack") end if
   if typeof(slots) != "array" then return packError("asset preload slots must be an array") end if
@@ -720,16 +739,15 @@ function preloadSlots(pack, slots, maxBatchBytes)
     while batchLimit < orderedCount
       candidate = ordered[batchLimit]
       candidateEnd = pack.offsets[candidate] + pack.storedSizes[candidate]
+      if pack.offsets[candidate] > batchEnd then break end if
       if candidateEnd - batchStart > maxBatchBytes then
         break
       end if
       if candidateEnd > batchEnd then batchEnd = candidateEnd end if
       batchLimit = batchLimit + 1
     end while
-    region = _readRange(pack.file, batchStart, batchEnd - batchStart)
+    region = _readPreloadRange(pack, batchStart, batchEnd - batchStart, maxBatchBytes)
     if typeof(region) == "error" then return region end if
-    pack.bulkReads = pack.bulkReads + 1
-    pack.storedBytesRead = pack.storedBytesRead + len(region)
 
     item = cursor
     while item < batchLimit
@@ -738,7 +756,10 @@ function preloadSlots(pack, slots, maxBatchBytes)
         relativeOffset = pack.offsets[slot] - batchStart
         payload = void
         if pack.protected then
-          stored = slice(region, relativeOffset, pack.storedSizes[slot])
+          stored = region
+          if relativeOffset != 0 or pack.storedSizes[slot] != len(region) then
+            stored = slice(region, relativeOffset, pack.storedSizes[slot])
+          end if
           if pack.codecs[slot] == CODEC_STREAM then
             payload = _decodeStreamPayload(stored, pack.key, pack.nonces[slot], pack.sizes[slot])
           else
@@ -776,7 +797,7 @@ end function
 
 /// Preloads every payload in an asset pack through bounded contiguous reads.
 /// @param pack Open asset pack.
-/// @param maxBatchBytes Maximum temporary read size, or a non-positive value for the default.
+/// @param maxBatchBytes Maximum physical read/coalescing size, not an asset memory limit; non-positive uses the default.
 function preloadAll(pack, maxBatchBytes)
   if not (pack is AssetPack) then return packError("invalid asset pack") end if
   slots = array(pack.count, 0)

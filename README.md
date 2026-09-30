@@ -33,7 +33,7 @@ diagnostics as failures.
 
 ## Requirements
 
-- Windows x64 or Linux x64 with glibc, X11 (`libX11.so.6`) and ALSA (`libasound.so.2`); streamed video on Linux also needs the GStreamer playback plugins required by `std.video`
+- Windows x64 or Linux x64 with glibc, X11 (`libX11.so.6`) and ALSA (`libasound.so.2`); streamed audio/video on Linux also needs GStreamer (base/good plugins plus libav for MP3/H.264 decoding). On Ubuntu: `sudo apt-get install libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-libav`. Building the native MPX runtime additionally requires OpenSSL development headers (`libssl-dev`).
 - MiniLang Compiler 1.2.11 or newer in a sibling checkout; lazy MPX I/O uses `std.io.file`, fast MPX assets use `std.compress.lz4`, protected builds use `std.crypto.ecdsa_p256`, and streamed media uses `std.audio`/`std.video`
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
 - The Python packages in `requirements.txt` for protected builds and WAV-to-MP3 asset transcoding
@@ -120,6 +120,8 @@ Run tests:
 ```powershell
 python tests\run_tests.py
 ```
+
+The suite includes native HTTP-range/authentication/cancellation regressions and MPX preload I/O limits. Windows-to-Linux test runs execute these native checks in WSL too (not just cross-compile them); install Python 3 with `cryptography` inside WSL, alongside the Linux runtime dependencies above.
 
 Optional window renderer smoke test:
 
@@ -417,6 +419,8 @@ mp.preloadAssetPackSlots(pack, [slot], 16777216)
 ```
 
 Generated helpers use numeric slots automatically, cache decoded sprites, short audio clips, text catalogs, localization services and JSON text, and release PNG/text/data source bytes after successful decoding. `gen.preload()` warms non-streaming assets through bounded contiguous reads before constructing them; `gen.preloadGroup("level-1")` does the same for non-streaming entries tagged with that group. Audio streams and video are deliberately excluded so preloading never copies an entire movie or music track into memory. `assetPackStats()` additionally reports physical `storedBytesRead`, logical `decodedBytes`, and `bulkReads`.
+
+Preloads coalesce only adjacent requested blocks, never gaps containing skipped media. `batchBytes` limits each file read even when a single asset is larger; `bulkReads` counts these read operations. It is not a total RAM limit: cached assets still occupy their full decoded size, and compressed/encrypted entries need decoding buffers. A single raw entry is read directly into its final cache buffer.
 
 Loading and container compression are configured without changing game code:
 

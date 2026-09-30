@@ -37,6 +37,8 @@ python tools\minipixels.py build examples\moving-sprite\minipixels.json --compil
 python tests\run_tests.py --target linux-x64
 ```
 
+Cross-target tests execute Linux binaries and the native media regressions inside WSL. Install Python 3 and `cryptography` there (Ubuntu: `sudo apt-get install python3-cryptography`), plus the GStreamer and OpenSSL packages listed in the README. Native Linux CI installs these runtime/build dependencies before running the same suite.
+
 There is also a native MiniLang CLI for the pieces that have already moved out of Python:
 
 ```powershell

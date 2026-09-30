@@ -32,9 +32,11 @@ typedef int mp_socklen;
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <openssl/evp.h>
+#include <poll.h>
 #include <pthread.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #include <unistd.h>
 #define MP_API __attribute__((visibility("default")))
 typedef int mp_socket;
@@ -81,6 +83,16 @@ typedef struct MiniPixelsMediaStream {
     EVP_CIPHER_CTX* crypto_context;
 #endif
 } MiniPixelsMediaStream;
+
+static void mp_shutdown_socket(mp_socket value)
+{
+    if (value == MP_INVALID_SOCKET) return;
+#if defined(_WIN32)
+    shutdown(value, SD_BOTH);
+#else
+    shutdown(value, SHUT_RDWR);
+#endif
+}
 
 static int mp_is_stopping(MiniPixelsMediaStream* stream)
 {
@@ -182,16 +194,64 @@ static void mp_close_socket(mp_socket socket_value)
 #endif
 }
 
-static int mp_send_all(mp_socket socket_value, const void* data, size_t size)
+static int mp_nonblocking(mp_socket value)
+{
+#if defined(_WIN32)
+    u_long enabled = 1;
+    return ioctlsocket(value, FIONBIO, &enabled) == 0;
+#else
+    int flags = fcntl(value, F_GETFL, 0);
+    return flags >= 0 && fcntl(value, F_SETFL, flags | O_NONBLOCK) == 0;
+#endif
+}
+
+static int mp_would_block(void)
+{
+#if defined(_WIN32)
+    int error = WSAGetLastError();
+    return error == WSAEWOULDBLOCK || error == WSAEINTR;
+#else
+    return errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR;
+#endif
+}
+
+// Bounded idle wait, with cancellation checked at least every 100 ms.
+static int mp_wait_socket(MiniPixelsMediaStream* stream, mp_socket value, int writing)
+{
+    int attempt;
+    for (attempt = 0; attempt < 50 && !mp_is_stopping(stream); ++attempt) {
+#if defined(_WIN32)
+        fd_set ready;
+        struct timeval timeout = {0, 100000};
+        int result;
+        FD_ZERO(&ready);
+        FD_SET(value, &ready);
+        result = select(0, writing ? NULL : &ready, writing ? &ready : NULL, NULL, &timeout);
+#else
+        // poll also supports descriptors beyond select's FD_SETSIZE limit.
+        struct pollfd ready = {value, writing ? POLLOUT : POLLIN, 0};
+        int result = poll(&ready, 1, 100);
+#endif
+        if (result > 0) return !mp_is_stopping(stream);
+        if (result < 0 && !mp_would_block()) return 0;
+    }
+    return 0;
+}
+
+static int mp_send_all(MiniPixelsMediaStream* stream, mp_socket socket_value, const void* data, size_t size)
 {
     const char* cursor = (const char*)data;
     while (size > 0) {
+        if (mp_is_stopping(stream)) return 0;
 #if defined(_WIN32)
         int sent = send(socket_value, cursor, size > INT32_MAX ? INT32_MAX : (int)size, 0);
 #else
         ssize_t sent = send(socket_value, cursor, size, MSG_NOSIGNAL);
 #endif
-        if (sent <= 0) return 0;
+        if (sent <= 0) {
+            if (sent < 0 && mp_would_block() && mp_wait_socket(stream, socket_value, 1)) continue;
+            return 0;
+        }
         cursor += sent;
         size -= (size_t)sent;
     }
@@ -339,6 +399,10 @@ static int mp_read_chunk(MiniPixelsMediaStream* stream, uint32_t index, uint8_t*
         stream->cached_chunk = (uint8_t*)malloc(stream->chunk_size);
         if (stream->cached_chunk == NULL) { memset(ciphertext, 0, plain_size); free(ciphertext); return 0; }
     }
+    // Decryption may write unauthenticated plaintext before rejecting its tag.
+    // Invalidate the old identity before touching the shared output buffer.
+    stream->cached_chunk_index = UINT32_MAX;
+    stream->cached_chunk_size = 0;
     result = mp_decrypt_gcm(stream, nonce, aad, sizeof(aad), ciphertext, plain_size, tag, stream->cached_chunk);
     memset(ciphertext, 0, plain_size);
     free(ciphertext);
@@ -347,6 +411,8 @@ static int mp_read_chunk(MiniPixelsMediaStream* stream, uint32_t index, uint8_t*
         stream->cached_chunk_size = plain_size;
         memcpy(output, stream->cached_chunk, plain_size);
         *output_size = plain_size;
+    } else {
+        memset(stream->cached_chunk, 0, stream->chunk_size);
     }
     return result;
 }
@@ -359,8 +425,9 @@ static int mp_send_range(MiniPixelsMediaStream* stream, mp_socket client, uint64
         buffer = (uint8_t*)malloc(64 * 1024);
         if (buffer == NULL || !mp_seek(stream->file, stream->payload_offset + start)) { free(buffer); return 0; }
         while (size > 0) {
+            if (mp_is_stopping(stream)) { free(buffer); return 0; }
             size_t count = size > 64 * 1024 ? 64 * 1024 : (size_t)size;
-            if (fread(buffer, 1, count, stream->file) != count || !mp_send_all(client, buffer, count)) {
+            if (fread(buffer, 1, count, stream->file) != count || !mp_send_all(stream, client, buffer, count)) {
                 free(buffer); return 0;
             }
             size -= count;
@@ -371,6 +438,7 @@ static int mp_send_range(MiniPixelsMediaStream* stream, mp_socket client, uint64
     buffer = (uint8_t*)malloc(stream->chunk_size);
     if (buffer == NULL) return 0;
     while (size > 0) {
+        if (mp_is_stopping(stream)) { memset(buffer, 0, stream->chunk_size); free(buffer); return 0; }
         uint32_t chunk_index = (uint32_t)(start / stream->chunk_size);
         size_t chunk_size = 0;
         size_t within = (size_t)(start % stream->chunk_size);
@@ -380,7 +448,7 @@ static int mp_send_range(MiniPixelsMediaStream* stream, mp_socket client, uint64
         }
         count = chunk_size - within;
         if ((uint64_t)count > size) count = (size_t)size;
-        if (!mp_send_all(client, buffer + within, count)) { free(buffer); return 0; }
+        if (!mp_send_all(stream, client, buffer + within, count)) { free(buffer); return 0; }
         start += count;
         size -= count;
     }
@@ -389,26 +457,80 @@ static int mp_send_range(MiniPixelsMediaStream* stream, mp_socket client, uint64
     return 1;
 }
 
-static const char* mp_find_header(const char* request, const char* name)
+static int mp_ascii_equal(const char* left, const char* right, size_t count)
 {
-    size_t length = strlen(name);
-    const char* cursor = request;
-    while ((cursor = strstr(cursor, name)) != NULL) {
-        if ((cursor == request || cursor[-1] == '\n') && strncmp(cursor, name, length) == 0) return cursor + length;
-        cursor += length;
+    size_t i;
+    for (i = 0; i < count; ++i) {
+        unsigned char a = (unsigned char)left[i], b = (unsigned char)right[i];
+        if (a >= 'A' && a <= 'Z') a += 'a' - 'A';
+        if (b >= 'A' && b <= 'Z') b += 'a' - 'A';
+        if (a != b) return 0;
     }
-    return NULL;
+    return 1;
+}
+
+static int mp_decimal(const char** cursor, uint64_t* value)
+{
+    const char* p = *cursor;
+    uint64_t result = 0;
+    if (*p < '0' || *p > '9') return 0;
+    while (*p >= '0' && *p <= '9') {
+        unsigned digit = (unsigned)(*p++ - '0');
+        if (result > (UINT64_MAX - digit) / 10) return 0;
+        result = result * 10 + digit;
+    }
+    *cursor = p;
+    *value = result;
+    return 1;
+}
+
+// A deliberately single-range source. Reject malformed or multiple ranges.
+static int mp_parse_range(const char* value, uint64_t size, uint64_t* start, uint64_t* end)
+{
+    uint64_t suffix;
+    if (strlen(value) < 6 || !mp_ascii_equal(value, "bytes=", 6) || size == 0) return 0;
+    value += 6;
+    if (*value == '-') {
+        ++value;
+        if (!mp_decimal(&value, &suffix) || suffix == 0) return 0;
+        *start = suffix >= size ? 0 : size - suffix;
+    } else {
+        if (!mp_decimal(&value, start) || *value++ != '-' || *start >= size) return 0;
+        if (*value >= '0' && *value <= '9') {
+            if (!mp_decimal(&value, end) || *end < *start) return 0;
+            if (*end >= size) *end = size - 1;
+        }
+    }
+    while (*value == ' ' || *value == '\t') ++value;
+    return *value == '\0';
 }
 
 static void mp_handle_client(MiniPixelsMediaStream* stream, mp_socket client)
 {
     char request[8192], header[1024], expected_path[96];
     int received, is_head = 0, partial = 0, header_size;
+    size_t used = 0;
     uint64_t start = 0, end = stream->logical_size == 0 ? 0 : stream->logical_size - 1;
-    const char* range;
-    received = recv(client, request, (int)sizeof(request) - 1, 0);
-    if (received <= 0) return;
-    request[received] = '\0';
+    const char* range = NULL;
+    char* line;
+    int duplicate_range = 0;
+    request[0] = '\0';
+    while (strstr(request, "\r\n\r\n") == NULL) {
+        if (used == sizeof(request) - 1) {
+            static const char too_large[] = "HTTP/1.1 431 Request Header Fields Too Large\r\nConnection: close\r\nContent-Length: 0\r\n\r\n";
+            mp_send_all(stream, client, too_large, sizeof(too_large) - 1);
+            return;
+        }
+        if (mp_is_stopping(stream)) return;
+        received = recv(client, request + used, (int)(sizeof(request) - used - 1), 0);
+        if (received <= 0) {
+            if (received < 0 && mp_would_block() && mp_wait_socket(stream, client, 0)) continue;
+            return;
+        }
+        if (memchr(request + used, '\0', (size_t)received) != NULL) return;
+        used += (size_t)received;
+        request[used] = '\0';
+    }
     snprintf(expected_path, sizeof(expected_path), "/%s/file%s", stream->token, stream->suffix);
     if (strncmp(request, "HEAD ", 5) == 0) is_head = 1;
     else if (strncmp(request, "GET ", 4) != 0) return;
@@ -420,30 +542,32 @@ static void mp_handle_client(MiniPixelsMediaStream* stream, mp_socket client)
         path_size = strcspn(path, " ");
         if (strlen(expected_path) != path_size || memcmp(path, expected_path, path_size) != 0) {
             static const char denied[] = "HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: 0\r\n\r\n";
-            mp_send_all(client, denied, sizeof(denied) - 1);
+            mp_send_all(stream, client, denied, sizeof(denied) - 1);
             return;
         }
     }
-    range = mp_find_header(request, "Range: bytes=");
-    if (range != NULL && stream->logical_size > 0) {
-        char* tail;
-        if (*range == '-') {
-            uint64_t suffix = strtoull(range + 1, &tail, 10);
-            if (suffix > stream->logical_size) suffix = stream->logical_size;
-            start = stream->logical_size - suffix;
-        } else {
-            start = strtoull(range, &tail, 10);
-            if (*tail == '-' && tail[1] >= '0' && tail[1] <= '9') end = strtoull(tail + 1, NULL, 10);
+    line = strstr(request, "\r\n") + 2;
+    while (*line != '\r') {
+        char* next = strstr(line, "\r\n");
+        char* colon;
+        if (next == NULL) return;
+        *next = '\0';
+        colon = strchr(line, ':');
+        if (colon != NULL && colon - line == 5 && mp_ascii_equal(line, "Range", 5)) {
+            if (range != NULL) duplicate_range = 1;
+            range = colon + 1;
+            while (*range == ' ' || *range == '\t') ++range;
         }
-        if (start >= stream->logical_size) {
+        line = next + 2;
+    }
+    if (range != NULL && !is_head) {
+        if (duplicate_range || !mp_parse_range(range, stream->logical_size, &start, &end)) {
             header_size = snprintf(header, sizeof(header),
                 "HTTP/1.1 416 Range Not Satisfiable\r\nContent-Range: bytes */%" PRIu64 "\r\nConnection: close\r\nContent-Length: 0\r\n\r\n",
                 stream->logical_size);
-            mp_send_all(client, header, (size_t)header_size);
+            mp_send_all(stream, client, header, (size_t)header_size);
             return;
         }
-        if (end >= stream->logical_size) end = stream->logical_size - 1;
-        if (end < start) end = start;
         partial = 1;
     }
     if (stream->logical_size == 0) { start = 0; end = 0; }
@@ -460,7 +584,7 @@ static void mp_handle_client(MiniPixelsMediaStream* stream, mp_socket client)
                 "Content-Length: %" PRIu64 "\r\nConnection: close\r\nCache-Control: no-store\r\n\r\n",
                 stream->mime, content_size);
         }
-        if (header_size > 0 && (size_t)header_size < sizeof(header) && mp_send_all(client, header, (size_t)header_size) && !is_head) {
+        if (header_size > 0 && (size_t)header_size < sizeof(header) && mp_send_all(stream, client, header, (size_t)header_size) && !is_head) {
             mp_send_range(stream, client, start, content_size);
         }
     }
@@ -474,17 +598,18 @@ static void* mp_server_thread(void* parameter)
 {
     MiniPixelsMediaStream* stream = (MiniPixelsMediaStream*)parameter;
     while (!mp_is_stopping(stream)) {
+        if (!mp_wait_socket(stream, stream->listener, 0)) continue;
         mp_socket client = accept(stream->listener, NULL, NULL);
         if (client == MP_INVALID_SOCKET) {
             if (mp_is_stopping(stream)) break;
             continue;
         }
-        mp_handle_client(stream, client);
-#if defined(_WIN32)
-        shutdown(client, SD_BOTH);
-#else
-        shutdown(client, SHUT_RDWR);
-#endif
+        if (mp_is_stopping(stream)) {
+            mp_close_socket(client);
+            break;
+        }
+        if (mp_nonblocking(client)) mp_handle_client(stream, client);
+        mp_shutdown_socket(client);
         mp_close_socket(client);
     }
 #if defined(_WIN32)
@@ -572,7 +697,8 @@ MP_API void* mpMediaStreamOpen(
     address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     address.sin_port = 0;
     if (bind(stream->listener, (struct sockaddr*)&address, sizeof(address)) != 0 ||
-        listen(stream->listener, 4) != 0 || getsockname(stream->listener, (struct sockaddr*)&address, &address_size) != 0) goto failure;
+        listen(stream->listener, 4) != 0 || !mp_nonblocking(stream->listener) ||
+        getsockname(stream->listener, (struct sockaddr*)&address, &address_size) != 0) goto failure;
     if (!mp_random(random_value, sizeof(random_value))) goto failure;
     for (index = 0; index < 16; ++index) {
         stream->token[index * 2] = hex[random_value[index] >> 4];
@@ -611,15 +737,6 @@ MP_API void mpMediaStreamClose(void* handle)
     MiniPixelsMediaStream* stream = (MiniPixelsMediaStream*)handle;
     if (stream == NULL) return;
     mp_request_stop(stream);
-    if (stream->listener != MP_INVALID_SOCKET) {
-#if defined(_WIN32)
-        shutdown(stream->listener, SD_BOTH);
-#else
-        shutdown(stream->listener, SHUT_RDWR);
-#endif
-        mp_close_socket(stream->listener);
-        stream->listener = MP_INVALID_SOCKET;
-    }
     if (stream->thread_started) {
 #if defined(_WIN32)
         WaitForSingleObject(stream->thread, INFINITE);
@@ -628,6 +745,7 @@ MP_API void mpMediaStreamClose(void* handle)
         pthread_join(stream->thread, NULL);
 #endif
     }
+    mp_close_socket(stream->listener);
     if (stream->file != NULL) fclose(stream->file);
     if (stream->cached_chunk != NULL) {
         memset(stream->cached_chunk, 0, stream->chunk_size);
