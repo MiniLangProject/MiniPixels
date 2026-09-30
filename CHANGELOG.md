@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.16.0 - 2026-09-30
 
 - Fixed authenticated stream-cache invalidation after a bad GCM tag and made native HTTP reads/writes cancellable so closing a stalled player cannot hang on a socket.
 - Added complete bounded HTTP header parsing, case-insensitive Range headers, suffix/open-ended ranges, and strict malformed/overflow range rejection.
