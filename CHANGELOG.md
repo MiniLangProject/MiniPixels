@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.16.1 - 2026-09-30
+
+- Preserve the HTTP 431 response on Windows by half-closing and draining bounded excess request data before closing; expanded oversized-header regression coverage.
+- Includes the complete 0.16.0 streaming feature set. The 0.16.0 tag did not publish an SDK because this additional Windows CI regression blocked its release build.
+
 ## 0.16.0 - 2026-09-30
 
 - Fixed authenticated stream-cache invalidation after a bad GCM tag and made native HTTP reads/writes cancellable so closing a stalled player cannot hang on a socket.

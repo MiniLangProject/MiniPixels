@@ -518,7 +518,24 @@ static void mp_handle_client(MiniPixelsMediaStream* stream, mp_socket client)
     while (strstr(request, "\r\n\r\n") == NULL) {
         if (used == sizeof(request) - 1) {
             static const char too_large[] = "HTTP/1.1 431 Request Header Fields Too Large\r\nConnection: close\r\nContent-Length: 0\r\n\r\n";
+            char discarded[1024];
+            size_t remaining = 64 * 1024;
             mp_send_all(stream, client, too_large, sizeof(too_large) - 1);
+            // Send FIN before discarding bounded excess input. Closing a socket
+            // with unread bytes can otherwise reset the connection on Windows,
+            // losing even the already-sent 431 response. Waits remain cancellable.
+#if defined(_WIN32)
+            shutdown(client, SD_SEND);
+#else
+            shutdown(client, SHUT_WR);
+#endif
+            while (remaining > 0 && !mp_is_stopping(stream)) {
+                int capacity = remaining < sizeof(discarded) ? (int)remaining : (int)sizeof(discarded);
+                int count = recv(client, discarded, capacity, 0);
+                if (count > 0) { remaining -= (size_t)count; continue; }
+                if (count < 0 && mp_would_block() && mp_wait_socket(stream, client, 0)) continue;
+                break;
+            }
             return;
         }
         if (mp_is_stopping(stream)) return;

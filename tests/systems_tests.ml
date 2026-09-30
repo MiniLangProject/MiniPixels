@@ -7,7 +7,7 @@ import minipixels.platform.linux as linuxPlatform
 #endif
 
 function main(args)
-  a.assertEq(mp.version(), "0.16.0", "engine version")
+  a.assertEq(mp.version(), "0.16.1", "engine version")
   cfg = mp.createConfig("Renderer", 64, 36, 2)
   a.assertEq(cfg.renderer, "auto", "renderer defaults to auto")
   a.assertEq(cfg.scaleMode, "stretch", "scale mode defaults to stretch")

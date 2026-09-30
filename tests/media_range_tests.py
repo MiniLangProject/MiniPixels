@@ -101,7 +101,9 @@ def test_runtime(runtime: Path) -> None:
                 assert headers["Content-Range"] == f"bytes */{len(payload)}"
             assert request(url, "Range: bytes=0-1\r\nrange: bytes=2-3\r\n")[0] == 416
             assert request(url, path="/wrong-token/file.bin")[0] == 404
-            assert request(url, "X-Padding: " + "x" * 8200 + "\r\n")[0] == 431
+            for size in (8200, 12000, 24000):
+                assert request(url, "X-Padding: " + "x" * size + "\r\n")[0] == 431
+            assert request(url, "Range: bytes=0-3\r\n")[2] == b"AAAA"
             # A disconnected partial request must not poison subsequent clients.
             with socket.create_connection((url.hostname, url.port), timeout=3) as client:
                 client.sendall(b"GET ")

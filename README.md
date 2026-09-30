@@ -3,9 +3,9 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.16.0`
+Current version: `0.16.1`
 
-See the [0.16.0 release notes](RELEASE_NOTES_0.16.0.md) for seekable MPX audio/video streaming, authenticated media chunks, robust cancellation, and bounded asset preloading.
+See the [0.16.1 release notes](RELEASE_NOTES_0.16.1.md) for seekable MPX audio/video streaming, authenticated media chunks, robust cancellation, and bounded asset preloading.
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.11 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
