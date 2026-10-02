@@ -8,7 +8,7 @@ These MiniLang source files are reachable through imports but are outside the co
 | ---: | --- | --- |
 | 2 | `std.array` | `../MiniLangCompilerML/std/array.ml` |
 | 1 | `std.audio` | `../MiniLangCompilerML/std/audio.ml` |
-| 5 | `std.bytes` | `../MiniLangCompilerML/std/bytes.ml` |
+| 6 | `std.bytes` | `../MiniLangCompilerML/std/bytes.ml` |
 | 1 | `std.checksum.crc32` | `../MiniLangCompilerML/std/checksum/crc32.ml` |
 | 2 | `std.compress.lz4` | `../MiniLangCompilerML/std/compress/lz4.ml` |
 | 1 | `std.crypto` | `../MiniLangCompilerML/std/crypto.ml` |
@@ -19,14 +19,15 @@ These MiniLang source files are reachable through imports but are outside the co
 | 1 | `std.ds.list` | `../MiniLangCompilerML/std/ds/list.ml` |
 | 0 | `std.encoding.hex` | `../MiniLangCompilerML/std/encoding/hex.ml` |
 | 0 | `std.fmt` | `../MiniLangCompilerML/std/fmt.ml` |
-| 5 | `std.fs` | `../MiniLangCompilerML/std/fs.ml` |
+| 6 | `std.fs` | `../MiniLangCompilerML/std/fs.ml` |
 | 1 | `std.io.file` | `../MiniLangCompilerML/std/io/file.ml` |
 | 3 | `std.math` | `../MiniLangCompilerML/std/math.ml` |
 | 1 | `std.path` | `../MiniLangCompilerML/std/path.ml` |
 | 0 | `std.platform` | `../MiniLangCompilerML/std/platform.ml` |
+| 1 | `std.process` | `../MiniLangCompilerML/std/process.ml` |
 | 0 | `std.result` | `../MiniLangCompilerML/std/result.ml` |
 | 1 | `std.sort` | `../MiniLangCompilerML/std/sort.ml` |
-| 5 | `std.string` | `../MiniLangCompilerML/std/string.ml` |
+| 6 | `std.string` | `../MiniLangCompilerML/std/string.ml` |
 | 2 | `std.string_builder` | `../MiniLangCompilerML/std/string_builder.ml` |
 | 1 | `std.time` | `../MiniLangCompilerML/std/time.ml` |
 | 1 | `std.video` | `../MiniLangCompilerML/std/video.ml` |

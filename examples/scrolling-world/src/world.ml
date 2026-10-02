@@ -31,7 +31,13 @@ function create(sprite)
   tileset = mp.tileset(sheet)
   map = mp.tilemap(16, 16, 80, 20, tileset, 3)
   solid = makeSolidData(80, 20)
-  map.addLayer(mp.tileLayer("world", 80, 20, solid, true, false, 1, 1))
+  visual = makeSolidData(80, 20)
+  for y = 18 to 19
+    for x = 0 to 79
+      visual[y * 80 + x] = 2
+    end for
+  end for
+  map.addLayer(mp.tileLayer("world", 80, 20, visual, true, false, 1, 1))
   map.addLayer(mp.tileLayer("collision", 80, 20, solid, false, true, 1, 1))
   return map
 end function

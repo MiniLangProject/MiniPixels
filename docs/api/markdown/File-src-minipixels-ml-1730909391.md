@@ -26,6 +26,7 @@ Reachable from entry: **yes**
 - `minipixels/math/types.ml` as `mt` → [src/minipixels/math/types.ml](File-src-minipixels-math-types-ml-311947336.md)
 - `minipixels/platform/windows.ml` as `win` → [src/minipixels/platform/windows.ml](File-src-minipixels-platform-windows-ml-1027159307.md)
 - `minipixels/scene/scene.ml` as `scn` → [src/minipixels/scene/scene.ml](File-src-minipixels-scene-scene-ml-552680371.md)
+- `minipixels/steam.ml` as `steam` → [src/minipixels/steam.ml](File-src-minipixels-steam-ml-239735282.md)
 - `minipixels/world/camera.ml` as `cam` → [src/minipixels/world/camera.ml](File-src-minipixels-world-camera-ml-397830650.md)
 - `minipixels/world/tilemap.ml` as `tile` → [src/minipixels/world/tilemap.ml](File-src-minipixels-world-tilemap-ml-2079329797.md)
 - `std/math.ml` as `math` → `../MiniLangCompilerML/std/math.ml` — external dependency
@@ -46,7 +47,7 @@ Performs the activeRenderer operation for the minipixels module.
 | `game` | `dynamic` | — | game value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L342)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L348)
 
 <a id="function-function-minipixels-animation-function-animation-maxframes-src-minipixels-ml-1356665698"></a>
 ### animation
@@ -62,7 +63,7 @@ Performs the animation operation for the minipixels module.
 | `maxFrames` | `dynamic` | — | maxFrames value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L515)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L521)
 
 <a id="function-function-minipixels-animationfromsheet-function-animationfromsheet-sheet-start-count-duration-src-minipixels-ml-308571094"></a>
 ### animationFromSheet
@@ -81,7 +82,7 @@ Performs the animationFromSheet operation for the minipixels module.
 | `duration` | `dynamic` | — | duration value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L521)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L527)
 
 <a id="function-function-minipixels-assetkindfrompack-function-assetkindfrompack-assetpack-name-src-minipixels-ml-482972938"></a>
 ### assetKindFromPack
@@ -98,7 +99,7 @@ Performs the assetKindFromPack operation for the minipixels module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L467)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L473)
 
 <a id="function-function-minipixels-assetkindfrompackslot-function-assetkindfrompackslot-assetpack-slot-src-minipixels-ml-697545587"></a>
 ### assetKindFromPackSlot
@@ -115,7 +116,7 @@ Returns the type code for a pre-resolved asset slot.
 | `slot` | `dynamic` | — | Pre-resolved entry slot. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L471)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L477)
 
 <a id="function-function-minipixels-assetpackstats-function-assetpackstats-assetpack-src-minipixels-ml-268899001"></a>
 ### assetPackStats
@@ -131,7 +132,7 @@ Returns asset-pack cache and lazy-I/O counters.
 | `assetPack` | `dynamic` | — | Open asset pack. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L509)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L515)
 
 <a id="function-function-minipixels-assetslotfrompack-function-assetslotfrompack-assetpack-name-src-minipixels-ml-840540666"></a>
 ### assetSlotFromPack
@@ -148,7 +149,7 @@ Resolves a dynamic asset name to a stable numeric slot, or -1.
 | `name` | `dynamic` | — | Stable asset name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L446)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L452)
 
 <a id="function-function-minipixels-audiobackend-function-audiobackend-src-minipixels-ml-1835271036"></a>
 ### audioBackend
@@ -160,7 +161,7 @@ function audioBackend()
 Performs the audioBackend operation for the minipixels module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L741)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L747)
 
 <a id="function-function-minipixels-audioclip-function-audioclip-path-name-src-minipixels-ml-515413188"></a>
 ### audioClip
@@ -177,7 +178,7 @@ Performs the audioClip operation for the minipixels module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L709)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L715)
 
 <a id="function-function-minipixels-audioclipfrombytes-function-audioclipfrombytes-data-name-src-minipixels-ml-1400301461"></a>
 ### audioClipFromBytes
@@ -194,7 +195,7 @@ Performs the audioClipFromBytes operation for the minipixels module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L713)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L719)
 
 <a id="function-function-minipixels-audiomixer-function-audiomixer-maxchannels-src-minipixels-ml-246446996"></a>
 ### audioMixer
@@ -210,7 +211,7 @@ Performs the audioMixer operation for the minipixels module.
 | `maxChannels` | `dynamic` | — | maxChannels value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L728)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L734)
 
 <a id="function-function-minipixels-audiostate-function-audiostate-src-minipixels-ml-872649788"></a>
 ### audioState
@@ -222,7 +223,7 @@ function audioState()
 Performs the audioState operation for the minipixels module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L697)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L703)
 
 <a id="function-function-minipixels-audiosupportsmp3-function-audiosupportsmp3-src-minipixels-ml-658236408"></a>
 ### audioSupportsMp3
@@ -234,7 +235,7 @@ function audioSupportsMp3()
 Returns whether the advanced mixer supports MP3 input.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L747)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L753)
 
 <a id="function-function-minipixels-audiosupportsmultiplesfx-function-audiosupportsmultiplesfx-src-minipixels-ml-155152452"></a>
 ### audioSupportsMultipleSfx
@@ -246,7 +247,7 @@ function audioSupportsMultipleSfx()
 Performs the audioSupportsMultipleSfx operation for the minipixels module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L743)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L749)
 
 <a id="function-function-minipixels-audiosupportsstereo-function-audiosupportsstereo-src-minipixels-ml-2076042780"></a>
 ### audioSupportsStereo
@@ -258,7 +259,7 @@ function audioSupportsStereo()
 Returns whether the advanced mixer preserves stereo input.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L749)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L755)
 
 <a id="function-function-minipixels-audiosupportsvolumecontrol-function-audiosupportsvolumecontrol-src-minipixels-ml-442255824"></a>
 ### audioSupportsVolumeControl
@@ -270,7 +271,7 @@ function audioSupportsVolumeControl()
 Performs the audioSupportsVolumeControl operation for the minipixels module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L745)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L751)
 
 <a id="function-function-minipixels-bindkey-function-bindkey-input-action-key-src-minipixels-ml-929736471"></a>
 ### bindKey
@@ -288,7 +289,7 @@ Binds one virtual key to an input action.
 | `key` | `dynamic` | — | Win32 virtual-key code. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L652)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L658)
 
 <a id="function-function-minipixels-bindkeys-function-bindkeys-input-action-primary-secondary-src-minipixels-ml-2127378948"></a>
 ### bindKeys
@@ -307,7 +308,7 @@ Binds two alternative virtual keys to an input action.
 | `secondary` | `dynamic` | — | Secondary Win32 virtual-key code, or -1. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L658)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L664)
 
 <a id="function-function-minipixels-calliffunction-function-calliffunction-fn-a-src-minipixels-ml-1622940695"></a>
 ### callIfFunction
@@ -324,7 +325,7 @@ Performs the callIfFunction operation for the minipixels module.
 | `a` | `dynamic` | — | a value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L757)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L763)
 
 <a id="function-function-minipixels-callrender-function-callrender-fn-game-canvas-src-minipixels-ml-417238454"></a>
 ### callRender
@@ -342,7 +343,7 @@ Performs the callRender operation for the minipixels module.
 | `canvas` | `dynamic` | — | canvas value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L773)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L779)
 
 <a id="function-function-minipixels-callupdate-function-callupdate-fn-game-dt-src-minipixels-ml-623549234"></a>
 ### callUpdate
@@ -360,7 +361,7 @@ Performs the callUpdate operation for the minipixels module.
 | `dt` | `dynamic` | — | dt value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L765)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L771)
 
 <a id="function-function-minipixels-camera-function-camera-width-height-src-minipixels-ml-1194025291"></a>
 ### camera
@@ -377,7 +378,7 @@ Performs the camera operation for the minipixels module.
 | `height` | `dynamic` | — | Height in the coordinate or storage units used by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L525)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L531)
 
 <a id="function-function-minipixels-changescene-function-changescene-game-name-src-minipixels-ml-204458343"></a>
 ### changeScene
@@ -394,7 +395,7 @@ Replaces the active game scene.
 | `name` | `dynamic` | — | Registered scene name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L592)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L598)
 
 <a id="function-function-minipixels-clearassetpackcache-function-clearassetpackcache-assetpack-src-minipixels-ml-935534221"></a>
 ### clearAssetPackCache
@@ -410,7 +411,7 @@ Clears every cached payload and decoded image retained by an asset pack.
 | `assetPack` | `dynamic` | — | Asset pack to mutate. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L506)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L512)
 
 <a id="function-function-minipixels-closeassetpack-function-closeassetpack-assetpack-src-minipixels-ml-366992309"></a>
 ### closeAssetPack
@@ -426,7 +427,7 @@ Closes an asset pack and wipes a retained MPX3 decryption key.
 | `assetPack` | `dynamic` | — | Open asset pack. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L512)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L518)
 
 <a id="function-function-minipixels-createconfig-function-createconfig-title-width-height-scale-src-minipixels-ml-867415209"></a>
 ### createConfig
@@ -445,7 +446,7 @@ Creates config for the minipixels module.
 | `scale` | `dynamic` | — | scale value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L121)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L126)
 
 <a id="function-function-minipixels-creategame-function-creategame-cfg-src-minipixels-ml-177514248"></a>
 ### createGame
@@ -461,7 +462,7 @@ Creates game for the minipixels module.
 | `cfg` | `dynamic` | — | Configuration used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L130)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L135)
 
 <a id="function-function-minipixels-designtorenderx-function-designtorenderx-game-value-src-minipixels-ml-475498989"></a>
 ### designToRenderX
@@ -478,7 +479,7 @@ Converts a horizontal design coordinate to a framebuffer coordinate.
 | `value` | `dynamic` | — | Horizontal design coordinate. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L269)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L275)
 
 <a id="function-function-minipixels-designtorendery-function-designtorendery-game-value-src-minipixels-ml-171346775"></a>
 ### designToRenderY
@@ -495,7 +496,7 @@ Converts a vertical design coordinate to a framebuffer coordinate.
 | `value` | `dynamic` | — | Vertical design coordinate. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L273)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L279)
 
 <a id="function-function-minipixels-drawrectworld-function-drawrectworld-canvas-camera-x-y-w-h-color-src-minipixels-ml-629981828"></a>
 ### drawRectWorld
@@ -517,7 +518,7 @@ Draws rect world through the minipixels rendering path.
 | `color` | `dynamic` | — | color value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L617)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L623)
 
 <a id="function-function-minipixels-drawrendertarget-function-drawrendertarget-canvas-source-x-y-src-minipixels-ml-1903551718"></a>
 ### drawRenderTarget
@@ -536,7 +537,7 @@ Draws an off-screen render target onto another canvas.
 | `y` | `dynamic` | — | Destination y coordinate. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L419)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L425)
 
 <a id="function-function-minipixels-drawspriterotated-function-drawspriterotated-canvas-sprite-x-y-radians-scale-tint-src-minipixels-ml-1880840149"></a>
 ### drawSpriteRotated
@@ -558,7 +559,7 @@ Draws a sprite rotated around its configured pivot.
 | `tint` | `dynamic` | — | Multiplicative RGBA tint. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L428)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L434)
 
 <a id="function-function-minipixels-drawspriteworld-function-drawspriteworld-canvas-camera-sprite-x-y-src-minipixels-ml-379099541"></a>
 ### drawSpriteWorld
@@ -578,7 +579,7 @@ Draws sprite world through the minipixels rendering path.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L624)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L630)
 
 <a id="function-function-minipixels-drawspriteworldex-function-drawspriteworldex-canvas-camera-sprite-x-y-flipx-flipy-scale-tint-src-minipixels-ml-480820627"></a>
 ### drawSpriteWorldEx
@@ -602,7 +603,7 @@ Draws sprite world ex through the minipixels rendering path.
 | `tint` | `dynamic` | — | tint value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L635)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L641)
 
 <a id="function-function-minipixels-drawtext-function-drawtext-canvas-text-x-y-scale-color-src-minipixels-ml-520545259"></a>
 ### drawText
@@ -623,7 +624,7 @@ Draws text through the minipixels rendering path.
 | `color` | `dynamic` | — | color value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L670)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L676)
 
 <a id="function-function-minipixels-drawtextcentered-function-drawtextcentered-canvas-text-y-scale-color-src-minipixels-ml-1797824963"></a>
 ### drawTextCentered
@@ -643,7 +644,7 @@ Draws text centered through the minipixels rendering path.
 | `color` | `dynamic` | — | color value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L677)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L683)
 
 <a id="function-function-minipixels-fillrectworld-function-fillrectworld-canvas-camera-x-y-w-h-color-src-minipixels-ml-1539538118"></a>
 ### fillRectWorld
@@ -665,7 +666,7 @@ Performs the fillRectWorld operation for the minipixels module.
 | `color` | `dynamic` | — | color value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L608)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L614)
 
 <a id="function-function-minipixels-framehash-function-framehash-canvas-src-minipixels-ml-1907773514"></a>
 ### frameHash
@@ -681,7 +682,7 @@ Performs the frameHash operation for the minipixels module.
 | `canvas` | `dynamic` | — | canvas value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L752)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L758)
 
 - [minipixels.Game](Type-minipixels-game-1761105865.md) — struct
 - [minipixels.GameConfig](Type-minipixels-gameconfig-282091547.md) — struct
@@ -702,7 +703,7 @@ Performs the image operation for the minipixels module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L392)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L398)
 
 <a id="function-function-minipixels-inputdown-function-inputdown-input-action-src-minipixels-ml-1105939080"></a>
 ### inputDown
@@ -719,7 +720,7 @@ Performs the inputDown operation for the minipixels module.
 | `action` | `dynamic` | — | action value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L639)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L645)
 
 <a id="function-function-minipixels-inputpressed-function-inputpressed-input-action-src-minipixels-ml-574904456"></a>
 ### inputPressed
@@ -736,7 +737,7 @@ Performs the inputPressed operation for the minipixels module.
 | `action` | `dynamic` | — | action value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L643)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L649)
 
 <a id="function-function-minipixels-inputreleased-function-inputreleased-input-action-src-minipixels-ml-2125100718"></a>
 ### inputReleased
@@ -753,7 +754,7 @@ Performs the inputReleased operation for the minipixels module.
 | `action` | `dynamic` | — | action value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L647)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L653)
 
 <a id="function-function-minipixels-isgpurenderer-function-isgpurenderer-game-src-minipixels-ml-1641277372"></a>
 ### isGpuRenderer
@@ -769,7 +770,7 @@ Returns whether gpu renderer satisfies the required condition.
 | `game` | `dynamic` | — | game value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L349)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L355)
 
 <a id="function-function-minipixels-linerect-function-linerect-x1-y1-x2-y2-rectangle-src-minipixels-ml-274910717"></a>
 ### lineRect
@@ -789,7 +790,7 @@ Returns whether a line segment intersects a rectangle.
 | `rectangle` | `dynamic` | — | Rectangle to test. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L568)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L574)
 
 <a id="function-function-minipixels-loadbytesfrompack-function-loadbytesfrompack-assetpack-name-src-minipixels-ml-594477536"></a>
 ### loadBytesFromPack
@@ -806,7 +807,7 @@ Loads bytes from pack for the minipixels module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L442)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L448)
 
 <a id="function-function-minipixels-loadbytesfrompackslot-function-loadbytesfrompackslot-assetpack-slot-src-minipixels-ml-1671895421"></a>
 ### loadBytesFromPackSlot
@@ -823,7 +824,7 @@ Loads bytes from a pre-resolved asset slot without a string lookup.
 | `slot` | `dynamic` | — | Pre-resolved entry slot. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L450)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L456)
 
 <a id="function-function-minipixels-loadpng-function-loadpng-path-src-minipixels-ml-1373535571"></a>
 ### loadPng
@@ -839,7 +840,7 @@ Loads a common non-interlaced PNG file directly from disk.
 | `path` | `dynamic` | — | PNG file path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L495)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L501)
 
 <a id="function-function-minipixels-loadpngfrompack-function-loadpngfrompack-assetpack-name-src-minipixels-ml-560140056"></a>
 ### loadPngFromPack
@@ -856,7 +857,7 @@ Loads png from pack for the minipixels module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L488)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L494)
 
 <a id="function-function-minipixels-loadpngfrompackslot-function-loadpngfrompackslot-assetpack-slot-src-minipixels-ml-680645685"></a>
 ### loadPngFromPackSlot
@@ -873,7 +874,7 @@ Loads a PNG from a pre-resolved asset slot without a string lookup.
 | `slot` | `dynamic` | — | Pre-resolved entry slot. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L492)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L498)
 
 <a id="function-function-minipixels-loadtextcatalogfrompack-function-loadtextcatalogfrompack-assetpack-name-locale-src-minipixels-ml-1272587848"></a>
 ### loadTextCatalogFromPack
@@ -891,7 +892,7 @@ Loads a UTF-8 localization catalog from a packed text asset.
 | `locale` | `dynamic` | — | Locale assigned to the decoded catalog. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L476)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L482)
 
 <a id="function-function-minipixels-loadtextcatalogfrompackslot-function-loadtextcatalogfrompackslot-assetpack-slot-locale-src-minipixels-ml-381634289"></a>
 ### loadTextCatalogFromPackSlot
@@ -909,7 +910,7 @@ Loads a UTF-8 localization catalog from a pre-resolved asset slot.
 | `locale` | `dynamic` | — | Locale assigned to the decoded catalog. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L481)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L487)
 
 <a id="function-function-minipixels-localization-function-localization-defaultlocale-src-minipixels-ml-2062561563"></a>
 ### localization
@@ -925,7 +926,7 @@ Creates a locale service with language-region fallback and a default locale.
 | `defaultLocale` | `dynamic` | — | Locale used when a requested catalog or key is absent. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L484)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L490)
 
 <a id="function-function-minipixels-mixerplaymusic-function-mixerplaymusic-mixer-clip-src-minipixels-ml-680020851"></a>
 ### mixerPlayMusic
@@ -942,7 +943,7 @@ Performs the mixerPlayMusic operation for the minipixels module.
 | `clip` | `dynamic` | — | clip value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L736)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L742)
 
 <a id="function-function-minipixels-mixerplaysfx-function-mixerplaysfx-mixer-clip-src-minipixels-ml-1261022307"></a>
 ### mixerPlaySfx
@@ -959,7 +960,7 @@ Performs the mixerPlaySfx operation for the minipixels module.
 | `clip` | `dynamic` | — | clip value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L732)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L738)
 
 <a id="function-function-minipixels-mixerstopall-function-mixerstopall-mixer-src-minipixels-ml-1666561493"></a>
 ### mixerStopAll
@@ -975,7 +976,7 @@ Performs the mixerStopAll operation for the minipixels module.
 | `mixer` | `dynamic` | — | mixer value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L739)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L745)
 
 <a id="function-function-minipixels-musicclip-function-musicclip-path-name-src-minipixels-ml-1876241718"></a>
 ### musicClip
@@ -992,7 +993,7 @@ Performs the musicClip operation for the minipixels module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L717)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L723)
 
 <a id="function-function-minipixels-musicclipfrombytes-function-musicclipfrombytes-data-name-src-minipixels-ml-1447723125"></a>
 ### musicClipFromBytes
@@ -1009,7 +1010,7 @@ Creates a streaming-capable music clip from complete WAV or MP3 bytes.
 | `name` | `dynamic` | — | Stable clip name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L721)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L727)
 
 <a id="function-function-minipixels-openassetpack-function-openassetpack-path-src-minipixels-ml-1608444883"></a>
 ### openAssetPack
@@ -1025,7 +1026,7 @@ Opens asset pack for the minipixels module.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L431)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L437)
 
 <a id="function-function-minipixels-openprotectedassetpack-function-openprotectedassetpack-path-key-publickey-keyid-src-minipixels-ml-1253388718"></a>
 ### openProtectedAssetPack
@@ -1044,7 +1045,7 @@ Opens a signed and AES-256-GCM encrypted MPX3 version-4 asset pack. Generated Mi
 | `keyId` | `dynamic` | — | Embedded public-key fingerprint prefix. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L438)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L444)
 
 <a id="function-function-minipixels-playaudio-function-playaudio-audio-clip-src-minipixels-ml-1404017418"></a>
 ### playAudio
@@ -1061,7 +1062,7 @@ Performs the playAudio operation for the minipixels module.
 | `clip` | `dynamic` | — | clip value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L725)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L731)
 
 <a id="function-function-minipixels-playmusic-function-playmusic-path-src-minipixels-ml-497976999"></a>
 ### playMusic
@@ -1077,7 +1078,7 @@ Performs the playMusic operation for the minipixels module.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L693)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L699)
 
 <a id="function-function-minipixels-playmusicwithstate-function-playmusicwithstate-audio-path-src-minipixels-ml-57082401"></a>
 ### playMusicWithState
@@ -1094,7 +1095,7 @@ Performs the playMusicWithState operation for the minipixels module.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L705)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L711)
 
 <a id="function-function-minipixels-playsfx-function-playsfx-audio-path-src-minipixels-ml-1629492027"></a>
 ### playSfx
@@ -1111,7 +1112,7 @@ Performs the playSfx operation for the minipixels module.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L701)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L707)
 
 <a id="function-function-minipixels-playsound-function-playsound-path-src-minipixels-ml-908724171"></a>
 ### playSound
@@ -1127,7 +1128,7 @@ Performs the playSound operation for the minipixels module.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L684)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L690)
 
 <a id="function-function-minipixels-playsoundloop-function-playsoundloop-path-src-minipixels-ml-1662601623"></a>
 ### playSoundLoop
@@ -1143,7 +1144,7 @@ Performs the playSoundLoop operation for the minipixels module.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L690)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L696)
 
 <a id="function-function-minipixels-playsoundsync-function-playsoundsync-path-src-minipixels-ml-959644505"></a>
 ### playSoundSync
@@ -1159,7 +1160,7 @@ Performs the playSoundSync operation for the minipixels module.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L687)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L693)
 
 <a id="function-function-minipixels-pointrect-function-pointrect-x-y-rectangle-src-minipixels-ml-1319069050"></a>
 ### pointRect
@@ -1177,7 +1178,7 @@ Returns whether a point lies inside a rectangle.
 | `rectangle` | `dynamic` | — | Rectangle to test. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L557)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L563)
 
 <a id="function-function-minipixels-popscene-function-popscene-game-src-minipixels-ml-1207952402"></a>
 ### popScene
@@ -1193,7 +1194,7 @@ Pops the active game scene.
 | `game` | `dynamic` | — | Game owning the scene stack. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L599)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L605)
 
 <a id="function-function-minipixels-preloadassetpack-function-preloadassetpack-assetpack-batchbytes-src-minipixels-ml-61283776"></a>
 ### preloadAssetPack
@@ -1210,7 +1211,7 @@ Preloads every payload using bounded contiguous reads.
 | `batchBytes` | `dynamic` | — | Maximum physical read/coalescing size, not an asset memory limit; non-positive uses the default. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L459)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L465)
 
 <a id="function-function-minipixels-preloadassetpackslots-function-preloadassetpackslots-assetpack-slots-batchbytes-src-minipixels-ml-1184270193"></a>
 ### preloadAssetPackSlots
@@ -1228,7 +1229,7 @@ Preloads selected asset slots using bounded contiguous reads.
 | `batchBytes` | `dynamic` | — | Maximum physical read/coalescing size, not an asset memory limit; non-positive uses the default. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L455)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L461)
 
 <a id="function-function-minipixels-pushscene-function-pushscene-game-name-src-minipixels-ml-1770771383"></a>
 ### pushScene
@@ -1245,7 +1246,7 @@ Pushes a registered game scene.
 | `name` | `dynamic` | — | Registered scene name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L596)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L602)
 
 <a id="function-function-minipixels-random-function-random-seed-src-minipixels-ml-1310410303"></a>
 ### random
@@ -1261,7 +1262,7 @@ Performs the random operation for the minipixels module.
 | `seed` | `dynamic` | — | seed value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L382)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L388)
 
 <a id="function-function-minipixels-recti-function-recti-x-y-w-h-src-minipixels-ml-1140640022"></a>
 ### recti
@@ -1280,7 +1281,7 @@ Performs the recti operation for the minipixels module.
 | `h` | `dynamic` | — | h value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L379)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L385)
 
 <a id="function-function-minipixels-rectrect-function-rectrect-first-second-src-minipixels-ml-2009437560"></a>
 ### rectRect
@@ -1297,7 +1298,7 @@ Returns whether two rectangles overlap.
 | `second` | `dynamic` | — | Second rectangle. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L561)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L567)
 
 <a id="function-function-minipixels-registerscene-function-registerscene-game-value-src-minipixels-ml-827521485"></a>
 ### registerScene
@@ -1314,7 +1315,7 @@ Registers a scene on a game.
 | `value` | `dynamic` | — | Scene to register. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L585)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L591)
 
 <a id="function-function-minipixels-releasepackedassetbytesslot-function-releasepackedassetbytesslot-assetpack-slot-src-minipixels-ml-1502473077"></a>
 ### releasePackedAssetBytesSlot
@@ -1331,7 +1332,7 @@ Releases cached raw bytes for a pre-resolved slot while keeping decoded objects.
 | `slot` | `dynamic` | — | Pre-resolved entry slot. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L463)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L469)
 
 <a id="function-function-minipixels-rendererfallbackreason-function-rendererfallbackreason-game-src-minipixels-ml-512016926"></a>
 ### rendererFallbackReason
@@ -1347,7 +1348,7 @@ Performs the rendererFallbackReason operation for the minipixels module.
 | `game` | `dynamic` | — | game value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L355)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L361)
 
 <a id="function-function-minipixels-rendersizeforclient-function-rendersizeforclient-cfg-clientwidth-clientheight-src-minipixels-ml-985696319"></a>
 ### renderSizeForClient
@@ -1365,7 +1366,7 @@ Calculates the framebuffer size for a native client area without allocating it. 
 | `clientHeight` | `dynamic` | — | Native client height in pixels. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L239)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L245)
 
 <a id="function-function-minipixels-rendertarget-function-rendertarget-width-height-src-minipixels-ml-329706259"></a>
 ### renderTarget
@@ -1382,7 +1383,7 @@ Creates an off-screen CPU render target.
 | `height` | `dynamic` | — | Render-target height. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L413)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L419)
 
 <a id="function-function-minipixels-rendertodesignx-function-rendertodesignx-game-value-src-minipixels-ml-1496644477"></a>
 ### renderToDesignX
@@ -1399,7 +1400,7 @@ Converts a horizontal framebuffer coordinate to a design coordinate.
 | `value` | `dynamic` | — | Horizontal framebuffer coordinate. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L277)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L283)
 
 <a id="function-function-minipixels-rendertodesigny-function-rendertodesigny-game-value-src-minipixels-ml-1696177351"></a>
 ### renderToDesignY
@@ -1416,7 +1417,7 @@ Converts a vertical framebuffer coordinate to a design coordinate.
 | `value` | `dynamic` | — | Vertical framebuffer coordinate. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L281)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L287)
 
 <a id="function-function-minipixels-rgb-inline-function-rgb-r-g-b-src-minipixels-ml-723441852"></a>
 ### rgb
@@ -1434,7 +1435,7 @@ Performs the rgb operation for the minipixels module.
 | `b` | `dynamic` | — | b value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L363)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L369)
 
 <a id="function-function-minipixels-rgba-inline-function-rgba-r-g-b-a-src-minipixels-ml-271228025"></a>
 ### rgba
@@ -1453,7 +1454,7 @@ Performs the rgba operation for the minipixels module.
 | `a` | `dynamic` | — | a value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L369)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L375)
 
 <a id="function-function-minipixels-run-function-run-cfg-initialize-update-render-shutdown-src-minipixels-ml-1457808081"></a>
 ### run
@@ -1473,7 +1474,7 @@ Runs run for the minipixels workflow.
 | `shutdown` | `dynamic` | — | shutdown value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L817)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L824)
 
 <a id="function-function-minipixels-runheadless-function-runheadless-cfg-initialize-update-render-shutdown-src-minipixels-ml-1345190063"></a>
 ### runHeadless
@@ -1493,7 +1494,7 @@ Runs headless for the minipixels workflow.
 | `shutdown` | `dynamic` | — | shutdown value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L783)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L789)
 
 <a id="function-function-minipixels-savecanvaspng-function-savecanvaspng-canvas-path-src-minipixels-ml-94977153"></a>
 ### saveCanvasPng
@@ -1510,7 +1511,7 @@ Saves a canvas as a deterministic RGBA PNG screenshot.
 | `path` | `dynamic` | — | Destination PNG path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L499)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L505)
 
 <a id="function-function-minipixels-scene-function-scene-name-state-void-onenter-void-onexit-void-update-void-render-void-onpause-void-onresume-void-renderbelow-false-src-minipixels-ml-2042563506"></a>
 ### scene
@@ -1534,7 +1535,7 @@ Creates a scene with optional lifecycle callbacks.
 | `renderBelow` | `dynamic` | `false` | Whether scenes underneath remain visible. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L579)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L585)
 
 <a id="function-function-minipixels-setdesignresolution-function-setdesignresolution-cfg-width-height-src-minipixels-ml-1167711911"></a>
 ### setDesignResolution
@@ -1552,7 +1553,7 @@ Set the coordinate-system reference size exposed through Game scaling fields. Re
 | `height` | `dynamic` | — | Design-coordinate height. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L220)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L226)
 
 <a id="function-function-minipixels-setmaxfps-function-setmaxfps-cfg-maxfps-src-minipixels-ml-1723548285"></a>
 ### setMaxFps
@@ -1569,7 +1570,7 @@ Sets the rendered-frame limit, using zero for an uncapped loop.
 | `maxFps` | `dynamic` | — | Maximum rendered frames per second. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L326)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L332)
 
 <a id="function-function-minipixels-setmaxrenderpixels-function-setmaxrenderpixels-cfg-pixels-src-minipixels-ml-505208023"></a>
 ### setMaxRenderPixels
@@ -1586,7 +1587,7 @@ Limit dynamic framebuffer allocation to a positive number of pixels.
 | `pixels` | `dynamic` | — | Maximum framebuffer pixel count. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L230)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L236)
 
 <a id="function-function-minipixels-setpausewhenunfocused-function-setpausewhenunfocused-cfg-enabled-src-minipixels-ml-1532495753"></a>
 ### setPauseWhenUnfocused
@@ -1603,7 +1604,7 @@ Configures whether simulation pauses when the window loses focus.
 | `enabled` | `dynamic` | — | Whether focus loss pauses simulation updates. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L336)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L342)
 
 <a id="function-function-minipixels-setrenderer-function-setrenderer-cfg-renderer-src-minipixels-ml-2072096035"></a>
 ### setRenderer
@@ -1620,7 +1621,7 @@ Updates renderer maintained by the minipixels module.
 | `renderer` | `dynamic` | — | renderer value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L157)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L163)
 
 <a id="function-function-minipixels-setscalemode-function-setscalemode-cfg-mode-src-minipixels-ml-628364205"></a>
 ### setScaleMode
@@ -1637,7 +1638,7 @@ Updates scale mode maintained by the minipixels module.
 | `mode` | `dynamic` | — | Mode selecting the requested behavior. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L170)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L176)
 
 <a id="function-function-minipixels-setsmoothing-function-setsmoothing-cfg-enabled-src-minipixels-ml-2017300397"></a>
 ### setSmoothing
@@ -1654,7 +1655,7 @@ Updates smoothing maintained by the minipixels module.
 | `enabled` | `dynamic` | — | enabled value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L319)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L325)
 
 <a id="function-function-minipixels-solidimage-function-solidimage-width-height-color-name-src-minipixels-ml-358627443"></a>
 ### solidImage
@@ -1673,7 +1674,7 @@ Performs the solidImage operation for the minipixels module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L398)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L404)
 
 <a id="function-function-minipixels-spritefromimage-function-spritefromimage-img-name-src-minipixels-ml-927567202"></a>
 ### spriteFromImage
@@ -1690,7 +1691,7 @@ Performs the spriteFromImage operation for the minipixels module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L402)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L408)
 
 <a id="function-function-minipixels-spritesheet-function-spritesheet-img-fw-fh-spacing-margin-src-minipixels-ml-2134396515"></a>
 ### spriteSheet
@@ -1710,7 +1711,7 @@ Performs the spriteSheet operation for the minipixels module.
 | `margin` | `dynamic` | — | margin value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L409)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L415)
 
 <a id="function-function-minipixels-stopsound-function-stopsound-src-minipixels-ml-1217573942"></a>
 ### stopSound
@@ -1722,7 +1723,7 @@ function stopSound()
 Stops sound for the minipixels workflow.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L695)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L701)
 
 <a id="function-function-minipixels-syncrenderresolution-function-syncrenderresolution-game-src-minipixels-ml-1503641570"></a>
 ### syncRenderResolution
@@ -1736,7 +1737,7 @@ function syncRenderResolution(game)
 | `game` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L284)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L290)
 
 <a id="function-function-minipixels-textwidth-function-textwidth-text-scale-src-minipixels-ml-979331937"></a>
 ### textWidth
@@ -1753,7 +1754,7 @@ Performs the textWidth operation for the minipixels module.
 | `scale` | `dynamic` | — | scale value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L681)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L687)
 
 <a id="function-function-minipixels-tilelayer-function-tilelayer-name-width-height-data-visible-collision-px-py-src-minipixels-ml-1882362233"></a>
 ### tileLayer
@@ -1776,7 +1777,7 @@ Performs the tileLayer operation for the minipixels module.
 | `py` | `dynamic` | — | py value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L546)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L552)
 
 <a id="function-function-minipixels-tilemap-function-tilemap-tilewidth-tileheight-width-height-tileset-maxlayers-src-minipixels-ml-1267631058"></a>
 ### tilemap
@@ -1797,7 +1798,7 @@ Performs the tilemap operation for the minipixels module.
 | `maxLayers` | `dynamic` | — | maxLayers value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L536)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L542)
 
 <a id="function-function-minipixels-tilemoveandcollide-function-tilemoveandcollide-map-rect-vx-vy-src-minipixels-ml-522107279"></a>
 ### tileMoveAndCollide
@@ -1816,7 +1817,7 @@ Performs the tileMoveAndCollide operation for the minipixels module.
 | `vy` | `dynamic` | — | vy value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L552)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L558)
 
 <a id="function-function-minipixels-tileset-function-tileset-sheet-src-minipixels-ml-313027703"></a>
 ### tileset
@@ -1832,7 +1833,7 @@ Performs the tileset operation for the minipixels module.
 | `sheet` | `dynamic` | — | sheet value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L528)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L534)
 
 <a id="function-function-minipixels-timer-function-timer-seconds-repeat-src-minipixels-ml-74789418"></a>
 ### timer
@@ -1849,7 +1850,7 @@ Performs the timer operation for the minipixels module.
 | `repeat` | `dynamic` | — | repeat value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L386)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L392)
 
 <a id="function-function-minipixels-unbindaction-function-unbindaction-input-action-src-minipixels-ml-1669983920"></a>
 ### unbindAction
@@ -1866,7 +1867,7 @@ Removes virtual-key bindings from an input action.
 | `action` | `dynamic` | — | Action name to unbind. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L662)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L668)
 
 <a id="function-function-minipixels-unloadpackedasset-function-unloadpackedasset-assetpack-name-src-minipixels-ml-2057674390"></a>
 ### unloadPackedAsset
@@ -1883,7 +1884,7 @@ Drops cached payload and decoded-image data for one packed asset.
 | `name` | `dynamic` | — | Registered packed asset name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L503)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L509)
 
 <a id="function-function-minipixels-usecpurenderer-function-usecpurenderer-cfg-src-minipixels-ml-861003236"></a>
 ### useCpuRenderer
@@ -1899,7 +1900,7 @@ Performs the useCpuRenderer operation for the minipixels module.
 | `cfg` | `dynamic` | — | Configuration used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L166)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L172)
 
 <a id="function-function-minipixels-usefitscale-function-usefitscale-cfg-src-minipixels-ml-1517206112"></a>
 ### useFitScale
@@ -1915,7 +1916,7 @@ Performs the useFitScale operation for the minipixels module.
 | `cfg` | `dynamic` | — | Configuration used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L179)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L185)
 
 <a id="function-function-minipixels-usefixedrenderresolution-function-usefixedrenderresolution-cfg-width-height-src-minipixels-ml-502195655"></a>
 ### useFixedRenderResolution
@@ -1933,7 +1934,7 @@ Select a fixed framebuffer size independent of later window resizes.
 | `height` | `dynamic` | — | Framebuffer height in pixels. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L187)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L193)
 
 <a id="function-function-minipixels-usegpurenderer-function-usegpurenderer-cfg-src-minipixels-ml-702356132"></a>
 ### useGpuRenderer
@@ -1949,7 +1950,7 @@ Performs the useGpuRenderer operation for the minipixels module.
 | `cfg` | `dynamic` | — | Configuration used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L163)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L169)
 
 <a id="function-function-minipixels-useintegerscale-function-useintegerscale-cfg-src-minipixels-ml-1916074690"></a>
 ### useIntegerScale
@@ -1965,7 +1966,7 @@ Performs the useIntegerScale operation for the minipixels module.
 | `cfg` | `dynamic` | — | Configuration used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L182)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L188)
 
 <a id="function-function-minipixels-usenativerenderresolution-function-usenativerenderresolution-cfg-src-minipixels-ml-69514884"></a>
 ### useNativeRenderResolution
@@ -1981,7 +1982,7 @@ Make the framebuffer match the current native window client size.
 | `cfg` | `dynamic` | — | Configuration to update. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L197)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L203)
 
 <a id="function-function-minipixels-usescaledrenderresolution-function-usescaledrenderresolution-cfg-scale-src-minipixels-ml-1623147566"></a>
 ### useScaledRenderResolution
@@ -1998,7 +1999,7 @@ Render at a fraction or multiple of the native window client size. Values below 
 | `scale` | `dynamic` | — | Positive native-resolution multiplier. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L208)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L214)
 
 <a id="function-function-minipixels-usestretchscale-function-usestretchscale-cfg-src-minipixels-ml-482967016"></a>
 ### useStretchScale
@@ -2014,7 +2015,7 @@ Performs the useStretchScale operation for the minipixels module.
 | `cfg` | `dynamic` | — | Configuration used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L176)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L182)
 
 <a id="function-function-minipixels-vec2-function-vec2-x-y-src-minipixels-ml-1313943249"></a>
 ### vec2
@@ -2031,7 +2032,7 @@ Performs the vec2 operation for the minipixels module.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L373)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L379)
 
 <a id="function-function-minipixels-version-function-version-src-minipixels-ml-86816988"></a>
 ### version
@@ -2043,4 +2044,4 @@ function version()
 Performs the version operation for the minipixels module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L153)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L159)

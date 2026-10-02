@@ -1,0 +1,6 @@
+{
+  "name": "empty-assets",
+  "main": "../../examples/pixel-effects/src/main.ml",
+  "window": {"width": 320, "height": 180, "scale": 1},
+  "assets": []
+}

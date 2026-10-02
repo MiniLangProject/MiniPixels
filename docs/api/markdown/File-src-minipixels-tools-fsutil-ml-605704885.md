@@ -6,7 +6,7 @@ Provides minipixels tools fsutil facilities for this project.
 
 Package: [`minipixels.tools.fsutil`](Package-minipixels-tools-fsutil-368541163.md)
 
-Reachable from entry: **no**
+Reachable from entry: **yes**
 
 ## Imports
 

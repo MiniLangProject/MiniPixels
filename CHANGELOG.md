@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.17.0 - 2026-10-02
+
+- Added opt-in Steamworks integration with account identity, game language, achievements, integer stats, asynchronous store callbacks, overlay input suppression and optional simulation pause. Ordinary games remain Steam-free by default.
+- Added SDK-backed Windows/Linux native bridges, atomic account-separated save files for Auto-Cloud, allowlisted SteamPipe depot export and a standalone-by-default Steam example. SDK 1.65 client initialization uses the exported `SteamAPI_InitFlat` entry point.
+- Added Steam lifecycle, native ABI, save, export and SDK smoke tests. No developer account credentials or Valve SDK binaries are bundled; Linux XImage presentation still cannot host the Steam overlay.
+- Refreshed all five graphics examples with generated artwork, reproducible asset preparation, provenance and deterministic screenshot capture.
+- Reworked the platformer layout, grounded enemy patrols and decoration alignment; added balanced run frames, slower 12-frame coin rotation and 12-frame portal animation, refined foliage and smooth camera following.
+- Fixed negative fractional flooring that caused moving tile seams at clipped screen edges, with regression coverage for fractional camera positions.
+- Fixed custom build/export asset-pack selection so an unrelated project build cannot overwrite the matching generated MPX.
+- Updated README, example guides, Steam documentation and generated MiniDoc references.
+
 ## 0.16.1 - 2026-09-30
 
 - Preserve the HTTP 431 response on Windows by half-closing and draining bounded excess request data before closing; expanded oversized-header regression coverage.

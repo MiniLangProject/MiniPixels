@@ -28,7 +28,7 @@ Performs the abs operation for the minipixels math types module.
 | `v` | `dynamic` | — | v value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L273)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L276)
 
 <a id="function-function-minipixels-math-types-alphablend-function-alphablend-dst-src-src-minipixels-math-types-ml-1999918739"></a>
 ### alphaBlend
@@ -45,7 +45,7 @@ Performs the alphaBlend operation for the minipixels math types module.
 | `src` | `dynamic` | — | src value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L405)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L408)
 
 <a id="function-function-minipixels-math-types-clamp-function-clamp-v-lo-hi-src-minipixels-math-types-ml-108090010"></a>
 ### clamp
@@ -63,7 +63,7 @@ Performs the clamp operation for the minipixels math types module.
 | `hi` | `dynamic` | — | hi value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L265)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L268)
 
 <a id="function-function-minipixels-math-types-colora-inline-function-colora-c-src-minipixels-math-types-ml-271769268"></a>
 ### colorA
@@ -79,7 +79,7 @@ Performs the colorA operation for the minipixels math types module.
 | `c` | `dynamic` | — | c value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L377)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L380)
 
 <a id="function-function-minipixels-math-types-colorb-inline-function-colorb-c-src-minipixels-math-types-ml-2072624206"></a>
 ### colorB
@@ -95,7 +95,7 @@ Performs the colorB operation for the minipixels math types module.
 | `c` | `dynamic` | — | c value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L371)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L374)
 
 <a id="function-function-minipixels-math-types-colorg-inline-function-colorg-c-src-minipixels-math-types-ml-1360337292"></a>
 ### colorG
@@ -111,7 +111,7 @@ Performs the colorG operation for the minipixels math types module.
 | `c` | `dynamic` | — | c value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L365)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L368)
 
 <a id="function-function-minipixels-math-types-colorr-inline-function-colorr-c-src-minipixels-math-types-ml-553997582"></a>
 ### colorR
@@ -127,7 +127,7 @@ Performs the colorR operation for the minipixels math types module.
 | `c` | `dynamic` | — | c value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L359)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L362)
 
 <a id="function-function-minipixels-math-types-floorint-function-floorint-v-src-minipixels-math-types-ml-23089798"></a>
 ### floorInt
@@ -160,7 +160,7 @@ Performs the randomCreate operation for the minipixels math types module.
 | `seed` | `dynamic` | — | seed value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L445)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L448)
 
 <a id="function-function-minipixels-math-types-randomnextfloat-function-randomnextfloat-r-src-minipixels-math-types-ml-689060758"></a>
 ### randomNextFloat
@@ -176,7 +176,7 @@ Performs the randomNextFloat operation for the minipixels math types module.
 | `r` | `dynamic` | — | r value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L474)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L477)
 
 <a id="function-function-minipixels-math-types-randomnextint-function-randomnextint-r-minvalue-maxvalue-src-minipixels-math-types-ml-1985110602"></a>
 ### randomNextInt
@@ -194,7 +194,7 @@ Performs the randomNextInt operation for the minipixels math types module.
 | `maxValue` | `dynamic` | — | maxValue value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L462)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L465)
 
 <a id="function-function-minipixels-math-types-randomstep-function-randomstep-r-src-minipixels-math-types-ml-1868025314"></a>
 ### randomStep
@@ -210,7 +210,7 @@ Performs the randomStep operation for the minipixels math types module.
 | `r` | `dynamic` | — | r value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L453)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L456)
 
 <a id="function-function-minipixels-math-types-rect-function-rect-x-y-w-h-src-minipixels-math-types-ml-390795144"></a>
 ### rect
@@ -248,7 +248,7 @@ Performs the rectangleContainsPoint operation for the minipixels math types modu
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L317)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L320)
 
 - [minipixels.math.types.RectangleInt](Type-minipixels-math-types-rectangleint-594382150.md) — struct
 <a id="function-function-minipixels-math-types-rectangleintersects-function-rectangleintersects-a-b-src-minipixels-math-types-ml-23907713"></a>
@@ -266,7 +266,7 @@ Performs the rectangleIntersects operation for the minipixels math types module.
 | `b` | `dynamic` | — | b value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L324)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L327)
 
 <a id="function-function-minipixels-math-types-recti-function-recti-x-y-w-h-src-minipixels-math-types-ml-1775539950"></a>
 ### recti
@@ -303,7 +303,7 @@ Performs the rgb operation for the minipixels math types module.
 | `b` | `dynamic` | — | b value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L353)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L356)
 
 <a id="function-function-minipixels-math-types-rgba-inline-function-rgba-r-g-b-a-src-minipixels-math-types-ml-1475027021"></a>
 ### rgba
@@ -322,7 +322,7 @@ Performs the rgba operation for the minipixels math types module.
 | `a` | `dynamic` | — | a value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L337)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L340)
 
 - [minipixels.math.types.Size](Type-minipixels-math-types-size-2038363481.md) — struct
 - [minipixels.math.types.Timer](Type-minipixels-math-types-timer-1595408457.md) — struct
@@ -341,7 +341,7 @@ Performs the timerCreate operation for the minipixels math types module.
 | `repeat` | `dynamic` | — | repeat value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L422)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L425)
 
 <a id="function-function-minipixels-math-types-timerupdate-function-timerupdate-t-dt-src-minipixels-math-types-ml-1128017996"></a>
 ### timerUpdate
@@ -358,7 +358,7 @@ Performs the timerUpdate operation for the minipixels math types module.
 | `dt` | `dynamic` | — | dt value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L429)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L432)
 
 <a id="function-function-minipixels-math-types-tintchannel-function-tintchannel-src-tint-src-minipixels-math-types-ml-2118486447"></a>
 ### tintChannel
@@ -375,7 +375,7 @@ Performs the tintChannel operation for the minipixels math types module.
 | `tint` | `dynamic` | — | tint value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L384)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L387)
 
 <a id="function-function-minipixels-math-types-tintcolor-function-tintcolor-c-tint-src-minipixels-math-types-ml-1909079504"></a>
 ### tintColor
@@ -392,7 +392,7 @@ Performs the tintColor operation for the minipixels math types module.
 | `tint` | `dynamic` | — | tint value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L393)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L396)
 
 <a id="function-function-minipixels-math-types-transform2d-function-transform2d-x-y-src-minipixels-math-types-ml-1138130575"></a>
 ### transform2d
@@ -462,7 +462,7 @@ Performs the vector2Add operation for the minipixels math types module.
 | `b` | `dynamic` | — | b value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L281)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L284)
 
 - [minipixels.math.types.Vector2Int](Type-minipixels-math-types-vector2int-1351615520.md) — struct
 <a id="function-function-minipixels-math-types-vector2length-function-vector2length-a-src-minipixels-math-types-ml-1827516301"></a>
@@ -479,7 +479,7 @@ Performs the vector2Length operation for the minipixels math types module.
 | `a` | `dynamic` | — | a value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L301)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L304)
 
 <a id="function-function-minipixels-math-types-vector2multiply-function-vector2multiply-a-s-src-minipixels-math-types-ml-501697406"></a>
 ### vector2Multiply
@@ -496,7 +496,7 @@ Performs the vector2Multiply operation for the minipixels math types module.
 | `s` | `dynamic` | — | s value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L295)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L298)
 
 <a id="function-function-minipixels-math-types-vector2normalize-function-vector2normalize-a-src-minipixels-math-types-ml-1235573287"></a>
 ### vector2Normalize
@@ -512,7 +512,7 @@ Performs the vector2Normalize operation for the minipixels math types module.
 | `a` | `dynamic` | — | a value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L307)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L310)
 
 <a id="function-function-minipixels-math-types-vector2subtract-function-vector2subtract-a-b-src-minipixels-math-types-ml-1097010229"></a>
 ### vector2Subtract
@@ -529,4 +529,4 @@ Performs the vector2Subtract operation for the minipixels math types module.
 | `b` | `dynamic` | — | b value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L288)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/math/types.ml#L291)

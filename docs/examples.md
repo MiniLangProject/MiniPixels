@@ -2,6 +2,11 @@
 
 All examples are regular MiniPixels projects with a `minipixels.json`, MiniLang source files, and assets.
 
+They share newly generated forest-adventure pixel art. Runtime sprite sheets,
+backgrounds, and props are checked in; ordinary game builds do not run image
+generation. Original artwork, prompts, and the reproducible preparation pipeline
+are in [`examples/_art`](../examples/_art/README.md).
+
 ## Moving Sprite
 
 ![Moving Sprite](images/moving-sprite.png)
@@ -25,7 +30,7 @@ function update(game, dt)
 end function
 
 function render(game, canvas)
-  canvas.clear(mp.rgb(20, 20, 30))
+  canvas.drawSprite(background, 0, 0)
   canvas.drawSprite(playerSprite, playerX, playerY)
 end function
 ```
@@ -60,6 +65,11 @@ camera.follow(player.x, player.y)
 
 ![Pixel Effects](images/pixel-effects.png)
 
+A moonlit landscape is loaded once from MPX. Animated reflected scanlines use
+`blitRegion`, with a translucent water tint and a handful of firefly pixels. The
+scene illustrates image reuse and inexpensive animation without generating a new
+image or calculating a full-screen per-pixel effect each frame.
+
 Run:
 
 ```powershell
@@ -67,6 +77,8 @@ python tools\minipixels.py run examples\pixel-effects\minipixels.json --compiler
 ```
 
 ## Tiled Platformer
+
+![Tiled Platformer](images/tiled-platformer.png)
 
 Run:
 
@@ -79,21 +91,8 @@ What it demonstrates:
 - Tiled JSON/TMJ level input through `levels.path`
 - Collision tile layer import
 - Object-layer `spawn`, `exit`, `coin`, and `enemy` records
-- Procedurally generated sprites and tiles
-
-MiniLang code excerpt:
-
-```ml
-while y < canvas.height
-  x = 0
-  while x < canvas.width
-    v = ((x * x) + (y * 3) + phase * 7) & 255
-    canvas.setPixel(x, y, mp.rgb((v + x) & 255, (v + y) & 255, 120))
-    x = x + 1
-  end while
-  y = y + 1
-end while
-```
+- Packed image assets for the player, coins, portal, and terrain
+- Separate visual tile selection and collision data, keeping grass on exposed tops
 
 ## Jump and Run
 
@@ -115,40 +114,69 @@ What it demonstrates:
 
 - Main menu, win screen, and retry screen
 - Three hand-authored scrolling levels
-- Player movement, jumping, gravity, tile collision, and camera follow
+- Player movement, variable-height jumping, one-way tile platforms, and camera follow
+- Coyote time, jump buffering, and distance-driven run animation independent of render FPS
+- A registered eight-pose running sheet with equally timed contact/support/push/flight half-strides
+- Twelve-phase coin rotation (1.2 seconds) and portal energy loop (1.8 seconds), independent of render FPS
+- Native 64px foreground trees rendered 1:1, with area-sampled foliage matching the scene's finer pixel detail
+- Damped camera tracking with a vertical dead zone and ground-anchored parallax trees
+- Grounded slime patrols with ledge detection, and separate flying bat animations
 - Coins, enemies, stomp combat, locked exits, level intros, particle bursts, and level transitions
 - Sprite-sheet animation, stateful SFX playback, HUD text, and camera-space drawing helpers
-- Open/free asset workflow with MiniPixels `assets.mpx` packs, manifest sheet metadata, generated level data, and Python build-time asset reports
+- Generated-art asset workflow with MiniPixels `assets.mpx` packs, manifest sheet metadata, generated level data, and Python build-time asset reports
 
 MiniLang code excerpt:
 
 ```ml
-rect = mp.recti(player.x + 9, player.y + 13, 14, 19)
-res = mp.tileMoveAndCollide(world, rect, player.vx * dt, player.vy * dt)
-player.x = res.x - 9
-player.y = res.y - 13
+import "gameplay.ml" as play
 
-if res.hitBottom then
-  player.vy = 0
-  player.grounded = true
-else
-  player.grounded = false
-end if
-
-if rectHit(player.x + 9, player.y + 13, 14, 19, exitX, exitY, 32, 64) and coinsTaken >= coinCount then
-  loadLevel(levelIndex + 1)
-end if
-
-mp.drawSpriteWorld(canvas, camera, playerSheet.getFrame(pframe), player.x, player.y)
+jumped = play.stepPlayer(player, world, game.input.left, game.input.right,
+                        game.input.jump or game.input.up, dt)
+if jumped then mp.playAudio(game.audio, jumpSfx) end if
+pframe = play.playerFrame(player)
+sprite = playerSheet.getFrame(pframe)
+if player.grounded and player.vx != 0 then sprite = playerRunSheet.getFrame(play.playerRunFrame(player)) end if
+mp.drawSpriteWorld(canvas, camera, sprite, player.x, player.y + 1)
 ```
 
-Level data lives in `examples/jump-and-run/assets/levels/levels.json` and is compiled into `generated.levels` during the build. Image/audio/file assets are written to `build/assets.mpx`; generated MiniLang image factories load from that pack through the MiniPixels PNG decoder, and generated audio factories load WAV bytes as memory-backed clips. The native MiniLang CLI can generate the level module too; the Python CLI is still needed for asset-pack creation and the full build/run pipeline.
+Hold Space/Up for a full jump (about 108px), release early for a shorter hop.
+Floating platforms can be entered from below and support the player on descent.
+The example-specific `src/gameplay.ml` keeps fractional positions and uses 120Hz
+movement substeps; it does not change the engine's normal solid tile collision API.
+Wider landing zones and repositioned end-of-level coins allow a route through all
+84 coins and all exits. `tests/jump_and_run_tests.ml` simulates that route using the
+same movement code and actual level data, and checks adjacent platform jumps,
+slime patrols, grounding, animation states, buffering, and coyote time. Reachability
+tests isolate geometry from combat; they are not an invulnerable game mode.
 
-Assets:
+Camera tracking uses retained subpixel spring state and a vertical quiet band
+(72-180 screen pixels for the player's center). It does not recenter on every
+jump or landing. The forest layer's roots are anchored eight pixels behind the
+world ground, keeping the trees visible as the camera moves vertically. Regression
+tests cover landing/walk-off stability, bounded movement, and timestep-independent damping.
 
-- World, tile, portal, grass, sign, background, and decor graphics are adapted from GandalfHardcore FREE Platformer Assets: https://gandalfhardcore.itch.io/free-pixel-art-sidescroller-asset-pack-32x32-overworld
-- Player sprites are adapted from OpenGameArt A platformer in the forest, CC0: https://opengameart.org/content/a-platformer-in-the-forest
-- Enemy sprites are adapted from OpenGameArt Bat (32x32), CC0: https://opengameart.org/content/bat-32x32
-- Additional enemy sprites are adapted from Kenney Pixel Platformer, CC0: https://kenney.nl/assets/pixel-platformer
-- The checked-in sheets are compact runtime assets for this example, not a redistribution of the original ZIP.
-- The small example sounds were generated for MiniPixels and are released as CC0 with the example.
+Level data lives in `examples/jump-and-run/assets/levels/levels.json` and is compiled into `generated.levels` during the build. Image/audio/file assets are written to `build/assets.mpx`; generated MiniLang image factories decode packed PNG payloads, and audio helpers load memory-backed clips. The Python build can transcode source WAVs to MP3 automatically. The native MiniLang CLI can generate the asset/level modules and unprotected packs too; use the Python driver for protected packs and the full build/run pipeline.
+
+Current graphics were generated with the built-in image-generation tool and then
+cropped, scaled, and assembled into the existing frame layouts. The previous
+third-party graphics have been replaced; their attribution files remain for older
+releases. The small example sounds are unchanged and retain their CC0 notice.
+
+## Reproduce the gallery
+
+```sh
+python tools/build_examples.py
+python tools/capture_examples.py --update-docs
+```
+
+For Linux, pass `--target linux-x64` to both commands. Capture runs 60 deterministic
+headless engine frames per scene, validates all five examples and all three Jump
+and Run levels, and writes a contact sheet to `build/example-previews/overview.png`.
+The same capture smoke checks run on Windows and Linux in CI. Individual executables
+also accept `--screenshot output.png`; Jump and Run additionally accepts
+`--screenshot output.png play 0` (level indices 0, 1, or 2).
+
+For animation review, Jump and Run accepts `--motion-preview path/prefix` and
+records a deterministic three-second run/jump/land sequence as 36 PNG frames
+(`prefix-5.png` through `prefix-180.png`). Create the destination directory first.
+Add `portal` after the prefix to capture the animated exit and nearby coins instead.

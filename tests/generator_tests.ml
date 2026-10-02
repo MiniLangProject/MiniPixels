@@ -6,7 +6,7 @@ import std.fs as fs
 
 function main(args)
   outDir = "build/tests/native_generated"
-  r = gen.generate("examples/pixel-effects/minipixels.json", outDir)
+  r = gen.generate("tests/fixtures/empty-assets.json", outDir)
   a.assertTrue(r.ok, "generator succeeds for empty assets")
   a.assertTrue(fs.exists(outDir + "/assets.ml"), "generator writes assets module")
   text = fs.readAllText(outDir + "/assets.ml")
@@ -34,7 +34,7 @@ function main(args)
   a.assertTrue(stringIndexOf(assets, "loadPngFromPackSlot", 0) >= 0, "generator uses direct asset slots")
   a.assertTrue(stringIndexOf(assets, "function preload", 0) >= 0, "generator preload helper")
 
-  r3 = gen.generate("examples/tiled-platformer/minipixels.json", "build/tests/native_generated_procedural/generated")
+  r3 = gen.generate("tests/fixtures/procedural-assets.json", "build/tests/native_generated_procedural/generated")
   a.assertTrue(r3.ok, "generator supports procedural manifest")
   procedural = fs.readAllText("build/tests/native_generated_procedural/generated/assets.ml")
   a.assertTrue(stringIndexOf(procedural, "function make_tiles", 0) >= 0, "generator procedural tiles")

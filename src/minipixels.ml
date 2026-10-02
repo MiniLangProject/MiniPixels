@@ -26,6 +26,7 @@ import minipixels.world.camera as cam
 import minipixels.world.tilemap as tile
 import minipixels.collision.collision as col
 import minipixels.audio.audio as aud
+import minipixels.steam as steam
 import std.math as math
 
 /// Represents the game config data used by the minipixels module.
@@ -68,6 +69,8 @@ struct GameConfig
   designWidth
   /// Optional coordinate-system reference height exposed to game code.
   designHeight
+  /// Optional Steam settings, generated from minipixels.json for Steam builds.
+  steam
 end struct
 
 /// Represents the game data used by the minipixels module.
@@ -106,6 +109,8 @@ struct Game
   renderScaleY
   /// True during a frame in which the main framebuffer changed size.
   resolutionChanged
+  /// Steam session; unavailable in ordinary and headless builds.
+  steam
 
   /// Performs the quit operation for the minipixels game module.
   function quit()
@@ -122,7 +127,7 @@ function createConfig(title, width, height, scale)
   if width <= 0 then width = 320 end if
   if height <= 0 then height = 180 end if
   if scale <= 0 then scale = 4 end if
-  return GameConfig(title, width, height, scale, 60, 0.25, 5, false, 120, "auto", "stretch", false, 60, true, "fixed", 1.0, 33554432, width, height)
+  return GameConfig(title, width, height, scale, 60, 0.25, 5, false, 120, "auto", "stretch", false, 60, true, "fixed", 1.0, 33554432, width, height, steam.defaults())
 end function
 
 /// Creates game for the minipixels module.
@@ -145,12 +150,13 @@ function createGame(cfg)
     cfg.designHeight,
     cfg.width / (cfg.designWidth * 1.0),
     cfg.height / (cfg.designHeight * 1.0),
-    false
+    false,
+    steam.session(cfg.steam, steam.nativeBackend)
   )
 end function
 
 /// Performs the version operation for the minipixels module.
-function version() return "0.16.1" end function
+function version() return "0.17.0" end function
 /// Updates renderer maintained by the minipixels module.
 /// @param cfg Configuration used by the operation.
 /// @param renderer renderer value consumed by this operation.
@@ -803,6 +809,7 @@ function runHeadless(cfg, initialize, update, render, shutdown)
   if typeof(failure) != "error" and typeof(sceneShutdownResult) == "error" then failure = sceneShutdownResult end if
   shutdownResult = try(callIfFunction(shutdown, game))
   aud.close(game.audio)
+  steam.close(game.steam)
   if typeof(failure) != "error" and typeof(shutdownResult) == "error" then failure = shutdownResult end if
   if typeof(failure) == "error" then return failure end if
   return game
@@ -816,9 +823,21 @@ end function
 /// @param shutdown shutdown value consumed by this operation.
 function run(cfg, initialize, update, render, shutdown)
   game = createGame(cfg)
+  startup = try(steam.start(game.steam, false))
+  if typeof(startup) == "error" or game.steam.restartRequested then
+    steam.close(game.steam)
+    aud.close(game.audio)
+    if typeof(startup) == "error" then return startup end if
+    return 0
+  end if
   w = win.open(cfg.title, cfg.width, cfg.height, cfg.scale, cfg.renderer, cfg.scaleMode, cfg.smoothing)
-  if typeof(w) == "error" then return w end if
+  if typeof(w) == "error" then
+    steam.close(game.steam)
+    aud.close(game.audio)
+    return w
+  end if
   game.window = w
+  steam.setRenderer(game.steam, win.rendererName(w))
   syncRenderResolution(game)
   failure = try(callIfFunction(initialize, game))
 
@@ -835,6 +854,14 @@ function run(cfg, initialize, update, render, shutdown)
     win.pollEvents(w)
     syncRenderResolution(game)
     win.updateInputForWindow(w, game.input)
+    steam.update(game.steam, dt)
+    if game.steam.overlayActive or game.steam.wasOverlayActive then
+      inp.suppress(game.input)
+      if game.steam.config.pauseOnOverlay then
+        dt = 0
+        accumulator = 0
+      end if
+    end if
     if game.input.escape then game.running = false end if
     if cfg.pauseWhenUnfocused and win.hasFocus(w) == false then dt = 0 end if
 
@@ -881,6 +908,7 @@ function run(cfg, initialize, update, render, shutdown)
   shutdownResult = try(callIfFunction(shutdown, game))
   aud.close(game.audio)
   win.close(w)
+  steam.close(game.steam)
   if typeof(failure) != "error" and typeof(shutdownResult) == "error" then failure = shutdownResult end if
   if typeof(failure) == "error" then return failure end if
   return 0

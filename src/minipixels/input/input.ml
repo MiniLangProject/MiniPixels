@@ -6,6 +6,23 @@ package minipixels.input.input
 
 import std.ds.hashmap as hm
 
+/// Discard input while an external overlay owns it, without creating release edges.
+/// @param state Input buffer to clear, including pending pointer motion.
+function suppress(state)
+  releaseAll(state)
+  beginUpdate(state)
+  endUpdate(state)
+  state.prevLeft = false
+  state.prevRight = false
+  state.prevUp = false
+  state.prevDown = false
+  state.prevJump = false
+  state.prevFire = false
+  state.prevEscape = false
+  state.mouseInside = false
+  state.mouseInitialized = false
+end function
+
 /// Initial number of action slots allocated for an input state.
 const DEFAULT_ACTION_CAPACITY = 16
 

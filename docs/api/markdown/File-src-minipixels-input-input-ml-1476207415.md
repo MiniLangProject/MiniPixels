@@ -29,7 +29,7 @@ Finds an existing action slot.
 | `action` | `dynamic` | — | Name of the action to find. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L204)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L221)
 
 <a id="function-function-minipixels-input-input-addmousewheel-function-addmousewheel-i-delta-src-minipixels-input-input-ml-2050748279"></a>
 ### addMouseWheel
@@ -46,7 +46,7 @@ Adds a platform wheel delta to the pending simulation input.
 | `delta` | `dynamic` | — | Signed wheel-step delta, including fractional high-resolution input. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L392)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L409)
 
 <a id="function-function-minipixels-input-input-beginpoll-function-beginpoll-i-src-minipixels-input-input-ml-729759027"></a>
 ### beginPoll
@@ -62,7 +62,7 @@ Starts one platform poll while preserving unconsumed input edges.
 | `i` | `dynamic` | — | Input state to update. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L300)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L317)
 
 <a id="function-function-minipixels-input-input-beginupdate-function-beginupdate-i-src-minipixels-input-input-ml-822292563"></a>
 ### beginUpdate
@@ -78,7 +78,7 @@ Publishes buffered edges and pointer deltas to one simulation update.
 | `i` | `dynamic` | — | Input state to update. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L312)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L329)
 
 <a id="function-function-minipixels-input-input-bindkeys-function-bindkeys-i-action-primary-secondary-src-minipixels-input-input-ml-1002032201"></a>
 ### bindKeys
@@ -97,7 +97,7 @@ Assigns primary and secondary virtual-key bindings to an action.
 | `secondary` | `dynamic` | — | Secondary Win32 virtual-key code, or -1. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L238)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L255)
 
 <a id="function-function-minipixels-input-input-create-function-create-src-minipixels-input-input-ml-1940254108"></a>
 ### create
@@ -109,7 +109,7 @@ function create()
 Creates an input state with conventional keyboard and mouse bindings.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L141)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L158)
 
 <a id="constant-constant-minipixels-input-input-default-action-capacity-const-default-action-capacity-16-src-minipixels-input-input-ml-1470367548"></a>
 ### DEFAULT_ACTION_CAPACITY
@@ -121,7 +121,7 @@ const DEFAULT_ACTION_CAPACITY = 16
 Initial number of action slots allocated for an input state.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L10)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L27)
 
 <a id="function-function-minipixels-input-input-endupdate-function-endupdate-i-src-minipixels-input-input-ml-2075493675"></a>
 ### endUpdate
@@ -137,7 +137,7 @@ Clears edges after one simulation update so catch-up updates cannot replay them.
 | `i` | `dynamic` | — | Input state to update. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L332)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L349)
 
 <a id="function-function-minipixels-input-input-ensureaction-function-ensureaction-i-action-src-minipixels-input-input-ml-1461760981"></a>
 ### ensureAction
@@ -154,7 +154,7 @@ Finds or creates an action slot.
 | `action` | `dynamic` | — | Name of the action to register. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L214)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L231)
 
 <a id="function-function-minipixels-input-input-ensureactioncapacity-function-ensureactioncapacity-i-src-minipixels-input-input-ml-1942901487"></a>
 ### ensureActionCapacity
@@ -170,7 +170,7 @@ Grows the parallel action arrays when another slot is required.
 | `i` | `dynamic` | — | Input state to resize. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L170)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L187)
 
 - [minipixels.input.input.InputState](Type-minipixels-input-input-inputstate-2086348942.md) — struct
 <a id="function-function-minipixels-input-input-isdown-function-isdown-i-action-src-minipixels-input-input-ml-2109353501"></a>
@@ -188,7 +188,7 @@ Returns whether an action is currently held.
 | `action` | `dynamic` | — | Name of the action to inspect. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L399)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L416)
 
 <a id="function-function-minipixels-input-input-pressed-function-pressed-i-action-src-minipixels-input-input-ml-1827530821"></a>
 ### pressed
@@ -205,7 +205,7 @@ Returns whether an action became held since the previous consumed update.
 | `action` | `dynamic` | — | Name of the action to inspect. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L422)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L439)
 
 <a id="function-function-minipixels-input-input-releaseall-function-releaseall-i-src-minipixels-input-input-ml-828367711"></a>
 ### releaseAll
@@ -221,7 +221,7 @@ Releases every registered action, buffering release edges where needed.
 | `i` | `dynamic` | — | Input state to update. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L366)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L383)
 
 <a id="function-function-minipixels-input-input-released-function-released-i-action-src-minipixels-input-input-ml-1900633497"></a>
 ### released
@@ -238,7 +238,7 @@ Returns whether an action became released since the previous consumed update.
 | `action` | `dynamic` | — | Name of the action to inspect. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L431)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L448)
 
 <a id="function-function-minipixels-input-input-setactionstate-function-setactionstate-i-action-down-src-minipixels-input-input-ml-1827232289"></a>
 ### setActionState
@@ -256,7 +256,7 @@ Updates an action and buffers any resulting edge until a simulation update.
 | `down` | `dynamic` | — | Whether the action is held. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L281)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L298)
 
 <a id="function-function-minipixels-input-input-setkeyboard-function-setkeyboard-i-left-right-up-down-jump-fire-escape-src-minipixels-input-input-ml-1358514256"></a>
 ### setKeyboard
@@ -279,7 +279,7 @@ Updates the conventional keyboard actions for tests and non-Windows providers.
 | `escape` | `dynamic` | — | Whether escape is held. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L354)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L371)
 
 <a id="function-function-minipixels-input-input-setmouseposition-function-setmouseposition-i-x-y-inside-src-minipixels-input-input-ml-2142517230"></a>
 ### setMousePosition
@@ -298,7 +298,23 @@ Records a pointer sample in logical canvas coordinates.
 | `inside` | `dynamic` | — | Whether the pointer lies inside the viewport. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L378)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L395)
+
+<a id="function-function-minipixels-input-input-suppress-function-suppress-state-src-minipixels-input-input-ml-327535741"></a>
+### suppress
+
+```ml
+function suppress(state)
+```
+
+Discard input while an external overlay owns it, without creating release edges.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `state` | `dynamic` | — | Input buffer to clear, including pending pointer motion. |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L11)
 
 <a id="function-function-minipixels-input-input-synclegacyaction-function-synclegacyaction-i-action-down-src-minipixels-input-input-ml-1772081145"></a>
 ### syncLegacyAction
@@ -316,7 +332,7 @@ Synchronizes backward-compatible named fields after an action change.
 | `down` | `dynamic` | — | Whether the action is held. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L264)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L281)
 
 <a id="function-function-minipixels-input-input-unbind-function-unbind-i-action-src-minipixels-input-input-ml-1366931409"></a>
 ### unbind
@@ -333,7 +349,7 @@ Removes all virtual-key bindings from an action while retaining its state slot.
 | `action` | `dynamic` | — | Name of the action to unbind. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L251)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L268)
 
 <a id="function-function-minipixels-input-input-wasdown-function-wasdown-i-action-src-minipixels-input-input-ml-1524276487"></a>
 ### wasDown
@@ -350,4 +366,4 @@ Returns the previous platform-poll state for a built-in action.
 | `action` | `dynamic` | — | Name of the action to inspect. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L408)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/input/input.ml#L425)

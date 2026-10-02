@@ -2,14 +2,19 @@ import minipixels as mp
 import generated.assets as gen
 import "player.ml" as pmod
 import "world.ml" as wmod
+import "../../showcase.ml" as showcase
 
 player = void
 world = void
 camera = void
+background = void
+near = void
 
 function initialize(game)
-  global player, world, camera
+  global player, world, camera, background, near
   game.assets = gen.registry()
+  background = game.assets.getSprite("background")
+  near = game.assets.getSprite("near")
   player = pmod.create(game.assets.getSprite("player"))
   world = wmod.create(game.assets.getSprite("world"))
   camera = mp.camera(game.config.width, game.config.height)
@@ -44,13 +49,13 @@ end function
 
 function render(game, canvas)
   global player, world, camera
-  canvas.clear(mp.rgb(48, 78, 112))
-  canvas.fillRect(0 - (camera.x / 5), 24, 800, 22, mp.rgb(72, 110, 158))
-  canvas.fillRect(40 - (camera.x / 3), 70, 120, 18, mp.rgb(58, 96, 132))
-  canvas.fillRect(210 - (camera.x / 3), 62, 160, 26, mp.rgb(58, 96, 132))
-  canvas.fillRect(430 - (camera.x / 3), 78, 140, 16, mp.rgb(58, 96, 132))
+  canvas.drawSprite(background, 0, 0)
+  shift = (camera.x / 5) % near.width
+  canvas.drawSprite(near, 0 - shift, 55)
+  canvas.drawSprite(near, near.width - shift, 55)
   world.draw(canvas, camera)
-  canvas.drawSprite(player.animation.currentSprite(), player.x - camera.x, player.y - camera.y)
+  canvas.drawSpriteEx(player.animation.currentSprite(), player.x - camera.x, player.y - camera.y, player.vx < 0, false, 1, mp.rgba(255, 255, 255, 255))
+  showcase.heading(canvas, "FOREST TRAIL", "ARROWS MOVE / SPACE JUMP")
   if game.debug then
     canvas.drawRect(player.x - camera.x, player.y - camera.y, 12, 15, mp.rgb(255, 60, 60))
   end if
@@ -59,5 +64,5 @@ end function
 function main(args)
   cfg = mp.createConfig("MiniPixels Scrolling World", 320, 180, 4)
   cfg.debug = false
-  return mp.run(cfg, initialize, update, render, void)
+  return showcase.run(args, cfg, initialize, update, render, void)
 end function

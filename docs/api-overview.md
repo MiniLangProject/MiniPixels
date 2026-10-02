@@ -1,5 +1,13 @@
 # API Overview
 
+## Steam
+
+`import minipixels.steam as steam` provides optional Steamworks integration.
+Enable it in `minipixels.json`; `mp.createConfig` picks up the generated defaults.
+`game.steam` exposes availability, user identity, overlay and asynchronous store
+status. Achievements/stats, atomic account-separated saves, build requirements,
+SteamPipe export, and platform limitations are described in [Steam integration](steam.md).
+
 ## Game Loop
 
 ```ml

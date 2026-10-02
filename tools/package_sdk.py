@@ -24,12 +24,15 @@ INCLUDE_FILES = [
     "CHANGELOG.md",
     "LICENSE",
     "README.md",
+    "RELEASE_NOTES_0.17.0.md",
     "RELEASE_NOTES_0.16.1.md",
     "RELEASE_NOTES_0.16.0.md",
     "requirements.txt",
     "VERSION",
 ]
 EXCLUDED_DIRS = {
+    ".minipixels",
+    "steamworks_sdk",
     ".asset-work",
     ".git",
     "__pycache__",
@@ -51,6 +54,8 @@ def read_version() -> str:
 
 
 def include_path(path: Path) -> bool:
+    if path.name.lower() in {"steam_appid.txt", "steam_api64.dll", "libsteam_api.so", "minipixels_steam.dll", "libminipixels_steam.so"}:
+        return False
     rel_parts = path.relative_to(ROOT).parts
     if any(part in EXCLUDED_DIRS for part in rel_parts):
         return False

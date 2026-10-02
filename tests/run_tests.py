@@ -26,11 +26,13 @@ ROOT = Path(__file__).resolve().parents[1]
 COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 DEFAULT_TARGET = "windows-x64" if os.name == "nt" else "linux-x64"
 TESTS = [
+    "steam_tests.ml",
     "canvas_tests.ml",
     "systems_tests.ml",
     "asset_pack_tests.ml",
     "asset_preload_tests.ml",
     "headless_game_tests.ml",
+    "jump_and_run_tests.ml",
     "render_regression_tests.ml",
     "json_manifest_tests.ml",
     "generator_tests.ml",
@@ -314,12 +316,15 @@ def create_protected_asset_fixture() -> Path:
 
 
 def run_python_tests() -> None:
+    subprocess.run([sys.executable, str(ROOT / "tests/steam_tools_tests.py")], check=True)
+    from example_art_tests import test_example_art
+    test_example_art()
     spec = importlib.util.spec_from_file_location("minipixels_cli", ROOT / "tools" / "minipixels.py")
     if spec is None or spec.loader is None:
         raise RuntimeError("could not load tools/minipixels.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    assert mod.VERSION == "0.16.1", mod.VERSION
+    assert mod.VERSION == "0.17.0", mod.VERSION
     # A fresh compiler checkout must build exactly where the packager looks,
     # regardless of the shell's working directory (GitHub runners use another drive).
     for target, name in (("windows-x64", "minilang_video.dll"), ("linux-x64", "libminilang_video.so")):
@@ -851,6 +856,8 @@ def main(argv: list[str] | None = None) -> int:
     build = ROOT / "build" / "tests"
     build.mkdir(parents=True, exist_ok=True)
     runtime = ensure_audio_runtime(target, build)
+    from steam_runtime_tests import run as run_steam_runtime_tests
+    run_steam_runtime_tests(compiler, target)
     test_media_range_runtime(runtime, target)
     root_runtime = ROOT / runtime.name
     if root_runtime.resolve() != runtime.resolve():

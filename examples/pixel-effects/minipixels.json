@@ -7,5 +7,5 @@
     "height": 180,
     "scale": 4
   },
-  "assets": []
+  "assets": [{"id": "landscape", "type": "image", "path": "assets/landscape.png"}]
 }

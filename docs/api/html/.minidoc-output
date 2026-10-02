@@ -24,6 +24,7 @@ file-src-minipixels-ml-1730909391.html
 file-src-minipixels-platform-linux-ml-1856075630.html
 file-src-minipixels-platform-windows-ml-1027159307.html
 file-src-minipixels-scene-scene-ml-552680371.html
+file-src-minipixels-steam-ml-239735282.html
 file-src-minipixels-tools-fsutil-ml-605704885.html
 file-src-minipixels-tools-generator-ml-920573533.html
 file-src-minipixels-tools-json-ml-388493918.html
@@ -56,6 +57,7 @@ package-minipixels-media-media-1865358103.html
 package-minipixels-platform-linux-1505480356.html
 package-minipixels-platform-windows-647622739.html
 package-minipixels-scene-scene-2050449523.html
+package-minipixels-steam-281536945.html
 package-minipixels-tools-fsutil-368541163.html
 package-minipixels-tools-generator-968290761.html
 package-minipixels-tools-json-1320765334.html
@@ -105,6 +107,8 @@ type-minipixels-platform-linux-window-788017826.html
 type-minipixels-platform-windows-window-369528407.html
 type-minipixels-scene-scene-scene-727861925.html
 type-minipixels-scene-scene-scenestack-1227700927.html
+type-minipixels-steam-steamconfig-726539401.html
+type-minipixels-steam-steamsession-1270188261.html
 type-minipixels-tools-generator-generateresult-1764755755.html
 type-minipixels-tools-generator-packedpayload-439377361.html
 type-minipixels-tools-json-jsonvalue-550249139.html

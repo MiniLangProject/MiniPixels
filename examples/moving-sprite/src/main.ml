@@ -1,14 +1,17 @@
 import minipixels as mp
 import generated.assets as gen
+import "../../showcase.ml" as showcase
 
-playerX = 40
-playerY = 40
+playerX = 152
+playerY = 100
 playerSprite = void
+background = void
 
 function initialize(game)
-  global playerSprite
+  global playerSprite, background
   game.assets = gen.registry()
   playerSprite = game.assets.getSprite("player")
+  background = game.assets.getSprite("background")
 end function
 
 function update(game, dt)
@@ -25,7 +28,8 @@ function update(game, dt)
 end function
 
 function render(game, canvas)
-  canvas.clear(mp.rgb(20, 20, 30))
+  canvas.drawSprite(background, 0, 0)
+  showcase.heading(canvas, "SPRITE LAB", "ARROWS MOVE / ESC EXIT")
   canvas.drawSprite(playerSprite, playerX - (playerX % 1), playerY - (playerY % 1))
 end function
 
@@ -35,5 +39,5 @@ end function
 function main(args)
   cfg = mp.createConfig("MiniPixels Moving Sprite", 320, 180, 4)
   cfg.debug = false
-  return mp.run(cfg, initialize, update, render, shutdown)
+  return showcase.run(args, cfg, initialize, update, render, shutdown)
 end function

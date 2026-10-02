@@ -3,9 +3,9 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.16.1`
+Current version: `0.17.0`
 
-See the [0.16.1 release notes](RELEASE_NOTES_0.16.1.md) for seekable MPX audio/video streaming, authenticated media chunks, robust cancellation, and bounded asset preloading.
+See the [0.17.0 release notes](RELEASE_NOTES_0.17.0.md) for optional Steam integration, refreshed example artwork and animations, smoother platformer camera motion, and tile-seam fixes.
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.11 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
@@ -14,6 +14,12 @@ MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 
 ![Moving Sprite](docs/images/moving-sprite.png)
 
 ## API documentation
+
+Optional [Steam integration](docs/steam.md) provides client identity, achievements,
+integer stats, user-separated Auto-Cloud save paths, and allowlisted SteamPipe
+export. Windows OpenGL supports overlay integration; Linux's current XImage
+presenter does not. Ordinary builds need no Steamworks SDK. See
+[`examples/steam-demo`](examples/steam-demo) for the opt-in example.
 
 Browse the committed [MiniDoc API reference](docs/api/markdown/README.md), or
 open `docs/api/html/index.html` locally for the searchable offline site. Source
@@ -168,6 +174,17 @@ Build all examples:
 ```powershell
 python tools\build_examples.py
 ```
+
+All five examples share newly generated forest-themed pixel art: animated characters,
+mossy platforms, layered scenery, and moonlit water reflections. See the
+[example gallery](docs/examples.md) and [art sources and preparation guide](examples/_art/README.md).
+Render eight deterministic preview scenes without opening a window:
+
+```powershell
+python tools\capture_examples.py
+```
+
+Use `--target linux-x64` for Linux builds, or `--update-docs` to refresh the gallery.
 
 Create the SDK bundle:
 

@@ -22,6 +22,7 @@
 - [minipixels.platform.linux](Package-minipixels-platform-linux-1505480356.md)
 - [minipixels.platform.windows](Package-minipixels-platform-windows-647622739.md)
 - [minipixels.scene.scene](Package-minipixels-scene-scene-2050449523.md)
+- [minipixels.steam](Package-minipixels-steam-281536945.md)
 - [minipixels.tools.fsutil](Package-minipixels-tools-fsutil-368541163.md)
 - [minipixels.tools.generator](Package-minipixels-tools-generator-968290761.md)
 - [minipixels.tools.json](Package-minipixels-tools-json-1320765334.md)

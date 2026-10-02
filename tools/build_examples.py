@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 DEFAULT_TARGET = "windows-x64" if os.name == "nt" else "linux-x64"
 EXAMPLES = [
+    "examples/steam-demo/minipixels.json",
     "examples/moving-sprite/minipixels.json",
     "examples/scrolling-world/minipixels.json",
     "examples/pixel-effects/minipixels.json",

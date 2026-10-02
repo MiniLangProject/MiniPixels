@@ -251,8 +251,11 @@ end function
 /// @param v v value consumed by this operation.
 function floorInt(v)
   if typeof(v) == "int" then return v end if
-  whole = v - (v % 1)
-  if v < 0 and whole != v then
+  remainder = v % 1
+  whole = v - remainder
+  // Positive modulo already floors negative coordinates. Only a negative
+  // remainder (truncating runtimes) needs the extra correction.
+  if remainder < 0 then
     whole = whole - 1
   end if
   return whole

@@ -3,6 +3,13 @@ build/
 dist/
 minipixels_audio.dll
 libminipixels_audio.so
+minipixels_steam.dll
+libminipixels_steam.so
+steam_api64.dll
+libsteam_api.so
+steam_appid.txt
+.minipixels/
+steamworks_sdk/
 examples/*/build/
 .asset-work/
 examples/jump-and-run/assets/*.zip

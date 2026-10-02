@@ -19,14 +19,14 @@ function main(args)
   a.assertTrue(mani.isValid(m), "moving-sprite manifest valid")
   a.assertEq(m.name, "moving-sprite", "manifest name")
   a.assertEq(m.width, 320, "manifest width")
-  a.assertEq(m.assetCount, 1, "manifest asset count")
+  a.assertEq(m.assetCount, 2, "manifest includes player and background")
 
   j = mani.load("examples/jump-and-run/minipixels.json")
   a.assertTrue(mani.isValid(j), "jump-and-run manifest valid")
   a.assertEq(j.levelPath, "assets/levels/levels.json", "manifest level path")
 
   t = mani.load("examples/tiled-platformer/minipixels.json")
-  a.assertTrue(mani.isValid(t), "procedural asset manifest valid")
+  a.assertTrue(mani.isValid(t), "Tiled image asset manifest valid")
 
   invalid = mani.parseText("{\"name\":\"bad\",\"window\":{\"width\":0,\"height\":180}}", "inline", ".")
   a.assertFalse(mani.isValid(invalid), "invalid manifest fails")

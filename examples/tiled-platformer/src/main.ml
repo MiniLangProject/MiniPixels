@@ -1,6 +1,7 @@
 import minipixels as mp
 import generated.assets as gen
 import generated.levels as lvl
+import "../../showcase.ml" as showcase
 
 struct Player
   x
@@ -21,6 +22,8 @@ camera = void
 world = void
 tileSheet = void
 playerSprite = void
+background = void
+items = void
 coins = []
 coinCount = 0
 coinsTaken = 0
@@ -41,8 +44,17 @@ function loadLevel()
   w = lvl.width(0)
   h = lvl.height(0)
   data = lvl.tileData(0)
+  visual = array(w * h, 0)
+  for y = 0 to h - 1
+    for x = 0 to w - 1
+      if data[y * w + x] > 0 then
+        visual[y * w + x] = 1
+        if y > 0 and data[(y - 1) * w + x] > 0 then visual[y * w + x] = 2 end if
+      end if
+    end for
+  end for
   world = mp.tilemap(32, 32, w, h, mp.tileset(tileSheet), 2)
-  world.addLayer(mp.tileLayer("ground", w, h, data, true, false, 1, 1))
+  world.addLayer(mp.tileLayer("ground", w, h, visual, true, false, 1, 1))
   world.addLayer(mp.tileLayer("collision", w, h, data, false, true, 1, 1))
 
   player = Player(lvl.spawnX(0), lvl.spawnY(0), 0, 0, false)
@@ -63,10 +75,12 @@ function loadLevel()
 end function
 
 function initialize(game)
-  global tileSheet, playerSprite
+  global tileSheet, playerSprite, background, items
   game.assets = gen.registry()
   tileSheet = gen.sheet_tiles()
   playerSprite = game.assets.getSprite("player")
+  background = game.assets.getSprite("background")
+  items = gen.sheet_items()
   loadLevel()
 end function
 
@@ -116,33 +130,26 @@ function update(game, dt)
 end function
 
 function drawBackground(canvas)
-  canvas.clear(mp.rgb(62, 103, 140))
-  canvas.fillRect(0 - (camera.x / 6), 44, 460, 18, mp.rgb(86, 132, 154))
-  canvas.fillRect(90 - (camera.x / 4), 74, 260, 16, mp.rgb(72, 118, 136))
-  canvas.fillRect(260 - (camera.x / 5), 34, 210, 24, mp.rgb(92, 142, 164))
+  canvas.drawSprite(background, 0, 0)
 end function
 
 function render(game, canvas)
   drawBackground(canvas)
   world.draw(canvas, camera)
 
-  canvas.fillRect(exitX - camera.x, exitY - camera.y, 20, 52, mp.rgb(255, 220, 80))
-  canvas.drawRect(exitX - camera.x, exitY - camera.y, 20, 52, mp.rgb(80, 50, 30))
+  canvas.drawSpriteEx(items.getFrame(2), exitX - camera.x - 16, exitY - camera.y, false, false, 2, mp.rgba(255, 255, 255, 255))
 
   i = 0
   while i < coinCount
     c = coins[i]
     if c.got == false then
-      canvas.fillCircle(c.x - camera.x + 8, c.y - camera.y + 8, 6, mp.rgb(255, 220, 80))
-      canvas.drawRect(c.x - camera.x + 3, c.y - camera.y + 3, 10, 10, mp.rgb(168, 104, 32))
+      canvas.drawSprite(items.getFrame(0), c.x - camera.x - 8, c.y - camera.y - 8)
     end if
     i = i + 1
   end while
 
-  canvas.drawSprite(playerSprite, player.x - camera.x, player.y - camera.y)
-  canvas.fillRect(0, 0, 320, 18, mp.rgba(20, 28, 36, 170))
-  mp.drawText(canvas, "TILED IMPORT", 8, 6, 1, mp.rgb(255, 255, 255))
-  mp.drawText(canvas, "COINS " + coinsTaken + "/" + coinCount, 210, 6, 1, mp.rgb(255, 220, 80))
+  canvas.drawSpriteEx(playerSprite, player.x - camera.x, player.y - camera.y, player.vx < 0, false, 1, mp.rgba(255, 255, 255, 255))
+  showcase.heading(canvas, "TILED EXPLORER", "ARROWS / SPACE     COINS " + coinsTaken + "/" + coinCount)
   if won then
     canvas.fillRect(0, 64, 320, 48, mp.rgba(0, 0, 0, 160))
     mp.drawTextCentered(canvas, "TILED LEVEL CLEAR", 76, 2, mp.rgb(255, 220, 80))
@@ -152,5 +159,5 @@ end function
 
 function main(args)
   cfg = mp.createConfig("MiniPixels Tiled Platformer", 320, 180, 4)
-  return mp.run(cfg, initialize, update, render, void)
+  return showcase.run(args, cfg, initialize, update, render, void)
 end function

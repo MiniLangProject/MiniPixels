@@ -12,6 +12,22 @@
   },
   "assets": [
     {
+      "id": "trees", "type": "image", "path": "assets/tiles/tree_sheet.png",
+      "sheet": {"frameWidth": 64, "frameHeight": 64, "spacing": 0, "margin": 0}
+    },
+    {
+      "id": "coin", "type": "image", "path": "assets/sprites/coin_sheet.png",
+      "sheet": {"frameWidth": 32, "frameHeight": 32, "spacing": 0, "margin": 0}
+    },
+    {
+      "id": "portal", "type": "image", "path": "assets/sprites/portal_sheet.png",
+      "sheet": {"frameWidth": 32, "frameHeight": 32, "spacing": 0, "margin": 0}
+    },
+    {
+      "id": "player_run", "type": "image", "path": "assets/sprites/player_run_sheet.png",
+      "sheet": {"frameWidth": 32, "frameHeight": 32, "spacing": 0, "margin": 0}
+    },
+    {
       "id": "player",
       "type": "image",
       "path": "assets/sprites/player_sheet.png",

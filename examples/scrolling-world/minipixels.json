@@ -8,6 +8,8 @@
     "scale": 4
   },
   "assets": [
+    {"id": "background", "type": "image", "path": "assets/background.png"},
+    {"id": "near", "type": "image", "path": "assets/near.png"},
     {
       "id": "player",
       "type": "image",

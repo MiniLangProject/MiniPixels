@@ -23,12 +23,13 @@ if str(TOOLS_DIR) not in sys.path:
 from asset_security import generate_signing_key, key_id, load_signing_key, protect_pack, raw_public_key
 from build_audio_runtime import ensure_audio_runtime
 from lz4_block import encode as encode_lz4
+import steam_support
 
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 ASSET_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-VERSION = "0.16.1"
+VERSION = "0.17.0"
 DEFAULT_TARGET = "windows-x64" if os.name == "nt" else "linux-x64"
 PACK_CODEC_NONE = 0
 PACK_CODEC_DEFLATE = 1
@@ -83,6 +84,10 @@ def project_root(project_file: Path) -> Path:
 def validate(project_file: Path) -> dict:
     data = load_project(project_file)
     errors: list[str] = []
+    try:
+        steam_support.settings(data)
+    except ValueError as exc:
+        errors.append(f"{project_file}: {exc}")
     for key in ["name", "main", "window"]:
         if key not in data:
             errors.append(f"{project_file}: missing required field '{key}'")
@@ -1571,7 +1576,7 @@ def write_asset_report(data: dict, root: Path, output: Path) -> Path:
     return report_path
 
 
-def copy_runtime_assets(data: dict, root: Path, output: Path) -> None:
+def copy_runtime_assets(data: dict, root: Path, output: Path, pack_source: Path | None = None) -> None:
     copied: set[Path] = set()
     stale_audio = output.parent / "assets" / "audio"
     if stale_audio.exists():
@@ -1594,7 +1599,7 @@ def copy_runtime_assets(data: dict, root: Path, output: Path) -> None:
         if not raw_path:
             continue
         copy_path(root / raw_path, Path(raw_path))
-    pack_source = (root / "build" / "assets.mpx").resolve()
+    pack_source = (pack_source or root / "build" / "assets.mpx").resolve()
     pack_target = (output.parent / "assets.mpx").resolve()
     if pack_source.is_file() and pack_source != pack_target:
         shutil.copy2(pack_source, pack_target)
@@ -1646,8 +1651,15 @@ def build(
     debug: bool = False,
     incremental: bool = True,
     verbose: bool = False,
+    steam_sdk: Path | None = None,
+    steam_stub: bool = False,
 ) -> Path:
     data = validate(project_file)
+    steam = steam_support.settings(data)
+    if steam_stub and not steam["enabled"]:
+        die("--steam-stub requires steam.enabled=true")
+    if steam["enabled"] and not steam_stub:
+        steam_sdk = steam_support.sdk_root(steam_sdk)
     root = project_root(project_file)
     generate(project_file, generated_dir)
     main = root / data["main"]
@@ -1677,6 +1689,10 @@ def build(
                 shutil.copy2(media_runtime, development_media)
     include_paths = [ROOT / "src", compiler_root, generated_dir.parent]
     compiler_args = ["--profile-calls"] if debug else []
+    if steam["enabled"]:
+        steam_support.ensure_runtime(target, output.parent, steam_sdk, stub=steam_stub)
+        write_text_if_changed(generated_dir / "steam_config.ml", steam_support.config_source(steam))
+        compiler_args += ["-D", "MINIPIXELS_STEAM=true"]
     manifest_lines = [
         "[project]",
         f"entry = {json.dumps(str(main))}",
@@ -1695,9 +1711,22 @@ def build(
     if verbose:
         print("compiler:", " ".join(cmd))
     subprocess.check_call(cmd, cwd=str(root))
-    copy_runtime_assets(data, root, output)
+    # The pack belongs to this generated module, including custom/export builds.
+    generated_pack = (generated_dir.parent.parent / "assets.mpx").resolve()
+    copy_runtime_assets(data, root, output, generated_pack)
     write_asset_report(data, root, output)
     return output
+
+
+def write_steam_dev_id(project: Path, executable: Path) -> None:
+    steam = steam_support.settings(load_project(project))
+    if not steam["enabled"]:
+        die("--steam-dev requires steam.enabled=true")
+    path = executable.parent / "steam_appid.txt"
+    value = str(steam["appId"]) + "\n"
+    if path.exists() and path.read_text(encoding="utf-8").strip() != str(steam["appId"]):
+        die(f"Refusing to replace a different development AppID: {path}")
+    write_text_if_changed(path, value)
 
 
 def new_project(name: str) -> None:
@@ -1817,6 +1846,13 @@ def main(argv: list[str]) -> int:
     pack_parser = sub.add_parser("pack")
     pack_parser.add_argument("project", nargs="?", default="minipixels.json")
     pack_parser.add_argument("--output")
+    steam_parser = sub.add_parser("steam", help="prepare SteamPipe depots without uploading")
+    steam_parser.add_argument("action", choices=("export",))
+    steam_parser.add_argument("project", nargs="?", default="minipixels.json")
+    steam_parser.add_argument("--compiler", default=str(DEFAULT_COMPILER))
+    steam_parser.add_argument("--steam-sdk")
+    steam_parser.add_argument("--target", action="append", choices=steam_support.TARGETS)
+    steam_parser.add_argument("--output-dir", required=True)
     for name in ["build", "run"]:
         sp = sub.add_parser(name)
         sp.add_argument("project", nargs="?", default="minipixels.json")
@@ -1830,6 +1866,9 @@ def main(argv: list[str]) -> int:
         sp.add_argument("--headless", action="store_true", help="build with the console subsystem")
         sp.add_argument("--no-incremental", action="store_true", help="bypass the compiler artifact cache")
         sp.add_argument("--verbose", action="store_true", help="print the compiler invocation")
+        sp.add_argument("--steam-sdk", help="official Steamworks SDK directory")
+        sp.add_argument("--steam-stub", action="store_true", help="test-only unavailable Steam backend; cannot be exported")
+        sp.add_argument("--steam-dev", action="store_true", help="create development-only steam_appid.txt beside the executable")
 
     args = p.parse_args(argv)
     if args.cmd == "new":
@@ -1849,7 +1888,14 @@ def main(argv: list[str]) -> int:
         return 0
 
     project = Path(args.project).resolve()
-    if args.cmd == "info":
+    if args.cmd == "steam":
+        try:
+            steam_support.export(project, Path(args.output_dir).resolve(), Path(args.compiler).resolve(),
+                                 args.target or [DEFAULT_TARGET], Path(args.steam_sdk) if args.steam_sdk else None,
+                                 build, validate)
+        except (ValueError, RuntimeError) as exc:
+            die(str(exc))
+    elif args.cmd == "info":
         print_project_info(project)
     elif args.cmd == "doctor":
         return doctor(project)
@@ -1866,7 +1912,7 @@ def main(argv: list[str]) -> int:
         gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"
         out = Path(args.output).resolve() if args.output else None
         subsystem = "console" if args.headless or args.target == "linux-x64" else "windows"
-        build(
+        exe = build(
             project,
             out,
             Path(args.compiler).resolve(),
@@ -1876,7 +1922,11 @@ def main(argv: list[str]) -> int:
             debug=args.debug,
             incremental=not args.no_incremental,
             verbose=args.verbose,
+            steam_sdk=Path(args.steam_sdk) if args.steam_sdk else None,
+            steam_stub=args.steam_stub,
         )
+        if args.steam_dev:
+            write_steam_dev_id(project, exe)
     elif args.cmd == "run":
         gen_dir = Path(args.generated_dir).resolve() if args.generated_dir else project.parent / "build" / "generated" / "generated"
         out = Path(args.output).resolve() if args.output else None
@@ -1891,10 +1941,15 @@ def main(argv: list[str]) -> int:
             debug=args.debug,
             incremental=not args.no_incremental,
             verbose=args.verbose,
+            steam_sdk=Path(args.steam_sdk) if args.steam_sdk else None,
+            steam_stub=args.steam_stub,
         )
+        if args.steam_dev:
+            write_steam_dev_id(project, exe)
         if args.target != DEFAULT_TARGET:
             die(f"built {args.target} output at {exe}; run it on a matching host")
-        subprocess.check_call([str(exe)], cwd=str(project.parent))
+        run_dir = exe.parent if steam_support.settings(load_project(project))["enabled"] else project.parent
+        subprocess.check_call([str(exe)], cwd=str(run_dir))
     return 0
 
 

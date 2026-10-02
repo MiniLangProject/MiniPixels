@@ -12,7 +12,7 @@ struct Game
 Represents the game data used by the minipixels module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L74)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L77)
 
 ## Members
 
@@ -26,7 +26,7 @@ assets
 Stores the assets value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L84)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L87)
 
 <a id="field-field-minipixels-game-audio-audio-src-minipixels-ml-1014532685"></a>
 ### audio
@@ -38,7 +38,7 @@ audio
 Stores the audio value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L86)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L89)
 
 <a id="field-field-minipixels-game-canvas-canvas-src-minipixels-ml-395912317"></a>
 ### canvas
@@ -50,7 +50,7 @@ canvas
 Stores the canvas value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L78)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L81)
 
 <a id="field-field-minipixels-game-config-config-src-minipixels-ml-569195077"></a>
 ### config
@@ -62,7 +62,7 @@ config
 Stores the config value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L76)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L79)
 
 <a id="field-field-minipixels-game-debug-debug-src-minipixels-ml-383497305"></a>
 ### debug
@@ -74,7 +74,7 @@ debug
 Stores the debug value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L94)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L97)
 
 <a id="field-field-minipixels-game-designheight-designheight-src-minipixels-ml-513640627"></a>
 ### designHeight
@@ -86,7 +86,7 @@ designHeight
 Coordinate-system reference height selected by the developer.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L102)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L105)
 
 <a id="field-field-minipixels-game-designwidth-designwidth-src-minipixels-ml-2082980973"></a>
 ### designWidth
@@ -98,7 +98,7 @@ designWidth
 Coordinate-system reference width selected by the developer.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L100)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L103)
 
 <a id="field-field-minipixels-game-input-input-src-minipixels-ml-1213036537"></a>
 ### input
@@ -110,7 +110,7 @@ input
 Stores the input value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L80)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L83)
 
 <a id="method-method-minipixels-game-quit-function-quit-src-minipixels-ml-1528183005"></a>
 ### quit
@@ -122,7 +122,7 @@ function quit()
 Performs the quit operation for the minipixels game module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L111)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L116)
 
 <a id="field-field-minipixels-game-renderheight-renderheight-src-minipixels-ml-1242373379"></a>
 ### renderHeight
@@ -134,7 +134,7 @@ renderHeight
 Current framebuffer height in physical render pixels.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L98)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L101)
 
 <a id="field-field-minipixels-game-renderscalex-renderscalex-src-minipixels-ml-69108485"></a>
 ### renderScaleX
@@ -146,7 +146,7 @@ renderScaleX
 Horizontal ratio from design coordinates to render pixels.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L104)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L107)
 
 <a id="field-field-minipixels-game-renderscaley-renderscaley-src-minipixels-ml-1372263531"></a>
 ### renderScaleY
@@ -158,7 +158,7 @@ renderScaleY
 Vertical ratio from design coordinates to render pixels.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L106)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L109)
 
 <a id="field-field-minipixels-game-renderwidth-renderwidth-src-minipixels-ml-260062685"></a>
 ### renderWidth
@@ -170,7 +170,7 @@ renderWidth
 Current framebuffer width in physical render pixels.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L96)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L99)
 
 <a id="field-field-minipixels-game-resolutionchanged-resolutionchanged-src-minipixels-ml-468617165"></a>
 ### resolutionChanged
@@ -182,7 +182,7 @@ resolutionChanged
 True during a frame in which the main framebuffer changed size.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L108)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L111)
 
 <a id="field-field-minipixels-game-running-running-src-minipixels-ml-1634284809"></a>
 ### running
@@ -194,7 +194,7 @@ running
 Stores the running value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L90)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L93)
 
 <a id="field-field-minipixels-game-scenes-scenes-src-minipixels-ml-1552745623"></a>
 ### scenes
@@ -206,7 +206,19 @@ scenes
 Stores the scenes value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L88)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L91)
+
+<a id="field-field-minipixels-game-steam-steam-src-minipixels-ml-378203241"></a>
+### steam
+
+```ml
+steam
+```
+
+Steam session; unavailable in ordinary and headless builds.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L113)
 
 <a id="field-field-minipixels-game-time-time-src-minipixels-ml-951476339"></a>
 ### time
@@ -218,7 +230,7 @@ time
 Stores the time value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L82)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L85)
 
 <a id="field-field-minipixels-game-window-window-src-minipixels-ml-1978613613"></a>
 ### window
@@ -230,4 +242,4 @@ window
 Stores the window value associated with game.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L92)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L95)

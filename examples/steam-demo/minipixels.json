@@ -1,0 +1,7 @@
+{
+  "name": "steam-demo",
+  "main": "src/main.ml",
+  "window": {"title": "MiniPixels Steam", "width": 480, "height": 270, "scale": 2},
+  "steam": {"enabled": false, "appId": 480, "mode": "optional", "pauseOnOverlay": true},
+  "assets": []
+}
