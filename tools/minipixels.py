@@ -1275,8 +1275,7 @@ def generate(project_file: Path, out_dir: Path) -> Path:
                 "function assetPack()",
                 "  global assetPackCache",
                 "  if assetPackCache == void then",
-                ('    opened = try(mp.openProtectedAssetPack("assets.mpx", security.aesKey(), security.publicKey(), security.keyId()))' if protection is not None else '    opened = try(mp.openAssetPack("assets.mpx"))'),
-                ('    if typeof(opened) == "error" then opened = try(mp.openProtectedAssetPack("build/assets.mpx", security.aesKey(), security.publicKey(), security.keyId())) end if' if protection is not None else '    if typeof(opened) == "error" then opened = try(mp.openAssetPack("build/assets.mpx")) end if'),
+                ('    opened = mp.openProtectedAssetPack(mp.defaultAssetPackPath(), security.aesKey(), security.publicKey(), security.keyId())' if protection is not None else '    opened = mp.openAssetPack(mp.defaultAssetPackPath())'),
                 *(
                     [
                         f"    resident = try(mp.preloadAssetPackSlots(opened, {json.dumps(resident_slots)}, {preload_batch_bytes}))",
@@ -1578,9 +1577,8 @@ def write_asset_report(data: dict, root: Path, output: Path) -> Path:
 
 def copy_runtime_assets(data: dict, root: Path, output: Path, pack_source: Path | None = None) -> None:
     copied: set[Path] = set()
-    stale_audio = output.parent / "assets" / "audio"
-    if stale_audio.exists():
-        shutil.rmtree(stale_audio)
+    # Never recursively clean an output-relative directory: custom outputs may
+    # point into the source tree. MPX builds simply stop copying loose audio.
 
     def copy_path(src: Path, rel: Path) -> None:
         src = src.resolve()
@@ -1667,11 +1665,7 @@ def build(
         suffix = ".exe" if target == "windows-x64" else ""
         output = root / "build" / f"{data.get('name', 'game')}{suffix}"
     output.parent.mkdir(parents=True, exist_ok=True)
-    audio_runtime = ensure_audio_runtime(target, output.parent)
-    if target == "linux-x64":
-        development_runtime = root / audio_runtime.name
-        if development_runtime.resolve() != audio_runtime.resolve():
-            shutil.copy2(audio_runtime, development_runtime)
+    ensure_audio_runtime(target, output.parent)
     manifest_path = output.parent / "minilang.toml"
     compiler_root = compiler.parent
     if not (compiler_root / "std").is_dir() and (compiler_root.parent / "std").is_dir():
@@ -1682,11 +1676,7 @@ def build(
         for asset in data.get("assets", [])
     )
     if needs_media:
-        media_runtime = ensure_media_runtime(compiler_root, target, output.parent)
-        if target == "linux-x64":
-            development_media = root / media_runtime.name
-            if development_media.resolve() != media_runtime.resolve():
-                shutil.copy2(media_runtime, development_media)
+        ensure_media_runtime(compiler_root, target, output.parent)
     include_paths = [ROOT / "src", compiler_root, generated_dir.parent]
     compiler_args = ["--profile-calls"] if debug else []
     if steam["enabled"]:

@@ -8,7 +8,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   linux:
@@ -74,6 +74,7 @@ jobs:
         working-directory: MiniPixels
         run: |
           mkdir -p build/tools
+          cp build/tests/libminipixels_audio.so build/tools/
           python ../MiniLangCompilerPy/mlc_win64.py tools/minipixels_cli.ml build/tools/minipixels -I src -I ../MiniLangCompilerPy --target linux-x64
           build/tools/minipixels info
           build/tools/minipixels doctor
@@ -90,6 +91,7 @@ jobs:
         run: |
           tmp=$(mktemp -d)
           cp build/tools/minipixels "$tmp/minipixels"
+          cp build/tools/libminipixels_audio.so "$tmp/"
           cd "$tmp"
           for tpl in basic platformer pixel-art; do
             name="demo-$tpl"
@@ -148,6 +150,11 @@ jobs:
         run: |
           .\native\build-gpu.ps1 -OutputDirectory build\tests
           python ..\MiniLangCompilerPy\mlc_win64.py tests\gpu_scene_smoke.ml build\tests\gpu_scene_smoke.exe -I src -I ..\MiniLangCompilerPy
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $result = & .\build\tests\gpu_scene_smoke.exe --allow-unavailable 2>&1
+          $exitCode = $LASTEXITCODE
+          $result | Write-Output
+          if ($exitCode -ne 0 -or "$result" -match '\[FAIL\]' -or "$result" -notmatch 'GPU_SCENE_SMOKE_OK|GPU_SCENE_UNAVAILABLE') { exit 1 }
 
       - name: Build native MiniLang CLI
         shell: pwsh
@@ -206,18 +213,25 @@ jobs:
             MiniPixels/dist/*.sha256
           compression-level: 0
 
-      - name: Publish GitHub release
-        if: startsWith(github.ref, 'refs/tags/v')
-        shell: pwsh
-        working-directory: MiniPixels
+  release:
+    name: Publish verified SDK
+    needs: [linux, windows]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Download and publish tested SDK
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          $tag = "${{ github.ref_name }}"
-          $assets = @("dist/*-sdk.zip", "dist/*.sha256")
-          gh release view $tag *> $null
-          if ($LASTEXITCODE -eq 0) {
-            gh release upload $tag @assets --clobber
-          } else {
-            gh release create $tag @assets --title "MiniPixels $tag" --generate-notes
-          }
+          gh run download "$GITHUB_RUN_ID" --name minipixels-sdk --dir dist
+          (cd dist && sha256sum --check ./*.sha256)
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" dist/*-sdk.zip dist/*.sha256 --clobber
+          else
+            gh release create "$RELEASE_TAG" dist/*-sdk.zip dist/*.sha256 --title "MiniPixels $RELEASE_TAG" --generate-notes
+          fi

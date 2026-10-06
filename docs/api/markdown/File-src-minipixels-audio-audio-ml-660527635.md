@@ -30,7 +30,7 @@ function backendName()
 Returns the primary advanced audio backend name.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L493)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L497)
 
 <a id="function-function-minipixels-audio-audio-channel-function-channel-id-src-minipixels-audio-audio-ml-1513742897"></a>
 ### channel
@@ -46,7 +46,7 @@ Creates an inactive mixer channel.
 | `id` | `dynamic` | — | Stable channel identifier. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L456)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L460)
 
 <a id="function-function-minipixels-audio-audio-choosechannel-function-choosechannel-value-src-minipixels-audio-audio-ml-132341089"></a>
 ### chooseChannel
@@ -62,7 +62,7 @@ Chooses an idle channel or a deterministic round-robin replacement.
 | `value` | `dynamic` | — | Mixer whose channels are inspected. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L824)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L828)
 
 <a id="function-function-minipixels-audio-audio-chunkis-function-chunkis-data-offset-a-b-c-d-src-minipixels-audio-audio-ml-1791883403"></a>
 ### chunkIs
@@ -83,7 +83,7 @@ Returns whether four bytes match an ASCII chunk identifier.
 | `d` | `dynamic` | — | Fourth identifier byte. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L681)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L685)
 
 <a id="function-function-minipixels-audio-audio-clip-function-clip-path-name-src-minipixels-audio-audio-ml-1063573672"></a>
 ### clip
@@ -100,7 +100,7 @@ Creates a file-backed audio clip.
 | `name` | `dynamic` | — | Stable clip name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L419)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L423)
 
 <a id="function-function-minipixels-audio-audio-clipfrombytes-function-clipfrombytes-data-name-src-minipixels-audio-audio-ml-1031187923"></a>
 ### clipFromBytes
@@ -117,7 +117,7 @@ Creates an in-memory WAV or MP3 audio clip.
 | `name` | `dynamic` | — | Stable clip name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L428)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L432)
 
 <a id="function-function-minipixels-audio-audio-close-function-close-audio-src-minipixels-audio-audio-ml-57250972"></a>
 ### close
@@ -133,7 +133,7 @@ Closes an advanced mixer while accepting legacy audio state values.
 | `audio` | `dynamic` | — | Audio state or mixer. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1250)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1277)
 
 <a id="function-function-minipixels-audio-audio-closemixer-function-closemixer-value-src-minipixels-audio-audio-ml-1464048709"></a>
 ### closeMixer
@@ -149,7 +149,7 @@ Releases retained buffers and closes the native PCM output device.
 | `value` | `dynamic` | — | Mixer to close. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1207)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1232)
 
 <a id="function-function-minipixels-audio-audio-closevoicedecoder-function-closevoicedecoder-voice-src-minipixels-audio-audio-ml-1105898744"></a>
 ### closeVoiceDecoder
@@ -165,7 +165,7 @@ Releases the decoder and buffered data owned by one mixer voice.
 | `voice` | `dynamic` | — | Voice to reset. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L835)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L839)
 
 <a id="function-function-minipixels-audio-audio-create-function-create-src-minipixels-audio-audio-ml-1139740796"></a>
 ### create
@@ -177,7 +177,7 @@ function create()
 Creates legacy direct-playback state.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L412)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L416)
 
 <a id="function-function-minipixels-audio-audio-effectiveclipvolume-function-effectiveclipvolume-audio-channelvolume-clipvolume-src-minipixels-audio-audio-ml-76886695"></a>
 ### effectiveClipVolume
@@ -195,7 +195,7 @@ Returns effective state/channel/clip volume.
 | `clipVolume` | `dynamic` | — | Clip volume percentage. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L488)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L492)
 
 <a id="function-function-minipixels-audio-audio-effectivevolume-function-effectivevolume-audio-channelvolume-src-minipixels-audio-audio-ml-4040267"></a>
 ### effectiveVolume
@@ -212,7 +212,7 @@ Returns effective state/channel volume before clip-specific scaling.
 | `channelVolume` | `dynamic` | — | Bus or channel volume percentage. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L479)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L483)
 
 <a id="function-function-minipixels-audio-audio-ensurebackend-function-ensurebackend-value-src-minipixels-audio-audio-ml-1066765565"></a>
 ### ensureBackend
@@ -228,7 +228,7 @@ Opens the platform PCM device and prepares retained output buffers.
 | `value` | `dynamic` | — | Mixer to open. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L990)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L994)
 
 <a id="function-function-minipixels-audio-audio-getu32-function-getu32-buffer-offset-src-minipixels-audio-audio-ml-2062268999"></a>
 ### getU32
@@ -245,7 +245,7 @@ Reads a little-endian unsigned 32-bit value.
 | `offset` | `dynamic` | — | Starting byte offset. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L655)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L659)
 
 <a id="function-function-minipixels-audio-audio-getu64-function-getu64-buffer-offset-src-minipixels-audio-audio-ml-876331771"></a>
 ### getU64
@@ -262,7 +262,7 @@ Reads a little-endian unsigned 64-bit value.
 | `offset` | `dynamic` | — | Starting byte offset. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L662)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L666)
 
 <a id="function-function-minipixels-audio-audio-hasrange-function-hasrange-data-offset-size-src-minipixels-audio-audio-ml-308052286"></a>
 ### hasRange
@@ -280,7 +280,7 @@ Returns whether a byte range is available.
 | `size` | `dynamic` | — | Required byte count. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L670)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L674)
 
 <a id="function-function-minipixels-audio-audio-ismp3-function-ismp3-data-src-minipixels-audio-audio-ml-1800060296"></a>
 ### isMp3
@@ -296,7 +296,7 @@ Returns whether bytes begin with an ID3 tag or MPEG audio frame sync.
 | `data` | `dynamic` | — | Complete candidate audio bytes. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L688)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L692)
 
 <a id="constant-constant-minipixels-audio-audio-max-decoded-audio-bytes-const-max-decoded-audio-bytes-536870912-src-minipixels-audio-audio-ml-1077858674"></a>
 ### MAX_DECODED_AUDIO_BYTES
@@ -325,7 +325,7 @@ Mixes active voices into one interleaved stereo 16-bit output buffer.
 | `output` | `dynamic` | — | Destination interleaved PCM buffer. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L948)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L952)
 
 <a id="function-function-minipixels-audio-audio-mixer-function-mixer-maxchannels-src-minipixels-audio-audio-ml-1382070998"></a>
 ### mixer
@@ -341,7 +341,7 @@ Creates a lazily opened multi-voice PCM mixer.
 | `maxChannels` | `dynamic` | — | Maximum simultaneous sound-effect voices. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L462)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L466)
 
 <a id="constant-constant-minipixels-audio-audio-mixer-buffer-count-const-mixer-buffer-count-3-src-minipixels-audio-audio-ml-287319778"></a>
 ### MIXER_BUFFER_COUNT
@@ -394,7 +394,7 @@ Starts or replaces the dedicated music voice.
 | `source` | `dynamic` | — | Prepared or lazy audio clip. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1074)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1078)
 
 <a id="function-function-minipixels-audio-audio-mixerplaysfx-function-mixerplaysfx-value-source-src-minipixels-audio-audio-ml-2069513338"></a>
 ### mixerPlaySfx
@@ -411,7 +411,7 @@ Starts a sound-effect voice without interrupting other voices.
 | `source` | `dynamic` | — | Prepared or lazy audio clip. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1045)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1049)
 
 <a id="function-function-minipixels-audio-audio-mixerstopall-function-mixerstopall-value-src-minipixels-audio-audio-ml-320772273"></a>
 ### mixerStopAll
@@ -427,7 +427,7 @@ Stops every mixer voice and replaces queued output with silence.
 | `value` | `dynamic` | — | Mixer to stop. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1154)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1177)
 
 <a id="function-function-minipixels-audio-audio-mixvoice-function-mixvoice-value-voice-busvolume-src-minipixels-audio-audio-ml-1921813683"></a>
 ### mixVoice
@@ -445,7 +445,7 @@ Accumulates one voice into reusable stereo mix arrays and returns its new state.
 | `busVolume` | `dynamic` | — | Bus volume percentage. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L899)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L903)
 
 <a id="constant-constant-minipixels-audio-audio-mmsyserr-noerror-const-mmsyserr-noerror-0-src-minipixels-audio-audio-ml-1668941983"></a>
 ### MMSYSERR_NOERROR
@@ -614,7 +614,7 @@ Creates a looping file-backed music clip. MP3 data streams while playing.
 | `name` | `dynamic` | — | Stable clip name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L437)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L441)
 
 <a id="function-function-minipixels-audio-audio-musicclipfrombytes-function-musicclipfrombytes-data-name-src-minipixels-audio-audio-ml-56868737"></a>
 ### musicClipFromBytes
@@ -631,7 +631,7 @@ Creates a looping in-memory music clip. MP3 data streams while playing.
 | `name` | `dynamic` | — | Stable clip name. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L447)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L451)
 
 <a id="function-function-minipixels-audio-audio-normalizepan-function-normalizepan-value-src-minipixels-audio-audio-ml-208173369"></a>
 ### normalizePan
@@ -647,7 +647,7 @@ Normalizes pan into the inclusive -100..100 range.
 | `value` | `dynamic` | — | Candidate pan. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L404)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L408)
 
 <a id="function-function-minipixels-audio-audio-normalizevolume-function-normalizevolume-value-src-minipixels-audio-audio-ml-1136828683"></a>
 ### normalizeVolume
@@ -663,7 +663,7 @@ Normalizes a percentage volume into the inclusive 0..100 range.
 | `value` | `dynamic` | — | Candidate volume. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L395)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L399)
 
 <a id="function-function-minipixels-audio-audio-openvoicedecoder-function-openvoicedecoder-voice-src-minipixels-audio-audio-ml-587609116"></a>
 ### openVoiceDecoder
@@ -679,7 +679,7 @@ Opens an independent streaming decoder for one MP3 voice.
 | `voice` | `dynamic` | — | Destination voice. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L846)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L850)
 
 <a id="function-function-minipixels-audio-audio-playclip-function-playclip-audio-value-src-minipixels-audio-audio-ml-1317191505"></a>
 ### playClip
@@ -696,7 +696,7 @@ Plays a clip through legacy state or the advanced mixer.
 | `value` | `dynamic` | — | Audio clip to play. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L615)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L619)
 
 <a id="function-function-minipixels-audio-audio-playmusic-function-playmusic-path-src-minipixels-audio-audio-ml-1533567019"></a>
 ### playMusic
@@ -712,7 +712,7 @@ Plays looping legacy music from a path.
 | `path` | `dynamic` | — | WAV file path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L587)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L591)
 
 <a id="function-function-minipixels-audio-audio-playmusicwithstate-function-playmusicwithstate-audio-path-src-minipixels-audio-audio-ml-1696997549"></a>
 ### playMusicWithState
@@ -729,7 +729,7 @@ Plays looping music through legacy state or the advanced mixer.
 | `path` | `dynamic` | — | WAV file path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L604)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L608)
 
 <a id="function-function-minipixels-audio-audio-playsfx-function-playsfx-audio-path-src-minipixels-audio-audio-ml-696113711"></a>
 ### playSfx
@@ -746,7 +746,7 @@ Plays a path as either legacy state playback or mixer playback.
 | `path` | `dynamic` | — | WAV file path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L594)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L598)
 
 <a id="function-function-minipixels-audio-audio-playsound-function-playsound-path-src-minipixels-audio-audio-ml-222199423"></a>
 ### playSound
@@ -762,7 +762,7 @@ Plays one WAV file through the legacy operating-system helper.
 | `path` | `dynamic` | — | WAV file path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L523)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L527)
 
 <a id="function-function-minipixels-audio-audio-playsoundbytes-function-playsoundbytes-data-src-minipixels-audio-audio-ml-253944656"></a>
 ### playSoundBytes
@@ -778,7 +778,7 @@ Plays WAV file bytes through the legacy helper.
 | `data` | `dynamic` | — | Complete WAV file bytes. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L556)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L560)
 
 <a id="function-function-minipixels-audio-audio-playsoundbytessync-function-playsoundbytessync-data-src-minipixels-audio-audio-ml-2100117544"></a>
 ### playSoundBytesSync
@@ -794,7 +794,7 @@ Plays WAV file bytes synchronously through the legacy helper.
 | `data` | `dynamic` | — | Complete WAV file bytes. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L567)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L571)
 
 <a id="function-function-minipixels-audio-audio-playsoundloop-function-playsoundloop-path-src-minipixels-audio-audio-ml-792422107"></a>
 ### playSoundLoop
@@ -810,7 +810,7 @@ Plays one looping WAV file through the legacy helper.
 | `path` | `dynamic` | — | WAV file path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L545)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L549)
 
 <a id="extern_function-extern-function-minipixels-audio-audio-playsoundmemory-extern-function-playsoundmemory-data-as-ptr-module-as-ptr-flags-as-int-from-winmm-dll-symbol-playsoundw-returns-bool-src-minipixels-audio-audio-ml-698928250"></a>
 ### PlaySoundMemory
@@ -846,7 +846,7 @@ Plays one WAV file synchronously through the legacy helper.
 | `path` | `dynamic` | — | WAV file path. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L534)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L538)
 
 <a id="extern_function-extern-function-minipixels-audio-audio-playsoundw-extern-function-playsoundw-path-as-wstr-module-as-ptr-flags-as-int-from-winmm-dll-symbol-playsoundw-returns-bool-src-minipixels-audio-audio-ml-1708401531"></a>
 ### PlaySoundW
@@ -882,7 +882,7 @@ Loads and prepares a WAV or MP3 clip on first use.
 | `value` | `dynamic` | — | Audio clip to prepare. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L781)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L785)
 
 <a id="function-function-minipixels-audio-audio-preparemixerformat-function-preparemixerformat-value-src-minipixels-audio-audio-ml-1534543109"></a>
 ### prepareMixerFormat
@@ -898,7 +898,7 @@ Initializes and fills the native PCM format structure.
 | `value` | `dynamic` | — | Mixer to initialize. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L977)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L981)
 
 <a id="function-function-minipixels-audio-audio-preparemp3-function-preparemp3-value-data-src-minipixels-audio-audio-ml-610412273"></a>
 ### prepareMp3
@@ -915,7 +915,7 @@ Reads source metadata from the native MP3 decoder and optionally decodes all PCM
 | `data` | `dynamic` | — | Complete MP3 file bytes. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L697)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L701)
 
 <a id="function-function-minipixels-audio-audio-preparewav-function-preparewav-value-data-src-minipixels-audio-audio-ml-758943945"></a>
 ### prepareWav
@@ -932,7 +932,7 @@ Parses an uncompressed PCM WAV payload.
 | `data` | `dynamic` | — | Complete WAV file bytes. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L737)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L741)
 
 <a id="function-function-minipixels-audio-audio-putu32-function-putu32-buffer-offset-value-src-minipixels-audio-audio-ml-1424367900"></a>
 ### putU32
@@ -950,7 +950,7 @@ Writes a little-endian 32-bit value to a native structure buffer.
 | `value` | `dynamic` | — | Integer value to encode. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L635)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L639)
 
 <a id="function-function-minipixels-audio-audio-putu64-function-putu64-buffer-offset-value-src-minipixels-audio-audio-ml-1896812244"></a>
 ### putU64
@@ -968,7 +968,7 @@ Writes a little-endian 64-bit value to a native structure buffer.
 | `value` | `dynamic` | — | Integer value to encode. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L647)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L651)
 
 <a id="function-function-minipixels-audio-audio-refillvoicestream-function-refillvoicestream-voice-sourceframe-src-minipixels-audio-audio-ml-459232312"></a>
 ### refillVoiceStream
@@ -985,7 +985,7 @@ Refills a streaming voice so it contains the requested source frame.
 | `sourceFrame` | `dynamic` | — | Absolute source frame needed by the mixer. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L862)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L866)
 
 <a id="function-function-minipixels-audio-audio-refreshmixer-function-refreshmixer-value-src-minipixels-audio-audio-ml-2084548497"></a>
 ### refreshMixer
@@ -1001,7 +1001,7 @@ Applies a volume or mute change to subsequently mixed buffers.
 | `value` | `dynamic` | — | Mixer to refresh. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1148)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1171)
 
 <a id="function-function-minipixels-audio-audio-sampleat-function-sampleat-value-frame-side-src-minipixels-audio-audio-ml-2062631707"></a>
 ### sampleAt
@@ -1019,7 +1019,7 @@ Reads one source sample and converts it to signed 16-bit amplitude.
 | `side` | `dynamic` | — | Source side, zero for left and one for right. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L799)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L803)
 
 <a id="function-function-minipixels-audio-audio-setchannel-function-setchannel-value-id-volume-pan-src-minipixels-audio-audio-ml-713064651"></a>
 ### setChannel
@@ -1038,7 +1038,7 @@ Sets one sound-effect channel's volume and pan.
 | `pan` | `dynamic` | — | Pan from -100 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1196)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1221)
 
 <a id="constant-constant-minipixels-audio-audio-snd-async-const-snd-async-1-src-minipixels-audio-audio-ml-1322667142"></a>
 ### SND_ASYNC
@@ -1187,7 +1187,7 @@ Stops one sound-effect channel.
 | `id` | `dynamic` | — | Zero-based channel identifier. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1182)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1207)
 
 <a id="function-function-minipixels-audio-audio-stopsound-function-stopsound-src-minipixels-audio-audio-ml-2145337042"></a>
 ### stopSound
@@ -1199,7 +1199,7 @@ function stopSound()
 Stops legacy direct playback.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L577)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L581)
 
 <a id="function-function-minipixels-audio-audio-streamsampleat-function-streamsampleat-voice-sourceframe-side-src-minipixels-audio-audio-ml-1970526897"></a>
 ### streamSampleAt
@@ -1217,7 +1217,7 @@ Reads one signed-16 sample from a streaming MP3 buffer.
 | `side` | `dynamic` | — | Destination side, zero for left and one for right. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L886)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L890)
 
 <a id="function-function-minipixels-audio-audio-supportsmp3-function-supportsmp3-src-minipixels-audio-audio-ml-269965156"></a>
 ### supportsMp3
@@ -1229,7 +1229,7 @@ function supportsMp3()
 Returns whether the advanced mixer can decode MP3 clips.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L512)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L516)
 
 <a id="function-function-minipixels-audio-audio-supportsmultiplesfx-function-supportsmultiplesfx-src-minipixels-audio-audio-ml-886731190"></a>
 ### supportsMultipleSfx
@@ -1241,7 +1241,7 @@ function supportsMultipleSfx()
 Returns whether the mixer supports simultaneous sound effects.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L502)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L506)
 
 <a id="function-function-minipixels-audio-audio-supportsstereo-function-supportsstereo-src-minipixels-audio-audio-ml-2127612104"></a>
 ### supportsStereo
@@ -1253,7 +1253,7 @@ function supportsStereo()
 Returns whether independent left/right source channels are preserved.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L517)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L521)
 
 <a id="function-function-minipixels-audio-audio-supportsvolumecontrol-function-supportsvolumecontrol-src-minipixels-audio-audio-ml-956723918"></a>
 ### supportsVolumeControl
@@ -1265,7 +1265,7 @@ function supportsVolumeControl()
 Returns whether the mixer applies per-bus, per-channel, and per-clip volume.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L507)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L511)
 
 <a id="function-function-minipixels-audio-audio-update-function-update-audio-src-minipixels-audio-audio-ml-563201104"></a>
 ### update
@@ -1281,7 +1281,7 @@ Updates an advanced mixer while accepting legacy audio state values.
 | `audio` | `dynamic` | — | Audio state or mixer. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1243)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1270)
 
 <a id="function-function-minipixels-audio-audio-updatemixer-function-updatemixer-value-src-minipixels-audio-audio-ml-1939388709"></a>
 ### updateMixer
@@ -1297,7 +1297,7 @@ Refills completed Windows headers or an available ALSA period.
 | `value` | `dynamic` | — | Mixer to update. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1106)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L1110)
 
 <a id="constant-constant-minipixels-audio-audio-wave-format-pcm-const-wave-format-pcm-1-src-minipixels-audio-audio-ml-853778922"></a>
 ### WAVE_FORMAT_PCM

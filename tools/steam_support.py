@@ -129,6 +129,8 @@ def stage_depot(executable: Path, destination: Path, target: str) -> list[str]:
     media = "minilang_video.dll" if win else "libminilang_video.so"
     if (executable.parent / media).is_file():
         names.append(media)
+    if win and (executable.parent / "minipixels_gpu.dll").exists():
+        names.append("minipixels_gpu.dll")
     for name in names:
         path = executable.parent / name
         if not path.is_file() or path.is_symlink():

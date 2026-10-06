@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Fixed protected-asset signing: MPX3 version 6 signs SHA-256 ciphertext digests for ordinary payloads and every 256 KiB media chunk. This rejects even known-AES-key GHASH collisions that preserve the original GCM tag. Rebuild protected packs and their game binaries together; older protected formats are rejected.
+- Removed unsafe recursive audio cleanup from custom build output directories.
+- Resolve generated asset packs beside the executable and load all Linux MiniPixels native libraries through `$ORIGIN`, independent of the launch working directory.
+- Fill available ALSA capacity with bounded work and retain partial/EAGAIN/underrun writes without losing PCM frames.
+- Preserve the optional GPU runtime in Steam depot staging.
+- Use half-open continuous tile bounds for subpixel collisions and stable O(n log n) sorting for bulk asset preloading.
+- Gate release publication on both platform jobs. Execute the optional GPU smoke in CI; runners without framebuffer support explicitly report unavailable pixel checks.
+- Added adversarial cryptographic, foreign-working-directory, source-preservation, subpixel, preload-order, depot and isolated ALSA regressions.
+
 ## 0.17.0 - 2026-10-02
 
 - Added opt-in Steamworks integration with account identity, game language, achievements, integer stats, asynchronous store callbacks, overlay input suppression and optional simulation pause. Ordinary games remain Steam-free by default.

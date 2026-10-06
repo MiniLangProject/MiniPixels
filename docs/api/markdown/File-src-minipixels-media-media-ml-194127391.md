@@ -30,7 +30,7 @@ Creates a media-module error.
 | `message` | `dynamic` | — | Human-readable error text. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L62)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L66)
 
 <a id="function-function-minipixels-media-media-opensource-function-opensource-info-mime-suffix-src-minipixels-media-media-ml-1721162251"></a>
 ### _openSource
@@ -48,7 +48,7 @@ Opens the local range source for one already-validated pack entry.
 | `suffix` | `dynamic` | — | Filename suffix used for decoder selection. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L195)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L199)
 
 <a id="extern_function-extern-function-minipixels-media-media-streamclose-extern-function-streamclose-handle-as-ptr-from-minipixels-audio-dll-symbol-mpmediastreamclose-returns-void-src-minipixels-media-media-ml-395662664"></a>
 ### _streamClose
@@ -64,13 +64,13 @@ Closes a native loopback media source.
 | `handle` | `ptr` | — | Native source handle. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L34)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L36)
 
-<a id="extern_function-extern-function-minipixels-media-media-streamopen-extern-function-streamopen-path-as-cstr-offset-as-u64-storedsize-as-u64-logicalsize-as-u64-codec-as-int-key-as-bytes-keysize-as-u64-nonce-as-bytes-noncesize-as-u64-mime-as-cstr-suffix-as-cstr-urloutput-as-bytes-urlcapacity-as-int-from-minipixels-audio-dll-symbol-mpmediastreamopen-returns-ptr-src-minipixels-media-media-ml-112098636"></a>
+<a id="extern_function-extern-function-minipixels-media-media-streamopen-extern-function-streamopen-path-as-cstr-offset-as-u64-storedsize-as-u64-logicalsize-as-u64-codec-as-int-key-as-bytes-keysize-as-u64-nonce-as-bytes-noncesize-as-u64-hashes-as-bytes-hashessize-as-u64-mime-as-cstr-suffix-as-cstr-urloutput-as-bytes-urlcapacity-as-int-from-minipixels-audio-dll-symbol-mpmediastreamopenv6-returns-ptr-src-minipixels-media-media-ml-14201583"></a>
 ### _streamOpen
 
 ```ml
-extern function _streamOpen(path as cstr, offset as u64, storedSize as u64, logicalSize as u64, codec as int, key as bytes, keySize as u64, nonce as bytes, nonceSize as u64, mime as cstr, suffix as cstr, urlOutput as bytes, urlCapacity as int) from "minipixels_audio.dll" symbol "mpMediaStreamOpen" returns ptr
+extern function _streamOpen(path as cstr, offset as u64, storedSize as u64, logicalSize as u64, codec as int, key as bytes, keySize as u64, nonce as bytes, nonceSize as u64, hashes as bytes, hashesSize as u64, mime as cstr, suffix as cstr, urlOutput as bytes, urlCapacity as int) from "minipixels_audio.dll" symbol "mpMediaStreamOpenV6" returns ptr
 ```
 
 Opens a native loopback source for one MPX media range.
@@ -86,6 +86,8 @@ Opens a native loopback source for one MPX media range.
 | `keySize` | `u64` | — | AES key size. |
 | `nonce` | `bytes` | — | Base nonce for protected media. |
 | `nonceSize` | `u64` | — | Base nonce size. |
+| `hashes` | `bytes` | — | Ciphertext SHA-256 digests from the verified signed index. |
+| `hashesSize` | `u64` | — | Size of the digest table in bytes. |
 | `mime` | `cstr` | — | HTTP response content type. |
 | `suffix` | `cstr` | — | Decoder filename suffix. |
 | `urlOutput` | `bytes` | — | Destination buffer for the loopback URL. |
@@ -94,7 +96,7 @@ Opens a native loopback source for one MPX media range.
 
 **Returns:** Opaque native source handle, or zero on failure.
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L30)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L32)
 
 <a id="constant-constant-minipixels-media-media-media-err-const-media-err-9310-src-minipixels-media-media-ml-341136306"></a>
 ### MEDIA_ERR
@@ -124,7 +126,7 @@ Opens streamed audio by stable MPX asset name.
 | `options` | `dynamic` | `void` | Optional `std.audio.PlayerOptions`. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L249)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L255)
 
 <a id="function-function-minipixels-media-media-openaudioat-function-openaudioat-pack-slot-mime-audio-mpeg-suffix-mp3-options-void-src-minipixels-media-media-ml-360541171"></a>
 ### openAudioAt
@@ -144,7 +146,7 @@ Opens streamed audio by pre-resolved MPX slot.
 | `options` | `dynamic` | `void` | Optional `std.audio.PlayerOptions`. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L229)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L235)
 
 <a id="function-function-minipixels-media-media-openvideo-function-openvideo-pack-name-mime-video-mp4-suffix-mp4-options-void-src-minipixels-media-media-ml-1401851240"></a>
 ### openVideo
@@ -164,7 +166,7 @@ Opens streamed video by stable MPX asset name.
 | `options` | `dynamic` | `void` | Optional `std.video.PlayerOptions`. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L281)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L287)
 
 <a id="function-function-minipixels-media-media-openvideoat-function-openvideoat-pack-slot-mime-video-mp4-suffix-mp4-options-void-src-minipixels-media-media-ml-424155165"></a>
 ### openVideoAt
@@ -184,7 +186,7 @@ Opens streamed video by pre-resolved MPX slot.
 | `options` | `dynamic` | `void` | Optional `std.video.PlayerOptions`. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L261)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L267)
 
 - [minipixels.media.media.PackedAudio](Type-minipixels-media-media-packedaudio-106545843.md) — struct
 - [minipixels.media.media.PackedMediaSource](Type-minipixels-media-media-packedmediasource-266006340.md) — struct

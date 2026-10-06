@@ -14,7 +14,7 @@ from pathlib import Path
 
 
 MPX3_MAGIC = b"MPX3"
-MPX3_VERSION = 5
+MPX3_VERSION = 6
 MPX3_HEADER_SIZE = 64
 MPX3_INDEX_MAGIC = b"MPI3"
 MPX3_NONCE_SIZE = 12
@@ -117,7 +117,7 @@ def protect_pack(plaintext: bytes, private_key) -> ProtectedPack:
     """Convert a deterministic MPX1 stream into a random-access MPX3 pack.
 
     The encrypted/signed index authenticates every block's location, nonce and
-    GCM tag. Payload blocks can therefore be read and decrypted independently
+    GCM tag and SHA-256 ciphertext digest. Payloads can be read independently
     without weakening the private signing-key modification boundary.
     """
     hashes, _, ec, decode_dss_signature, AESGCM = _crypto()
@@ -176,6 +176,7 @@ def protect_pack(plaintext: bytes, private_key) -> ProtectedPack:
             if stream_payload:
                 chunk_count = (len(payload) + PACK_STREAM_CHUNK_SIZE - 1) // PACK_STREAM_CHUNK_SIZE
                 envelope = bytearray(PACK_STREAM_MAGIC)
+                signed_hashes = bytearray()
                 envelope.extend(struct.pack("<IQII", PACK_STREAM_CHUNK_SIZE, len(payload), chunk_count, 0))
                 for chunk_index in range(chunk_count):
                     start = chunk_index * PACK_STREAM_CHUNK_SIZE
@@ -186,19 +187,23 @@ def protect_pack(plaintext: bytes, private_key) -> ProtectedPack:
                     aad = PACK_STREAM_MAGIC + nonce + struct.pack("<QI", len(payload), chunk_index)
                     sealed_chunk = cipher.encrypt(bytes(chunk_nonce), chunk, aad)
                     envelope.extend(sealed_chunk[-MPX3_TAG_SIZE:])
+                    signed_hashes.extend(hashlib.sha256(sealed_chunk[:-MPX3_TAG_SIZE]).digest())
                     envelope.extend(sealed_chunk[:-MPX3_TAG_SIZE])
                 ciphertext = bytes(envelope)
-                tag = bytes(MPX3_TAG_SIZE)
+                tag = bytes(signed_hashes)
             else:
                 sealed = cipher.encrypt(nonce, payload, None)
                 ciphertext = sealed[:-MPX3_TAG_SIZE]
-                tag = sealed[-MPX3_TAG_SIZE:]
+                tag = sealed[-MPX3_TAG_SIZE:] + hashlib.sha256(ciphertext).digest()
             block_index = len(sealed_blocks)
             block_indices[block_key] = block_index
             sealed_blocks.append((nonce, ciphertext, tag))
         sealed_entries.append((name, kind, output_codec, logical_size, block_index))
 
-    index_size = 8 + sum(56 + len(name) for name, _, _, _, _ in sealed_entries)
+    index_size = 8 + sum(56 + len(name) + (len(sealed_blocks[block][2]) if codec == PACK_CODEC_STREAM else 32)
+                         for name, _, codec, _, block in sealed_entries)
+    if index_size > 64 * 1024 * 1024:
+        raise ValueError("MPX3 signed index exceeds the runtime limit")
     payload_offset = MPX3_HEADER_SIZE + index_size + MPX3_TAG_SIZE + MPX3_SIGNATURE_SIZE
     block_offsets: list[int] = []
     next_offset = payload_offset
@@ -214,6 +219,10 @@ def protect_pack(plaintext: bytes, private_key) -> ProtectedPack:
         index.extend(bytes([kind, codec]))
         index.extend(struct.pack("<QQQ", block_offsets[block_index], logical_size, len(ciphertext)))
         index.extend(nonce)
+        # GCM/GHASH is not a collision-resistant digest when the AES key is
+        # known. v6 signs SHA-256 ciphertext digests, not merely GCM tags.
+        if codec == PACK_CODEC_STREAM:
+            index.extend(bytes(MPX3_TAG_SIZE))
         index.extend(tag)
 
     index_nonce = os.urandom(MPX3_NONCE_SIZE)
@@ -242,7 +251,7 @@ def inspect_header(data: bytes) -> dict:
     if len(data) < MPX3_HEADER_SIZE + MPX3_TAG_SIZE + MPX3_SIGNATURE_SIZE:
         raise ValueError("MPX3 file is truncated")
     if data[:4] != MPX3_MAGIC or data[4] != MPX3_VERSION:
-        raise ValueError("not a supported MPX3 version-5 file")
+        raise ValueError("not a supported MPX3 version-6 file")
     header_size, reserved, index_size, index_cipher_size, file_size = struct.unpack_from("<HHQQQ", data, 8)
     if header_size != MPX3_HEADER_SIZE or reserved != 0:
         raise ValueError("unsupported MPX3 header")

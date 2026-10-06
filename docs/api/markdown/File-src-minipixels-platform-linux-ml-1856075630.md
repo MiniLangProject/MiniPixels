@@ -412,11 +412,11 @@ const MOTION_NOTIFY = 6
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L71)
 
-<a id="extern_function-extern-function-minipixels-platform-linux-mppixelsrgbatobgra-extern-function-mppixelsrgbatobgra-destination-as-bytes-destinationoffset-as-u64-source-as-bytes-sourceoffset-as-u64-pixelcount-as-int-from-libminipixels-audio-so-returns-void-src-minipixels-platform-linux-ml-1957117957"></a>
+<a id="extern_function-extern-function-minipixels-platform-linux-mppixelsrgbatobgra-extern-function-mppixelsrgbatobgra-destination-as-bytes-destinationoffset-as-u64-source-as-bytes-sourceoffset-as-u64-pixelcount-as-int-from-origin-libminipixels-audio-so-returns-void-src-minipixels-platform-linux-ml-311278213"></a>
 ### mpPixelsRgbaToBgra
 
 ```ml
-extern function mpPixelsRgbaToBgra(destination as bytes, destinationOffset as u64, source as bytes, sourceOffset as u64, pixelCount as int) from "./libminipixels_audio.so" returns void
+extern function mpPixelsRgbaToBgra(destination as bytes, destinationOffset as u64, source as bytes, sourceOffset as u64, pixelCount as int) from "$ORIGIN/libminipixels_audio.so" returns void
 ```
 
 | Parameter | Type | Default | Description |
@@ -430,11 +430,11 @@ extern function mpPixelsRgbaToBgra(destination as bytes, destinationOffset as u6
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L12)
 
-<a id="extern_function-extern-function-minipixels-platform-linux-mppixelsscaleintegerbgra-extern-function-mppixelsscaleintegerbgra-destination-as-bytes-destinationwidth-as-int-destinationheight-as-int-source-as-bytes-sourcewidth-as-int-sourceheight-as-int-viewportx-as-int-viewporty-as-int-factor-as-int-from-libminipixels-audio-so-returns-i32-src-minipixels-platform-linux-ml-27949279"></a>
+<a id="extern_function-extern-function-minipixels-platform-linux-mppixelsscaleintegerbgra-extern-function-mppixelsscaleintegerbgra-destination-as-bytes-destinationwidth-as-int-destinationheight-as-int-source-as-bytes-sourcewidth-as-int-sourceheight-as-int-viewportx-as-int-viewporty-as-int-factor-as-int-from-origin-libminipixels-audio-so-returns-i32-src-minipixels-platform-linux-ml-2115376931"></a>
 ### mpPixelsScaleIntegerBgra
 
 ```ml
-extern function mpPixelsScaleIntegerBgra(destination as bytes, destinationWidth as int, destinationHeight as int, source as bytes, sourceWidth as int, sourceHeight as int, viewportX as int, viewportY as int, factor as int) from "./libminipixels_audio.so" returns i32
+extern function mpPixelsScaleIntegerBgra(destination as bytes, destinationWidth as int, destinationHeight as int, source as bytes, sourceWidth as int, sourceHeight as int, viewportX as int, viewportY as int, factor as int) from "$ORIGIN/libminipixels_audio.so" returns i32
 ```
 
 | Parameter | Type | Default | Description |
@@ -452,11 +452,11 @@ extern function mpPixelsScaleIntegerBgra(destination as bytes, destinationWidth 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/platform/linux.ml#L14)
 
-<a id="extern_function-extern-function-minipixels-platform-linux-mppixelsscalenearestbgra-extern-function-mppixelsscalenearestbgra-destination-as-bytes-destinationwidth-as-int-destinationheight-as-int-source-as-bytes-sourcewidth-as-int-sourceheight-as-int-viewportx-as-int-viewporty-as-int-viewportwidth-as-int-viewportheight-as-int-from-libminipixels-audio-so-returns-i32-src-minipixels-platform-linux-ml-390237396"></a>
+<a id="extern_function-extern-function-minipixels-platform-linux-mppixelsscalenearestbgra-extern-function-mppixelsscalenearestbgra-destination-as-bytes-destinationwidth-as-int-destinationheight-as-int-source-as-bytes-sourcewidth-as-int-sourceheight-as-int-viewportx-as-int-viewporty-as-int-viewportwidth-as-int-viewportheight-as-int-from-origin-libminipixels-audio-so-returns-i32-src-minipixels-platform-linux-ml-886265412"></a>
 ### mpPixelsScaleNearestBgra
 
 ```ml
-extern function mpPixelsScaleNearestBgra(destination as bytes, destinationWidth as int, destinationHeight as int, source as bytes, sourceWidth as int, sourceHeight as int, viewportX as int, viewportY as int, viewportWidth as int, viewportHeight as int) from "./libminipixels_audio.so" returns i32
+extern function mpPixelsScaleNearestBgra(destination as bytes, destinationWidth as int, destinationHeight as int, source as bytes, sourceWidth as int, sourceHeight as int, viewportX as int, viewportY as int, viewportWidth as int, viewportHeight as int) from "$ORIGIN/libminipixels_audio.so" returns i32
 ```
 
 | Parameter | Type | Default | Description |

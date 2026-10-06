@@ -61,7 +61,7 @@ def wsl_path(path: Path) -> str:
     return f"/mnt/{drive}{tail}"
 
 
-def executable_command(exe: Path, target: str, args: list[str] | None = None) -> list[str]:
+def executable_command(exe: Path, target: str, args: list[str] | None = None, cwd: Path = ROOT) -> list[str]:
     extra = list(args or [])
     if target == "linux-x64" and os.name == "nt":
         return [
@@ -69,7 +69,7 @@ def executable_command(exe: Path, target: str, args: list[str] | None = None) ->
             "-d",
             os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"),
             "--cd",
-            wsl_path(ROOT),
+            wsl_path(cwd),
             "--",
             wsl_path(exe),
             *extra,
@@ -77,9 +77,9 @@ def executable_command(exe: Path, target: str, args: list[str] | None = None) ->
     return [str(exe), *extra]
 
 
-def run_test_executable(exe: Path, target: str, args: list[str] | None = None) -> None:
-    cmd = executable_command(exe, target, args)
-    result = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True)
+def run_test_executable(exe: Path, target: str, args: list[str] | None = None, cwd: Path = ROOT) -> None:
+    cmd = executable_command(exe, target, args, cwd)
+    result = subprocess.run(cmd, cwd=str(cwd), text=True, capture_output=True, timeout=120)
     if result.stdout:
         print(result.stdout, end="")
     if result.stderr:
@@ -289,11 +289,23 @@ def create_protected_asset_fixture() -> Path:
     project_file.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     (source / "main.ml").write_text("function main(args) return 0 end function\n", encoding="utf-8")
     generated = project / "build" / "generated" / "generated"
-    mod.generate(project_file, generated)
+    protected_results = []
+    original_protect = mod.protect_pack
+
+    def capture_protected(*args):
+        result = original_protect(*args)
+        protected_results.append(result)
+        return result
+
+    with mock.patch.object(mod, "protect_pack", side_effect=capture_protected):
+        mod.generate(project_file, generated)
     pack = project / "build" / "assets.mpx"
     data = pack.read_bytes()
     assert data.startswith(b"MPX3"), data[:4]
-    assert data[4] == 5, data[4]
+    assert data[4] == 6, data[4]
+    from security_forgery import forge_stream
+    (project / "build/assets-forged-stream.mpx").write_bytes(forge_stream(protected_results[0], "music"))
+    (project / "build/assets-forged-block.mpx").write_bytes(forge_stream(protected_results[0], "world"))
     assert b"menu.start" not in data and b"world" not in data and b"MPT1" not in data
     tampered = bytearray(data)
     tampered[80] ^= 1
@@ -307,6 +319,8 @@ def create_protected_asset_fixture() -> Path:
     previous_version = bytearray(data)
     previous_version[4] = 4
     (project / "build" / "assets-version4.mpx").write_bytes(previous_version)
+    previous_version[4] = 5
+    (project / "build" / "assets-version5.mpx").write_bytes(previous_version)
     old_container = bytearray(data)
     old_container[:4] = b"MPX2"
     (project / "build" / "assets-mpx2.mpx").write_bytes(old_container)
@@ -317,6 +331,7 @@ def create_protected_asset_fixture() -> Path:
 
 def run_python_tests() -> None:
     subprocess.run([sys.executable, str(ROOT / "tests/steam_tools_tests.py")], check=True)
+    subprocess.run([sys.executable, str(ROOT / "tests/asset_security_tests.py")], check=True)
     from example_art_tests import test_example_art
     test_example_art()
     spec = importlib.util.spec_from_file_location("minipixels_cli", ROOT / "tools" / "minipixels.py")
@@ -550,7 +565,7 @@ def run_python_tests() -> None:
             protected_name_size = struct.unpack_from("<H", protected_index, protected_position)[0]
             protected_position += 2 + protected_name_size + 2
             protected_offsets.append(struct.unpack_from("<Q", protected_index, protected_position)[0])
-            protected_position += 24 + 28
+            protected_position += 24 + 28 + 32
         assert protected_offsets[0] == protected_offsets[1], protected_offsets
 
         frames = 22050
@@ -648,6 +663,11 @@ def run_generated_smoke(compiler: Path, target: str) -> None:
                 "import std.assert as a",
                 "",
                 "function main(args)",
+                "  if len(args) > 0 and args[0] == \"--reject-pack\" then",
+                "    invalid = try(gen.assetPack())",
+                "    a.assertTrue(typeof(invalid) == \"error\", \"invalid installed pack never falls back to project pack\")",
+                "    return 0",
+                "  end if",
                 "  reg = gen.registry()",
                 "  spr = reg.getSprite(\"player\")",
                 "  a.assertEq(spr.width, 256, \"generated sprite uses packed PNG width\")",
@@ -666,7 +686,9 @@ def run_generated_smoke(compiler: Path, target: str) -> None:
         ),
         encoding="utf-8",
     )
-    exe = output_path("generated_smoke", target)
+    exe = generated_root / output_path("generated_smoke", target).name
+    shutil.copy2(ROOT / "examples/jump-and-run/build/assets.mpx", exe.parent / "assets.mpx")
+    ensure_audio_runtime(target, exe.parent)
     cmd = [
         sys.executable,
         str(compiler),
@@ -712,7 +734,9 @@ def run_generated_smoke(compiler: Path, target: str) -> None:
         ),
         encoding="utf-8",
     )
-    procedural_exe = output_path("generated_procedural_smoke", target)
+    procedural_exe = procedural_root / output_path("generated_procedural_smoke", target).name
+    shutil.copy2(ROOT / "tests/fixtures/build/assets.mpx", procedural_exe.parent / "assets.mpx")
+    ensure_audio_runtime(target, procedural_exe.parent)
     cmd = [
         sys.executable,
         str(compiler),
@@ -731,6 +755,20 @@ def run_generated_smoke(compiler: Path, target: str) -> None:
     subprocess.check_call(cmd, cwd=str(ROOT))
     print("run:", procedural_exe)
     run_test_executable(procedural_exe, target)
+    # WSL may retain a Windows directory handle briefly after process exit.
+    # Keep this generated fixture under build, like the compiled smoke outputs.
+    foreign = ROOT / "build/tests/foreign-cwd"
+    foreign.mkdir(parents=True, exist_ok=True)
+    (foreign / "assets.mpx").write_bytes(b"wrong working-directory pack")
+    run_test_executable(exe, target, cwd=foreign)
+    run_test_executable(procedural_exe, target, cwd=foreign)
+    installed = exe.parent / "assets.mpx"
+    valid_pack = installed.read_bytes()
+    try:
+        installed.write_bytes(b"invalid installed pack")
+        run_test_executable(exe, target, ["--reject-pack"])
+    finally:
+        installed.write_bytes(valid_pack)
 
 
 def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> None:
@@ -782,6 +820,11 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
                 "  a.assertEq(balance.ENEMIES_SLIME_HEALTH, 3, \"compiled nested constant\")",
                 "  values = balance.data()",
                 "  a.assertEq(values.get(\"waves\")[2], 8, \"compiled structured constants\")",
+                "  if len(args) > 0 and args[0] == \"--foreign-cwd\" then",
+                "    mp.closeAssetPack(pack)",
+                "    print \"PROTECTED_FOREIGN_CWD_OK\"",
+                "    return 0",
+                "  end if",
                 "  wrong = security.aesKey()",
                 "  wrong[0] = wrong[0] ^ 1",
                 "  rejectedKey = try(mp.openProtectedAssetPack(\"build/assets.mpx\", wrong, security.publicKey(), security.keyId()))",
@@ -793,6 +836,21 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
                 "  rejectedPayload = try(mp.loadBytesFromPack(lazyTamper, \"world\"))",
                 "  a.assertTrue(typeof(rejectedPayload) == \"error\", \"tampered payload rejected on first access\")",
                 "  mp.closeAssetPack(lazyTamper)",
+                "  forged = mp.openProtectedAssetPack(\"build/assets-forged-stream.mpx\", security.aesKey(), security.publicKey(), security.keyId())",
+                "  rejectedStream = try(mp.loadBytesFromPack(forged, \"music\"))",
+                "  a.assertTrue(typeof(rejectedStream) == \"error\", \"valid AES forgery rejected by signed chunk table\")",
+                "  rejectedPreload = try(mp.preloadAssetPackSlots(forged, [mp.assetSlotFromPack(forged, \"music\")], 65536))",
+                "  a.assertTrue(typeof(rejectedPreload) == \"error\", \"preload rejects valid AES stream forgery\")",
+                "  mp.closeAssetPack(forged)",
+                "  forgedBlock = mp.openProtectedAssetPack(\"build/assets-forged-block.mpx\", security.aesKey(), security.publicKey(), security.keyId())",
+                "  rejectedBlock = try(mp.loadBytesFromPack(forgedBlock, \"world\"))",
+                "  a.assertTrue(typeof(rejectedBlock) == \"error\", \"same-tag ordinary payload forgery rejected\")",
+                "  a.assertEq(rejectedBlock.message, \"MPX3 payload signature binding failed\", \"signed SHA-256 rejects before decode\")",
+                "  rejectedBlockPreload = try(mp.preloadAssetPackSlots(forgedBlock, [mp.assetSlotFromPack(forgedBlock, \"world\")], 65536))",
+                "  a.assertTrue(typeof(rejectedBlockPreload) == \"error\", \"preload rejects same-tag ordinary forgery\")",
+                "  mp.closeAssetPack(forgedBlock)",
+                "  rejectedV5 = try(mp.openProtectedAssetPack(\"build/assets-version5.mpx\", security.aesKey(), security.publicKey(), security.keyId()))",
+                "  a.assertTrue(typeof(rejectedV5) == \"error\", \"unsigned-chunk version 5 rejected\")",
                 "  rejectedV3 = try(mp.openProtectedAssetPack(\"build/assets-version3.mpx\", security.aesKey(), security.publicKey(), security.keyId()))",
                 "  a.assertTrue(typeof(rejectedV3) == \"error\", \"MPX3 version 3 rejected\")",
                 "  rejectedV4 = try(mp.openProtectedAssetPack(\"build/assets-version4.mpx\", security.aesKey(), security.publicKey(), security.keyId()))",
@@ -807,7 +865,9 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
         ),
         encoding="utf-8",
     )
-    exe = output_path("protected_asset_smoke", target)
+    exe = project / "build" / output_path("protected_asset_smoke", target).name
+    ensure_audio_runtime(target, exe.parent)
+    ensure_media_runtime(compiler.parent, target, exe.parent)
     cmd = [
         sys.executable,
         str(compiler),
@@ -843,6 +903,10 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
         print(result.stderr, end="", file=sys.stderr)
     if result.returncode != 0 or "[FAIL]" in result.stdout:
         raise RuntimeError(f"protected asset smoke failed ({target})")
+    foreign = ROOT / "build/tests/foreign-cwd"
+    foreign.mkdir(parents=True, exist_ok=True)
+    (foreign / "assets.mpx").write_bytes(b"wrong working-directory pack")
+    run_test_executable(exe, target, ["--foreign-cwd"], cwd=foreign)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -859,9 +923,9 @@ def main(argv: list[str] | None = None) -> int:
     from steam_runtime_tests import run as run_steam_runtime_tests
     run_steam_runtime_tests(compiler, target)
     test_media_range_runtime(runtime, target)
-    root_runtime = ROOT / runtime.name
-    if root_runtime.resolve() != runtime.resolve():
-        shutil.copy2(runtime, root_runtime)
+    if target == "linux-x64":
+        from alsa_mixer_tests import run as run_alsa_tests
+        run_alsa_tests(compiler)
     compiler_root = ROOT.parent / "MiniLangCompilerPy"
     ensure_media_runtime(compiler_root, target, build)
     create_asset_pack_fixture()

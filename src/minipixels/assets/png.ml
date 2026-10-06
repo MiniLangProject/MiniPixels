@@ -14,7 +14,7 @@ import minipixels.graphics.sprite as sp
 extern function mpAssetInflateZlib(destination as bytes, destinationSize as u64, source as bytes, sourceOffset as u64, sourceSize as u64) from "minipixels_audio.dll" returns i32
 #else
 /// @internal
-extern function mpAssetInflateZlib(destination as bytes, destinationSize as u64, source as bytes, sourceOffset as u64, sourceSize as u64) from "./libminipixels_audio.so" returns i32
+extern function mpAssetInflateZlib(destination as bytes, destinationSize as u64, source as bytes, sourceOffset as u64, sourceSize as u64) from "$ORIGIN/libminipixels_audio.so" returns i32
 #endif
 
 /// PNG decoding error code.

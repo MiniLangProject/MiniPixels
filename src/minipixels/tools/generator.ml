@@ -564,6 +564,7 @@ function assetsHeader(root, fallbackPackPath)
   code.appendLine("")
   code.appendLine("import minipixels as mp")
   code.appendLine("import minipixels.assets.assets as assets")
+  code.appendLine("import std.fs as fs")
   hasMedia = false
   if len(sourceAssets) > 0 then
     for i = 0 to len(sourceAssets) - 1
@@ -577,9 +578,9 @@ function assetsHeader(root, fallbackPackPath)
   code.appendLine("function assetPack()")
   code.appendLine("  global assetPackCache")
   code.appendLine("  if assetPackCache == void then")
-  code.appendLine("    opened = try(mp.openAssetPack(\"assets.mpx\"))")
-  code.appendLine("    if typeof(opened) == \"error\" then opened = try(mp.openAssetPack(\"build/assets.mpx\")) end if")
-  code.appendLine("    if typeof(opened) == \"error\" then opened = mp.openAssetPack(" + quotePath(fallbackPackPath) + ") end if")
+  code.appendLine("    packPath = mp.defaultAssetPackPath()")
+  code.appendLine("    if not fs.exists(packPath) then packPath = " + quotePath(fallbackPackPath) + " end if")
+  code.appendLine("    opened = mp.openAssetPack(packPath)")
   if mode == "resident" then
     residentSlots = ""
     if len(sourceAssets) > 0 then

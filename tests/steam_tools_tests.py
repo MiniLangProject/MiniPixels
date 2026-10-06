@@ -13,6 +13,17 @@ import package_sdk
 
 
 class SteamToolsTests(unittest.TestCase):
+    def test_build_output_never_deletes_source_audio(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            audio = root / "assets/audio"
+            audio.mkdir(parents=True)
+            original = audio / "original.wav"
+            original.write_bytes(b"irreplaceable source fixture")
+            data = {"assets": [{"type": "audio", "path": "assets/audio/original.wav"}]}
+            cli.copy_runtime_assets(data, root, root / "game.exe")
+            self.assertEqual(original.read_bytes(), b"irreplaceable source fixture")
+
     def test_configuration(self):
         self.assertFalse(steam.settings({})["enabled"])
         self.assertFalse(steam.settings({"steam": {"enabled": True, "appId": 480}})["restartThroughSteam"])
@@ -28,7 +39,7 @@ class SteamToolsTests(unittest.TestCase):
             root = Path(temp)
             build = root / "build"
             build.mkdir()
-            names = ["game.exe", "assets.mpx", "minipixels_audio.dll", "minipixels_steam.dll", "steam_api64.dll", "minilang_video.dll"]
+            names = ["game.exe", "assets.mpx", "minipixels_audio.dll", "minipixels_steam.dll", "steam_api64.dll", "minilang_video.dll", "minipixels_gpu.dll"]
             for name in names + ["steam_appid.txt", "secret.pem", "main.ml", "junk.dll"]:
                 (build / name).write_bytes(b"test")
             (build / "steam-build.json").write_text(json.dumps({"stub": False, "target": "windows-x64"}))

@@ -1,7 +1,29 @@
 import minipixels.assets.pack as packs
 import std.assert as a
 
+struct OffsetFixture
+  offsets
+end struct
+
 function main(args)
+  offsets = array(8193, 0)
+  reversed = array(8193, 0)
+  for i = 0 to 8192
+    offsets[i] = i * 16
+    reversed[i] = 8192 - i
+  end for
+  fixture = OffsetFixture(offsets)
+  packs._sortSlotsByOffset(fixture, reversed, len(reversed))
+  sorted = true
+  for i = 0 to 8192
+    if reversed[i] != i then sorted = false end if
+  end for
+  a.assertTrue(sorted, "large reversed preload order sorts correctly")
+  packs._sortSlotsByOffset(fixture, reversed, 1)
+  packs._sortSlotsByOffset(fixture, [], 0)
+  tied = [2, 0, 1]
+  packs._sortSlotsByOffset(OffsetFixture([7, 7, 7]), tied, 3)
+  a.assertEq(tied, [2, 0, 1], "equal offsets retain stable order")
   pack = packs.open("build/tests/preload.mpx")
   a.assertTrue(typeof(pack) != "error", "preload regression pack opens")
   first = packs.find(pack, "a")

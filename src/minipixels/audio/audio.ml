@@ -89,13 +89,13 @@ extern function waveOutReset(handle as ptr) from "winmm.dll" returns u32
 extern function waveOutClose(handle as ptr) from "winmm.dll" returns u32
 #else
 /// Opens an in-memory MP3 decoder retained by the native audio bridge.
-extern function mpAudioMp3Open(data as bytes, size as u64) from "./libminipixels_audio.so" returns ptr
-extern function mpAudioMp3Channels(handle as ptr) from "./libminipixels_audio.so" returns i32
-extern function mpAudioMp3SampleRate(handle as ptr) from "./libminipixels_audio.so" returns i32
-extern function mpAudioMp3FrameCount(handle as ptr) from "./libminipixels_audio.so" returns u64
-extern function mpAudioMp3Read(handle as ptr, output as bytes, frames as u64) from "./libminipixels_audio.so" returns u64
-extern function mpAudioMp3Seek(handle as ptr, frame as u64) from "./libminipixels_audio.so" returns i32
-extern function mpAudioMp3Close(handle as ptr) from "./libminipixels_audio.so" returns void
+extern function mpAudioMp3Open(data as bytes, size as u64) from "$ORIGIN/libminipixels_audio.so" returns ptr
+extern function mpAudioMp3Channels(handle as ptr) from "$ORIGIN/libminipixels_audio.so" returns i32
+extern function mpAudioMp3SampleRate(handle as ptr) from "$ORIGIN/libminipixels_audio.so" returns i32
+extern function mpAudioMp3FrameCount(handle as ptr) from "$ORIGIN/libminipixels_audio.so" returns u64
+extern function mpAudioMp3Read(handle as ptr, output as bytes, frames as u64) from "$ORIGIN/libminipixels_audio.so" returns u64
+extern function mpAudioMp3Seek(handle as ptr, frame as u64) from "$ORIGIN/libminipixels_audio.so" returns i32
+extern function mpAudioMp3Close(handle as ptr) from "$ORIGIN/libminipixels_audio.so" returns void
 /// Opens an ALSA PCM stream.
 extern function snd_pcm_open(handle as bytes, name as cstr, stream as int, mode as int) from "libasound.so.2" returns i32
 /// Configures a simple interleaved PCM stream.
@@ -325,6 +325,10 @@ struct AudioMixer
   ready
   /// Last native audio error code.
   lastError
+  /// Unwritten ALSA frames retained after a partial/non-blocking write.
+  pendingFrames
+  /// First unwritten frame in the retained ALSA buffer.
+  pendingOffset
 
   /// Sets master volume for subsequently mixed samples.
   /// @param value Percentage from 0 through 100.
@@ -469,7 +473,7 @@ function mixer(maxChannels)
   return AudioMixer(
     create(), channels, maxChannels, 0, void, channel(-1), MIXER_SAMPLE_RATE,
     0, bytes(8, 0), bytes(18, 0), array(MIXER_BUFFER_COUNT), array(MIXER_BUFFER_COUNT),
-    frames, MIXER_BUFFER_COUNT, array(frames, 0), array(frames, 0), false, 0
+    frames, MIXER_BUFFER_COUNT, array(frames, 0), array(frames, 0), false, 0, 0, 0
   )
 end function
 
@@ -1130,16 +1134,35 @@ function updateMixer(value)
     end if
     available = snd_pcm_avail_update(value.handle)
   end if
-  if available < value.bufferFrames then return false end if
-  output = value.buffers[0]
-  mixBuffer(value, output)
-  written = snd_pcm_writei(value.handle, nativeBytesPtr(output), value.bufferFrames)
-  if written < 0 then
-    result = snd_pcm_recover(value.handle, written, 1)
-    if result < 0 then value.lastError = result end if
-    return false
-  end if
-  return written > 0
+  wrote = false
+  // Fill the device's available capacity, but bound work per game frame.
+  // Three periods cover the configured 50 ms queue, including 30 FPS games.
+  attempts = 0
+  while available > 0 and attempts < value.bufferCount * 2
+    if value.pendingFrames == 0 then
+      if available < value.bufferFrames then break end if
+      mixBuffer(value, value.buffers[0])
+      value.pendingFrames = value.bufferFrames
+      value.pendingOffset = 0
+    end if
+    count = value.pendingFrames
+    if count > available then count = available end if
+    pointer = nativeBytesPtr(value.buffers[0]) + value.pendingOffset * 4
+    written = snd_pcm_writei(value.handle, pointer, count)
+    attempts = attempts + 1
+    if written == 0 or written == -11 then break end if
+    if written < 0 then
+      result = snd_pcm_recover(value.handle, written, 1)
+      if result < 0 then value.lastError = result end if
+      // Keep the unsent PCM; recovery/EAGAIN must not advance voices again.
+      break
+    end if
+    value.pendingFrames = value.pendingFrames - written
+    value.pendingOffset = value.pendingOffset + written
+    available = available - written
+    wrote = true
+  end while
+  return wrote
 #endif
 end function
 
@@ -1152,6 +1175,8 @@ end function
 /// Stops every mixer voice and replaces queued output with silence.
 /// @param value Mixer to stop.
 function mixerStopAll(value)
+  value.pendingFrames = 0
+  value.pendingOffset = 0
   for index = 0 to value.channelCount - 1
     voice = closeVoiceDecoder(value.channels[index])
     voice.playing = false
@@ -1206,6 +1231,8 @@ end function
 /// @param value Mixer to close.
 function closeMixer(value)
   if value is not AudioMixer then return true end if
+  value.pendingFrames = 0
+  value.pendingOffset = 0
   for index = 0 to value.channelCount - 1
     value.channels[index] = closeVoiceDecoder(value.channels[index])
   end for

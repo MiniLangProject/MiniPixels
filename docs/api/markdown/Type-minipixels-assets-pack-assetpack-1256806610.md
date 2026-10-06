@@ -12,7 +12,7 @@ struct AssetPack
 Represents the asset pack data used by the minipixels assets pack module.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L38)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L43)
 
 ## Members
 
@@ -26,7 +26,7 @@ bulkReads
 Number of contiguous reads issued by bulk preloading.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L96)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L101)
 
 <a id="field-field-minipixels-assets-pack-assetpack-cachedpayloadbytes-cachedpayloadbytes-src-minipixels-assets-pack-ml-1289388372"></a>
 ### cachedPayloadBytes
@@ -38,7 +38,7 @@ cachedPayloadBytes
 Bytes currently retained by the payload cache.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L90)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L95)
 
 <a id="field-field-minipixels-assets-pack-assetpack-codecs-codecs-src-minipixels-assets-pack-ml-867224620"></a>
 ### codecs
@@ -50,7 +50,7 @@ codecs
 Per-entry container compression codec.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L56)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L61)
 
 <a id="field-field-minipixels-assets-pack-assetpack-count-count-src-minipixels-assets-pack-ml-1711272198"></a>
 ### count
@@ -62,7 +62,7 @@ count
 Stores the count value associated with asset pack.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L70)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L75)
 
 <a id="field-field-minipixels-assets-pack-assetpack-data-data-src-minipixels-assets-pack-ml-37947814"></a>
 ### data
@@ -74,7 +74,7 @@ data
 Stores the data value associated with asset pack.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L42)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L47)
 
 <a id="field-field-minipixels-assets-pack-assetpack-decodedbytes-decodedbytes-src-minipixels-assets-pack-ml-1983905400"></a>
 ### decodedBytes
@@ -86,7 +86,7 @@ decodedBytes
 Logical payload bytes materialized by cache misses.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L94)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L99)
 
 <a id="field-field-minipixels-assets-pack-assetpack-file-file-src-minipixels-assets-pack-ml-865025314"></a>
 ### file
@@ -98,7 +98,7 @@ file
 Open random-access file handle used by MPX3 packs.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L44)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L49)
 
 <a id="field-field-minipixels-assets-pack-assetpack-filebacked-filebacked-src-minipixels-assets-pack-ml-1456381014"></a>
 ### fileBacked
@@ -110,7 +110,7 @@ fileBacked
 Whether payload bytes remain in the source file until first access.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L46)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L51)
 
 <a id="field-field-minipixels-assets-pack-assetpack-imagecache-imagecache-src-minipixels-assets-pack-ml-1457634964"></a>
 ### imageCache
@@ -122,7 +122,7 @@ imageCache
 Cache of decoded image objects.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L78)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L83)
 
 <a id="field-field-minipixels-assets-pack-assetpack-imagehits-imagehits-src-minipixels-assets-pack-ml-1142138722"></a>
 ### imageHits
@@ -134,7 +134,7 @@ imageHits
 Number of decoded-image cache hits.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L86)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L91)
 
 <a id="field-field-minipixels-assets-pack-assetpack-imageloaded-imageloaded-src-minipixels-assets-pack-ml-2035815170"></a>
 ### imageLoaded
@@ -146,7 +146,7 @@ imageLoaded
 Whether each image slot currently contains a decoded image.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L80)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L85)
 
 <a id="field-field-minipixels-assets-pack-assetpack-imagemisses-imagemisses-src-minipixels-assets-pack-ml-490197346"></a>
 ### imageMisses
@@ -158,7 +158,7 @@ imageMisses
 Number of image decodes.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L88)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L93)
 
 <a id="field-field-minipixels-assets-pack-assetpack-index-index-src-minipixels-assets-pack-ml-1521197782"></a>
 ### index
@@ -170,7 +170,7 @@ index
 Hash index mapping names to entry slots.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L72)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L77)
 
 <a id="field-field-minipixels-assets-pack-assetpack-key-key-src-minipixels-assets-pack-ml-1495975894"></a>
 ### key
@@ -182,7 +182,7 @@ key
 AES key retained only while a lazy MPX3 pack is open.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L50)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L55)
 
 <a id="field-field-minipixels-assets-pack-assetpack-kinds-kinds-src-minipixels-assets-pack-ml-1471208638"></a>
 ### kinds
@@ -194,7 +194,7 @@ kinds
 Stores the kinds value associated with asset pack.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L54)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L59)
 
 <a id="field-field-minipixels-assets-pack-assetpack-names-names-src-minipixels-assets-pack-ml-979745314"></a>
 ### names
@@ -206,7 +206,7 @@ names
 Stores the names value associated with asset pack.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L52)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L57)
 
 <a id="field-field-minipixels-assets-pack-assetpack-nonces-nonces-src-minipixels-assets-pack-ml-600697530"></a>
 ### nonces
@@ -218,7 +218,7 @@ nonces
 Per-entry AES-GCM nonces for MPX3 payload blocks.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L64)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L69)
 
 <a id="field-field-minipixels-assets-pack-assetpack-offsets-offsets-src-minipixels-assets-pack-ml-2049450334"></a>
 ### offsets
@@ -230,7 +230,7 @@ offsets
 Stores the offsets value associated with asset pack.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L58)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L63)
 
 <a id="field-field-minipixels-assets-pack-assetpack-owners-owners-src-minipixels-assets-pack-ml-257164018"></a>
 ### owners
@@ -242,7 +242,7 @@ owners
 Canonical slot for entries that share one identical stored block.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L68)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L73)
 
 <a id="field-field-minipixels-assets-pack-assetpack-path-path-src-minipixels-assets-pack-ml-2058340300"></a>
 ### path
@@ -254,7 +254,7 @@ path
 Stores the path value associated with asset pack.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L40)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L45)
 
 <a id="field-field-minipixels-assets-pack-assetpack-payloadcache-payloadcache-src-minipixels-assets-pack-ml-724104538"></a>
 ### payloadCache
@@ -266,7 +266,7 @@ payloadCache
 Cache of sliced payload byte buffers.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L74)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L79)
 
 <a id="field-field-minipixels-assets-pack-assetpack-payloadhits-payloadhits-src-minipixels-assets-pack-ml-1809310778"></a>
 ### payloadHits
@@ -278,7 +278,7 @@ payloadHits
 Number of payload-cache hits.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L82)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L87)
 
 <a id="field-field-minipixels-assets-pack-assetpack-payloadloaded-payloadloaded-src-minipixels-assets-pack-ml-2045872526"></a>
 ### payloadLoaded
@@ -290,7 +290,7 @@ payloadLoaded
 Whether each payload slot currently contains cached bytes.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L76)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L81)
 
 <a id="field-field-minipixels-assets-pack-assetpack-payloadmisses-payloadmisses-src-minipixels-assets-pack-ml-832515282"></a>
 ### payloadMisses
@@ -302,7 +302,7 @@ payloadMisses
 Number of payload reads or slices.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L84)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L89)
 
 <a id="field-field-minipixels-assets-pack-assetpack-protected-protected-src-minipixels-assets-pack-ml-106347898"></a>
 ### protected
@@ -314,7 +314,7 @@ protected
 Whether payloads are independently encrypted MPX3 blocks.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L48)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L53)
 
 <a id="field-field-minipixels-assets-pack-assetpack-sizes-sizes-src-minipixels-assets-pack-ml-2075833842"></a>
 ### sizes
@@ -326,7 +326,7 @@ sizes
 Logical payload sizes where available.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L60)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L65)
 
 <a id="field-field-minipixels-assets-pack-assetpack-storedbytesread-storedbytesread-src-minipixels-assets-pack-ml-1212362522"></a>
 ### storedBytesRead
@@ -338,7 +338,7 @@ storedBytesRead
 Stored payload bytes read from the backing file.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L92)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L97)
 
 <a id="field-field-minipixels-assets-pack-assetpack-storedsizes-storedsizes-src-minipixels-assets-pack-ml-1202092842"></a>
 ### storedSizes
@@ -350,7 +350,7 @@ storedSizes
 Number of bytes stored in the backing file for each entry.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L62)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L67)
 
 <a id="field-field-minipixels-assets-pack-assetpack-tags-tags-src-minipixels-assets-pack-ml-1553807592"></a>
 ### tags
@@ -359,7 +359,7 @@ Number of bytes stored in the backing file for each entry.
 tags
 ```
 
-Per-entry AES-GCM authentication tags for MPX3 payload blocks.
+Ordinary GCM tag plus SHA-256 digest, or a table of signed chunk digests.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L66)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L71)

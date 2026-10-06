@@ -9,11 +9,11 @@ import minipixels.math.types as mt
 import minipixels.input.input as inp
 
 /// @internal
-extern function mpPixelsRgbaToBgra(destination as bytes, destinationOffset as u64, source as bytes, sourceOffset as u64, pixelCount as int) from "./libminipixels_audio.so" returns void
+extern function mpPixelsRgbaToBgra(destination as bytes, destinationOffset as u64, source as bytes, sourceOffset as u64, pixelCount as int) from "$ORIGIN/libminipixels_audio.so" returns void
 /// @internal
-extern function mpPixelsScaleIntegerBgra(destination as bytes, destinationWidth as int, destinationHeight as int, source as bytes, sourceWidth as int, sourceHeight as int, viewportX as int, viewportY as int, factor as int) from "./libminipixels_audio.so" returns i32
+extern function mpPixelsScaleIntegerBgra(destination as bytes, destinationWidth as int, destinationHeight as int, source as bytes, sourceWidth as int, sourceHeight as int, viewportX as int, viewportY as int, factor as int) from "$ORIGIN/libminipixels_audio.so" returns i32
 /// @internal
-extern function mpPixelsScaleNearestBgra(destination as bytes, destinationWidth as int, destinationHeight as int, source as bytes, sourceWidth as int, sourceHeight as int, viewportX as int, viewportY as int, viewportWidth as int, viewportHeight as int) from "./libminipixels_audio.so" returns i32
+extern function mpPixelsScaleNearestBgra(destination as bytes, destinationWidth as int, destinationHeight as int, source as bytes, sourceWidth as int, sourceHeight as int, viewportX as int, viewportY as int, viewportWidth as int, viewportHeight as int) from "$ORIGIN/libminipixels_audio.so" returns i32
 
 /// @internal
 extern function XOpenDisplay(name as ptr) from "libX11.so.6" returns ptr

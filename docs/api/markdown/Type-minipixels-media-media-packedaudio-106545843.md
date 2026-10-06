@@ -12,7 +12,7 @@ struct PackedAudio
 Audio player whose encoded bytes remain inside its MPX file.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L84)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L88)
 
 ## Members
 
@@ -26,7 +26,7 @@ function close()
 Closes the player before releasing its MPX range source.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L122)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L126)
 
 <a id="field-field-minipixels-media-media-packedaudio-closed-closed-src-minipixels-media-media-ml-17206723"></a>
 ### closed
@@ -36,7 +36,7 @@ closed
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L87)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L91)
 
 <a id="method-method-minipixels-media-media-packedaudio-duration-function-duration-src-minipixels-media-media-ml-1326806933"></a>
 ### duration
@@ -48,7 +48,7 @@ function duration()
 Returns the media duration.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L101)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L105)
 
 <a id="method-method-minipixels-media-media-packedaudio-hasaudio-function-hasaudio-src-minipixels-media-media-ml-439836221"></a>
 ### hasAudio
@@ -60,7 +60,7 @@ function hasAudio()
 Returns whether the media exposes an audio track.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L105)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L109)
 
 <a id="method-method-minipixels-media-media-packedaudio-pause-function-pause-src-minipixels-media-media-ml-1605000957"></a>
 ### pause
@@ -72,7 +72,7 @@ function pause()
 Pauses playback.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L92)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L96)
 
 <a id="method-method-minipixels-media-media-packedaudio-play-function-play-src-minipixels-media-media-ml-443831549"></a>
 ### play
@@ -84,7 +84,7 @@ function play()
 Starts or resumes playback.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L90)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L94)
 
 <a id="field-field-minipixels-media-media-packedaudio-player-player-src-minipixels-media-media-ml-1410445717"></a>
 ### player
@@ -94,7 +94,7 @@ player
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L86)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L90)
 
 <a id="method-method-minipixels-media-media-packedaudio-pollevent-function-pollevent-src-minipixels-media-media-ml-240631491"></a>
 ### pollEvent
@@ -106,7 +106,7 @@ function pollEvent()
 Returns the next queued media event.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L119)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L123)
 
 <a id="method-method-minipixels-media-media-packedaudio-position-function-position-src-minipixels-media-media-ml-1594558425"></a>
 ### position
@@ -118,7 +118,7 @@ function position()
 Returns the current playback timestamp.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L99)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L103)
 
 <a id="method-method-minipixels-media-media-packedaudio-seek-function-seek-milliseconds-src-minipixels-media-media-ml-1954995491"></a>
 ### seek
@@ -134,7 +134,7 @@ Seeks to a media timestamp.
 | `milliseconds` | `dynamic` | — | Target timestamp in milliseconds. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L97)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L101)
 
 <a id="method-method-minipixels-media-media-packedaudio-setloop-function-setloop-enabled-src-minipixels-media-media-ml-97114894"></a>
 ### setLoop
@@ -150,7 +150,7 @@ Enables or disables looping.
 | `enabled` | `dynamic` | — | True to loop playback. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L117)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L121)
 
 <a id="method-method-minipixels-media-media-packedaudio-setmuted-function-setmuted-muted-src-minipixels-media-media-ml-1176508216"></a>
 ### setMuted
@@ -166,7 +166,7 @@ Enables or disables muting.
 | `muted` | `dynamic` | — | True to mute playback. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L111)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L115)
 
 <a id="method-method-minipixels-media-media-packedaudio-setplaybackrate-function-setplaybackrate-rate-src-minipixels-media-media-ml-1965883301"></a>
 ### setPlaybackRate
@@ -182,7 +182,7 @@ Sets the playback speed multiplier.
 | `rate` | `dynamic` | — | Playback speed accepted by `std.audio`. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L114)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L118)
 
 <a id="method-method-minipixels-media-media-packedaudio-setvolume-function-setvolume-volume-src-minipixels-media-media-ml-777929739"></a>
 ### setVolume
@@ -198,7 +198,7 @@ Sets playback volume.
 | `volume` | `dynamic` | — | Volume accepted by `std.audio`. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L108)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L112)
 
 <a id="field-field-minipixels-media-media-packedaudio-source-source-src-minipixels-media-media-ml-2104026313"></a>
 ### source
@@ -208,7 +208,7 @@ source
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L85)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L89)
 
 <a id="method-method-minipixels-media-media-packedaudio-state-function-state-src-minipixels-media-media-ml-455829007"></a>
 ### state
@@ -220,7 +220,7 @@ function state()
 Returns the current player state.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L103)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L107)
 
 <a id="method-method-minipixels-media-media-packedaudio-stop-function-stop-src-minipixels-media-media-ml-2037000945"></a>
 ### stop
@@ -232,4 +232,4 @@ function stop()
 Stops playback and rewinds the player.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L94)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L98)

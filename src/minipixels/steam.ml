@@ -13,7 +13,7 @@ import generated.steam_config as generatedSteam
 #if TARGET_OS == "windows"
 extern function nativeCall(op as i32, text as cstr, value as i64, output as bytes, capacity as i32) from "minipixels_steam.dll" symbol "mpSteamCall" returns i64
 #else
-extern function nativeCall(op as i32, text as cstr, value as i64, output as bytes, capacity as i32) from "./libminipixels_steam.so" symbol "mpSteamCall" returns i64
+extern function nativeCall(op as i32, text as cstr, value as i64, output as bytes, capacity as i32) from "$ORIGIN/libminipixels_steam.so" symbol "mpSteamCall" returns i64
 #endif
 #endif
 

@@ -26,14 +26,18 @@ def run(compiler: Path, target: str, sdk: Path | None = None, require_client: bo
         env["LOCALAPPDATA"] = str(root / "userdata")
         env["XDG_DATA_HOME"] = str(root / "userdata")
         extra = ["--require-client"] if require_client else []
+        # WSL can briefly retain the launch directory after process exit.
+        # Keep this empty fixture outside the temporary build being cleaned up.
+        foreign = ROOT / "build/tests/steam foreign working directory"
+        foreign.mkdir(parents=True, exist_ok=True)
         command = [str(exe), *extra]
         if sdk:
             env["SteamAppId"] = env["SteamGameId"] = "480"
         if target == "linux-x64" and os.name == "nt":
-            command = ["wsl.exe", "-d", os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"), "--cd", _wsl_path(exe.parent),
+            command = ["wsl.exe", "-d", os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"), "--cd", _wsl_path(foreign),
                        "--", "env", "XDG_DATA_HOME=" + _wsl_path(root / "userdata"),
                        *(["SteamAppId=480", "SteamGameId=480"] if sdk else []), _wsl_path(exe), *extra]
-        result = subprocess.run(command, cwd=exe.parent, env=env, text=True, capture_output=True, timeout=45)
+        result = subprocess.run(command, cwd=foreign, env=env, text=True, capture_output=True, timeout=45)
         print(result.stdout)
         success = "Tests: 1, passed: 1, failed: 0" if sdk else "=== STEAM NATIVE/SAVE SMOKE DONE ==="
         if result.returncode or "[FAIL]" in result.stdout or success not in result.stdout:

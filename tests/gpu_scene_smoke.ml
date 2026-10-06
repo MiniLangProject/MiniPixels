@@ -14,6 +14,12 @@ function main(args)
   scene = gpu.create(w, 64, 36, false)
   if typeof(scene) == "void" then
     win.close(w)
+    // Hosted Windows runners may only expose OpenGL 1.1 without framebuffer
+    // objects. Execute the capability/fallback path, and report a visible skip.
+    if len(args) > 0 and args[0] == "--allow-unavailable" then
+      print "GPU_SCENE_UNAVAILABLE: framebuffer runtime unsupported; pixel checks skipped"
+      return 0
+    end if
     return 2
   end if
   a.assertTrue(gpu.begin(w), "GPU scene begins")

@@ -35,6 +35,7 @@
 - [`minipixels.closeAssetPack`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-closeassetpack-function-closeassetpack-assetpack-src-minipixels-ml-366992309) — function
 - [`minipixels.createConfig`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-createconfig-function-createconfig-title-width-height-scale-src-minipixels-ml-867415209) — function
 - [`minipixels.createGame`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-creategame-function-creategame-cfg-src-minipixels-ml-177514248) — function
+- [`minipixels.defaultAssetPackPath`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-defaultassetpackpath-function-defaultassetpackpath-src-minipixels-ml-964891920) — function
 - [`minipixels.designToRenderX`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-designtorenderx-function-designtorenderx-game-value-src-minipixels-ml-475498989) — function
 - [`minipixels.designToRenderY`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-designtorendery-function-designtorendery-game-value-src-minipixels-ml-171346775) — function
 - [`minipixels.drawRectWorld`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-drawrectworld-function-drawrectworld-canvas-camera-x-y-w-h-color-src-minipixels-ml-629981828) — function

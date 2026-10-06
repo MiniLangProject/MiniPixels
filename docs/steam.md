@@ -162,7 +162,8 @@ python tools/minipixels.py steam export path/to/minipixels.json --steam-sdk C:/S
 
 This builds fresh target artifacts and stages `content/<target>` with an explicit
 allowlist: executable, matching MPX, audio bridge, Steam bridge, Valve's runtime,
-and the MiniLang video runtime when present. No recursive build-directory copy,
+the MiniLang video runtime when present, and the optional Windows `minipixels_gpu.dll`
+when present beside the executable. No recursive build-directory copy,
 private keys, sources, SDK, `steam_appid.txt`, or credentials enter the depot.
 Existing output directories are refused to prevent stale files. Development
 stub builds and test AppID 480 cannot be exported. SteamCMD scripts reference

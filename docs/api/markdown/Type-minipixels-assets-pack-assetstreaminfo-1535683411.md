@@ -12,7 +12,7 @@ struct AssetStreamInfo
 File-backed media range that can be served without materializing the asset.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L114)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L119)
 
 ## Members
 
@@ -24,7 +24,17 @@ codec
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L119)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L124)
+
+<a id="field-field-minipixels-assets-pack-assetstreaminfo-hashes-hashes-src-minipixels-assets-pack-ml-1709239223"></a>
+### hashes
+
+```ml
+hashes
+```
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L127)
 
 <a id="field-field-minipixels-assets-pack-assetstreaminfo-key-key-src-minipixels-assets-pack-ml-1571623139"></a>
 ### key
@@ -34,7 +44,7 @@ key
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L120)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L125)
 
 <a id="field-field-minipixels-assets-pack-assetstreaminfo-logicalsize-logicalsize-src-minipixels-assets-pack-ml-2103921591"></a>
 ### logicalSize
@@ -44,7 +54,7 @@ logicalSize
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L118)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L123)
 
 <a id="field-field-minipixels-assets-pack-assetstreaminfo-nonce-nonce-src-minipixels-assets-pack-ml-445137395"></a>
 ### nonce
@@ -54,7 +64,7 @@ nonce
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L121)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L126)
 
 <a id="field-field-minipixels-assets-pack-assetstreaminfo-offset-offset-src-minipixels-assets-pack-ml-135141313"></a>
 ### offset
@@ -64,7 +74,7 @@ offset
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L116)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L121)
 
 <a id="field-field-minipixels-assets-pack-assetstreaminfo-path-path-src-minipixels-assets-pack-ml-869362977"></a>
 ### path
@@ -74,7 +84,7 @@ path
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L115)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L120)
 
 <a id="field-field-minipixels-assets-pack-assetstreaminfo-storedsize-storedsize-src-minipixels-assets-pack-ml-982978407"></a>
 ### storedSize
@@ -84,4 +94,4 @@ storedSize
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L117)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L122)

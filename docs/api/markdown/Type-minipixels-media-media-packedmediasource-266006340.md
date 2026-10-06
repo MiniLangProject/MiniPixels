@@ -12,7 +12,7 @@ struct PackedMediaSource
 Native loopback range source owned by one media player.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L67)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L71)
 
 ## Members
 
@@ -26,7 +26,7 @@ function close()
 Closes the loopback source and releases its native resources.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L73)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L77)
 
 <a id="field-field-minipixels-media-media-packedmediasource-closed-closed-src-minipixels-media-media-ml-1665087092"></a>
 ### closed
@@ -36,7 +36,7 @@ closed
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L70)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L74)
 
 <a id="field-field-minipixels-media-media-packedmediasource-handle-handle-src-minipixels-media-media-ml-1058796660"></a>
 ### handle
@@ -46,7 +46,7 @@ handle
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L68)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L72)
 
 <a id="field-field-minipixels-media-media-packedmediasource-url-url-src-minipixels-media-media-ml-1739452316"></a>
 ### url
@@ -56,4 +56,4 @@ url
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L69)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L73)

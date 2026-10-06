@@ -211,10 +211,11 @@ function moveAndCollide(map, rect, vx, vy)
   res = col.result(rect.x, rect.y)
   nx = rect.x + vx
   top = mt.floorInt(rect.y / map.tileHeight)
-  bottom = mt.floorInt((rect.y + rect.height - 1) / map.tileHeight)
+  bottom = 0 - mt.floorInt((0 - rect.y - rect.height) / map.tileHeight) - 1
   if vx > 0 then
-    startColumn = mt.floorInt((rect.x + rect.width - 1) / map.tileWidth)
-    endColumn = mt.floorInt((nx + rect.width - 1) / map.tileWidth)
+    // Half-open continuous bounds: ceil(right / tileWidth) - 1.
+    startColumn = 0 - mt.floorInt((0 - rect.x - rect.width) / map.tileWidth) - 1
+    endColumn = 0 - mt.floorInt((0 - nx - rect.width) / map.tileWidth) - 1
     column = startColumn + 1
     while column <= endColumn and res.hitRight == false
       row = top
@@ -249,10 +250,10 @@ function moveAndCollide(map, rect, vx, vy)
   end if
   ny = rect.y + vy
   left = mt.floorInt(nx / map.tileWidth)
-  right = mt.floorInt((nx + rect.width - 1) / map.tileWidth)
+  right = 0 - mt.floorInt((0 - nx - rect.width) / map.tileWidth) - 1
   if vy > 0 then
-    startRow = mt.floorInt((rect.y + rect.height - 1) / map.tileHeight)
-    endRow = mt.floorInt((ny + rect.height - 1) / map.tileHeight)
+    startRow = 0 - mt.floorInt((0 - rect.y - rect.height) / map.tileHeight) - 1
+    endRow = 0 - mt.floorInt((0 - ny - rect.height) / map.tileHeight) - 1
     row = startRow + 1
     while row <= endRow and res.hitBottom == false
       column = left

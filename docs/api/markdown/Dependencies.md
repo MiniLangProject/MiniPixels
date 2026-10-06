@@ -19,12 +19,12 @@ These MiniLang source files are reachable through imports but are outside the co
 | 1 | `std.ds.list` | `../MiniLangCompilerML/std/ds/list.ml` |
 | 0 | `std.encoding.hex` | `../MiniLangCompilerML/std/encoding/hex.ml` |
 | 0 | `std.fmt` | `../MiniLangCompilerML/std/fmt.ml` |
-| 6 | `std.fs` | `../MiniLangCompilerML/std/fs.ml` |
+| 7 | `std.fs` | `../MiniLangCompilerML/std/fs.ml` |
 | 1 | `std.io.file` | `../MiniLangCompilerML/std/io/file.ml` |
 | 3 | `std.math` | `../MiniLangCompilerML/std/math.ml` |
-| 1 | `std.path` | `../MiniLangCompilerML/std/path.ml` |
+| 2 | `std.path` | `../MiniLangCompilerML/std/path.ml` |
 | 0 | `std.platform` | `../MiniLangCompilerML/std/platform.ml` |
-| 1 | `std.process` | `../MiniLangCompilerML/std/process.ml` |
+| 2 | `std.process` | `../MiniLangCompilerML/std/process.ml` |
 | 0 | `std.result` | `../MiniLangCompilerML/std/result.ml` |
 | 1 | `std.sort` | `../MiniLangCompilerML/std/sort.ml` |
 | 6 | `std.string` | `../MiniLangCompilerML/std/string.ml` |

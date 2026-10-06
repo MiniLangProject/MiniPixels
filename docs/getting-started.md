@@ -59,6 +59,12 @@ python tools\minipixels.py build path\to\minipixels.json --compiler ..\MiniLangC
 
 Keep the generated private signing key outside version control. The public verification key and an obfuscated AES-key reconstruction are generated into the game automatically; no key files are needed beside the finished executable and `assets.mpx`.
 
+Generated asset helpers first select `assets.mpx` beside the executable, independently of the launch working directory. Only when that file is absent do development paths apply (`assets.mpx`, then `build/assets.mpx` in the working directory). An invalid installed pack is an error, not a reason to silently use another pack. Native-generator development code also retains its configured project-path fallback.
+
+Distribute the native libraries beside the executable as produced by the build command. Linux uses executable-relative `$ORIGIN` imports for MiniPixels libraries, so launching from a desktop shortcut, Steam, or another directory works without copying `.so` files into the working directory. Custom build outputs no longer delete existing `assets/audio` directories; remove obsolete loose assets manually after checking that they are not source files.
+
+Protected packs now use MPX3 version 6. When upgrading, rebuild the game and its pack together; keep the existing private signing key. See the [asset protection reference](manifest-reference.md#protected-asset-builds) for the integrity model and format change.
+
 ## Minimal game
 
 ```ml
@@ -91,6 +97,8 @@ Colors are packed as `0xRRGGBBAA`. Canvas pixels are stored as RGBA bytes. Alpha
 ## Thread model
 
 Game logic, input polling, PCM mixing, MP3 stream decoding, rendering, and native presentation run on the main thread. Windows waveOut consumes retained mixer buffers asynchronously; Linux refills a non-blocking ALSA stream from the frame loop. Public MiniPixels objects should be created and used on the main thread in this version.
+
+The ALSA refill drains available capacity with a bounded number of writes per update and retains unwritten PCM after partial writes or temporary backpressure. It is not limited to one 1024-frame buffer per game frame, so a steady 30 FPS loop can sustain 44.1-kHz stereo. Long main-thread stalls can still underrun; this is not a dedicated audio-thread design.
 
 ## Implemented now
 

@@ -12,7 +12,7 @@ struct PackedVideo
 Video player whose encoded bytes remain inside its MPX file.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L133)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L137)
 
 ## Members
 
@@ -30,7 +30,7 @@ Attaches video output to a native window.
 | `windowHandle` | `dynamic` | — | Win32 HWND or X11 window id. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L140)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L144)
 
 <a id="method-method-minipixels-media-media-packedvideo-close-function-close-src-minipixels-media-media-ml-1448024954"></a>
 ### close
@@ -42,7 +42,7 @@ function close()
 Closes the player before releasing its MPX range source.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L180)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L184)
 
 <a id="field-field-minipixels-media-media-packedvideo-closed-closed-src-minipixels-media-media-ml-1912254490"></a>
 ### closed
@@ -52,7 +52,7 @@ closed
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L136)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L140)
 
 <a id="method-method-minipixels-media-media-packedvideo-duration-function-duration-src-minipixels-media-media-ml-237413034"></a>
 ### duration
@@ -64,7 +64,7 @@ function duration()
 Returns the media duration.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L153)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L157)
 
 <a id="method-method-minipixels-media-media-packedvideo-hasaudio-function-hasaudio-src-minipixels-media-media-ml-225646466"></a>
 ### hasAudio
@@ -76,7 +76,7 @@ function hasAudio()
 Returns whether the media exposes an audio track.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L157)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L161)
 
 <a id="method-method-minipixels-media-media-packedvideo-hasvideo-function-hasvideo-src-minipixels-media-media-ml-1878030482"></a>
 ### hasVideo
@@ -88,7 +88,7 @@ function hasVideo()
 Returns whether the media exposes a video track.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L159)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L163)
 
 <a id="method-method-minipixels-media-media-packedvideo-pause-function-pause-src-minipixels-media-media-ml-1516739230"></a>
 ### pause
@@ -100,7 +100,7 @@ function pause()
 Pauses playback.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L144)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L148)
 
 <a id="method-method-minipixels-media-media-packedvideo-play-function-play-src-minipixels-media-media-ml-326160994"></a>
 ### play
@@ -112,7 +112,7 @@ function play()
 Starts or resumes playback.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L142)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L146)
 
 <a id="field-field-minipixels-media-media-packedvideo-player-player-src-minipixels-media-media-ml-1108460048"></a>
 ### player
@@ -122,7 +122,7 @@ player
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L135)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L139)
 
 <a id="method-method-minipixels-media-media-packedvideo-pollevent-function-pollevent-src-minipixels-media-media-ml-2055105472"></a>
 ### pollEvent
@@ -134,7 +134,7 @@ function pollEvent()
 Returns the next queued media event.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L177)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L181)
 
 <a id="method-method-minipixels-media-media-packedvideo-position-function-position-src-minipixels-media-media-ml-955998150"></a>
 ### position
@@ -146,7 +146,7 @@ function position()
 Returns the current playback timestamp.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L151)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L155)
 
 <a id="method-method-minipixels-media-media-packedvideo-seek-function-seek-milliseconds-src-minipixels-media-media-ml-792649568"></a>
 ### seek
@@ -162,7 +162,7 @@ Seeks to a media timestamp.
 | `milliseconds` | `dynamic` | — | Target timestamp in milliseconds. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L149)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L153)
 
 <a id="method-method-minipixels-media-media-packedvideo-setloop-function-setloop-enabled-src-minipixels-media-media-ml-530716307"></a>
 ### setLoop
@@ -178,7 +178,7 @@ Enables or disables looping.
 | `enabled` | `dynamic` | — | True to loop playback. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L175)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L179)
 
 <a id="method-method-minipixels-media-media-packedvideo-setmuted-function-setmuted-muted-src-minipixels-media-media-ml-931409493"></a>
 ### setMuted
@@ -194,7 +194,7 @@ Enables or disables muting.
 | `muted` | `dynamic` | — | True to mute playback. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L169)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L173)
 
 <a id="method-method-minipixels-media-media-packedvideo-setplaybackrate-function-setplaybackrate-rate-src-minipixels-media-media-ml-563065634"></a>
 ### setPlaybackRate
@@ -210,7 +210,7 @@ Sets the playback speed multiplier.
 | `rate` | `dynamic` | — | Playback speed accepted by `std.video`. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L172)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L176)
 
 <a id="method-method-minipixels-media-media-packedvideo-setvolume-function-setvolume-volume-src-minipixels-media-media-ml-228705196"></a>
 ### setVolume
@@ -226,7 +226,7 @@ Sets playback volume.
 | `volume` | `dynamic` | — | Volume accepted by `std.video`. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L166)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L170)
 
 <a id="field-field-minipixels-media-media-packedvideo-source-source-src-minipixels-media-media-ml-845850280"></a>
 ### source
@@ -236,7 +236,7 @@ source
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L134)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L138)
 
 <a id="method-method-minipixels-media-media-packedvideo-state-function-state-src-minipixels-media-media-ml-158619428"></a>
 ### state
@@ -248,7 +248,7 @@ function state()
 Returns the current player state.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L155)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L159)
 
 <a id="method-method-minipixels-media-media-packedvideo-stop-function-stop-src-minipixels-media-media-ml-1647671830"></a>
 ### stop
@@ -260,7 +260,7 @@ function stop()
 Stops playback and rewinds the player.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L146)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L150)
 
 <a id="method-method-minipixels-media-media-packedvideo-videoheight-function-videoheight-src-minipixels-media-media-ml-1716028242"></a>
 ### videoHeight
@@ -272,7 +272,7 @@ function videoHeight()
 Returns the decoded video height.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L163)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L167)
 
 <a id="method-method-minipixels-media-media-packedvideo-videowidth-function-videowidth-src-minipixels-media-media-ml-1338987938"></a>
 ### videoWidth
@@ -284,4 +284,4 @@ function videoWidth()
 Returns the decoded video width.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L161)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L165)

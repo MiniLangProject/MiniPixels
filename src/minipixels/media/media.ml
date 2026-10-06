@@ -22,12 +22,14 @@ const MEDIA_ERR = 9310
 /// @param keySize AES key size.
 /// @param nonce Base nonce for protected media.
 /// @param nonceSize Base nonce size.
+/// @param hashes Ciphertext SHA-256 digests from the verified signed index.
+/// @param hashesSize Size of the digest table in bytes.
 /// @param mime HTTP response content type.
 /// @param suffix Decoder filename suffix.
 /// @param urlOutput Destination buffer for the loopback URL.
 /// @param urlCapacity Destination buffer capacity.
 /// @returns Opaque native source handle, or zero on failure.
-extern function _streamOpen(path as cstr, offset as u64, storedSize as u64, logicalSize as u64, codec as int, key as bytes, keySize as u64, nonce as bytes, nonceSize as u64, mime as cstr, suffix as cstr, urlOutput as bytes, urlCapacity as int) from "minipixels_audio.dll" symbol "mpMediaStreamOpen" returns ptr
+extern function _streamOpen(path as cstr, offset as u64, storedSize as u64, logicalSize as u64, codec as int, key as bytes, keySize as u64, nonce as bytes, nonceSize as u64, hashes as bytes, hashesSize as u64, mime as cstr, suffix as cstr, urlOutput as bytes, urlCapacity as int) from "minipixels_audio.dll" symbol "mpMediaStreamOpenV6" returns ptr
 /// Closes a native loopback media source.
 /// @internal
 /// @param handle Native source handle.
@@ -44,12 +46,14 @@ extern function _streamClose(handle as ptr) from "minipixels_audio.dll" symbol "
 /// @param keySize AES key size.
 /// @param nonce Base nonce for protected media.
 /// @param nonceSize Base nonce size.
+/// @param hashes Ciphertext SHA-256 digests from the verified signed index.
+/// @param hashesSize Size of the digest table in bytes.
 /// @param mime HTTP response content type.
 /// @param suffix Decoder filename suffix.
 /// @param urlOutput Destination buffer for the loopback URL.
 /// @param urlCapacity Destination buffer capacity.
 /// @returns Opaque native source handle, or zero on failure.
-extern function _streamOpen(path as cstr, offset as u64, storedSize as u64, logicalSize as u64, codec as int, key as bytes, keySize as u64, nonce as bytes, nonceSize as u64, mime as cstr, suffix as cstr, urlOutput as bytes, urlCapacity as int) from "$ORIGIN/libminipixels_audio.so" symbol "mpMediaStreamOpen" returns ptr
+extern function _streamOpen(path as cstr, offset as u64, storedSize as u64, logicalSize as u64, codec as int, key as bytes, keySize as u64, nonce as bytes, nonceSize as u64, hashes as bytes, hashesSize as u64, mime as cstr, suffix as cstr, urlOutput as bytes, urlCapacity as int) from "$ORIGIN/libminipixels_audio.so" symbol "mpMediaStreamOpenV6" returns ptr
 /// Closes a native loopback media source.
 /// @internal
 /// @param handle Native source handle.
@@ -207,6 +211,8 @@ function _openSource(info, mime, suffix)
     len(info.key),
     info.nonce,
     len(info.nonce),
+    info.hashes,
+    len(info.hashes),
     mime,
     suffix,
     urlBuffer,

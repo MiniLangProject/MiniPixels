@@ -11,6 +11,9 @@ import std.crypto.aes_gcm as aes
 import std.crypto.ecdsa_p256 as ecdsa
 import std.ds.hashmap as hm
 import std.compress.lz4 as lz4
+import std.process as process
+import std.fs as fs
+import std.path as paths
 import minipixels.assets.png as png
 
 /// Defines the pack err constant used by the minipixels assets pack module.
@@ -29,6 +32,8 @@ const CODEC_LZ4 = 3
 const CODEC_STREAM = 4
 /// Fixed header size of one MPS1 chunked media envelope.
 const STREAM_HEADER_SIZE = 24
+/// Fixed authenticated streaming chunk size in MPX3 version 6.
+const STREAM_CHUNK_SIZE = 262144
 /// Maximum logical size of one decompressed asset.
 const MAX_DECOMPRESSED_ASSET_SIZE = 536870912
 /// Default upper bound for one physical preload read and coalesced batch.
@@ -62,7 +67,7 @@ struct AssetPack
   storedSizes
   /// Per-entry AES-GCM nonces for MPX3 payload blocks.
   nonces
-  /// Per-entry AES-GCM authentication tags for MPX3 payload blocks.
+  /// Ordinary GCM tag plus SHA-256 digest, or a table of signed chunk digests.
   tags
   /// Canonical slot for entries that share one identical stored block.
   owners
@@ -119,12 +124,24 @@ struct AssetStreamInfo
   codec
   key
   nonce
+  hashes
 end struct
 
 /// Performs the packError operation for the minipixels assets pack module.
 /// @param message Human-readable message associated with the operation.
 function packError(message)
   return error(PACK_ERR, message)
+end function
+
+/// Selects an executable-relative installed pack before development CWD paths.
+/// An existing but invalid installed pack is never replaced by a fallback.
+function defaultPath()
+  executable = process.executablePath()
+  if typeof(executable) == "error" then return executable end if
+  installed = fs.joinPath(paths.directoryName(executable), "assets.mpx")
+  if fs.exists(installed) then return installed end if
+  if fs.exists("assets.mpx") then return "assets.mpx" end if
+  return "build/assets.mpx"
 end function
 
 /// Returns whether range is available.
@@ -224,7 +241,7 @@ end function
 /// Decrypts a complete MPS1 payload for callers that explicitly request bytes.
 /// Normal media playback uses AssetStreamInfo and never takes this path.
 /// @internal
-function _decodeStreamPayload(payload, key, baseNonce, expectedSize)
+function _decodeStreamPayload(payload, key, baseNonce, expectedSize, signedHashes)
   if not hasRange(payload, 0, STREAM_HEADER_SIZE) or payload[0] != 77 or payload[1] != 80 or payload[2] != 83 or payload[3] != 49 then
     return packError("chunked media envelope is invalid")
   end if
@@ -232,11 +249,11 @@ function _decodeStreamPayload(payload, key, baseNonce, expectedSize)
   logicalSize = _readU64LE(payload, 8)
   chunkCount = by.readU32LE(payload, 16)
   reserved = by.readU32LE(payload, 20)
-  if chunkSize <= 0 or logicalSize < 0 or chunkCount < 0 or reserved != 0 or logicalSize != expectedSize then
+  if chunkSize != STREAM_CHUNK_SIZE or logicalSize < 0 or chunkCount < 0 or reserved != 0 or logicalSize != expectedSize then
     return packError("chunked media metadata is invalid")
   end if
   expectedChunks = integerDivide(logicalSize + chunkSize - 1, chunkSize)
-  if chunkCount != expectedChunks or len(payload) != STREAM_HEADER_SIZE + logicalSize + chunkCount * 16 then
+  if chunkCount != expectedChunks or len(payload) != STREAM_HEADER_SIZE + logicalSize + chunkCount * 16 or len(signedHashes) != chunkCount * 32 then
     return packError("chunked media size is invalid")
   end if
   result = bytes(logicalSize, 0)
@@ -247,6 +264,7 @@ function _decodeStreamPayload(payload, key, baseNonce, expectedSize)
     if remaining < plainSize then plainSize = remaining end if
     tag = slice(payload, source, 16)
     ciphertext = slice(payload, source + 16, plainSize)
+    if not crypto.constantTimeEquals(crypto.sha256(ciphertext), slice(signedHashes, chunkIndex * 32, 32)) then return packError("chunked media signature binding failed") end if
     nonce = slice(baseNonce, 0, len(baseNonce))
     counter = chunkIndex
     for byteIndex = 0 to 7
@@ -416,7 +434,7 @@ end function
 /// Payload blocks remain encrypted on disk until first access.
 /// @internal
 function _openProtected3(path, file, header, key, publicKey, expectedKeyId)
-  if header[4] != 5 or header[5] != 0 or header[6] != 1 or header[7] != 1 or by.readU16LE(header, 8) != 64 or by.readU16LE(header, 10) != 0 then
+  if header[4] != 6 or header[5] != 0 or header[6] != 1 or header[7] != 1 or by.readU16LE(header, 8) != 64 or by.readU16LE(header, 10) != 0 then
     fileio.close(file)
     crypto.secureZero(key)
     return packError("unsupported MPX3 header or algorithm suite")
@@ -539,6 +557,25 @@ function _openProtected3(path, file, header, key, publicKey, expectedKeyId)
     offsets[i] = offset
     sizes[i] = size
     storedSizes[i] = cipherSize
+    if codec == CODEC_STREAM then
+      hashBytes = integerDivide(size, STREAM_CHUNK_SIZE) * 32
+      if size % STREAM_CHUNK_SIZE != 0 then hashBytes = hashBytes + 32 end if
+      if not crypto.constantTimeEquals(entryTag, bytes(16, 0)) or not hasRange(indexData, pos, hashBytes) or cipherSize != STREAM_HEADER_SIZE + size + integerDivide(hashBytes, 2) then
+        fileio.close(file)
+        crypto.secureZero(key)
+        return packError("MPX3 signed chunk hash table is invalid")
+      end if
+      entryTag = slice(indexData, pos, hashBytes)
+      pos = pos + hashBytes
+    else
+      if not hasRange(indexData, pos, 32) then
+        fileio.close(file)
+        crypto.secureZero(key)
+        return packError("MPX3 signed payload digest is missing")
+      end if
+      entryTag = slice(indexData, pos - 16, 48)
+      pos = pos + 32
+    end if
     nonces[i] = entryNonce
     tags[i] = entryTag
     nameIndex.set(name, i)
@@ -574,7 +611,7 @@ function _openProtected3(path, file, header, key, publicKey, expectedKeyId)
   return AssetPack(path, void, file, true, true, keyCopy, names, kinds, codecs, offsets, sizes, storedSizes, nonces, tags, owners, count, nameIndex, array(count, false), array(count, false), array(count, false), array(count, false), 0, 0, 0, 0, 0, 0, 0, 0)
 end function
 
-/// Opens an authenticated MPX3 version-5 pack. Only its index is verified and
+/// Opens an authenticated MPX3 version-6 pack. Only its index is verified and
 /// decrypted up front; caller-owned AES key bytes are always wiped.
 /// @param path Path to the protected pack.
 /// @param key Obfuscated build key reconstructed by generated game code.
@@ -646,9 +683,10 @@ function getBytesAt(pack, index)
     if typeof(ciphertext) == "error" then return ciphertext end if
     pack.storedBytesRead = pack.storedBytesRead + pack.storedSizes[index]
     if pack.codecs[index] == CODEC_STREAM then
-      payload = _decodeStreamPayload(ciphertext, pack.key, pack.nonces[index], pack.sizes[index])
+      payload = _decodeStreamPayload(ciphertext, pack.key, pack.nonces[index], pack.sizes[index], pack.tags[index])
     else
-      payload = try(aes.decrypt(pack.key, pack.nonces[index], ciphertext, pack.tags[index], bytes(0, 0)))
+      if not crypto.constantTimeEquals(crypto.sha256(ciphertext), slice(pack.tags[index], 16, 32)) then return packError("MPX3 payload signature binding failed") end if
+      payload = try(aes.decrypt(pack.key, pack.nonces[index], ciphertext, slice(pack.tags[index], 0, 16), bytes(0, 0)))
       if typeof(payload) == "error" then return packError("MPX3 asset authentication failed: " + pack.names[index]) end if
     end if
   else if pack.fileBacked then
@@ -687,6 +725,44 @@ function _readPreloadRange(pack, offset, size, maxBatchBytes)
   return result
 end function
 
+/// Stable bottom-up mergesort; bounded O(n log n) even for reversed requests.
+/// @internal
+function _sortSlotsByOffset(pack, slots, count)
+  if count < 2 then return end if
+  scratch = array(count, 0)
+  source = slots
+  destination = scratch
+  width = 1
+  while width < count
+    start = 0
+    while start < count
+      middle = start + width
+      if middle > count then middle = count end if
+      limit = middle + width
+      if limit > count then limit = count end if
+      left = start
+      right = middle
+      for output = start to limit - 1
+        takeLeft = right >= limit
+        if left < middle and right < limit then takeLeft = pack.offsets[source[left]] <= pack.offsets[source[right]] end if
+        if left < middle and takeLeft then
+          destination[output] = source[left]
+          left = left + 1
+        else
+          destination[output] = source[right]
+          right = right + 1
+        end if
+      end for
+      start = limit
+    end while
+    temporary = source
+    source = destination
+    destination = temporary
+    width = width * 2
+  end while
+  copyArray(slots, 0, source, 0, count)
+end function
+
 /// Preloads selected asset slots with contiguous, bounded file reads.
 /// Already cached slots are skipped. File-order sorting turns a long sequence of
 /// small random reads into sequential reads without spanning unrequested gaps.
@@ -720,16 +796,12 @@ function preloadSlots(pack, slots, maxBatchBytes)
     owner = pack.owners[slot]
     if not pack.payloadLoaded[owner] and not seen[owner] then
       seen[owner] = true
-      insertAt = orderedCount
-      while insertAt > 0 and pack.offsets[ordered[insertAt - 1]] > pack.offsets[owner]
-        ordered[insertAt] = ordered[insertAt - 1]
-        insertAt = insertAt - 1
-      end while
-      ordered[insertAt] = owner
+      ordered[orderedCount] = owner
       orderedCount = orderedCount + 1
     end if
   end for
 
+  _sortSlotsByOffset(pack, ordered, orderedCount)
   cursor = 0
   while cursor < orderedCount
     first = ordered[cursor]
@@ -761,9 +833,10 @@ function preloadSlots(pack, slots, maxBatchBytes)
             stored = slice(region, relativeOffset, pack.storedSizes[slot])
           end if
           if pack.codecs[slot] == CODEC_STREAM then
-            payload = _decodeStreamPayload(stored, pack.key, pack.nonces[slot], pack.sizes[slot])
+            payload = _decodeStreamPayload(stored, pack.key, pack.nonces[slot], pack.sizes[slot], pack.tags[slot])
           else
-            payload = try(aes.decrypt(pack.key, pack.nonces[slot], stored, pack.tags[slot], bytes(0, 0)))
+            if not crypto.constantTimeEquals(crypto.sha256(stored), slice(pack.tags[slot], 16, 32)) then return packError("MPX3 payload signature binding failed") end if
+            payload = try(aes.decrypt(pack.key, pack.nonces[slot], stored, slice(pack.tags[slot], 0, 16), bytes(0, 0)))
             if typeof(payload) == "error" then return packError("MPX3 asset authentication failed: " + pack.names[slot]) end if
             payload = _decodePayload(pack.codecs[slot], payload, pack.sizes[slot])
           end if
@@ -851,11 +924,13 @@ function streamInfoAt(pack, index)
   if pack.protected and codec != CODEC_STREAM then return packError("protected media asset is not chunk-authenticated") end if
   key = bytes(0, 0)
   nonce = bytes(0, 0)
+  hashes = bytes(0, 0)
   if codec == CODEC_STREAM then
     key = pack.key
     nonce = pack.nonces[owner]
+    hashes = pack.tags[owner]
   end if
-  return AssetStreamInfo(pack.path, pack.offsets[owner], pack.storedSizes[owner], pack.sizes[owner], codec, key, nonce)
+  return AssetStreamInfo(pack.path, pack.offsets[owner], pack.storedSizes[owner], pack.sizes[owner], codec, key, nonce, hashes)
 end function
 
 /// Resolves a named file-backed audio/video stream.

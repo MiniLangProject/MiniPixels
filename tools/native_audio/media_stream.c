@@ -11,6 +11,7 @@
 
 #include <errno.h>
 #include <inttypes.h>
+#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,6 +59,7 @@ typedef struct MiniPixelsMediaStream {
     uint32_t cached_chunk_index;
     size_t cached_chunk_size;
     uint8_t* cached_chunk;
+    uint8_t* signed_hashes;
     int codec;
     uint8_t key[32];
     uint8_t nonce[12];
@@ -362,11 +364,31 @@ static int mp_read_plain(MiniPixelsMediaStream* stream, uint64_t offset, void* o
     return fread(output, 1, size, stream->file) == size;
 }
 
+// Public collision-resistant digest, independent of the embedded AES key.
+static int mp_sha256(const uint8_t* input, size_t size, uint8_t output[32])
+{
+#if defined(_WIN32)
+    BCRYPT_ALG_HANDLE algorithm = NULL;
+    BCRYPT_HASH_HANDLE hash = NULL;
+    int ok = 0;
+    if (size > ULONG_MAX || BCryptOpenAlgorithmProvider(&algorithm, BCRYPT_SHA256_ALGORITHM, NULL, 0) != 0) return 0;
+    if (BCryptCreateHash(algorithm, &hash, NULL, 0, NULL, 0, 0) == 0) {
+        ok = BCryptHashData(hash, (PUCHAR)input, (ULONG)size, 0) == 0 && BCryptFinishHash(hash, output, 32, 0) == 0;
+        BCryptDestroyHash(hash);
+    }
+    BCryptCloseAlgorithmProvider(algorithm, 0);
+    return ok;
+#else
+    unsigned int written = 0;
+    return EVP_Digest(input, size, output, &written, EVP_sha256(), NULL) == 1 && written == 32;
+#endif
+}
+
 static int mp_read_chunk(MiniPixelsMediaStream* stream, uint32_t index, uint8_t* output, size_t* output_size)
 {
     uint64_t plain_offset, remaining, record_offset;
     size_t plain_size;
-    uint8_t tag[16], nonce[12], aad[28];
+    uint8_t tag[16], nonce[12], aad[28], digest[32];
     uint8_t* ciphertext;
     uint64_t counter;
     int byte_index, result;
@@ -385,6 +407,10 @@ static int mp_read_chunk(MiniPixelsMediaStream* stream, uint32_t index, uint8_t*
     ciphertext = (uint8_t*)malloc(plain_size == 0 ? 1 : plain_size);
     if (ciphertext == NULL) return 0;
     if (fread(ciphertext, 1, plain_size, stream->file) != plain_size) { free(ciphertext); return 0; }
+    if (!mp_sha256(ciphertext, plain_size, digest) ||
+        memcmp(digest, stream->signed_hashes + (size_t)index * 32, 32) != 0) {
+        free(ciphertext); return 0;
+    }
     memcpy(nonce, stream->nonce, sizeof(nonce));
     counter = index;
     for (byte_index = 0; byte_index < 8; ++byte_index) {
@@ -649,9 +675,10 @@ static void mp_copy_ascii(char* output, size_t capacity, const char* value, cons
     output[used] = '\0';
 }
 
-MP_API void* mpMediaStreamOpen(
+MP_API void* mpMediaStreamOpenV6(
     const char* path, uint64_t payload_offset, uint64_t stored_size, uint64_t logical_size, int32_t codec,
     const void* key, uint64_t key_size, const void* nonce, uint64_t nonce_size,
+    const void* signed_hashes, uint64_t signed_hashes_size,
     const char* mime, const char* suffix, void* url_output, int32_t url_capacity)
 {
     MiniPixelsMediaStream* stream = NULL;
@@ -673,8 +700,8 @@ MP_API void* mpMediaStreamOpen(
     stream->logical_size = logical_size;
     stream->codec = codec;
     stream->cached_chunk_index = UINT32_MAX;
-    if (key_size == 32) memcpy(stream->key, key, 32);
-    if (nonce_size == 12) memcpy(stream->nonce, nonce, 12);
+    if (key != NULL && key_size == 32) memcpy(stream->key, key, 32);
+    if (nonce != NULL && nonce_size == 12) memcpy(stream->nonce, nonce, 12);
     mp_copy_ascii(stream->mime, sizeof(stream->mime), mime, "application/octet-stream", 0);
     mp_copy_ascii(stream->suffix, sizeof(stream->suffix), suffix, ".bin", 1);
     if (stream->suffix[0] != '.') strcpy(stream->suffix, ".bin");
@@ -692,12 +719,19 @@ MP_API void* mpMediaStreamOpen(
         stream->chunk_size = mp_read_u32le(header + 4);
         if (mp_read_u64le(header + 8) != logical_size) goto failure;
         stream->chunk_count = mp_read_u32le(header + 16);
-        if (mp_read_u32le(header + 20) != 0 || stream->chunk_size == 0 || stream->chunk_size > 16 * 1024 * 1024) goto failure;
+        if (mp_read_u32le(header + 20) != 0 || stream->chunk_size != 256 * 1024) goto failure;
         expected_chunks = logical_size == 0 ? 0 : 1 + ((logical_size - 1) / stream->chunk_size);
         if (expected_chunks > UINT32_MAX || stream->chunk_count != expected_chunks) goto failure;
         if ((uint64_t)stream->chunk_count > (UINT64_MAX - MP_STREAM_HEADER_SIZE - logical_size) / MP_STREAM_TAG_SIZE) goto failure;
         expected_size = MP_STREAM_HEADER_SIZE + logical_size + (uint64_t)stream->chunk_count * MP_STREAM_TAG_SIZE;
         if (expected_size != stored_size) goto failure;
+        if (signed_hashes_size != (uint64_t)stream->chunk_count * 32 || signed_hashes_size > 64 * 1024 * 1024) goto failure;
+        if (signed_hashes_size > 0) {
+            if (signed_hashes == NULL) goto failure;
+            stream->signed_hashes = (uint8_t*)malloc((size_t)signed_hashes_size);
+            if (stream->signed_hashes == NULL) goto failure;
+            memcpy(stream->signed_hashes, signed_hashes, (size_t)signed_hashes_size);
+        }
     }
     if (!mp_crypto_init(stream)) goto failure;
 #if defined(_WIN32)
@@ -739,6 +773,7 @@ failure:
         if (stream->listener != MP_INVALID_SOCKET) mp_close_socket(stream->listener);
         if (stream->file != NULL) fclose(stream->file);
         if (stream->cached_chunk != NULL) { memset(stream->cached_chunk, 0, stream->chunk_size); free(stream->cached_chunk); }
+        free(stream->signed_hashes);
         mp_crypto_close(stream);
 #if defined(_WIN32)
         if (stream->winsock_started) WSACleanup();
@@ -774,5 +809,6 @@ MP_API void mpMediaStreamClose(void* handle)
 #endif
     memset(stream->key, 0, sizeof(stream->key));
     memset(stream->nonce, 0, sizeof(stream->nonce));
+    free(stream->signed_hashes);
     free(stream);
 }

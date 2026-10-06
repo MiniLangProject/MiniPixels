@@ -98,7 +98,7 @@ function close()
 Releases the native output device.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L388)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L392)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-format-format-src-minipixels-audio-audio-ml-1754452030"></a>
 ### format
@@ -218,7 +218,7 @@ function mute()
 Mutes all buses for subsequently mixed samples.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L348)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L352)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-nextchannel-nextchannel-src-minipixels-audio-audio-ml-1240139108"></a>
 ### nextChannel
@@ -231,6 +231,30 @@ Round-robin replacement cursor.
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L299)
+
+<a id="field-field-minipixels-audio-audio-audiomixer-pendingframes-pendingframes-src-minipixels-audio-audio-ml-1133386780"></a>
+### pendingFrames
+
+```ml
+pendingFrames
+```
+
+Unwritten ALSA frames retained after a partial/non-blocking write.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L329)
+
+<a id="field-field-minipixels-audio-audio-audiomixer-pendingoffset-pendingoffset-src-minipixels-audio-audio-ml-494827656"></a>
+### pendingOffset
+
+```ml
+pendingOffset
+```
+
+First unwritten frame in the retained ALSA buffer.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L331)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-playmusic-function-playmusic-clip-src-minipixels-audio-audio-ml-1170273894"></a>
 ### playMusic
@@ -246,7 +270,7 @@ Starts or replaces the dedicated music voice.
 | `clip` | `dynamic` | — | WAV or MP3 clip. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L364)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L368)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-playsfx-function-playsfx-clip-src-minipixels-audio-audio-ml-869959498"></a>
 ### playSfx
@@ -262,7 +286,7 @@ Starts a sound-effect voice.
 | `clip` | `dynamic` | — | WAV or MP3 clip. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L359)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L363)
 
 <a id="field-field-minipixels-audio-audio-audiomixer-ready-ready-src-minipixels-audio-audio-ml-530294568"></a>
 ### ready
@@ -304,7 +328,7 @@ Sets volume and pan for one sound-effect channel.
 | `pan` | `dynamic` | — | Pan from -100 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L384)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L388)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-setmastervolume-function-setmastervolume-value-src-minipixels-audio-audio-ml-195509011"></a>
 ### setMasterVolume
@@ -320,7 +344,7 @@ Sets master volume for subsequently mixed samples.
 | `value` | `dynamic` | — | Percentage from 0 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L331)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L335)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-setmusicvolume-function-setmusicvolume-value-src-minipixels-audio-audio-ml-987640579"></a>
 ### setMusicVolume
@@ -336,7 +360,7 @@ Sets music bus volume for subsequently mixed samples.
 | `value` | `dynamic` | — | Percentage from 0 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L343)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L347)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-setsfxvolume-function-setsfxvolume-value-src-minipixels-audio-audio-ml-1926371943"></a>
 ### setSfxVolume
@@ -352,7 +376,7 @@ Sets sound-effect bus volume for subsequently mixed samples.
 | `value` | `dynamic` | — | Percentage from 0 through 100. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L337)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L341)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-stopall-function-stopall-src-minipixels-audio-audio-ml-2353796"></a>
 ### stopAll
@@ -364,7 +388,7 @@ function stopAll()
 Stops every active voice.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L372)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L376)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-stopchannel-function-stopchannel-id-src-minipixels-audio-audio-ml-549842483"></a>
 ### stopChannel
@@ -380,7 +404,7 @@ Stops one sound-effect channel.
 | `id` | `dynamic` | — | Zero-based channel identifier. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L377)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L381)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-unmute-function-unmute-src-minipixels-audio-audio-ml-1780619714"></a>
 ### unmute
@@ -392,7 +416,7 @@ function unmute()
 Unmutes all buses for subsequently mixed samples.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L353)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L357)
 
 <a id="method-method-minipixels-audio-audio-audiomixer-update-function-update-src-minipixels-audio-audio-ml-701288054"></a>
 ### update
@@ -404,4 +428,4 @@ function update()
 Refills completed output buffers.
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L368)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/audio/audio.ml#L372)

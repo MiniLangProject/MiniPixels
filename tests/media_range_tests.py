@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import ctypes
 import http.client
+import hashlib
 import os
 import socket
 import struct
@@ -19,25 +20,32 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 def test_runtime(runtime: Path) -> None:
     library = ctypes.CDLL(str(runtime.resolve()))
-    open_stream = library.mpMediaStreamOpen
+    open_stream = library.mpMediaStreamOpenV6
     open_stream.restype = ctypes.c_void_p
     open_stream.argtypes = [
         ctypes.c_char_p, ctypes.c_uint64, ctypes.c_uint64, ctypes.c_uint64, ctypes.c_int32,
         ctypes.c_void_p, ctypes.c_uint64, ctypes.c_void_p, ctypes.c_uint64,
+        ctypes.c_void_p, ctypes.c_uint64,
         ctypes.c_char_p, ctypes.c_char_p, ctypes.c_void_p, ctypes.c_int32,
     ]
     close_stream = library.mpMediaStreamClose
     close_stream.argtypes = [ctypes.c_void_p]
     close_stream.restype = None
 
-    def open_native(path, offset, stored, logical, codec=0, key=b"", nonce=b""):
+    def open_native(path, offset, stored, logical, codec=0, key=b"", nonce=b"", tags=b"", reject=False):
         url = ctypes.create_string_buffer(192)
         handle = open_stream(
             str(path).encode("utf-8"), offset, stored, logical, codec,
             ctypes.create_string_buffer(key) if key else None, len(key),
             ctypes.create_string_buffer(nonce) if nonce else None, len(nonce),
+            ctypes.create_string_buffer(tags) if tags else None, len(tags),
             b"application/octet-stream", b".bin", url, len(url),
         )
+        if reject:
+            if handle:
+                close_stream(handle)
+                raise AssertionError("invalid signed digest table was accepted")
+            return None
         assert handle, "native media range source did not open"
         return handle, urlsplit(url.value.decode("ascii"))
 
@@ -119,25 +127,54 @@ def test_runtime(runtime: Path) -> None:
         chunk_count = (len(payload) + chunk_size - 1) // chunk_size
         envelope = bytearray(b"MPS1" + struct.pack("<IQII", chunk_size, len(payload), chunk_count, 0))
         cipher = AESGCM(key)
+        tags = bytearray()
         for index in range(chunk_count):
             chunk = payload[index * chunk_size:(index + 1) * chunk_size]
             nonce = base_nonce[:4] + (int.from_bytes(base_nonce[4:], "little") ^ index).to_bytes(8, "little")
             sealed = cipher.encrypt(nonce, chunk, b"MPS1" + base_nonce + struct.pack("<QI", len(payload), index))
             envelope.extend(sealed[-16:] + sealed[:-16])
+            tags.extend(hashlib.sha256(sealed[:-16]).digest())
         protected = directory / "protected.bin"
         protected.write_bytes(envelope)
-        with stream(protected, 0, len(envelope), len(payload), 4, key, base_nonce) as url:
+        for invalid_table in (b"", bytes(tags[:-1]), bytes(tags) + bytes(32)):
+            open_native(protected, 0, len(envelope), len(payload), 4, key, base_nonce, invalid_table, reject=True)
+        with stream(protected, 0, len(envelope), len(payload), 4, key, base_nonce, bytes(tags)) as url:
             assert request(url, "Range: bytes=262120-262200\r\n")[2] == payload[262120:262201]
             assert request(url)[2] == payload
 
+        empty_protected = directory / "empty-protected.bin"
+        empty_protected.write_bytes(b"MPS1" + struct.pack("<IQII", chunk_size, 0, 0, 0))
+        with stream(empty_protected, 0, 24, 0, 4, key, base_nonce, b"") as url:
+            assert request(url)[0:3:2] == (200, b"")
+
         envelope[24 + 16 + chunk_size] ^= 1  # Corrupt only B's authentication tag.
         protected.write_bytes(envelope)
-        with stream(protected, 0, len(envelope), len(payload), 4, key, base_nonce) as url:
+        with stream(protected, 0, len(envelope), len(payload), 4, key, base_nonce, bytes(tags)) as url:
             for _ in range(3):
                 assert request(url, "Range: bytes=0-3\r\n")[2] == b"AAAA"
                 assert request(url, "Range: bytes=262144-262147\r\n")[2] == b"", "unauthenticated bytes leaked"
                 assert request(url, "Range: bytes=0-3\r\n")[2] == b"AAAA", "failed GCM poisoned previous cache entry"
             assert request(url, "Range: bytes=-4\r\n")[2] == b"CCCC"
+
+        # An attacker can recompute GCM with the shipped AES key, but cannot
+        # change the signed table independently supplied by the MPX loader.
+        forged = cipher.encrypt(base_nonce, b"Z" * chunk_size,
+                                b"MPS1" + base_nonce + struct.pack("<QI", len(payload), 0))
+        envelope[24:24 + 16 + chunk_size] = forged[-16:] + forged[:-16]
+        protected.write_bytes(envelope)
+        with stream(protected, 0, len(envelope), len(payload), 4, key, base_nonce, bytes(tags)) as url:
+            assert request(url, "Range: bytes=0-3\r\n")[2] == b"", "AES-key-only forgery bypassed signature binding"
+            assert request(url, "Range: bytes=-4\r\n")[2] == b"CCCC"
+
+        from security_forgery import same_tag_forgery
+        original = cipher.encrypt(base_nonce, b"A" * chunk_size,
+                                  b"MPS1" + base_nonce + struct.pack("<QI", len(payload), 0))
+        forged_ciphertext = same_tag_forgery(key, base_nonce, original[:-16], original[-16:],
+                                           b"MPS1" + base_nonce + struct.pack("<QI", len(payload), 0))
+        envelope[24:24 + 16 + chunk_size] = original[-16:] + forged_ciphertext
+        protected.write_bytes(envelope)
+        with stream(protected, 0, len(envelope), len(payload), 4, key, base_nonce, bytes(tags)) as url:
+            assert request(url, "Range: bytes=0-3\r\n")[2] == b"", "same-tag GHASH forgery bypassed signature binding"
 
         # Cover both a receiver waiting for headers and a sender blocked by a slow reader.
         large = directory / "large.bin"
