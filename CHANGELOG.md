@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.18.0 - 2026-10-06
 
 - Fixed protected-asset signing: MPX3 version 6 signs SHA-256 ciphertext digests for ordinary payloads and every 256 KiB media chunk. This rejects even known-AES-key GHASH collisions that preserve the original GCM tag. Rebuild protected packs and their game binaries together; older protected formats are rejected.
 - Removed unsafe recursive audio cleanup from custom build output directories.

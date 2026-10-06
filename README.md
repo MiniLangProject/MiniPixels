@@ -3,9 +3,9 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.17.0`
+Current version: `0.18.0`
 
-See the [0.17.0 release notes](RELEASE_NOTES_0.17.0.md) for optional Steam integration, refreshed example artwork and animations, smoother platformer camera motion, and tile-seam fixes.
+See the [0.18.0 release notes](RELEASE_NOTES_0.18.0.md) for hardened asset signatures, faster preloading, Linux audio/runtime fixes, and safer builds and releases. Protected games must rebuild their executable, pack, and native runtime together.
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.11 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
