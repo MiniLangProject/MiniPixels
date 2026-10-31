@@ -29,7 +29,7 @@ import steam_support
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMPILER = ROOT.parent / "MiniLangCompilerPy" / "mlc_win64.py"
 ASSET_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-VERSION = "0.18.0"
+VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 DEFAULT_TARGET = "windows-x64" if os.name == "nt" else "linux-x64"
 PACK_CODEC_NONE = 0
 PACK_CODEC_DEFLATE = 1

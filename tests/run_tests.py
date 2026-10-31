@@ -339,7 +339,7 @@ def run_python_tests() -> None:
         raise RuntimeError("could not load tools/minipixels.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    assert mod.VERSION == "0.18.0", mod.VERSION
+    assert mod.VERSION == (ROOT / "VERSION").read_text(encoding="utf-8").strip(), mod.VERSION
     # A fresh compiler checkout must build exactly where the packager looks,
     # regardless of the shell's working directory (GitHub runners use another drive).
     for target, name in (("windows-x64", "minilang_video.dll"), ("linux-x64", "libminilang_video.so")):

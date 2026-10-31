@@ -3,11 +3,11 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.19.0`
+Current version: `0.20.0`
 
-See the [0.19.0 release notes](RELEASE_NOTES_0.19.0.md) for faster CPU canvas rendering and the new bulk pixel API. Protected games must still rebuild their executable, pack, and native runtime together when upgrading from versions before 0.18.0.
+See the [0.20.0 release notes](RELEASE_NOTES_0.20.0.md) for inline ASM canvas optimizations. Protected games must still rebuild their executable, pack, and native runtime together when upgrading from versions before 0.18.0.
 
-MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. The published 0.19.0 release uses MiniLang Compiler 1.2.11 or newer; current `main` needs typed inline x64 assembly from MiniLangCompilerPy commit `1ba5719` or newer. It builds native Windows x64 PE and Linux x64 ELF executables.
+MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. Version 0.20.0 needs typed inline x64 assembly from MiniLangCompilerPy commit `1ba5719` or newer. It builds native Windows x64 PE and Linux x64 ELF executables.
 
 MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, fixed/native/scaled framebuffers, OpenGL/WGL, GDI and XImage presentation, an optional batched Windows GPU scene canvas, configurable keyboard/mouse actions, sprites and rotated render targets, signed and optionally encrypted asset packs, localized text and generated game data, scene stacks, swept tile collision, bitmap text, multi-voice WAV/MP3 audio through waveOut or ALSA, streamed MPX audio/video, headless tests, and example projects.
 
@@ -40,7 +40,7 @@ diagnostics as failures.
 ## Requirements
 
 - Windows x64 or Linux x64 with glibc, X11 (`libX11.so.6`) and ALSA (`libasound.so.2`); streamed audio/video on Linux also needs GStreamer (base/good plugins plus libav for MP3/H.264 decoding). On Ubuntu: `sudo apt-get install libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-libav`. Building the native MPX runtime additionally requires OpenSSL development headers (`libssl-dev`).
-- MiniLangCompilerPy commit `1ba5719` or newer in a sibling checkout for current `main` (or a MiniLangCompilerML binary rebuilt from commit `b9de207` or newer); the published 0.19.0 release supports MiniLang Compiler 1.2.11 or newer. Lazy MPX I/O uses `std.io.file`, fast MPX assets use `std.compress.lz4`, protected builds use `std.crypto.ecdsa_p256`, and streamed media uses `std.audio`/`std.video`.
+- MiniLangCompilerPy commit `1ba5719` or newer in a sibling checkout (or a MiniLangCompilerML binary rebuilt from commit `b9de207` or newer). Lazy MPX I/O uses `std.io.file`, fast MPX assets use `std.compress.lz4`, protected builds use `std.crypto.ecdsa_p256`, and streamed media uses `std.audio`/`std.video`.
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
 - The Python packages in `requirements.txt` for protected builds and WAV-to-MP3 asset transcoding
 - Visual Studio C++ Build Tools on Windows, or GCC on Linux, for the small native audio/asset/presentation bridge

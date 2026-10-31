@@ -28,7 +28,7 @@ Populates every frame descriptor cache ahead of a hot rendering loop.
 | `sheet` | `dynamic` | — | Sprite sheet to prewarm. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L238)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L250)
 
 - [minipixels.graphics.sprite.Image](Type-minipixels-graphics-sprite-image-712579706.md) — struct
 <a id="function-function-minipixels-graphics-sprite-imagegetpixel-function-imagegetpixel-img-x-y-src-minipixels-graphics-sprite-ml-595135794"></a>
@@ -47,7 +47,7 @@ Performs the imageGetPixel operation for the minipixels graphics sprite module.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L160)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L172)
 
 <a id="function-function-minipixels-graphics-sprite-imageindex-inline-function-imageindex-img-x-y-src-minipixels-graphics-sprite-ml-1559316635"></a>
 ### imageIndex
@@ -65,7 +65,7 @@ Performs the imageIndex operation for the minipixels graphics sprite module.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L135)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L147)
 
 <a id="function-function-minipixels-graphics-sprite-imagesetpixel-function-imagesetpixel-img-x-y-color-src-minipixels-graphics-sprite-ml-1730185989"></a>
 ### imageSetPixel
@@ -84,7 +84,7 @@ Performs the imageSetPixel operation for the minipixels graphics sprite module.
 | `color` | `dynamic` | — | color value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L144)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L156)
 
 <a id="function-function-minipixels-graphics-sprite-newimage-function-newimage-width-height-pixels-name-src-minipixels-graphics-sprite-ml-1608740487"></a>
 ### newImage
@@ -141,7 +141,7 @@ Performs the solidImage operation for the minipixels graphics sprite module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L112)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L124)
 
 - [minipixels.graphics.sprite.Sprite](Type-minipixels-graphics-sprite-sprite-363793820.md) — struct
 <a id="function-function-minipixels-graphics-sprite-spritefromimage-function-spritefromimage-img-name-src-minipixels-graphics-sprite-ml-2049691192"></a>
@@ -159,7 +159,7 @@ Performs the spriteFromImage operation for the minipixels graphics sprite module
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L176)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L188)
 
 <a id="function-function-minipixels-graphics-sprite-spriteregion-function-spriteregion-img-sx-sy-w-h-name-src-minipixels-graphics-sprite-ml-1585338268"></a>
 ### spriteRegion
@@ -180,7 +180,7 @@ Performs the spriteRegion operation for the minipixels graphics sprite module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L187)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L199)
 
 <a id="function-function-minipixels-graphics-sprite-spritesheet-function-spritesheet-img-framewidth-frameheight-spacing-margin-src-minipixels-graphics-sprite-ml-1575399887"></a>
 ### spriteSheet
@@ -200,7 +200,7 @@ Performs the spriteSheet operation for the minipixels graphics sprite module.
 | `margin` | `dynamic` | — | margin value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L197)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L209)
 
 - [minipixels.graphics.sprite.SpriteSheet](Type-minipixels-graphics-sprite-spritesheet-395190639.md) — struct
 <a id="function-function-minipixels-graphics-sprite-spritesheetframe-function-spritesheetframe-sheet-index-src-minipixels-graphics-sprite-ml-199818173"></a>
@@ -218,4 +218,4 @@ Performs the spriteSheetFrame operation for the minipixels graphics sprite modul
 | `index` | `dynamic` | — | Zero-based index of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L221)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/sprite.ml#L233)

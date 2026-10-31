@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.20.0 - 2026-10-31
+
+- Scanned RGBA alpha bytes in a bounds-checked typed inline ASM loop when detecting image and replacement-frame opacity.
+- Copied opaque horizontally flipped sprite rows through 32-bit inline ASM loads and stores after buffer checks; short rows retain the byte-copy path.
+- Added a flipped-sprite benchmark and regression coverage for opacity boundaries and overlapping horizontal self-blits on Windows and Linux.
+- Improved optional Windows GPU build discovery when the first Visual Studio lookup finds no C++ tools.
+- Updated the required compiler baseline to include typed inline ASM loops and 32-bit byte-buffer access.
+
 ## 0.19.0 - 2026-10-31
 
 - Added `Canvas.replacePixels` for full-frame RGBA updates from a reusable byte buffer, with size validation, opacity detection and one dirty-region update.

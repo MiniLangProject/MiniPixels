@@ -150,6 +150,24 @@ Clears canvas maintained by the minipixels graphics canvas module.
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L372)
 
+<a id="function-function-minipixels-graphics-canvas-copyopaqueflippedrow-inline-function-copyopaqueflippedrow-destination-as-bytes-source-as-bytes-di-as-int-si-as-int-count-as-int-returns-bool-src-minipixels-graphics-canvas-ml-528331708"></a>
+### copyOpaqueFlippedRow
+
+```ml
+inline function copyOpaqueFlippedRow(destination as bytes, source as bytes, di as int, si as int, count as int) returns bool
+```
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `destination` | `bytes` | — |  |
+| `source` | `bytes` | — |  |
+| `di` | `int` | — |  |
+| `si` | `int` | — |  |
+| `count` | `int` | — |  |
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L916)
+
 <a id="function-function-minipixels-graphics-canvas-create-function-create-width-height-src-minipixels-graphics-canvas-ml-1074773335"></a>
 ### create
 
@@ -184,7 +202,7 @@ Draws a source canvas as a reusable CPU render target.
 | `y` | `dynamic` | — | Destination y coordinate. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1197)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1227)
 
 <a id="function-function-minipixels-graphics-canvas-drawcircle-function-drawcircle-c-cx-cy-r-color-src-minipixels-graphics-canvas-ml-2045286387"></a>
 ### drawCircle
@@ -308,7 +326,7 @@ Draws rect world through the minipixels graphics canvas rendering path.
 | `color` | `dynamic` | — | color value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1235)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1265)
 
 <a id="function-function-minipixels-graphics-canvas-drawsprite-function-drawsprite-c-spr-x-y-src-minipixels-graphics-canvas-ml-1771831875"></a>
 ### drawSprite
@@ -350,7 +368,7 @@ Draws sprite ex through the minipixels graphics canvas rendering path.
 | `tint` | `dynamic` | — | tint value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L987)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1017)
 
 <a id="function-function-minipixels-graphics-canvas-drawspritefast1x-function-drawspritefast1x-c-spr-x-y-src-minipixels-graphics-canvas-ml-1613156323"></a>
 ### drawSpriteFast1x
@@ -389,7 +407,7 @@ Draws a sprite rotated around its configured pivot using inverse sampling.
 | `tint` | `dynamic` | — | Multiplicative RGBA tint. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1107)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1137)
 
 <a id="function-function-minipixels-graphics-canvas-drawspritescaled-function-drawspritescaled-c-spr-x-y-scale-tint-src-minipixels-graphics-canvas-ml-841362936"></a>
 ### drawSpriteScaled
@@ -410,7 +428,7 @@ Draws a sprite at an arbitrary nearest-neighbour scale. Unlike drawSpriteEx, thi
 | `tint` | `dynamic` | — | Multiplicative RGBA tint. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1044)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1074)
 
 <a id="function-function-minipixels-graphics-canvas-drawspriteunittransformed-function-drawspriteunittransformed-c-spr-x-y-flipx-flipy-tint-src-minipixels-graphics-canvas-ml-1094242111"></a>
 ### drawSpriteUnitTransformed
@@ -430,7 +448,7 @@ function drawSpriteUnitTransformed(c, spr, x, y, flipX, flipY, tint)
 | `tint` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L916)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L941)
 
 <a id="function-function-minipixels-graphics-canvas-drawspriteworld-function-drawspriteworld-c-camera-spr-x-y-src-minipixels-graphics-canvas-ml-758119470"></a>
 ### drawSpriteWorld
@@ -450,7 +468,7 @@ Draws sprite world through the minipixels graphics canvas rendering path.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1245)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1275)
 
 <a id="function-function-minipixels-graphics-canvas-drawspriteworldex-function-drawspriteworldex-c-camera-spr-x-y-flipx-flipy-scale-tint-src-minipixels-graphics-canvas-ml-273018892"></a>
 ### drawSpriteWorldEx
@@ -474,7 +492,7 @@ Draws sprite world ex through the minipixels graphics canvas rendering path.
 | `tint` | `dynamic` | — | tint value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1259)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1289)
 
 <a id="function-function-minipixels-graphics-canvas-fillcircle-function-fillcircle-c-cx-cy-r-color-src-minipixels-graphics-canvas-ml-108867707"></a>
 ### fillCircle
@@ -537,7 +555,7 @@ Performs the fillRectWorld operation for the minipixels graphics canvas module.
 | `color` | `dynamic` | — | color value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1223)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1253)
 
 <a id="function-function-minipixels-graphics-canvas-fillscaledpixel-function-fillscaledpixel-c-x-y-scale-color-src-minipixels-graphics-canvas-ml-1949563361"></a>
 ### fillScaledPixel
@@ -591,7 +609,7 @@ Performs the hash operation for the minipixels graphics canvas module.
 | `c` | `dynamic` | — | c value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1265)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1295)
 
 <a id="function-function-minipixels-graphics-canvas-imagepixelunchecked-inline-function-imagepixelunchecked-image-x-y-src-minipixels-graphics-canvas-ml-1909827365"></a>
 ### imagePixelUnchecked
@@ -731,7 +749,7 @@ Performs the screenX operation for the minipixels graphics canvas module.
 | `x` | `dynamic` | — | Horizontal coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1204)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1234)
 
 <a id="function-function-minipixels-graphics-canvas-screeny-function-screeny-camera-y-src-minipixels-graphics-canvas-ml-963577846"></a>
 ### screenY
@@ -748,7 +766,7 @@ Performs the screenY operation for the minipixels graphics canvas module.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1211)
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/graphics/canvas.ml#L1241)
 
 <a id="function-function-minipixels-graphics-canvas-setpixel-function-setpixel-c-x-y-color-src-minipixels-graphics-canvas-ml-1444983993"></a>
 ### setPixel

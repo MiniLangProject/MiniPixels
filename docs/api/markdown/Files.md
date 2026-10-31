@@ -14,7 +14,7 @@
 | [src/minipixels/collision/collision.ml](File-src-minipixels-collision-collision-ml-1544745439.md) | `minipixels.collision.collision` | yes | 14 |
 | [src/minipixels/core/time.ml](File-src-minipixels-core-time-ml-1360759889.md) | `minipixels.core.time` | yes | 16 |
 | [src/minipixels/debug/debug.ml](File-src-minipixels-debug-debug-ml-1202344879.md) | `minipixels.debug.debug` | yes | 5 |
-| [src/minipixels/graphics/canvas.ml](File-src-minipixels-graphics-canvas-ml-370061960.md) | `minipixels.graphics.canvas` | yes | 80 |
+| [src/minipixels/graphics/canvas.ml](File-src-minipixels-graphics-canvas-ml-370061960.md) | `minipixels.graphics.canvas` | yes | 81 |
 | [src/minipixels/graphics/font.ml](File-src-minipixels-graphics-font-ml-906525775.md) | `minipixels.graphics.font` | yes | 5 |
 | [src/minipixels/graphics/gpu.ml](File-src-minipixels-graphics-gpu-ml-159526452.md) | `minipixels.graphics.gpu` | no | 55 |
 | [src/minipixels/graphics/sprite.ml](File-src-minipixels-graphics-sprite-ml-1992064667.md) | `minipixels.graphics.sprite` | yes | 39 |
