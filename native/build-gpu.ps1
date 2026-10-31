@@ -2,6 +2,14 @@ param([Parameter(Mandatory=$true)][string]$OutputDirectory)
 $ErrorActionPreference = 'Stop'
 $vswhere = 'C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe'
 $vs = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+$vs = @($vs)[0]
+if (-not $vs) {
+  # Visual Studio can temporarily be marked incomplete while a reboot is
+  # pending even though the installed C++ toolchain is fully usable.
+  $vs = @(& $vswhere -all -products * -property installationPath | Where-Object {
+    Test-Path -LiteralPath (Join-Path $_ 'VC\Auxiliary\Build\vcvars64.bat')
+  })[0]
+}
 if (-not $vs) { throw 'Visual Studio C++ x64 tools are required for the optional GPU backend.' }
 New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
 $dest = (Resolve-Path -LiteralPath $OutputDirectory).Path
