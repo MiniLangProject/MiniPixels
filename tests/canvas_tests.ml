@@ -23,6 +23,10 @@ function main(args)
   bulkPixels[5] = 5
   bulkPixels[6] = 4
   bulkPixels[7] = 128
+  a.assertTrue(sp.pixelsAreOpaque(bulkPixels, 0), "zero pixels need no alpha scan")
+  a.assertFalse(sp.pixelsAreOpaque(bulkPixels, 3), "opacity scan rejects truncated buffers")
+  a.assertTrue(sp.pixelsAreOpaque(bulkPixels, 1), "opacity scan respects pixel count")
+  a.assertFalse(sp.pixelsAreOpaque(bulkPixels, 2), "opacity scan finds last transparent pixel")
   a.assertTrue(bulkCanvas.replacePixels(bulkPixels), "replacePixels accepts exact RGBA buffer")
   a.assertEq(bulkCanvas.getPixel(0, 0), mp.rgb(9, 8, 7), "replacePixels copies RGB")
   a.assertEq(bulkCanvas.getPixel(1, 0), mp.rgba(6, 5, 4, 128), "replacePixels copies alpha")

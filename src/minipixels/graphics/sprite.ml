@@ -95,13 +95,25 @@ end function
 /// @returns Native bool result produced by the call.
 function pixelsAreOpaque(pixels as bytes, pixelCount as int) returns bool
   if len(pixels) < pixelCount * 4 then return false end if
-  i = 3
   limit = pixelCount * 4
-  while i < limit
-    if pixels[i] != 255 then return false end if
-    i = i + 4
-  end while
-  return true
+  // The size check above guarantees every alpha-byte read stays in bounds.
+  opaque = asm unsafe x64(in pixels as bytes, in limit as int, scratch i as int, scratch alpha as int) returns int
+    mov result, 1
+    mov i, 3
+    label scan
+    cmp i, limit
+    jge done
+    movzx alpha, byte [pixels.data + i]
+    cmp alpha, 255
+    je next
+    mov result, 0
+    jmp done
+    label next
+    add i, 4
+    jmp scan
+    label done
+  end asm
+  return opaque == 1
 end function
 
 /// Performs the solidImage operation for the minipixels graphics sprite module.
