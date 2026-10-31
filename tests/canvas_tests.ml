@@ -13,6 +13,31 @@ function main(args)
   a.assertEq(canvas.getPixel(3, 4), mp.rgb(9, 8, 7), "setPixel/getPixel")
   canvas.setPixel(-1, -1, mp.rgb(0, 0, 0))
   a.assertEq(canvas.getPixel(0, 0), mp.rgb(1, 2, 3), "out of bounds write is ignored")
+  bulkCanvas = minipixels.graphics.canvas.create(2, 1)
+  bulkPixels = bytes(8, 0)
+  bulkPixels[0] = 9
+  bulkPixels[1] = 8
+  bulkPixels[2] = 7
+  bulkPixels[3] = 255
+  bulkPixels[4] = 6
+  bulkPixels[5] = 5
+  bulkPixels[6] = 4
+  bulkPixels[7] = 128
+  a.assertTrue(bulkCanvas.replacePixels(bulkPixels), "replacePixels accepts exact RGBA buffer")
+  a.assertEq(bulkCanvas.getPixel(0, 0), mp.rgb(9, 8, 7), "replacePixels copies RGB")
+  a.assertEq(bulkCanvas.getPixel(1, 0), mp.rgba(6, 5, 4, 128), "replacePixels copies alpha")
+  a.assertFalse(bulkCanvas.imageView.opaque, "replacePixels tracks transparency")
+  minipixels.graphics.canvas.resetDirty(bulkCanvas)
+  a.assertFalse(bulkCanvas.replacePixels(bytes(7, 0)), "replacePixels rejects wrong buffer size")
+  a.assertFalse(bulkCanvas.dirty, "rejected pixel replacement does not dirty canvas")
+  bulkPixels[7] = 255
+  a.assertTrue(bulkCanvas.replacePixels(bulkPixels), "replacePixels accepts reused source buffer")
+  a.assertTrue(bulkCanvas.imageView.opaque, "replacePixels recognizes opaque frames")
+  a.assertTrue(bulkCanvas.dirty, "replacePixels marks full canvas dirty")
+  a.assertEq(bulkCanvas.dirtyX1, 2, "replacePixels dirty width")
+  a.assertEq(bulkCanvas.dirtyY1, 1, "replacePixels dirty height")
+  a.assertTrue(bulkCanvas.replacePixels(bulkCanvas.pixels), "replacePixels accepts its own pixel buffer")
+  a.assertEq(bulkCanvas.getPixel(1, 0), mp.rgb(6, 5, 4), "self replacement preserves pixels")
   canvas.fillRect(1, 1, 3, 2, mp.rgb(10, 20, 30))
   a.assertEq(canvas.getPixel(2, 2), mp.rgb(10, 20, 30), "fillRect")
   canvas.fillRect(1, 1, 1, 1, mp.rgba(110, 220, 130, 128))

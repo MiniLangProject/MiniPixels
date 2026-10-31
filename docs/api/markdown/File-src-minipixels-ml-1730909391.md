@@ -29,7 +29,7 @@ Reachable from entry: **yes**
 - `minipixels/steam.ml` as `steam` → [src/minipixels/steam.ml](File-src-minipixels-steam-ml-239735282.md)
 - `minipixels/world/camera.ml` as `cam` → [src/minipixels/world/camera.ml](File-src-minipixels-world-camera-ml-397830650.md)
 - `minipixels/world/tilemap.ml` as `tile` → [src/minipixels/world/tilemap.ml](File-src-minipixels-world-tilemap-ml-2079329797.md)
-- `std/math.ml` as `math` → `../MiniLangCompilerML/std/math.ml` — external dependency
+- `std/math.ml` as `math` → `../MiniLangCompilerPy/std/math.ml` — external dependency
 
 ## Declarations
 

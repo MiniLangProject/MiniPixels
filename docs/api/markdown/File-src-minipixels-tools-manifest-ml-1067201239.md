@@ -11,9 +11,9 @@ Reachable from entry: **no**
 ## Imports
 
 - `minipixels/tools/json.ml` as `json` → [src/minipixels/tools/json.ml](File-src-minipixels-tools-json-ml-388493918.md)
-- `std/array.ml` as `arr` → `../MiniLangCompilerML/std/array.ml` — external dependency
-- `std/fs.ml` as `fs` → `../MiniLangCompilerML/std/fs.ml` — external dependency
-- `std/string.ml` as `str` → `../MiniLangCompilerML/std/string.ml` — external dependency
+- `std/array.ml` as `arr` → `../MiniLangCompilerPy/std/array.ml` — external dependency
+- `std/fs.ml` as `fs` → `../MiniLangCompilerPy/std/fs.ml` — external dependency
+- `std/string.ml` as `str` → `../MiniLangCompilerPy/std/string.ml` — external dependency
 
 ## Declarations
 

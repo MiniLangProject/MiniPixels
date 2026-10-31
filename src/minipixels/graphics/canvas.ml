@@ -57,6 +57,15 @@ struct Canvas
     return minipixels.graphics.canvas.setPixel(this, x, y, color)
   end function
 
+  /// Replaces the entire framebuffer with tightly packed RGBA bytes.
+  /// Reuse the source buffer across frames when generating pixels on the CPU.
+  /// Returns false if its size does not match the canvas.
+  /// @param source Row-major RGBA bytes covering the whole canvas.
+  /// @returns Whether the buffer size matched and the frame was replaced.
+  function replacePixels(source as bytes) returns bool
+    return minipixels.graphics.canvas.replacePixels(this, source)
+  end function
+
   /// Returns pixel maintained by the minipixels graphics canvas module.
   /// @param x Horizontal coordinate used by the operation.
   /// @param y Vertical coordinate used by the operation.
@@ -410,6 +419,27 @@ function setPixel(c, x, y, color)
   return true
 end function
 
+/// Replaces every pixel in one bulk copy and updates presentation metadata once.
+/// The source is row-major RGBA with exactly width * height * 4 bytes.
+/// @param c Canvas to update.
+/// @param source Row-major RGBA bytes covering the whole canvas.
+/// @returns Whether the buffer size matched and the frame was replaced.
+function replacePixels(c, source as bytes) returns bool
+  if len(source) != len(c.pixels) then return false end if
+  opaque = sp.pixelsAreOpaque(source, c.width * c.height)
+  if nativeBytesPtr(source) != nativeBytesPtr(c.pixels) then
+    copyBytes(c.pixels, 0, source, 0, len(source))
+  end if
+  c.imageView.opaque = opaque
+  c.dirty = true
+  c.dirtyX0 = 0
+  c.dirtyY0 = 0
+  c.dirtyX1 = c.width
+  c.dirtyY1 = c.height
+  c.drawCalls = c.drawCalls + 1
+  return true
+end function
+
 /// Performs the blendPixelRaw operation for the minipixels graphics canvas module.
 /// @param c c value consumed by this operation.
 /// @param x Horizontal coordinate used by the operation.
@@ -534,6 +564,26 @@ function fillRect(c, x, y, w, h, color)
       copyBytes(c.pixels, index(c, x0, yy), c.pixels, rowStart, rowBytes)
       yy = yy + 1
     end while
+  else if x0 < x1 and y0 < y1 and a > 0 and c.imageView.opaque then
+    // Every destination alpha is 255, so only RGB needs blending. Decode the
+    // source color once and walk each clipped row by byte offset.
+    inverseAlpha = 255 - a
+    yy = y0
+    while yy < y1
+      i = index(c, x0, yy)
+      xx = x0
+      while xx < x1
+        red = r * a + c.pixels[i] * inverseAlpha
+        green = g * a + c.pixels[i + 1] * inverseAlpha
+        blue = b * a + c.pixels[i + 2] * inverseAlpha
+        c.pixels[i] = (red + 1 + (red >> 8)) >> 8
+        c.pixels[i + 1] = (green + 1 + (green >> 8)) >> 8
+        c.pixels[i + 2] = (blue + 1 + (blue >> 8)) >> 8
+        i = i + 4
+        xx = xx + 1
+      end while
+      yy = yy + 1
+    end while
   else
     yy = y0
     while yy < y1
@@ -571,10 +621,12 @@ end function
 /// @param y2 y2 value consumed by this operation.
 /// @param color color value consumed by this operation.
 function drawLine(c, x1, y1, x2, y2, color)
-  x1 = mt.floorInt(x1)
-  y1 = mt.floorInt(y1)
-  x2 = mt.floorInt(x2)
-  y2 = mt.floorInt(y2)
+  cameraOffsetX = mt.floorInt(0 - c.cameraX)
+  cameraOffsetY = mt.floorInt(0 - c.cameraY)
+  x1 = mt.floorInt(x1) + cameraOffsetX
+  y1 = mt.floorInt(y1) + cameraOffsetY
+  x2 = mt.floorInt(x2) + cameraOffsetX
+  y2 = mt.floorInt(y2) + cameraOffsetY
   dx = mt.abs(x2 - x1)
   dy = 0 - mt.abs(y2 - y1)
   sx = -1
@@ -582,8 +634,30 @@ function drawLine(c, x1, y1, x2, y2, color)
   if x1 < x2 then sx = 1 end if
   if y1 < y2 then sy = 1 end if
   err = dx + dy
+  red = (color >> 24) & 255
+  green = (color >> 16) & 255
+  blue = (color >> 8) & 255
+  alpha = color & 255
+  visible = false
+  firstX = 0
+  firstY = 0
+  lastX = 0
+  lastY = 0
   while true
-    setPixel(c, x1, y1, color)
+    if x1 >= 0 and y1 >= 0 and x1 < c.width and y1 < c.height then
+      i = index(c, x1, y1)
+      c.pixels[i] = red
+      c.pixels[i + 1] = green
+      c.pixels[i + 2] = blue
+      c.pixels[i + 3] = alpha
+      if visible == false then
+        firstX = x1
+        firstY = y1
+        visible = true
+      end if
+      lastX = x1
+      lastY = y1
+    end if
     if x1 == x2 and y1 == y2 then break end if
     e2 = 2 * err
     if e2 >= dy then
@@ -595,6 +669,22 @@ function drawLine(c, x1, y1, x2, y2, color)
       y1 = y1 + sy
     end if
   end while
+  if visible then
+    if alpha < 255 then c.imageView.opaque = false end if
+    x0 = firstX
+    y0 = firstY
+    xEnd = lastX
+    yEnd = lastY
+    if xEnd < x0 then
+      x0 = lastX
+      xEnd = firstX
+    end if
+    if yEnd < y0 then
+      y0 = lastY
+      yEnd = firstY
+    end if
+    markDirty(c, x0, y0, xEnd - x0 + 1, yEnd - y0 + 1)
+  end if
   c.drawCalls = c.drawCalls + 1
 end function
 
@@ -720,7 +810,9 @@ function fillScaledPixel(c, x, y, scale, color)
         c.pixels[i + 2] = b
         c.pixels[i + 3] = a
       else
-        blendPixel(c, xx, yy, color)
+        // Blend directly into the byte buffer instead of packing and unpacking
+        // each destination pixel through getPixel/alphaBlend/setPixel.
+        blendPixelRaw(c, xx, yy, color)
       end if
       xx = xx + 1
     end while
@@ -819,6 +911,70 @@ function drawSpriteFast1x(c, spr, x, y)
   return drawImageRegionFast1x(c, spr.image, spr.sx, spr.sy, spr.width, spr.height, x, y)
 end function
 
+/// @internal
+/// Draw a clipped unit-scale sprite without repeating bounds and flip checks per pixel.
+function drawSpriteUnitTransformed(c, spr, x, y, flipX, flipY, tint)
+  x0 = mt.clamp(x, 0, c.width)
+  y0 = mt.clamp(y, 0, c.height)
+  x1 = mt.clamp(x + spr.width, 0, c.width)
+  y1 = mt.clamp(y + spr.height, 0, c.height)
+  source = spr.image.pixels
+  destination = c.pixels
+  tintRequired = tint != whiteTint
+  sourceStep = 4
+  if flipX then sourceStep = -4 end if
+  canCopyRows = spr.image.opaque and not tintRequired and not flipX
+  // Row copies may overlap when a canvas is drawn onto itself. Keep the old
+  // left-to-right pixel order for that case.
+  if canCopyRows and nativeBytesPtr(source) == nativeBytesPtr(destination) then canCopyRows = false end if
+
+  yy = y0
+  while yy < y1
+    sourceY = yy - y
+    if flipY then sourceY = spr.height - 1 - sourceY end if
+    sourceX = x0 - x
+    if flipX then sourceX = spr.width - 1 - sourceX end if
+    sourceIndex = (((spr.sy + sourceY) * spr.image.width) + spr.sx + sourceX) * 4
+    destinationIndex = ((yy * c.width) + x0) * 4
+
+    if canCopyRows then
+      copyBytes(destination, destinationIndex, source, sourceIndex, (x1 - x0) * 4)
+    else if spr.image.opaque and not tintRequired then
+      xx = x0
+      while xx < x1
+        destination[destinationIndex] = source[sourceIndex]
+        destination[destinationIndex + 1] = source[sourceIndex + 1]
+        destination[destinationIndex + 2] = source[sourceIndex + 2]
+        destination[destinationIndex + 3] = source[sourceIndex + 3]
+        sourceIndex = sourceIndex + sourceStep
+        destinationIndex = destinationIndex + 4
+        xx = xx + 1
+      end while
+    else
+      xx = x0
+      while xx < x1
+        if source[sourceIndex + 3] > 0 then
+          color = (source[sourceIndex] << 24) | (source[sourceIndex + 1] << 16) | (source[sourceIndex + 2] << 8) | source[sourceIndex + 3]
+          if tintRequired then color = tintColorUnchecked(color, tint) end if
+          alpha = color & 255
+          if alpha >= 255 then
+            destination[destinationIndex] = (color >> 24) & 255
+            destination[destinationIndex + 1] = (color >> 16) & 255
+            destination[destinationIndex + 2] = (color >> 8) & 255
+            destination[destinationIndex + 3] = alpha
+          else if alpha > 0 then
+            blendPixelRaw(c, xx, yy, color)
+          end if
+        end if
+        sourceIndex = sourceIndex + sourceStep
+        destinationIndex = destinationIndex + 4
+        xx = xx + 1
+      end while
+    end if
+    yy = yy + 1
+  end while
+end function
+
 /// Draws sprite ex through the minipixels graphics canvas rendering path.
 /// @param c c value consumed by this operation.
 /// @param spr spr value consumed by this operation.
@@ -837,6 +993,23 @@ function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
     return drawSpriteFast1x(c, spr, x, y)
   end if
   markDirty(c, x, y, spr.width * scale, spr.height * scale)
+  if scale == 1 and spr.width == 1 and spr.height == 1 then
+    // Flipping a single pixel has no effect; avoid the row setup for particles.
+    color = imagePixelUnchecked(spr.image, spr.sx, spr.sy)
+    if mt.colorA(color) > 0 then
+      if tint != whiteTint then color = tintColorUnchecked(color, tint) end if
+      drawPixelFast(c, x, y, color)
+    end if
+    c.spriteCount = c.spriteCount + 1
+    c.drawCalls = c.drawCalls + 1
+    return
+  end if
+  if scale == 1 then
+    drawSpriteUnitTransformed(c, spr, x, y, flipX, flipY, tint)
+    c.spriteCount = c.spriteCount + 1
+    c.drawCalls = c.drawCalls + 1
+    return
+  end if
   yy = 0
   while yy < spr.height
     xx = 0
@@ -850,11 +1023,7 @@ function drawSpriteEx(c, spr, x, y, flipX, flipY, scale, tint)
         if tint != whiteTint then
           color = tintColorUnchecked(color, tint)
         end if
-        if scale == 1 then
-          drawPixelFast(c, x + xx, y + yy, color)
-        else
-          fillScaledPixel(c, x + (xx * scale), y + (yy * scale), scale, color)
-        end if
+        fillScaledPixel(c, x + (xx * scale), y + (yy * scale), scale, color)
       end if
       xx = xx + 1
     end while
@@ -887,19 +1056,41 @@ function drawSpriteScaled(c, spr, x, y, scale, tint)
   y1 = mt.clamp(y + scaledHeight, 0, c.height)
   if x0 >= x1 or y0 >= y1 then return end if
   inverseScale = 1.0 / scale
-  yy = y0
-  while yy < y1
-    sourceY = mt.clamp(mt.floorInt((yy - y) * inverseScale), 0, spr.height - 1)
-    xx = x0
-    while xx < x1
-      sourceX = mt.clamp(mt.floorInt((xx - x) * inverseScale), 0, spr.width - 1)
-      color = imagePixelUnchecked(spr.image, spr.sx + sourceX, spr.sy + sourceY)
-      if tint != whiteTint then color = tintColorUnchecked(color, tint) end if
-      if mt.colorA(color) > 0 then drawPixelFast(c, xx, yy, color) end if
-      xx = xx + 1
+  if scale > 1 then
+    yy = y0
+    while yy < y1
+      sourceY = mt.clamp(mt.floorInt((yy - y) * inverseScale), 0, spr.height - 1)
+      previousSourceX = -1
+      color = 0
+      xx = x0
+      while xx < x1
+        sourceX = mt.clamp(mt.floorInt((xx - x) * inverseScale), 0, spr.width - 1)
+        // Reuse decoded and tinted colors when upscaling repeats source pixels.
+        if sourceX != previousSourceX then
+          color = imagePixelUnchecked(spr.image, spr.sx + sourceX, spr.sy + sourceY)
+          if tint != whiteTint then color = tintColorUnchecked(color, tint) end if
+          previousSourceX = sourceX
+        end if
+        if mt.colorA(color) > 0 then drawPixelFast(c, xx, yy, color) end if
+        xx = xx + 1
+      end while
+      yy = yy + 1
     end while
-    yy = yy + 1
-  end while
+  else
+    yy = y0
+    while yy < y1
+      sourceY = mt.clamp(mt.floorInt((yy - y) * inverseScale), 0, spr.height - 1)
+      xx = x0
+      while xx < x1
+        sourceX = mt.clamp(mt.floorInt((xx - x) * inverseScale), 0, spr.width - 1)
+        color = imagePixelUnchecked(spr.image, spr.sx + sourceX, spr.sy + sourceY)
+        if tint != whiteTint then color = tintColorUnchecked(color, tint) end if
+        if mt.colorA(color) > 0 then drawPixelFast(c, xx, yy, color) end if
+        xx = xx + 1
+      end while
+      yy = yy + 1
+    end while
+  end if
   markDirty(c, x0, y0, x1 - x0, y1 - y0)
   c.spriteCount = c.spriteCount + 1
   c.drawCalls = c.drawCalls + 1
@@ -928,11 +1119,14 @@ function drawSpriteRotated(c, spr, x, y, radians, scale, tint)
   x1 = x0
   y0 = mt.floorInt(y + (left * sine + top * cosine) * scale)
   y1 = y0
-  cornersX = [right, right, left]
-  cornersY = [top, bottom, bottom]
+  // Check the remaining corners without allocating two arrays per sprite.
   for corner = 0 to 2
-    rx = mt.floorInt(x + (cornersX[corner] * cosine - cornersY[corner] * sine) * scale)
-    ry = mt.floorInt(y + (cornersX[corner] * sine + cornersY[corner] * cosine) * scale)
+    cornerX = right
+    cornerY = bottom
+    if corner == 0 then cornerY = top end if
+    if corner == 2 then cornerX = left end if
+    rx = mt.floorInt(x + (cornerX * cosine - cornerY * sine) * scale)
+    ry = mt.floorInt(y + (cornerX * sine + cornerY * cosine) * scale)
     if rx < x0 then x0 = rx end if
     if rx > x1 then x1 = rx end if
     if ry < y0 then y0 = ry end if
@@ -946,6 +1140,11 @@ function drawSpriteRotated(c, spr, x, y, radians, scale, tint)
   inverseScale = 1.0 / scale
   stepSourceX = cosine * inverseScale
   stepSourceY = (0 - sine) * inverseScale
+  source = spr.image.pixels
+  destination = c.pixels
+  sourceWidth = spr.image.width
+  tintRequired = tint != whiteTint
+  copyOpaque = spr.image.opaque and not tintRequired
   yy = y0
   while yy < y1
     dx = (x0 + 0.5 - x) * inverseScale
@@ -953,16 +1152,34 @@ function drawSpriteRotated(c, spr, x, y, radians, scale, tint)
     sourceXF = (dx * cosine) + (dy * sine) + pivotX
     sourceYF = (0 - dx * sine) + (dy * cosine) + pivotY
     xx = x0
+    destinationIndex = ((yy * c.width) + x0) * 4
     while xx < x1
       sourceX = mt.floorInt(sourceXF)
       sourceY = mt.floorInt(sourceYF)
       if sourceX >= 0 and sourceY >= 0 and sourceX < spr.width and sourceY < spr.height then
-        color = imagePixelUnchecked(spr.image, spr.sx + sourceX, spr.sy + sourceY)
-        if tint != whiteTint then color = tintColorUnchecked(color, tint) end if
-        if mt.colorA(color) > 0 then drawPixelFast(c, xx, yy, color) end if
+        sourceIndex = (((spr.sy + sourceY) * sourceWidth) + spr.sx + sourceX) * 4
+        if copyOpaque then
+          destination[destinationIndex] = source[sourceIndex]
+          destination[destinationIndex + 1] = source[sourceIndex + 1]
+          destination[destinationIndex + 2] = source[sourceIndex + 2]
+          destination[destinationIndex + 3] = source[sourceIndex + 3]
+        else if source[sourceIndex + 3] > 0 then
+          color = (source[sourceIndex] << 24) | (source[sourceIndex + 1] << 16) | (source[sourceIndex + 2] << 8) | source[sourceIndex + 3]
+          if tintRequired then color = tintColorUnchecked(color, tint) end if
+          alpha = color & 255
+          if alpha >= 255 then
+            destination[destinationIndex] = (color >> 24) & 255
+            destination[destinationIndex + 1] = (color >> 16) & 255
+            destination[destinationIndex + 2] = (color >> 8) & 255
+            destination[destinationIndex + 3] = alpha
+          else if alpha > 0 then
+            blendPixelRaw(c, xx, yy, color)
+          end if
+        end if
       end if
       sourceXF = sourceXF + stepSourceX
       sourceYF = sourceYF + stepSourceY
+      destinationIndex = destinationIndex + 4
       xx = xx + 1
     end while
     yy = yy + 1

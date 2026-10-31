@@ -11,8 +11,8 @@ Reachable from entry: **no**
 ## Imports
 
 - `minipixels/assets/pack.ml` as `packs` → [src/minipixels/assets/pack.ml](File-src-minipixels-assets-pack-ml-1157891367.md)
-- `std/audio.ml` as `nativeAudio` → `../MiniLangCompilerML/std/audio.ml` — external dependency
-- `std/video.ml` as `nativeVideo` → `../MiniLangCompilerML/std/video.ml` — external dependency
+- `std/audio.ml` as `nativeAudio` → `../MiniLangCompilerPy/std/audio.ml` — external dependency
+- `std/video.ml` as `nativeVideo` → `../MiniLangCompilerPy/std/video.ml` — external dependency
 
 ## Declarations
 

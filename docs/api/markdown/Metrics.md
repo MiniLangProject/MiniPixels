@@ -8,19 +8,19 @@ Static metrics are calculated from target-specific preprocessed MiniLang files i
 
 | Metric | Value |
 | --- | ---: |
-| Blank lines | 1074 |
-| Clone groups | 22 |
-| Cognitive complexity | 2984 (maximum per function: 154) |
-| Comment lines | 3363 |
-| Cyclomatic complexity | 2880 (average: 3.57, maximum: 61) |
-| Documentation coverage | 96.15% (3045 of 3167 documentation items) |
-| Duplicated lines | 154 (1.83%) |
+| Blank lines | 1079 |
+| Clone groups | 30 |
+| Cognitive complexity | 3095 (maximum per function: 154) |
+| Comment lines | 3384 |
+| Cyclomatic complexity | 2931 (average: 3.62, maximum: 61) |
+| Documentation coverage | 96.15% (3050 of 3172 documentation items) |
+| Duplicated lines | 200 (2.32%) |
 | Files | 28 |
-| Functions | 807 |
-| Maintainability index | 4.81 / 100 |
-| Physical lines | 12869 |
-| Source lines | 8432 |
-| Statements | 6360 |
+| Functions | 810 |
+| Maintainability index | 4.7 / 100 |
+| Physical lines | 13086 |
+| Source lines | 8623 |
+| Statements | 6528 |
 
 ## Documentation coverage
 
@@ -28,19 +28,19 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 
 | Category | Documented | Total | Coverage |
 | --- | ---: | ---: | ---: |
-| API declarations | 874 | 874 | 100% |
+| API declarations | 876 | 876 | 100% |
 | Constants | 71 | 97 | 73.2% |
 | Enum variants | 0 | 0 | 100% |
 | Fields | 368 | 456 | 80.7% |
 | Globals | 11 | 19 | 57.89% |
-| Overall | 3045 | 3167 | 96.15% |
-| Parameters | 1721 | 1721 | 100% |
+| Overall | 3050 | 3172 | 96.15% |
+| Parameters | 1724 | 1724 | 100% |
 
 ## Halstead metrics
 
 | Distinct operators | Distinct operands | Total operators | Total operands | Vocabulary | Length | Volume | Difficulty | Effort | Estimated defects |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 53 | 2908 | 38648 | 29754 | 2961 | 68402 | 788802.89 | 271.14 | 213877609.97 | 262.93 |
+| 53 | 2926 | 39489 | 30470 | 2979 | 69959 | 807369.7 | 275.96 | 222800650.64 | 269.12 |
 
 ## Files
 
@@ -56,7 +56,7 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`src/minipixels/collision/collision.ml`](File-src-minipixels-collision-collision-ml-1544745439.md) | 67 | 7 | 19 / 2.71 / 8 | 17 / 12 | 0 (0%) | 3296.15 | 32.98 |
 | [`src/minipixels/core/time.ml`](File-src-minipixels-core-time-ml-1360759889.md) | 41 | 4 | 8 / 2 / 4 | 4 / 3 | 0 (0%) | 1201.07 | 42.18 |
 | [`src/minipixels/debug/debug.ml`](File-src-minipixels-debug-debug-ml-1202344879.md) | 47 | 4 | 16 / 4 / 10 | 13 / 9 | 0 (0%) | 4365.48 | 35.89 |
-| [`src/minipixels/graphics/canvas.ml`](File-src-minipixels-graphics-canvas-ml-370061960.md) | 665 | 61 | 205 / 3.36 / 19 | 204 / 31 | 16 (2.41%) | 51284.52 | 0 |
+| [`src/minipixels/graphics/canvas.ml`](File-src-minipixels-graphics-canvas-ml-370061960.md) | 856 | 64 | 256 / 4 / 24 | 315 / 50 | 62 (7.24%) | 64608.59 | 0 |
 | [`src/minipixels/graphics/font.ml`](File-src-minipixels-graphics-font-ml-906525775.md) | 88 | 5 | 58 / 11.6 / 43 | 59 / 42 | 0 (0%) | 5226.68 | 23.75 |
 | [`src/minipixels/graphics/gpu.ml`](File-src-minipixels-graphics-gpu-ml-159526452.md) | 186 | 24 | 60 / 2.5 / 8 | 39 / 9 | 0 (0%) | 13639.37 | 13.47 |
 | [`src/minipixels/graphics/sprite.ml`](File-src-minipixels-graphics-sprite-ml-1992064667.md) | 144 | 13 | 46 / 3.54 / 12 | 37 / 11 | 0 (0%) | 7847 | 19.46 |
@@ -323,67 +323,70 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.fillRectWorld`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-fillrectworld-function-fillrectworld-canvas-camera-x-y-w-h-color-src-minipixels-ml-1539538118) | `src/minipixels.ml:617` | 1 | 1 | 1 | 0 | 0 | 152 | 84.59 |
 | [`minipixels.frameHash`](File-src-minipixels-ml-1730909391.md#function-function-minipixels-framehash-function-framehash-canvas-src-minipixels-ml-1907773514) | `src/minipixels.ml:761` | 1 | 1 | 1 | 0 | 0 | 46.51 | 88.19 |
 | [`minipixels.Game.quit`](Type-minipixels-game-1761105865.md#method-method-minipixels-game-quit-function-quit-src-minipixels-ml-1528183005) | `src/minipixels.ml:116` | 3 | 1 | 1 | 0 | 0 | 36.54 | 78.52 |
-| [`minipixels.graphics.canvas.blendOpaqueSpriteRow`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blendopaquespriterow-function-blendopaquespriterow-destination-as-bytes-source-as-bytes-di-as-int-si-as-int-count-as-int-returns-bool-src-minipixels-graphics-canvas-ml-1753098185) | `src/minipixels/graphics/canvas.ml:732` | 23 | 18 | 4 | 5 | 2 | 1235.67 | 48.11 |
-| [`minipixels.graphics.canvas.blendPixel`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blendpixel-function-blendpixel-c-x-y-color-src-minipixels-graphics-canvas-ml-1273688265) | `src/minipixels/graphics/canvas.ml:469` | 7 | 4 | 2 | 1 | 1 | 289.51 | 64.06 |
-| [`minipixels.graphics.canvas.blendPixelRaw`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blendpixelraw-inline-function-blendpixelraw-c-x-y-color-src-minipixels-graphics-canvas-ml-1780994490) | `src/minipixels/graphics/canvas.ml:418` | 33 | 31 | 9 | 8 | 1 | 2509.11 | 41.86 |
-| [`minipixels.graphics.canvas.blendTransparentSpriteRow`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blendtransparentspriterow-function-blendtransparentspriterow-destination-as-bytes-source-as-bytes-di-as-int-si-as-int-count-as-int-returns-bool-src-minipixels-graphics-canvas-ml-1352210493) | `src/minipixels/graphics/canvas.ml:757` | 26 | 20 | 5 | 7 | 3 | 1649.71 | 45.93 |
-| [`minipixels.graphics.canvas.blitImage`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blitimage-function-blitimage-c-img-x-y-src-minipixels-graphics-canvas-ml-991305047) | `src/minipixels/graphics/canvas.ml:666` | 3 | 1 | 1 | 0 | 0 | 144 | 74.34 |
-| [`minipixels.graphics.canvas.blitRegion`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blitregion-function-blitregion-c-img-sx-sy-sw-sh-x-y-src-minipixels-graphics-canvas-ml-165924677) | `src/minipixels/graphics/canvas.ml:679` | 6 | 5 | 7 | 6 | 1 | 446.93 | 63.53 |
-| [`minipixels.graphics.canvas.Canvas.beginCamera`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-begincamera-function-begincamera-camera-src-minipixels-graphics-canvas-ml-187269402) | `src/minipixels/graphics/canvas.ml:230` | 4 | 2 | 1 | 0 | 0 | 77.71 | 73.5 |
-| [`minipixels.graphics.canvas.Canvas.blit`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-blit-function-blit-image-x-y-src-minipixels-graphics-canvas-ml-1673562235) | `src/minipixels/graphics/canvas.ml:119` | 3 | 1 | 1 | 0 | 0 | 112 | 75.11 |
-| [`minipixels.graphics.canvas.Canvas.blitRegion`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-blitregion-function-blitregion-image-sx-sy-sw-sh-x-y-src-minipixels-graphics-canvas-ml-766058417) | `src/minipixels/graphics/canvas.ml:131` | 3 | 1 | 1 | 0 | 0 | 186.91 | 73.55 |
+| [`minipixels.graphics.canvas.blendOpaqueSpriteRow`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blendopaquespriterow-function-blendopaquespriterow-destination-as-bytes-source-as-bytes-di-as-int-si-as-int-count-as-int-returns-bool-src-minipixels-graphics-canvas-ml-1753098185) | `src/minipixels/graphics/canvas.ml:824` | 23 | 18 | 4 | 5 | 2 | 1235.67 | 48.11 |
+| [`minipixels.graphics.canvas.blendPixel`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blendpixel-function-blendpixel-c-x-y-color-src-minipixels-graphics-canvas-ml-1273688265) | `src/minipixels/graphics/canvas.ml:499` | 7 | 4 | 2 | 1 | 1 | 289.51 | 64.06 |
+| [`minipixels.graphics.canvas.blendPixelRaw`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blendpixelraw-inline-function-blendpixelraw-c-x-y-color-src-minipixels-graphics-canvas-ml-1780994490) | `src/minipixels/graphics/canvas.ml:448` | 33 | 31 | 9 | 8 | 1 | 2509.11 | 41.86 |
+| [`minipixels.graphics.canvas.blendTransparentSpriteRow`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blendtransparentspriterow-function-blendtransparentspriterow-destination-as-bytes-source-as-bytes-di-as-int-si-as-int-count-as-int-returns-bool-src-minipixels-graphics-canvas-ml-1352210493) | `src/minipixels/graphics/canvas.ml:849` | 26 | 20 | 5 | 7 | 3 | 1649.71 | 45.93 |
+| [`minipixels.graphics.canvas.blitImage`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blitimage-function-blitimage-c-img-x-y-src-minipixels-graphics-canvas-ml-991305047) | `src/minipixels/graphics/canvas.ml:756` | 3 | 1 | 1 | 0 | 0 | 144 | 74.34 |
+| [`minipixels.graphics.canvas.blitRegion`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-blitregion-function-blitregion-c-img-sx-sy-sw-sh-x-y-src-minipixels-graphics-canvas-ml-165924677) | `src/minipixels/graphics/canvas.ml:769` | 6 | 5 | 7 | 6 | 1 | 446.93 | 63.53 |
+| [`minipixels.graphics.canvas.Canvas.beginCamera`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-begincamera-function-begincamera-camera-src-minipixels-graphics-canvas-ml-187269402) | `src/minipixels/graphics/canvas.ml:239` | 4 | 2 | 1 | 0 | 0 | 77.71 | 73.5 |
+| [`minipixels.graphics.canvas.Canvas.blit`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-blit-function-blit-image-x-y-src-minipixels-graphics-canvas-ml-1673562235) | `src/minipixels/graphics/canvas.ml:128` | 3 | 1 | 1 | 0 | 0 | 112 | 75.11 |
+| [`minipixels.graphics.canvas.Canvas.blitRegion`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-blitregion-function-blitregion-image-sx-sy-sw-sh-x-y-src-minipixels-graphics-canvas-ml-766058417) | `src/minipixels/graphics/canvas.ml:140` | 3 | 1 | 1 | 0 | 0 | 186.91 | 73.55 |
 | [`minipixels.graphics.canvas.Canvas.clear`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-clear-function-clear-color-src-minipixels-graphics-canvas-ml-2046325442) | `src/minipixels/graphics/canvas.ml:48` | 3 | 1 | 1 | 0 | 0 | 76.15 | 76.28 |
-| [`minipixels.graphics.canvas.Canvas.drawCanvas`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawcanvas-function-drawcanvas-source-x-y-src-minipixels-graphics-canvas-ml-1209826293) | `src/minipixels/graphics/canvas.ml:180` | 3 | 1 | 1 | 0 | 0 | 109.39 | 75.18 |
-| [`minipixels.graphics.canvas.Canvas.drawCircle`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawcircle-function-drawcircle-cx-cy-r-color-src-minipixels-graphics-canvas-ml-1526448457) | `src/minipixels/graphics/canvas.ml:102` | 3 | 1 | 1 | 0 | 0 | 128 | 74.7 |
-| [`minipixels.graphics.canvas.Canvas.drawLine`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawline-function-drawline-x1-y1-x2-y2-color-src-minipixels-graphics-canvas-ml-758004720) | `src/minipixels/graphics/canvas.ml:73` | 3 | 1 | 1 | 0 | 0 | 147.15 | 74.28 |
-| [`minipixels.graphics.canvas.Canvas.drawRect`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawrect-function-drawrect-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1442125648) | `src/minipixels/graphics/canvas.ml:83` | 3 | 1 | 1 | 0 | 0 | 147.15 | 74.28 |
-| [`minipixels.graphics.canvas.Canvas.drawRectWorld`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawrectworld-function-drawrectworld-camera-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1989667083) | `src/minipixels/graphics/canvas.ml:202` | 3 | 1 | 1 | 0 | 0 | 166.8 | 73.9 |
-| [`minipixels.graphics.canvas.Canvas.drawSprite`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawsprite-function-drawsprite-sprite-x-y-src-minipixels-graphics-canvas-ml-606726197) | `src/minipixels/graphics/canvas.ml:139` | 3 | 1 | 1 | 0 | 0 | 109.39 | 75.18 |
-| [`minipixels.graphics.canvas.Canvas.drawSpriteEx`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawspriteex-function-drawspriteex-sprite-x-y-flipx-flipy-scale-tint-src-minipixels-graphics-canvas-ml-1922682251) | `src/minipixels/graphics/canvas.ml:151` | 3 | 1 | 1 | 0 | 0 | 186.91 | 73.55 |
-| [`minipixels.graphics.canvas.Canvas.drawSpriteRotated`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawspriterotated-function-drawspriterotated-sprite-x-y-radians-scale-tint-src-minipixels-graphics-canvas-ml-1377866026) | `src/minipixels/graphics/canvas.ml:172` | 3 | 1 | 1 | 0 | 0 | 166.8 | 73.9 |
-| [`minipixels.graphics.canvas.Canvas.drawSpriteScaled`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawspritescaled-function-drawspritescaled-sprite-x-y-scale-tint-src-minipixels-graphics-canvas-ml-2138352210) | `src/minipixels/graphics/canvas.ml:161` | 3 | 1 | 1 | 0 | 0 | 147.15 | 74.28 |
-| [`minipixels.graphics.canvas.Canvas.drawSpriteWorld`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawspriteworld-function-drawspriteworld-camera-sprite-x-y-src-minipixels-graphics-canvas-ml-2088929754) | `src/minipixels/graphics/canvas.ml:211` | 3 | 1 | 1 | 0 | 0 | 128 | 74.7 |
-| [`minipixels.graphics.canvas.Canvas.drawSpriteWorldEx`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawspriteworldex-function-drawspriteworldex-camera-sprite-x-y-flipx-flipy-scale-tint-src-minipixels-graphics-canvas-ml-1097149584) | `src/minipixels/graphics/canvas.ml:224` | 3 | 1 | 1 | 0 | 0 | 207.45 | 73.23 |
-| [`minipixels.graphics.canvas.Canvas.endCamera`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-endcamera-function-endcamera-src-minipixels-graphics-canvas-ml-1852350255) | `src/minipixels/graphics/canvas.ml:236` | 4 | 2 | 1 | 0 | 0 | 55.35 | 74.53 |
-| [`minipixels.graphics.canvas.Canvas.fillCircle`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-fillcircle-function-fillcircle-cx-cy-r-color-src-minipixels-graphics-canvas-ml-1150265425) | `src/minipixels/graphics/canvas.ml:111` | 3 | 1 | 1 | 0 | 0 | 128 | 74.7 |
-| [`minipixels.graphics.canvas.Canvas.fillRect`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-fillrect-function-fillrect-x-y-w-h-color-src-minipixels-graphics-canvas-ml-2145824812) | `src/minipixels/graphics/canvas.ml:93` | 3 | 1 | 1 | 0 | 0 | 147.15 | 74.28 |
-| [`minipixels.graphics.canvas.Canvas.fillRectWorld`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-fillrectworld-function-fillrectworld-camera-x-y-w-h-color-src-minipixels-graphics-canvas-ml-919901805) | `src/minipixels/graphics/canvas.ml:191` | 3 | 1 | 1 | 0 | 0 | 166.8 | 73.9 |
-| [`minipixels.graphics.canvas.Canvas.getPixel`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-getpixel-function-getpixel-x-y-src-minipixels-graphics-canvas-ml-219773286) | `src/minipixels/graphics/canvas.ml:63` | 3 | 1 | 1 | 0 | 0 | 91.38 | 75.73 |
-| [`minipixels.graphics.canvas.Canvas.resize`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-resize-function-resize-width-height-src-minipixels-graphics-canvas-ml-320755980) | `src/minipixels/graphics/canvas.ml:244` | 3 | 1 | 1 | 0 | 0 | 91.38 | 75.73 |
+| [`minipixels.graphics.canvas.Canvas.drawCanvas`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawcanvas-function-drawcanvas-source-x-y-src-minipixels-graphics-canvas-ml-1209826293) | `src/minipixels/graphics/canvas.ml:189` | 3 | 1 | 1 | 0 | 0 | 109.39 | 75.18 |
+| [`minipixels.graphics.canvas.Canvas.drawCircle`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawcircle-function-drawcircle-cx-cy-r-color-src-minipixels-graphics-canvas-ml-1526448457) | `src/minipixels/graphics/canvas.ml:111` | 3 | 1 | 1 | 0 | 0 | 128 | 74.7 |
+| [`minipixels.graphics.canvas.Canvas.drawLine`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawline-function-drawline-x1-y1-x2-y2-color-src-minipixels-graphics-canvas-ml-758004720) | `src/minipixels/graphics/canvas.ml:82` | 3 | 1 | 1 | 0 | 0 | 147.15 | 74.28 |
+| [`minipixels.graphics.canvas.Canvas.drawRect`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawrect-function-drawrect-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1442125648) | `src/minipixels/graphics/canvas.ml:92` | 3 | 1 | 1 | 0 | 0 | 147.15 | 74.28 |
+| [`minipixels.graphics.canvas.Canvas.drawRectWorld`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawrectworld-function-drawrectworld-camera-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1989667083) | `src/minipixels/graphics/canvas.ml:211` | 3 | 1 | 1 | 0 | 0 | 166.8 | 73.9 |
+| [`minipixels.graphics.canvas.Canvas.drawSprite`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawsprite-function-drawsprite-sprite-x-y-src-minipixels-graphics-canvas-ml-606726197) | `src/minipixels/graphics/canvas.ml:148` | 3 | 1 | 1 | 0 | 0 | 109.39 | 75.18 |
+| [`minipixels.graphics.canvas.Canvas.drawSpriteEx`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawspriteex-function-drawspriteex-sprite-x-y-flipx-flipy-scale-tint-src-minipixels-graphics-canvas-ml-1922682251) | `src/minipixels/graphics/canvas.ml:160` | 3 | 1 | 1 | 0 | 0 | 186.91 | 73.55 |
+| [`minipixels.graphics.canvas.Canvas.drawSpriteRotated`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawspriterotated-function-drawspriterotated-sprite-x-y-radians-scale-tint-src-minipixels-graphics-canvas-ml-1377866026) | `src/minipixels/graphics/canvas.ml:181` | 3 | 1 | 1 | 0 | 0 | 166.8 | 73.9 |
+| [`minipixels.graphics.canvas.Canvas.drawSpriteScaled`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawspritescaled-function-drawspritescaled-sprite-x-y-scale-tint-src-minipixels-graphics-canvas-ml-2138352210) | `src/minipixels/graphics/canvas.ml:170` | 3 | 1 | 1 | 0 | 0 | 147.15 | 74.28 |
+| [`minipixels.graphics.canvas.Canvas.drawSpriteWorld`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawspriteworld-function-drawspriteworld-camera-sprite-x-y-src-minipixels-graphics-canvas-ml-2088929754) | `src/minipixels/graphics/canvas.ml:220` | 3 | 1 | 1 | 0 | 0 | 128 | 74.7 |
+| [`minipixels.graphics.canvas.Canvas.drawSpriteWorldEx`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-drawspriteworldex-function-drawspriteworldex-camera-sprite-x-y-flipx-flipy-scale-tint-src-minipixels-graphics-canvas-ml-1097149584) | `src/minipixels/graphics/canvas.ml:233` | 3 | 1 | 1 | 0 | 0 | 207.45 | 73.23 |
+| [`minipixels.graphics.canvas.Canvas.endCamera`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-endcamera-function-endcamera-src-minipixels-graphics-canvas-ml-1852350255) | `src/minipixels/graphics/canvas.ml:245` | 4 | 2 | 1 | 0 | 0 | 55.35 | 74.53 |
+| [`minipixels.graphics.canvas.Canvas.fillCircle`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-fillcircle-function-fillcircle-cx-cy-r-color-src-minipixels-graphics-canvas-ml-1150265425) | `src/minipixels/graphics/canvas.ml:120` | 3 | 1 | 1 | 0 | 0 | 128 | 74.7 |
+| [`minipixels.graphics.canvas.Canvas.fillRect`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-fillrect-function-fillrect-x-y-w-h-color-src-minipixels-graphics-canvas-ml-2145824812) | `src/minipixels/graphics/canvas.ml:102` | 3 | 1 | 1 | 0 | 0 | 147.15 | 74.28 |
+| [`minipixels.graphics.canvas.Canvas.fillRectWorld`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-fillrectworld-function-fillrectworld-camera-x-y-w-h-color-src-minipixels-graphics-canvas-ml-919901805) | `src/minipixels/graphics/canvas.ml:200` | 3 | 1 | 1 | 0 | 0 | 166.8 | 73.9 |
+| [`minipixels.graphics.canvas.Canvas.getPixel`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-getpixel-function-getpixel-x-y-src-minipixels-graphics-canvas-ml-219773286) | `src/minipixels/graphics/canvas.ml:72` | 3 | 1 | 1 | 0 | 0 | 91.38 | 75.73 |
+| [`minipixels.graphics.canvas.Canvas.replacePixels`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-replacepixels-function-replacepixels-source-as-bytes-returns-bool-src-minipixels-graphics-canvas-ml-1281580898) | `src/minipixels/graphics/canvas.ml:65` | 3 | 1 | 1 | 0 | 0 | 98.1 | 75.51 |
+| [`minipixels.graphics.canvas.Canvas.resize`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-resize-function-resize-width-height-src-minipixels-graphics-canvas-ml-320755980) | `src/minipixels/graphics/canvas.ml:253` | 3 | 1 | 1 | 0 | 0 | 91.38 | 75.73 |
 | [`minipixels.graphics.canvas.Canvas.setPixel`](Type-minipixels-graphics-canvas-canvas-2121003546.md#method-method-minipixels-graphics-canvas-canvas-setpixel-function-setpixel-x-y-color-src-minipixels-graphics-canvas-ml-1492748631) | `src/minipixels/graphics/canvas.ml:56` | 3 | 1 | 1 | 0 | 0 | 109.39 | 75.18 |
-| [`minipixels.graphics.canvas.clearCanvas`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-clearcanvas-function-clearcanvas-c-color-src-minipixels-graphics-canvas-ml-2094788080) | `src/minipixels/graphics/canvas.ml:363` | 27 | 24 | 4 | 6 | 3 | 1037.48 | 47.12 |
-| [`minipixels.graphics.canvas.create`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-create-function-create-width-height-src-minipixels-graphics-canvas-ml-1074773335) | `src/minipixels/graphics/canvas.ml:252` | 5 | 3 | 1 | 0 | 0 | 325.7 | 67.02 |
-| [`minipixels.graphics.canvas.drawCanvas`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawcanvas-function-drawcanvas-destination-source-x-y-src-minipixels-graphics-canvas-ml-1518492604) | `src/minipixels/graphics/canvas.ml:980` | 3 | 1 | 1 | 0 | 0 | 98.99 | 75.48 |
-| [`minipixels.graphics.canvas.drawCircle`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawcircle-function-drawcircle-c-cx-cy-r-color-src-minipixels-graphics-canvas-ml-2045286387) | `src/minipixels/graphics/canvas.ml:607` | 23 | 18 | 3 | 3 | 2 | 937.22 | 49.08 |
-| [`minipixels.graphics.canvas.drawImageRegionFast1x`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawimageregionfast1x-function-drawimageregionfast1x-c-image-sx-sy-width-height-x-y-src-minipixels-graphics-canvas-ml-1575518775) | `src/minipixels/graphics/canvas.ml:787` | 26 | 21 | 6 | 7 | 2 | 1508.87 | 46.07 |
-| [`minipixels.graphics.canvas.drawLine`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawline-function-drawline-c-x1-y1-x2-y2-color-src-minipixels-graphics-canvas-ml-379303362) | `src/minipixels/graphics/canvas.ml:573` | 27 | 25 | 8 | 10 | 2 | 953.64 | 46.84 |
-| [`minipixels.graphics.canvas.drawPixelFast`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawpixelfast-inline-function-drawpixelfast-c-x-y-color-src-minipixels-graphics-canvas-ml-885988526) | `src/minipixels/graphics/canvas.ml:482` | 14 | 13 | 7 | 6 | 1 | 749.53 | 53.93 |
-| [`minipixels.graphics.canvas.drawRect`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawrect-function-drawrect-c-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1392056414) | `src/minipixels/graphics/canvas.ml:559` | 6 | 4 | 1 | 0 | 0 | 420 | 64.52 |
-| [`minipixels.graphics.canvas.drawRectWorld`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawrectworld-function-drawrectworld-c-camera-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1655626413) | `src/minipixels/graphics/canvas.ml:1018` | 3 | 1 | 1 | 0 | 0 | 179.85 | 73.67 |
-| [`minipixels.graphics.canvas.drawSprite`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawsprite-function-drawsprite-c-spr-x-y-src-minipixels-graphics-canvas-ml-1771831875) | `src/minipixels/graphics/canvas.ml:691` | 3 | 1 | 1 | 0 | 0 | 125.02 | 74.77 |
-| [`minipixels.graphics.canvas.drawSpriteEx`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriteex-function-drawspriteex-c-spr-x-y-flipx-flipy-scale-tint-src-minipixels-graphics-canvas-ml-1977777057) | `src/minipixels/graphics/canvas.ml:831` | 35 | 30 | 18 | 30 | 4 | 1951.21 | 40.86 |
-| [`minipixels.graphics.canvas.drawSpriteFast1x`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspritefast1x-function-drawspritefast1x-c-spr-x-y-src-minipixels-graphics-canvas-ml-1613156323) | `src/minipixels/graphics/canvas.ml:818` | 3 | 1 | 1 | 0 | 0 | 175.14 | 73.75 |
-| [`minipixels.graphics.canvas.drawSpriteRotated`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriterotated-function-drawspriterotated-c-spr-x-y-radians-scale-tint-src-minipixels-graphics-canvas-ml-840764200) | `src/minipixels/graphics/canvas.ml:916` | 58 | 61 | 19 | 31 | 4 | 3859.12 | 33.86 |
-| [`minipixels.graphics.canvas.drawSpriteScaled`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspritescaled-function-drawspritescaled-c-spr-x-y-scale-tint-src-minipixels-graphics-canvas-ml-841362936) | `src/minipixels/graphics/canvas.ml:875` | 32 | 35 | 11 | 15 | 3 | 2270.43 | 42.19 |
-| [`minipixels.graphics.canvas.drawSpriteWorld`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriteworld-function-drawspriteworld-c-camera-spr-x-y-src-minipixels-graphics-canvas-ml-758119470) | `src/minipixels/graphics/canvas.ml:1028` | 3 | 1 | 1 | 0 | 0 | 140.65 | 74.42 |
-| [`minipixels.graphics.canvas.drawSpriteWorldEx`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriteworldex-function-drawspriteworldex-c-camera-spr-x-y-flipx-flipy-scale-tint-src-minipixels-graphics-canvas-ml-273018892) | `src/minipixels/graphics/canvas.ml:1042` | 3 | 1 | 1 | 0 | 0 | 220.89 | 73.04 |
-| [`minipixels.graphics.canvas.fillCircle`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillcircle-function-fillcircle-c-cx-cy-r-color-src-minipixels-graphics-canvas-ml-108867707) | `src/minipixels/graphics/canvas.ml:637` | 23 | 20 | 7 | 11 | 3 | 1074.46 | 48.13 |
-| [`minipixels.graphics.canvas.fillRect`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillrect-function-fillrect-c-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1196303130) | `src/minipixels/graphics/canvas.ml:504` | 47 | 41 | 11 | 17 | 3 | 2335.44 | 38.46 |
-| [`minipixels.graphics.canvas.fillRectWorld`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillrectworld-function-fillrectworld-c-camera-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1749998495) | `src/minipixels/graphics/canvas.ml:1006` | 3 | 1 | 1 | 0 | 0 | 179.85 | 73.67 |
-| [`minipixels.graphics.canvas.fillScaledPixel`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillscaledpixel-function-fillscaledpixel-c-x-y-scale-color-src-minipixels-graphics-canvas-ml-1949563361) | `src/minipixels/graphics/canvas.ml:701` | 29 | 25 | 7 | 9 | 3 | 1259.8 | 45.45 |
-| [`minipixels.graphics.canvas.getPixel`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-getpixel-function-getpixel-c-x-y-src-minipixels-graphics-canvas-ml-113781492) | `src/minipixels/graphics/canvas.ml:456` | 7 | 6 | 5 | 4 | 1 | 559.09 | 61.65 |
-| [`minipixels.graphics.canvas.hash`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-hash-function-hash-c-src-minipixels-graphics-canvas-ml-1715757429) | `src/minipixels/graphics/canvas.ml:1048` | 8 | 5 | 2 | 1 | 1 | 153.73 | 64.72 |
-| [`minipixels.graphics.canvas.imagePixelUnchecked`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-imagepixelunchecked-inline-function-imagepixelunchecked-image-x-y-src-minipixels-graphics-canvas-ml-1909827365) | `src/minipixels/graphics/canvas.ml:340` | 4 | 2 | 1 | 0 | 0 | 354.63 | 68.88 |
-| [`minipixels.graphics.canvas.index`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-index-inline-function-index-c-x-y-src-minipixels-graphics-canvas-ml-859928981) | `src/minipixels/graphics/canvas.ml:334` | 3 | 1 | 1 | 0 | 0 | 104 | 75.33 |
-| [`minipixels.graphics.canvas.markDirty`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-markdirty-function-markdirty-c-x-y-w-h-src-minipixels-graphics-canvas-ml-540302783) | `src/minipixels/graphics/canvas.ml:288` | 20 | 23 | 13 | 12 | 1 | 1253.67 | 48.18 |
-| [`minipixels.graphics.canvas.resetDirty`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-resetdirty-function-resetdirty-c-src-minipixels-graphics-canvas-ml-2031001549) | `src/minipixels/graphics/canvas.ml:314` | 7 | 5 | 1 | 0 | 0 | 125.02 | 66.75 |
-| [`minipixels.graphics.canvas.resetStats`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-resetstats-function-resetstats-c-src-minipixels-graphics-canvas-ml-1731332189) | `src/minipixels/graphics/canvas.ml:324` | 5 | 3 | 1 | 0 | 0 | 78.87 | 71.34 |
-| [`minipixels.graphics.canvas.resize`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-resize-function-resize-c-width-height-src-minipixels-graphics-canvas-ml-1088691982) | `src/minipixels/graphics/canvas.ml:263` | 18 | 19 | 6 | 5 | 1 | 771.68 | 51.59 |
-| [`minipixels.graphics.canvas.screenX`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-screenx-function-screenx-camera-x-src-minipixels-graphics-canvas-ml-1707190397) | `src/minipixels/graphics/canvas.ml:987` | 3 | 1 | 1 | 0 | 0 | 51.89 | 77.45 |
-| [`minipixels.graphics.canvas.screenY`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-screeny-function-screeny-camera-y-src-minipixels-graphics-canvas-ml-963577846) | `src/minipixels/graphics/canvas.ml:994` | 3 | 1 | 1 | 0 | 0 | 51.89 | 77.45 |
-| [`minipixels.graphics.canvas.setPixel`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-setpixel-function-setpixel-c-x-y-color-src-minipixels-graphics-canvas-ml-1444983993) | `src/minipixels/graphics/canvas.ml:396` | 16 | 15 | 11 | 10 | 1 | 1111.22 | 50.93 |
-| [`minipixels.graphics.canvas.tintChannelUnchecked`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-tintchannelunchecked-inline-function-tintchannelunchecked-source-tint-src-minipixels-graphics-canvas-ml-1081626959) | `src/minipixels/graphics/canvas.ml:346` | 4 | 2 | 1 | 0 | 0 | 118.54 | 72.21 |
-| [`minipixels.graphics.canvas.tintColorUnchecked`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-tintcolorunchecked-inline-function-tintcolorunchecked-color-tint-src-minipixels-graphics-canvas-ml-1768827903) | `src/minipixels/graphics/canvas.ml:352` | 7 | 5 | 1 | 0 | 0 | 467.67 | 62.74 |
+| [`minipixels.graphics.canvas.clearCanvas`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-clearcanvas-function-clearcanvas-c-color-src-minipixels-graphics-canvas-ml-2094788080) | `src/minipixels/graphics/canvas.ml:372` | 27 | 24 | 4 | 6 | 3 | 1037.48 | 47.12 |
+| [`minipixels.graphics.canvas.create`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-create-function-create-width-height-src-minipixels-graphics-canvas-ml-1074773335) | `src/minipixels/graphics/canvas.ml:261` | 5 | 3 | 1 | 0 | 0 | 325.7 | 67.02 |
+| [`minipixels.graphics.canvas.drawCanvas`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawcanvas-function-drawcanvas-destination-source-x-y-src-minipixels-graphics-canvas-ml-1518492604) | `src/minipixels/graphics/canvas.ml:1197` | 3 | 1 | 1 | 0 | 0 | 98.99 | 75.48 |
+| [`minipixels.graphics.canvas.drawCircle`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawcircle-function-drawcircle-c-cx-cy-r-color-src-minipixels-graphics-canvas-ml-2045286387) | `src/minipixels/graphics/canvas.ml:697` | 23 | 18 | 3 | 3 | 2 | 937.22 | 49.08 |
+| [`minipixels.graphics.canvas.drawImageRegionFast1x`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawimageregionfast1x-function-drawimageregionfast1x-c-image-sx-sy-width-height-x-y-src-minipixels-graphics-canvas-ml-1575518775) | `src/minipixels/graphics/canvas.ml:879` | 26 | 21 | 6 | 7 | 2 | 1508.87 | 46.07 |
+| [`minipixels.graphics.canvas.drawLine`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawline-function-drawline-c-x1-y1-x2-y2-color-src-minipixels-graphics-canvas-ml-379303362) | `src/minipixels/graphics/canvas.ml:623` | 67 | 61 | 17 | 25 | 3 | 2597.42 | 33.97 |
+| [`minipixels.graphics.canvas.drawPixelFast`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawpixelfast-inline-function-drawpixelfast-c-x-y-color-src-minipixels-graphics-canvas-ml-885988526) | `src/minipixels/graphics/canvas.ml:512` | 14 | 13 | 7 | 6 | 1 | 749.53 | 53.93 |
+| [`minipixels.graphics.canvas.drawRect`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawrect-function-drawrect-c-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1392056414) | `src/minipixels/graphics/canvas.ml:609` | 6 | 4 | 1 | 0 | 0 | 420 | 64.52 |
+| [`minipixels.graphics.canvas.drawRectWorld`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawrectworld-function-drawrectworld-c-camera-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1655626413) | `src/minipixels/graphics/canvas.ml:1235` | 3 | 1 | 1 | 0 | 0 | 179.85 | 73.67 |
+| [`minipixels.graphics.canvas.drawSprite`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawsprite-function-drawsprite-c-spr-x-y-src-minipixels-graphics-canvas-ml-1771831875) | `src/minipixels/graphics/canvas.ml:781` | 3 | 1 | 1 | 0 | 0 | 125.02 | 74.77 |
+| [`minipixels.graphics.canvas.drawSpriteEx`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriteex-function-drawspriteex-c-spr-x-y-flipx-flipy-scale-tint-src-minipixels-graphics-canvas-ml-1977777057) | `src/minipixels/graphics/canvas.ml:987` | 47 | 42 | 23 | 35 | 4 | 2609.52 | 36.51 |
+| [`minipixels.graphics.canvas.drawSpriteFast1x`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspritefast1x-function-drawspritefast1x-c-spr-x-y-src-minipixels-graphics-canvas-ml-1613156323) | `src/minipixels/graphics/canvas.ml:910` | 3 | 1 | 1 | 0 | 0 | 175.14 | 73.75 |
+| [`minipixels.graphics.canvas.drawSpriteRotated`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriterotated-function-drawspriterotated-c-spr-x-y-radians-scale-tint-src-minipixels-graphics-canvas-ml-840764200) | `src/minipixels/graphics/canvas.ml:1107` | 83 | 83 | 24 | 50 | 5 | 5442.33 | 28.75 |
+| [`minipixels.graphics.canvas.drawSpriteScaled`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspritescaled-function-drawspritescaled-c-spr-x-y-scale-tint-src-minipixels-graphics-canvas-ml-841362936) | `src/minipixels/graphics/canvas.ml:1044` | 53 | 53 | 17 | 38 | 5 | 3281.75 | 35.48 |
+| [`minipixels.graphics.canvas.drawSpriteUnitTransformed`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriteunittransformed-function-drawspriteunittransformed-c-spr-x-y-flipx-flipy-tint-src-minipixels-graphics-canvas-ml-1094242111) | `src/minipixels/graphics/canvas.ml:916` | 57 | 51 | 16 | 38 | 5 | 3173.95 | 35.03 |
+| [`minipixels.graphics.canvas.drawSpriteWorld`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriteworld-function-drawspriteworld-c-camera-spr-x-y-src-minipixels-graphics-canvas-ml-758119470) | `src/minipixels/graphics/canvas.ml:1245` | 3 | 1 | 1 | 0 | 0 | 140.65 | 74.42 |
+| [`minipixels.graphics.canvas.drawSpriteWorldEx`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-drawspriteworldex-function-drawspriteworldex-c-camera-spr-x-y-flipx-flipy-scale-tint-src-minipixels-graphics-canvas-ml-273018892) | `src/minipixels/graphics/canvas.ml:1259` | 3 | 1 | 1 | 0 | 0 | 220.89 | 73.04 |
+| [`minipixels.graphics.canvas.fillCircle`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillcircle-function-fillcircle-c-cx-cy-r-color-src-minipixels-graphics-canvas-ml-108867707) | `src/minipixels/graphics/canvas.ml:727` | 23 | 20 | 7 | 11 | 3 | 1074.46 | 48.13 |
+| [`minipixels.graphics.canvas.fillRect`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillrect-function-fillrect-c-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1196303130) | `src/minipixels/graphics/canvas.ml:534` | 65 | 56 | 17 | 26 | 3 | 3517.58 | 33.34 |
+| [`minipixels.graphics.canvas.fillRectWorld`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillrectworld-function-fillrectworld-c-camera-x-y-w-h-color-src-minipixels-graphics-canvas-ml-1749998495) | `src/minipixels/graphics/canvas.ml:1223` | 3 | 1 | 1 | 0 | 0 | 179.85 | 73.67 |
+| [`minipixels.graphics.canvas.fillScaledPixel`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-fillscaledpixel-function-fillscaledpixel-c-x-y-scale-color-src-minipixels-graphics-canvas-ml-1949563361) | `src/minipixels/graphics/canvas.ml:791` | 29 | 25 | 7 | 9 | 3 | 1259.8 | 45.45 |
+| [`minipixels.graphics.canvas.getPixel`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-getpixel-function-getpixel-c-x-y-src-minipixels-graphics-canvas-ml-113781492) | `src/minipixels/graphics/canvas.ml:486` | 7 | 6 | 5 | 4 | 1 | 559.09 | 61.65 |
+| [`minipixels.graphics.canvas.hash`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-hash-function-hash-c-src-minipixels-graphics-canvas-ml-1715757429) | `src/minipixels/graphics/canvas.ml:1265` | 8 | 5 | 2 | 1 | 1 | 153.73 | 64.72 |
+| [`minipixels.graphics.canvas.imagePixelUnchecked`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-imagepixelunchecked-inline-function-imagepixelunchecked-image-x-y-src-minipixels-graphics-canvas-ml-1909827365) | `src/minipixels/graphics/canvas.ml:349` | 4 | 2 | 1 | 0 | 0 | 354.63 | 68.88 |
+| [`minipixels.graphics.canvas.index`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-index-inline-function-index-c-x-y-src-minipixels-graphics-canvas-ml-859928981) | `src/minipixels/graphics/canvas.ml:343` | 3 | 1 | 1 | 0 | 0 | 104 | 75.33 |
+| [`minipixels.graphics.canvas.markDirty`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-markdirty-function-markdirty-c-x-y-w-h-src-minipixels-graphics-canvas-ml-540302783) | `src/minipixels/graphics/canvas.ml:297` | 20 | 23 | 13 | 12 | 1 | 1253.67 | 48.18 |
+| [`minipixels.graphics.canvas.replacePixels`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-replacepixels-function-replacepixels-c-source-as-bytes-returns-bool-src-minipixels-graphics-canvas-ml-852267000) | `src/minipixels/graphics/canvas.ml:427` | 15 | 13 | 3 | 2 | 1 | 665.24 | 54.17 |
+| [`minipixels.graphics.canvas.resetDirty`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-resetdirty-function-resetdirty-c-src-minipixels-graphics-canvas-ml-2031001549) | `src/minipixels/graphics/canvas.ml:323` | 7 | 5 | 1 | 0 | 0 | 125.02 | 66.75 |
+| [`minipixels.graphics.canvas.resetStats`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-resetstats-function-resetstats-c-src-minipixels-graphics-canvas-ml-1731332189) | `src/minipixels/graphics/canvas.ml:333` | 5 | 3 | 1 | 0 | 0 | 78.87 | 71.34 |
+| [`minipixels.graphics.canvas.resize`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-resize-function-resize-c-width-height-src-minipixels-graphics-canvas-ml-1088691982) | `src/minipixels/graphics/canvas.ml:272` | 18 | 19 | 6 | 5 | 1 | 771.68 | 51.59 |
+| [`minipixels.graphics.canvas.screenX`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-screenx-function-screenx-camera-x-src-minipixels-graphics-canvas-ml-1707190397) | `src/minipixels/graphics/canvas.ml:1204` | 3 | 1 | 1 | 0 | 0 | 51.89 | 77.45 |
+| [`minipixels.graphics.canvas.screenY`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-screeny-function-screeny-camera-y-src-minipixels-graphics-canvas-ml-963577846) | `src/minipixels/graphics/canvas.ml:1211` | 3 | 1 | 1 | 0 | 0 | 51.89 | 77.45 |
+| [`minipixels.graphics.canvas.setPixel`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-setpixel-function-setpixel-c-x-y-color-src-minipixels-graphics-canvas-ml-1444983993) | `src/minipixels/graphics/canvas.ml:405` | 16 | 15 | 11 | 10 | 1 | 1111.22 | 50.93 |
+| [`minipixels.graphics.canvas.tintChannelUnchecked`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-tintchannelunchecked-inline-function-tintchannelunchecked-source-tint-src-minipixels-graphics-canvas-ml-1081626959) | `src/minipixels/graphics/canvas.ml:355` | 4 | 2 | 1 | 0 | 0 | 118.54 | 72.21 |
+| [`minipixels.graphics.canvas.tintColorUnchecked`](File-src-minipixels-graphics-canvas-ml-370061960.md#function-function-minipixels-graphics-canvas-tintcolorunchecked-inline-function-tintcolorunchecked-color-tint-src-minipixels-graphics-canvas-ml-1768827903) | `src/minipixels/graphics/canvas.ml:361` | 7 | 5 | 1 | 0 | 0 | 467.67 | 62.74 |
 | [`minipixels.graphics.font.drawGlyph`](File-src-minipixels-graphics-font-ml-906525775.md#function-function-minipixels-graphics-font-drawglyph-function-drawglyph-canvas-ch-x-y-scale-color-src-minipixels-graphics-font-ml-725828193) | `src/minipixels/graphics/font.ml:73` | 25 | 20 | 8 | 13 | 4 | 966.62 | 47.53 |
 | [`minipixels.graphics.font.drawText`](File-src-minipixels-graphics-font-ml-906525775.md#function-function-minipixels-graphics-font-drawtext-function-drawtext-canvas-text-x-y-scale-color-src-minipixels-graphics-font-ml-1630535549) | `src/minipixels/graphics/font.ml:106` | 8 | 6 | 3 | 2 | 1 | 285.29 | 62.7 |
 | [`minipixels.graphics.font.drawTextCentered`](File-src-minipixels-graphics-font-ml-906525775.md#function-function-minipixels-graphics-font-drawtextcentered-function-drawtextcentered-canvas-text-y-scale-color-src-minipixels-graphics-font-ml-1722252689) | `src/minipixels/graphics/font.ml:121` | 3 | 1 | 1 | 0 | 0 | 175.14 | 73.75 |
@@ -891,7 +894,7 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 
 A clone group is an exact sequence of 6 normalized, contiguous code lines found more than once. Comments and formatting whitespace are ignored. Duplicated-line totals count overlapping windows only once.
 
-Found 22 clone group(s). At most 22 groups are shown.
+Found 30 clone group(s). At most 30 groups are shown.
 
 <details>
 <summary>Clone 1 — 2 occurrences</summary>
@@ -990,11 +993,11 @@ Found 22 clone group(s). At most 22 groups are shown.
     end while
     yy = yy + 1
     end while
-    markDirty ( c , x0 , y0 , x1 - x0 , y1 - y0 )
-    c . spriteCount = c . spriteCount + 1
+    else
+    yy = y0
 
-- [`src/minipixels/graphics/canvas.ml:899`](File-src-minipixels-graphics-canvas-ml-370061960.md)
-- [`src/minipixels/graphics/canvas.ml:966`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:1075`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:583`](File-src-minipixels-graphics-canvas-ml-370061960.md)
 
 </details>
 
@@ -1004,32 +1007,152 @@ Found 22 clone group(s). At most 22 groups are shown.
     end while
     yy = yy + 1
     end while
-    markDirty ( c , x0 , y0 , x1 - x0 , y1 - y0 )
-    c . spriteCount = c . spriteCount + 1
-    c . drawCalls = c . drawCalls + 1
+    else
+    yy = y0
+    while yy < y1
 
-- [`src/minipixels/graphics/canvas.ml:900`](File-src-minipixels-graphics-canvas-ml-370061960.md)
-- [`src/minipixels/graphics/canvas.ml:967`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:1076`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:584`](File-src-minipixels-graphics-canvas-ml-370061960.md)
 
 </details>
 
 <details>
 <summary>Clone 9 — 2 occurrences</summary>
 
+    xx = xx + 1
+    end while
     yy = yy + 1
     end while
+    end if
     markDirty ( c , x0 , y0 , x1 - x0 , y1 - y0 )
-    c . spriteCount = c . spriteCount + 1
-    c . drawCalls = c . drawCalls + 1
-    end function
 
-- [`src/minipixels/graphics/canvas.ml:901`](File-src-minipixels-graphics-canvas-ml-370061960.md)
-- [`src/minipixels/graphics/canvas.ml:968`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:1089`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:593`](File-src-minipixels-graphics-canvas-ml-370061960.md)
 
 </details>
 
 <details>
 <summary>Clone 10 — 2 occurrences</summary>
+
+    color = ( source [ sourceIndex ] << 24 ) | ( source [ sourceIndex + 1 ] << 16 ) | ( source [ sourceIndex + 2 ] << 8 ) | source [ sourceIndex + 3 ]
+    if tintRequired then color = tintColorUnchecked ( color , tint ) end if
+    alpha = color & 255
+    if alpha >= 255 then
+    destination [ destinationIndex ] = ( color >> 24 ) & 255
+    destination [ destinationIndex + 1 ] = ( color >> 16 ) & 255
+
+- [`src/minipixels/graphics/canvas.ml:1167`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:957`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+
+</details>
+
+<details>
+<summary>Clone 11 — 2 occurrences</summary>
+
+    if tintRequired then color = tintColorUnchecked ( color , tint ) end if
+    alpha = color & 255
+    if alpha >= 255 then
+    destination [ destinationIndex ] = ( color >> 24 ) & 255
+    destination [ destinationIndex + 1 ] = ( color >> 16 ) & 255
+    destination [ destinationIndex + 2 ] = ( color >> 8 ) & 255
+
+- [`src/minipixels/graphics/canvas.ml:1168`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:958`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+
+</details>
+
+<details>
+<summary>Clone 12 — 2 occurrences</summary>
+
+    alpha = color & 255
+    if alpha >= 255 then
+    destination [ destinationIndex ] = ( color >> 24 ) & 255
+    destination [ destinationIndex + 1 ] = ( color >> 16 ) & 255
+    destination [ destinationIndex + 2 ] = ( color >> 8 ) & 255
+    destination [ destinationIndex + 3 ] = alpha
+
+- [`src/minipixels/graphics/canvas.ml:1169`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:959`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+
+</details>
+
+<details>
+<summary>Clone 13 — 2 occurrences</summary>
+
+    if alpha >= 255 then
+    destination [ destinationIndex ] = ( color >> 24 ) & 255
+    destination [ destinationIndex + 1 ] = ( color >> 16 ) & 255
+    destination [ destinationIndex + 2 ] = ( color >> 8 ) & 255
+    destination [ destinationIndex + 3 ] = alpha
+    else if alpha > 0 then
+
+- [`src/minipixels/graphics/canvas.ml:1170`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:960`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+
+</details>
+
+<details>
+<summary>Clone 14 — 2 occurrences</summary>
+
+    destination [ destinationIndex ] = ( color >> 24 ) & 255
+    destination [ destinationIndex + 1 ] = ( color >> 16 ) & 255
+    destination [ destinationIndex + 2 ] = ( color >> 8 ) & 255
+    destination [ destinationIndex + 3 ] = alpha
+    else if alpha > 0 then
+    blendPixelRaw ( c , xx , yy , color )
+
+- [`src/minipixels/graphics/canvas.ml:1171`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:961`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+
+</details>
+
+<details>
+<summary>Clone 15 — 2 occurrences</summary>
+
+    destination [ destinationIndex + 1 ] = ( color >> 16 ) & 255
+    destination [ destinationIndex + 2 ] = ( color >> 8 ) & 255
+    destination [ destinationIndex + 3 ] = alpha
+    else if alpha > 0 then
+    blendPixelRaw ( c , xx , yy , color )
+    end if
+
+- [`src/minipixels/graphics/canvas.ml:1172`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:962`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+
+</details>
+
+<details>
+<summary>Clone 16 — 2 occurrences</summary>
+
+    destination [ destinationIndex + 2 ] = ( color >> 8 ) & 255
+    destination [ destinationIndex + 3 ] = alpha
+    else if alpha > 0 then
+    blendPixelRaw ( c , xx , yy , color )
+    end if
+    end if
+
+- [`src/minipixels/graphics/canvas.ml:1173`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:963`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+
+</details>
+
+<details>
+<summary>Clone 17 — 2 occurrences</summary>
+
+    c . dirty = true
+    c . dirtyX0 = 0
+    c . dirtyY0 = 0
+    c . dirtyX1 = c . width
+    c . dirtyY1 = c . height
+    c . drawCalls = c . drawCalls + 1
+
+- [`src/minipixels/graphics/canvas.ml:392`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+- [`src/minipixels/graphics/canvas.ml:434`](File-src-minipixels-graphics-canvas-ml-370061960.md)
+
+</details>
+
+<details>
+<summary>Clone 18 — 2 occurrences</summary>
 
     function close ( )
     if this . closed then return true end if
@@ -1044,7 +1167,7 @@ Found 22 clone group(s). At most 22 groups are shown.
 </details>
 
 <details>
-<summary>Clone 11 — 2 occurrences</summary>
+<summary>Clone 19 — 2 occurrences</summary>
 
     if this . closed then return true end if
     result = try ( this . player . close ( ) )
@@ -1059,7 +1182,7 @@ Found 22 clone group(s). At most 22 groups are shown.
 </details>
 
 <details>
-<summary>Clone 12 — 2 occurrences</summary>
+<summary>Clone 20 — 2 occurrences</summary>
 
     result = try ( this . player . close ( ) )
     this . source . close ( )
@@ -1074,7 +1197,7 @@ Found 22 clone group(s). At most 22 groups are shown.
 </details>
 
 <details>
-<summary>Clone 13 — 2 occurrences</summary>
+<summary>Clone 21 — 2 occurrences</summary>
 
     this . source . close ( )
     this . closed = true
@@ -1089,7 +1212,7 @@ Found 22 clone group(s). At most 22 groups are shown.
 </details>
 
 <details>
-<summary>Clone 14 — 2 occurrences</summary>
+<summary>Clone 22 — 2 occurrences</summary>
 
     if w is not Window or width < 1 or height < 1 then return false end if
     width = mt . floorInt ( width )
@@ -1104,7 +1227,7 @@ Found 22 clone group(s). At most 22 groups are shown.
 </details>
 
 <details>
-<summary>Clone 15 — 2 occurrences</summary>
+<summary>Clone 23 — 2 occurrences</summary>
 
     return
     end if
@@ -1119,7 +1242,7 @@ Found 22 clone group(s). At most 22 groups are shown.
 </details>
 
 <details>
-<summary>Clone 16 — 2 occurrences</summary>
+<summary>Clone 24 — 2 occurrences</summary>
 
     end if
     if input . actionCount > 0 then
@@ -1134,7 +1257,7 @@ Found 22 clone group(s). At most 22 groups are shown.
 </details>
 
 <details>
-<summary>Clone 17 — 2 occurrences</summary>
+<summary>Clone 25 — 2 occurrences</summary>
 
     function dirname ( path )
     lastSlash = str . lastIndexOf ( path , "\\" )
@@ -1149,7 +1272,7 @@ Found 22 clone group(s). At most 22 groups are shown.
 </details>
 
 <details>
-<summary>Clone 18 — 2 occurrences</summary>
+<summary>Clone 26 — 2 occurrences</summary>
 
     lastSlash = str . lastIndexOf ( path , "\\" )
     lastForward = str . lastIndexOf ( path , "/" )
@@ -1164,7 +1287,7 @@ Found 22 clone group(s). At most 22 groups are shown.
 </details>
 
 <details>
-<summary>Clone 19 — 2 occurrences</summary>
+<summary>Clone 27 — 2 occurrences</summary>
 
     lastForward = str . lastIndexOf ( path , "/" )
     last = maxInt ( lastSlash , lastForward )
@@ -1179,7 +1302,7 @@ Found 22 clone group(s). At most 22 groups are shown.
 </details>
 
 <details>
-<summary>Clone 20 — 2 occurrences</summary>
+<summary>Clone 28 — 2 occurrences</summary>
 
     end for
     code . appendLine ( "  return " + fallback )
@@ -1194,7 +1317,7 @@ Found 22 clone group(s). At most 22 groups are shown.
 </details>
 
 <details>
-<summary>Clone 21 — 2 occurrences</summary>
+<summary>Clone 29 — 2 occurrences</summary>
 
     return
     end if
@@ -1209,7 +1332,7 @@ Found 22 clone group(s). At most 22 groups are shown.
 </details>
 
 <details>
-<summary>Clone 22 — 2 occurrences</summary>
+<summary>Clone 30 — 2 occurrences</summary>
 
     end if
     p . pos = p . pos + 1

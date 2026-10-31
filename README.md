@@ -3,9 +3,9 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.18.0`
+Current version: `0.19.0`
 
-See the [0.18.0 release notes](RELEASE_NOTES_0.18.0.md) for hardened asset signatures, faster preloading, Linux audio/runtime fixes, and safer builds and releases. Protected games must rebuild their executable, pack, and native runtime together.
+See the [0.19.0 release notes](RELEASE_NOTES_0.19.0.md) for faster CPU canvas rendering and the new bulk pixel API. Protected games must still rebuild their executable, pack, and native runtime together when upgrading from versions before 0.18.0.
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. It uses MiniLang Compiler 1.2.11 or newer and builds native Windows x64 PE and Linux x64 ELF executables.
 
@@ -161,13 +161,22 @@ Optional CPU-canvas, sprite, and presenter benchmarks:
 
 ```powershell
 python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\canvas_bench.ml build\benchmarks\canvas_bench.exe -I src -I ..\MiniLangCompilerPy
+python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\pixel_write_bench.ml build\benchmarks\pixel_write_bench.exe -I src -I ..\MiniLangCompilerPy
+python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\render_paths_bench.ml build\benchmarks\render_paths_bench.exe -I src -I ..\MiniLangCompilerPy
 python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\sprite_bench.ml build\benchmarks\sprite_bench.exe -I src -I ..\MiniLangCompilerPy
 python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\renderer_bench.ml build\benchmarks\renderer_bench.exe -I src -I ..\MiniLangCompilerPy
 python ..\MiniLangCompilerPy\mlc_win64.py benchmarks\asset_loading_bench.ml build\benchmarks\asset_loading_bench.exe -I src -I ..\MiniLangCompilerPy
 build\benchmarks\canvas_bench.exe
+build\benchmarks\pixel_write_bench.exe
+build\benchmarks\render_paths_bench.exe
 build\benchmarks\sprite_bench.exe
 build\benchmarks\renderer_bench.exe
 ```
+
+For full-frame CPU pixel effects, fill a reusable `bytes(width * height * 4)`
+buffer in row-major RGBA order and call `canvas.replacePixels(buffer)` once per
+frame. It checks the buffer size, copies the pixels, tracks opacity, and marks
+the whole canvas for presentation. Use `setPixel` for sparse changes.
 
 Build all examples:
 

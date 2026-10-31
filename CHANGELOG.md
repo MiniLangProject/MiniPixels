@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.19.0 - 2026-10-31
+
+- Added `Canvas.replacePixels` for full-frame RGBA updates from a reusable byte buffer, with size validation, opacity detection and one dirty-region update.
+- Accelerated fractional upscaling, translucent integer-scaled sprites, and unit-scale flipped/tinted sprites while preserving clipped and self-blit output.
+- Accelerated rotated sprites, translucent rectangles over opaque canvases, and lines by reducing per-pixel setup and dirty tracking.
+- Added focused pixel and renderer benchmarks plus Windows/Linux rendering regressions. Synthetic CPU benchmark gains do not represent whole-game FPS.
+
 ## 0.18.0 - 2026-10-06
 
 - Fixed protected-asset signing: MPX3 version 6 signs SHA-256 ciphertext digests for ordinary payloads and every 256 KiB media chunk. This rejects even known-AES-key GHASH collisions that preserve the original GCM tag. Rebuild protected packs and their game binaries together; older protected formats are rejected.
