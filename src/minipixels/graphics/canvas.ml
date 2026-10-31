@@ -966,7 +966,8 @@ function drawSpriteUnitTransformed(c, spr, x, y, flipX, flipY, tint)
       copyBytes(destination, destinationIndex, source, sourceIndex, (x1 - x0) * 4)
     else if spr.image.opaque and not tintRequired then
       copied = false
-      if flipX then copied = copyOpaqueFlippedRow(destination, source, destinationIndex, sourceIndex, x1 - x0) end if
+      // Tiny rows cost less in the regular loop than in the assembly setup.
+      if flipX and x1 - x0 >= 8 then copied = copyOpaqueFlippedRow(destination, source, destinationIndex, sourceIndex, x1 - x0) end if
       if not copied then
         xx = x0
         while xx < x1
