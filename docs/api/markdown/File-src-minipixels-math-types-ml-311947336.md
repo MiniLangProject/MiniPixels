@@ -10,7 +10,7 @@ Reachable from entry: **yes**
 
 ## Imports
 
-- `std/math.ml` as `math` → `../MiniLangCompilerPy/std/math.ml` — external dependency
+- `std/math.ml` as `math` → `../MiniLangCompilerML/std/math.ml` — external dependency
 
 ## Declarations
 

@@ -11,9 +11,9 @@ Reachable from entry: **yes**
 ## Imports
 
 - `minipixels/assets/pack.ml` as `packs` → [src/minipixels/assets/pack.ml](File-src-minipixels-assets-pack-ml-1157891367.md)
-- `std/bytes.ml` as `by` → `../MiniLangCompilerPy/std/bytes.ml` — external dependency
-- `std/ds/hashmap.ml` as `hm` → `../MiniLangCompilerPy/std/ds/hashmap.ml` — external dependency
-- `std/string.ml` as `strings` → `../MiniLangCompilerPy/std/string.ml` — external dependency
+- `std/bytes.ml` as `by` → `../MiniLangCompilerML/std/bytes.ml` — external dependency
+- `std/ds/hashmap.ml` as `hm` → `../MiniLangCompilerML/std/ds/hashmap.ml` — external dependency
+- `std/string.ml` as `strings` → `../MiniLangCompilerML/std/string.ml` — external dependency
 
 ## Declarations
 

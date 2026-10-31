@@ -11,10 +11,10 @@ Reachable from entry: **yes**
 ## Imports
 
 - `minipixels/tools/fsutil.ml` as `dirs` → [src/minipixels/tools/fsutil.ml](File-src-minipixels-tools-fsutil-ml-605704885.md)
-- `std/bytes.ml` as `by` → `../MiniLangCompilerPy/std/bytes.ml` — external dependency
-- `std/fs.ml` as `fs` → `../MiniLangCompilerPy/std/fs.ml` — external dependency
-- `std/process.ml` as `process` → `../MiniLangCompilerPy/std/process.ml` — external dependency
-- `std/string.ml` as `str` → `../MiniLangCompilerPy/std/string.ml` — external dependency
+- `std/bytes.ml` as `by` → `../MiniLangCompilerML/std/bytes.ml` — external dependency
+- `std/fs.ml` as `fs` → `../MiniLangCompilerML/std/fs.ml` — external dependency
+- `std/process.ml` as `process` → `../MiniLangCompilerML/std/process.ml` — external dependency
+- `std/string.ml` as `str` → `../MiniLangCompilerML/std/string.ml` — external dependency
 
 ## Declarations
 
