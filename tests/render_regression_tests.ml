@@ -130,6 +130,18 @@ function testUnitSpriteSelfBlit()
   sprite = sp.spriteRegion(canvas.imageView, 1, 1, 5, 4, "self-blit")
   canvas.drawSpriteEx(sprite, 2, 2, false, true, 1, mt.rgba(255, 255, 255, 255))
   a.assertEq(mp.frameHash(canvas), 822985925, "vertically flipped self-blit preserves pixel order")
+
+  line = minipixels.graphics.canvas.create(8, 1)
+  line.clear(mt.rgb(0, 0, 0))
+  for x = 0 to 7
+    line.setPixel(x, 0, mt.rgb(x * 20, 0, 0))
+  end for
+  flipped = sp.spriteRegion(line.imageView, 0, 0, 8, 1, "horizontal-self-blit")
+  line.drawSpriteEx(flipped, 0, 0, true, false, 1, mt.rgba(255, 255, 255, 255))
+  a.assertEq(line.getPixel(0, 0), mt.rgb(140, 0, 0), "horizontal self-blit copies rightmost first")
+  a.assertEq(line.getPixel(3, 0), mt.rgb(80, 0, 0), "horizontal self-blit keeps left-to-right stores")
+  a.assertEq(line.getPixel(4, 0), mt.rgb(80, 0, 0), "horizontal self-blit reads prior write")
+  a.assertEq(line.getPixel(7, 0), mt.rgb(140, 0, 0), "horizontal self-blit copies rightmost last")
 end function
 
 function testSinglePixelSprite()

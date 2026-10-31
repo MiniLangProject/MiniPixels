@@ -912,6 +912,31 @@ function drawSpriteFast1x(c, spr, x, y)
 end function
 
 /// @internal
+/// Copy a clipped opaque row in reverse source order after checking both buffers.
+function inline copyOpaqueFlippedRow(destination as bytes, source as bytes, di as int, si as int, count as int) returns bool
+  if count < 1 or di < 0 or si < 0 then return false end if
+  if count > (len(destination) >> 2) then return false end if
+  if di > len(destination) - count * 4 or si > len(source) - 4 then return false end if
+  if count - 1 > (si >> 2) then return false end if
+  asm unsafe x64(inout destination as bytes, in source as bytes, in di as int, in si as int, in count as int, scratch dst as int, scratch src as int, scratch remaining as int, scratch pixel as int)
+    mov dst, di
+    mov src, si
+    mov remaining, count
+    label copy
+    cmp remaining, 0
+    jle done
+    mov pixel, dword [source.data + src]
+    mov dword [destination.data + dst], pixel
+    add dst, 4
+    sub src, 4
+    sub remaining, 1
+    jmp copy
+    label done
+  end asm
+  return true
+end function
+
+/// @internal
 /// Draw a clipped unit-scale sprite without repeating bounds and flip checks per pixel.
 function drawSpriteUnitTransformed(c, spr, x, y, flipX, flipY, tint)
   x0 = mt.clamp(x, 0, c.width)
@@ -940,16 +965,20 @@ function drawSpriteUnitTransformed(c, spr, x, y, flipX, flipY, tint)
     if canCopyRows then
       copyBytes(destination, destinationIndex, source, sourceIndex, (x1 - x0) * 4)
     else if spr.image.opaque and not tintRequired then
-      xx = x0
-      while xx < x1
-        destination[destinationIndex] = source[sourceIndex]
-        destination[destinationIndex + 1] = source[sourceIndex + 1]
-        destination[destinationIndex + 2] = source[sourceIndex + 2]
-        destination[destinationIndex + 3] = source[sourceIndex + 3]
-        sourceIndex = sourceIndex + sourceStep
-        destinationIndex = destinationIndex + 4
-        xx = xx + 1
-      end while
+      copied = false
+      if flipX then copied = copyOpaqueFlippedRow(destination, source, destinationIndex, sourceIndex, x1 - x0) end if
+      if not copied then
+        xx = x0
+        while xx < x1
+          destination[destinationIndex] = source[sourceIndex]
+          destination[destinationIndex + 1] = source[sourceIndex + 1]
+          destination[destinationIndex + 2] = source[sourceIndex + 2]
+          destination[destinationIndex + 3] = source[sourceIndex + 3]
+          sourceIndex = sourceIndex + sourceStep
+          destinationIndex = destinationIndex + 4
+          xx = xx + 1
+        end while
+      end if
     else
       xx = x0
       while xx < x1

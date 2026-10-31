@@ -27,6 +27,18 @@ function main(args)
   end for
   printResult("sprite-1x", win.ticks() - start, frames, 200)
 
+  opaqueImage = mp.solidImage(32, 32, mp.rgb(73, 149, 228), "flipped-sprite-bench")
+  opaqueSprite = mp.spriteFromImage(opaqueImage, "flipped-sprite-bench")
+  white = mp.rgba(255, 255, 255, 255)
+  start = win.ticks()
+  for frame = 0 to frames - 1
+    canvas.clear(mp.rgb(8, 12, 20))
+    for i = 0 to 199
+      canvas.drawSpriteEx(opaqueSprite, (i * 37 + frame) % 288, (i * 19) % 148, true, false, 1, white)
+    end for
+  end for
+  printResult("sprite-1x-opaque-flipped", win.ticks() - start, frames, 200)
+
   start = win.ticks()
   for frame = 0 to frames - 1
     canvas.clear(mp.rgb(8, 12, 20))
