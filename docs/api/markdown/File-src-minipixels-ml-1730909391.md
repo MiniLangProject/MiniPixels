@@ -29,7 +29,7 @@ Reachable from entry: **yes**
 - `minipixels/steam.ml` as `steam` → [src/minipixels/steam.ml](File-src-minipixels-steam-ml-239735282.md)
 - `minipixels/world/camera.ml` as `cam` → [src/minipixels/world/camera.ml](File-src-minipixels-world-camera-ml-397830650.md)
 - `minipixels/world/tilemap.ml` as `tile` → [src/minipixels/world/tilemap.ml](File-src-minipixels-world-tilemap-ml-2079329797.md)
-- `std/math.ml` as `math` → `../MiniLangCompilerML/std/math.ml` — external dependency
+- `std/math.ml` as `math` → `../MiniLangCompilerPy/std/math.ml` — external dependency
 
 ## Declarations
 
@@ -1047,7 +1047,7 @@ Opens asset pack for the minipixels module.
 function openProtectedAssetPack(path, key, publicKey, keyId)
 ```
 
-Opens a signed and AES-256-GCM encrypted MPX3 version-4 asset pack. Generated MiniPixels asset modules call this automatically for protected builds.
+Opens a signed and AES-256-GCM encrypted MPX3 version-6 asset pack. Generated MiniPixels asset modules call this automatically for protected builds.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |

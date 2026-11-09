@@ -10,7 +10,7 @@ Reachable from entry: **yes**
 
 ## Imports
 
-- `std/ds/hashmap.ml` as `hm` → `../MiniLangCompilerML/std/ds/hashmap.ml` — external dependency
+- `std/ds/hashmap.ml` as `hm` → `../MiniLangCompilerPy/std/ds/hashmap.ml` — external dependency
 
 ## Declarations
 

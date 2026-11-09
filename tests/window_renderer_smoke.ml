@@ -50,6 +50,17 @@ function main(args)
   win.sleepMs(120)
   win.close(w)
 
+  // Repeatedly disconnect the last X11 client and reopen after the server has
+  // had time to reset. CI keeps Xvfb alive with -noreset between these windows.
+  for cycle = 1 to 8
+    win.sleepMs(40)
+    reopened = win.open("MiniPixels Reopen Smoke", canvas.width, canvas.height, 2, "cpu", "integer", false)
+    if typeof(reopened) == "error" then return 6 end if
+    if win.present(reopened, canvas) == false then return 7 end if
+    win.close(reopened)
+  end for
+  print "WINDOW_REOPEN_OK"
+
   cfg = mp.createConfig("MiniPixels Native Resolution Smoke", 64, 36, 2)
   mp.useNativeRenderResolution(cfg)
   mp.setPauseWhenUnfocused(cfg, false)

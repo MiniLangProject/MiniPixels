@@ -25,6 +25,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: MiniLangProject/MiniLangCompilerPy
+          ref: 25f168e02d9e0ef7c33d7ac37c3ec83779308d02 # v1.3.3
           path: MiniLangCompilerPy
 
       - name: Set up Python
@@ -62,7 +63,7 @@ jobs:
         working-directory: MiniPixels
         run: |
           python ../MiniLangCompilerPy/mlc_win64.py tests/window_renderer_smoke.ml build/tests/window_renderer_smoke -I src -I ../MiniLangCompilerPy --target linux-x64
-          xvfb-run -a build/tests/window_renderer_smoke
+          xvfb-run -a -s "-screen 0 1280x720x24 -noreset" build/tests/window_renderer_smoke
 
       - name: Smoke optional GPU fallback
         working-directory: MiniPixels
@@ -115,6 +116,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: MiniLangProject/MiniLangCompilerPy
+          ref: 25f168e02d9e0ef7c33d7ac37c3ec83779308d02 # v1.3.3
           path: MiniLangCompilerPy
 
       - name: Set up Python

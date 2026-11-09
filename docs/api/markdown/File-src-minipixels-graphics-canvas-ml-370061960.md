@@ -12,7 +12,7 @@ Reachable from entry: **yes**
 
 - `minipixels/graphics/sprite.ml` as `sp` → [src/minipixels/graphics/sprite.ml](File-src-minipixels-graphics-sprite-ml-1992064667.md)
 - `minipixels/math/types.ml` as `mt` → [src/minipixels/math/types.ml](File-src-minipixels-math-types-ml-311947336.md)
-- `std/math.ml` as `math` → `../MiniLangCompilerML/std/math.ml` — external dependency
+- `std/math.ml` as `math` → `../MiniLangCompilerPy/std/math.ml` — external dependency
 
 ## Declarations
 

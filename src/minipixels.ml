@@ -156,7 +156,7 @@ function createGame(cfg)
 end function
 
 /// Performs the version operation for the minipixels module.
-function version() return "0.18.0" end function
+function version() return "0.20.1" end function
 /// Updates renderer maintained by the minipixels module.
 /// @param cfg Configuration used by the operation.
 /// @param renderer renderer value consumed by this operation.
@@ -438,7 +438,7 @@ function openAssetPack(path) return pack.open(path) end function
 
 /// Locates the default pack beside the executable, with development fallbacks.
 function defaultAssetPackPath() return pack.defaultPath() end function
-/// Opens a signed and AES-256-GCM encrypted MPX3 version-4 asset pack.
+/// Opens a signed and AES-256-GCM encrypted MPX3 version-6 asset pack.
 /// Generated MiniPixels asset modules call this automatically for protected builds.
 /// @param path Path to the protected pack.
 /// @param key Per-build 32-byte AES key.

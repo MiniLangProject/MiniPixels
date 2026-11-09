@@ -50,7 +50,7 @@ struct AssetPack
   /// Whether payload bytes remain in the source file until first access.
   fileBacked
   /// Whether payloads are independently encrypted MPX3 blocks.
-  protected
+  isProtected
   /// AES key retained only while a lazy MPX3 pack is open.
   key
   /// Stores the names value associated with asset pack.
@@ -678,7 +678,7 @@ function getBytesAt(pack, index)
   if not pack.fileBacked and typeof(pack.data) != "bytes" then return packError("asset pack is closed") end if
   pack.payloadMisses = pack.payloadMisses + 1
   payload = void
-  if pack.protected then
+  if pack.isProtected then
     ciphertext = _readRange(pack.file, pack.offsets[index], pack.storedSizes[index])
     if typeof(ciphertext) == "error" then return ciphertext end if
     pack.storedBytesRead = pack.storedBytesRead + pack.storedSizes[index]
@@ -697,7 +697,7 @@ function getBytesAt(pack, index)
     payload = slice(pack.data, pack.offsets[index], pack.storedSizes[index])
   end if
   expectedSize = -1
-  if pack.protected then expectedSize = pack.sizes[index] end if
+  if pack.isProtected then expectedSize = pack.sizes[index] end if
   if pack.codecs[index] != CODEC_STREAM then payload = _decodePayload(pack.codecs[index], payload, expectedSize) end if
   if typeof(payload) == "error" then return payload end if
   pack.payloadCache[index] = payload
@@ -827,7 +827,7 @@ function preloadSlots(pack, slots, maxBatchBytes)
       if not pack.payloadLoaded[slot] then
         relativeOffset = pack.offsets[slot] - batchStart
         payload = void
-        if pack.protected then
+        if pack.isProtected then
           stored = region
           if relativeOffset != 0 or pack.storedSizes[slot] != len(region) then
             stored = slice(region, relativeOffset, pack.storedSizes[slot])
@@ -921,7 +921,7 @@ function streamInfoAt(pack, index)
   if kind != 2 and kind != 6 then return packError("asset is not audio or video: " + pack.names[index]) end if
   codec = pack.codecs[owner]
   if codec != CODEC_NONE and codec != CODEC_STREAM then return packError("media asset is not stored in a streamable representation") end if
-  if pack.protected and codec != CODEC_STREAM then return packError("protected media asset is not chunk-authenticated") end if
+  if pack.isProtected and codec != CODEC_STREAM then return packError("protected media asset is not chunk-authenticated") end if
   key = bytes(0, 0)
   nonce = bytes(0, 0)
   hashes = bytes(0, 0)
@@ -1023,9 +1023,9 @@ function close(pack)
   if not (pack is AssetPack) then return false end if
   clearCache(pack)
   if pack.fileBacked then
-    if pack.protected then crypto.secureZero(pack.key) end if
+    if pack.isProtected then crypto.secureZero(pack.key) end if
     result = fileio.close(pack.file)
-    pack.protected = false
+    pack.isProtected = false
     pack.fileBacked = false
     pack.file = false
     pack.data = false

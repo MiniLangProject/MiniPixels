@@ -172,6 +172,18 @@ Hash index mapping names to entry slots.
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L77)
 
+<a id="field-field-minipixels-assets-pack-assetpack-isprotected-isprotected-src-minipixels-assets-pack-ml-863822130"></a>
+### isProtected
+
+```ml
+isProtected
+```
+
+Whether payloads are independently encrypted MPX3 blocks.
+
+
+[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L53)
+
 <a id="field-field-minipixels-assets-pack-assetpack-key-key-src-minipixels-assets-pack-ml-1495975894"></a>
 ### key
 
@@ -303,18 +315,6 @@ Number of payload reads or slices.
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L89)
-
-<a id="field-field-minipixels-assets-pack-assetpack-protected-protected-src-minipixels-assets-pack-ml-106347898"></a>
-### protected
-
-```ml
-protected
-```
-
-Whether payloads are independently encrypted MPX3 blocks.
-
-
-[View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/assets/pack.ml#L53)
 
 <a id="field-field-minipixels-assets-pack-assetpack-sizes-sizes-src-minipixels-assets-pack-ml-2075833842"></a>
 ### sizes

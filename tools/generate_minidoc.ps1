@@ -32,8 +32,8 @@ if ([string]::IsNullOrWhiteSpace($MiniDoc) -or -not (Test-Path -LiteralPath $Min
 if ([string]::IsNullOrWhiteSpace($CompilerRoot)) {
     $compilerCandidates = @(
         $env:MINILANG_ROOT,
-        (Join-Path $workspace 'MiniLangCompilerML'),
-        (Join-Path $workspace 'MiniLangCompilerPy')
+        (Join-Path $workspace 'MiniLangCompilerPy'),
+        (Join-Path $workspace 'MiniLangCompilerML')
     ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
     $CompilerRoot = $compilerCandidates |
         Where-Object { Test-Path -LiteralPath (Join-Path $_ 'std') -PathType Container } |

@@ -12,7 +12,7 @@ Reachable from entry: **no**
 
 - `minipixels/input/input.ml` as `inp` → [src/minipixels/input/input.ml](File-src-minipixels-input-input-ml-1476207415.md)
 - `minipixels/math/types.ml` as `mt` → [src/minipixels/math/types.ml](File-src-minipixels-math-types-ml-311947336.md)
-- `std/time.ml` as `time` → `../MiniLangCompilerML/std/time.ml` — external dependency
+- `std/time.ml` as `time` → `../MiniLangCompilerPy/std/time.ml` — external dependency
 
 ## Declarations
 

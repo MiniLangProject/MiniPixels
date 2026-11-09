@@ -5,6 +5,7 @@ import std.assert as a
 function main(args)
   pack = mp.openAssetPack("build/tests/assets.mpx")
   a.assertTrue(typeof(pack) != "error", "asset pack opens")
+  a.assertEq(pack.isProtected, false, "MPX1 pack is unprotected")
   initialStats = mp.assetPackStats(pack)
   a.assertTrue(initialStats.lazyFile, "asset pack opens without retaining payloads")
   a.assertEq(initialStats.payloadMisses, 0, "asset open performs no payload reads")

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.20.1 - 2026-11-09
+
+- Updated the compiler baseline to MiniLangCompilerPy 1.3.3 and pinned both CI targets to its release commit.
+- Renamed `AssetPack.protected` to `AssetPack.isProtected` to avoid the compiler's visibility keyword; asset formats and generated game asset APIs are unchanged.
+- Kept the CI Xvfb server alive between window lifetimes and extended the presenter smoke test with repeated close/reopen cycles.
+- Added protection-state and AES-key wipe assertions to the asset regression tests.
+- Synchronized the engine's version query with the CLI and SDK version and refreshed the API documentation.
+
 ## 0.20.0 - 2026-10-31
 
 - Scanned RGBA alpha bytes in a bounds-checked typed inline ASM loop when detecting image and replacement-frame opacity.
