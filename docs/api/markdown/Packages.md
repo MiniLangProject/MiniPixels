@@ -16,6 +16,7 @@
 - [minipixels.graphics.canvas](Package-minipixels-graphics-canvas-2037800108.md)
 - [minipixels.graphics.font](Package-minipixels-graphics-font-76916397.md)
 - [minipixels.graphics.gpu](Package-minipixels-graphics-gpu-1856137742.md)
+- [minipixels.graphics.scene3d](Package-minipixels-graphics-scene3d-353711103.md)
 - [minipixels.graphics.sprite](Package-minipixels-graphics-sprite-484808201.md)
 - [minipixels.input.input](Package-minipixels-input-input-1057851307.md)
 - [minipixels.math.types](Package-minipixels-math-types-2130299542.md)

@@ -1,0 +1,30 @@
+# Package `minipixels.graphics.scene3d`
+
+[Home](README.md) · [Packages](Packages.md)
+
+## Files
+
+- [src/minipixels/graphics/scene3d.ml](File-src-minipixels-graphics-scene3d-ml-1530096291.md)
+
+## Symbols
+
+- [`minipixels.graphics.scene3d.begin`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-begin-function-begin-camerax-cameray-zoom-centerx-centery-returns-bool-src-minipixels-graphics-scene3d-ml-70495686) — function
+- [`minipixels.graphics.scene3d.beginProjected`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-beginprojected-function-beginprojected-x-y-width-height-halfextent-returns-bool-src-minipixels-graphics-scene3d-ml-1381206914) — function
+- [`minipixels.graphics.scene3d.box`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-box-function-box-x-y-z-sx-sy-sz-color-returns-bool-src-minipixels-graphics-scene3d-ml-567024415) — function
+- [`minipixels.graphics.scene3d.draw`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-draw-function-draw-handle-returns-bool-src-minipixels-graphics-scene3d-ml-1643208343) — function
+- [`minipixels.graphics.scene3d.drawAt`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-drawat-function-drawat-handle-x-y-z-yaw-0-sx-1-sy-1-sz-1-returns-bool-src-minipixels-graphics-scene3d-ml-111743870) — function
+- [`minipixels.graphics.scene3d.finish`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-finish-function-finish-src-minipixels-graphics-scene3d-ml-805697962) — function
+- [`minipixels.graphics.scene3d.meshBegin`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-meshbegin-function-meshbegin-returns-bool-src-minipixels-graphics-scene3d-ml-1195999557) — function
+- [`minipixels.graphics.scene3d.meshEnd`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-meshend-function-meshend-returns-int-src-minipixels-graphics-scene3d-ml-2092566256) — function
+- [`minipixels.graphics.scene3d.metric`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-metric-function-metric-field-src-minipixels-graphics-scene3d-ml-753839984) — function
+- [`minipixels.graphics.scene3d.mp3dBegin`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#extern_function-extern-function-minipixels-graphics-scene3d-mp3dbegin-extern-function-mp3dbegin-camerax-as-double-cameray-as-double-zoom-as-double-centerx-as-double-centery-as-double-from-minipixels-gpu-dll-returns-int-src-minipixels-graphics-scene3d-ml-1911764236) — extern_function
+- [`minipixels.graphics.scene3d.mp3dBeginProjected`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#extern_function-extern-function-minipixels-graphics-scene3d-mp3dbeginprojected-extern-function-mp3dbeginprojected-x-as-double-y-as-double-width-as-int-height-as-int-halfextent-as-double-from-minipixels-gpu-dll-returns-int-src-minipixels-graphics-scene3d-ml-1552049476) — extern_function
+- [`minipixels.graphics.scene3d.mp3dBox`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#extern_function-extern-function-minipixels-graphics-scene3d-mp3dbox-extern-function-mp3dbox-x-as-double-y-as-double-z-as-double-sx-as-double-sy-as-double-sz-as-double-color-as-u32-from-minipixels-gpu-dll-returns-int-src-minipixels-graphics-scene3d-ml-942455978) — extern_function
+- [`minipixels.graphics.scene3d.mp3dEnd`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#extern_function-extern-function-minipixels-graphics-scene3d-mp3dend-extern-function-mp3dend-from-minipixels-gpu-dll-returns-void-src-minipixels-graphics-scene3d-ml-322749221) — extern_function
+- [`minipixels.graphics.scene3d.mp3dMeshBegin`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#extern_function-extern-function-minipixels-graphics-scene3d-mp3dmeshbegin-extern-function-mp3dmeshbegin-from-minipixels-gpu-dll-returns-int-src-minipixels-graphics-scene3d-ml-152461430) — extern_function
+- [`minipixels.graphics.scene3d.mp3dMeshDelete`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#extern_function-extern-function-minipixels-graphics-scene3d-mp3dmeshdelete-extern-function-mp3dmeshdelete-handle-as-int-from-minipixels-gpu-dll-returns-void-src-minipixels-graphics-scene3d-ml-2069904168) — extern_function
+- [`minipixels.graphics.scene3d.mp3dMeshDraw`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#extern_function-extern-function-minipixels-graphics-scene3d-mp3dmeshdraw-extern-function-mp3dmeshdraw-handle-as-int-from-minipixels-gpu-dll-returns-int-src-minipixels-graphics-scene3d-ml-874570519) — extern_function
+- [`minipixels.graphics.scene3d.mp3dMeshDrawAt`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#extern_function-extern-function-minipixels-graphics-scene3d-mp3dmeshdrawat-extern-function-mp3dmeshdrawat-handle-as-int-x-as-double-y-as-double-z-as-double-yaw-as-double-sx-as-double-sy-as-double-sz-as-double-from-minipixels-gpu-dll-returns-int-src-minipixels-graphics-scene3d-ml-1740738720) — extern_function
+- [`minipixels.graphics.scene3d.mp3dMeshEnd`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#extern_function-extern-function-minipixels-graphics-scene3d-mp3dmeshend-extern-function-mp3dmeshend-from-minipixels-gpu-dll-returns-int-src-minipixels-graphics-scene3d-ml-822456662) — extern_function
+- [`minipixels.graphics.scene3d.mp3dMetric`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#extern_function-extern-function-minipixels-graphics-scene3d-mp3dmetric-extern-function-mp3dmetric-field-as-int-from-minipixels-gpu-dll-returns-u64-src-minipixels-graphics-scene3d-ml-1358237559) — extern_function
+- [`minipixels.graphics.scene3d.release`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-release-function-release-handle-src-minipixels-graphics-scene3d-ml-426897158) — function

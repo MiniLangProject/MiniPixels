@@ -34,6 +34,8 @@ static std::vector<Vertex> vertices;
 static std::vector<unsigned char> readRow;
 static GLuint batchTexture=0;
 static uint64_t uploadBytes=0, drawCalls=0;
+namespace mp3d { static void reset(); static void invalidateDepthAttachment(); }
+API void mp3dEnd();
 static void destroyLight();
 static bool current() { return ready && owner && wglGetCurrentContext()==owner; }
 static PROC proc(const char* name) {
@@ -117,7 +119,8 @@ API int mpGpuResize(int w,int h) {
     glViewport(0,0,w,h); glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
     glClearColor(0,0,0,1); glClear(GL_COLOR_BUFFER_BIT); glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_FALSE); bindFbo(FBO,0);
     deleteFbo(1,&fbo); glDeleteTextures(1,&scene); if(light) glDeleteTextures(1,&light);
-    fbo=nextFbo; scene=nextScene; light=0; width=w; height=h; drawing=false; return 1;
+    fbo=nextFbo; scene=nextScene; light=0; width=w; height=h; drawing=false;
+    mp3d::invalidateDepthAttachment();return 1;
 }
 API void mpGpuResetTextures() {
     if(!current()) return;
@@ -126,6 +129,7 @@ API void mpGpuResetTextures() {
 }
 API void mpGpuShutdown() {
     if(!current()) return;
+    mp3d::reset();
     flush(); mpGpuResetTextures(); deleteFbo(1,&fbo); glDeleteTextures(1,&scene); glDeleteTextures(1,&white);
     if(light) glDeleteTextures(1,&light);
     destroyLight();
@@ -257,3 +261,4 @@ API void mpGpuEnd(int cw,int ch,int vx,int vy,int vw,int vh) {
 }
 API uint64_t mpGpuUploads() { return uploadBytes; }
 API uint64_t mpGpuDrawCalls() { return drawCalls; }
+#include "gpu_scene3d.hpp"

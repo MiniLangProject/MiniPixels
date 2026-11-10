@@ -3,9 +3,17 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.21.0`
+Current version: `0.22.0`
 
-See the [0.21.0 release notes](RELEASE_NOTES_0.21.0.md) for faster asset loading with prepared images and native LZ4. Rebuild the game executable, asset pack, and native runtime together when upgrading.
+See the [0.22.0 release notes](RELEASE_NOTES_0.22.0.md) for the optional retained 3D layer and optimized 2D/3D composition. Rebuild the native GPU runtime when upgrading to use the new API.
+
+Optional Windows/OpenGL 3D is available through `minipixels.graphics.scene3d`:
+resident box meshes, world transforms, depth-tested isometric passes and
+projected model viewports sharing the 2D canvas. Restore the canvas with
+`scene3d.finish()` before drawing ordinary 2D UI. Linux builds remain supported;
+the 3D module returns unsupported results there. See the [3D guide](docs/scene3d.md)
+for lifecycle, integration contracts and limitations. This is an experimental
+fixed-camera layer, without a general model importer or automatic 3D shadows.
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. The current source targets MiniLang Compiler 1.3.3 and builds native Windows x64 PE and Linux x64 ELF executables.
 

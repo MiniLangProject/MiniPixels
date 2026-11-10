@@ -18,6 +18,7 @@
 | [src/minipixels/graphics/canvas.ml](File-src-minipixels-graphics-canvas-ml-370061960.md) | `minipixels.graphics.canvas` | yes | 81 |
 | [src/minipixels/graphics/font.ml](File-src-minipixels-graphics-font-ml-906525775.md) | `minipixels.graphics.font` | yes | 5 |
 | [src/minipixels/graphics/gpu.ml](File-src-minipixels-graphics-gpu-ml-159526452.md) | `minipixels.graphics.gpu` | no | 55 |
+| [src/minipixels/graphics/scene3d.ml](File-src-minipixels-graphics-scene3d-ml-1530096291.md) | `minipixels.graphics.scene3d` | no | 20 |
 | [src/minipixels/graphics/sprite.ml](File-src-minipixels-graphics-sprite-ml-1992064667.md) | `minipixels.graphics.sprite` | yes | 39 |
 | [src/minipixels/input/input.ml](File-src-minipixels-input-input-ml-1476207415.md) | `minipixels.input.input` | yes | 68 |
 | [src/minipixels/math/types.ml](File-src-minipixels-math-types-ml-311947336.md) | `minipixels.math.types` | yes | 79 |

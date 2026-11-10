@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.22.0 - 2026-11-10
+
+- Integrate the optional Windows/OpenGL `minipixels.graphics.scene3d` layer from the local renderer experiment.
+- Retain box meshes on the GPU; support transformed draws, shared scene depth and projected orthographic model viewports.
+- Preserve public 2D rendering state, including texture units, and invalidate cached depth attachments on resize.
+- Reduce redundant projection and texture-state work through an explicit private integration contract; public scopes retain full state preservation.
+- Rebuild the native GPU DLL when either the C++ source or its 3D header changes.
+- Add native depth/state/lifecycle regressions and MiniLang ABI tests; Linux exposes explicit unsupported fallbacks.
+- Document the optional API and its Windows-only, fixed-camera scope. Game-specific model formats and material shaders remain outside the SDK.
+
 ## 0.21.0 - 2026-11-10
 
 - Prepare image and procedural assets as compact MRI1 RGBA8888 payloads during Python/native builds, eliminating runtime PNG filter reconstruction and color conversion while preserving generated game APIs.

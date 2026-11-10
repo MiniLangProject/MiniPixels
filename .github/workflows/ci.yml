@@ -158,6 +158,13 @@ jobs:
           $result | Write-Output
           if ($exitCode -ne 0 -or "$result" -match '\[FAIL\]' -or "$result" -notmatch 'GPU_SCENE_SMOKE_OK|GPU_SCENE_UNAVAILABLE') { exit 1 }
 
+      - name: Test retained 3D scene runtime
+        # Hosted Windows OpenGL can lack framebuffer support. The native suite
+        # reports that capability skip explicitly; local GPU tests run strictly.
+        shell: pwsh
+        working-directory: MiniPixels
+        run: .\tests\run_scene3d.ps1 -AllowUnavailable
+
       - name: Build native MiniLang CLI
         shell: pwsh
         working-directory: MiniPixels

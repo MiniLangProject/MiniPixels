@@ -8,19 +8,19 @@ Static metrics are calculated from target-specific preprocessed MiniLang files i
 
 | Metric | Value |
 | --- | ---: |
-| Blank lines | 1093 |
+| Blank lines | 1143 |
 | Clone groups | 30 |
 | Cognitive complexity | 3130 (maximum per function: 154) |
-| Comment lines | 3402 |
-| Cyclomatic complexity | 2963 (average: 3.64, maximum: 61) |
-| Documentation coverage | 96.16% (3058 of 3180 documentation items) |
-| Duplicated lines | 200 (2.3%) |
-| Files | 29 |
-| Functions | 814 |
-| Maintainability index | 4.81 / 100 |
-| Physical lines | 13193 |
-| Source lines | 8698 |
-| Statements | 6575 |
+| Comment lines | 3461 |
+| Cyclomatic complexity | 2973 (average: 3.61, maximum: 61) |
+| Documentation coverage | 96.21% (3096 of 3218 documentation items) |
+| Duplicated lines | 200 (2.29%) |
+| Files | 30 |
+| Functions | 824 |
+| Maintainability index | 4.93 / 100 |
+| Physical lines | 13329 |
+| Source lines | 8725 |
+| Statements | 6585 |
 
 ## Documentation coverage
 
@@ -28,19 +28,19 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 
 | Category | Documented | Total | Coverage |
 | --- | ---: | ---: | ---: |
-| API declarations | 878 | 878 | 100% |
+| API declarations | 888 | 888 | 100% |
 | Constants | 72 | 98 | 73.47% |
 | Enum variants | 0 | 0 | 100% |
 | Fields | 368 | 456 | 80.7% |
 | Globals | 11 | 19 | 57.89% |
-| Overall | 3058 | 3180 | 96.16% |
-| Parameters | 1729 | 1729 | 100% |
+| Overall | 3096 | 3218 | 96.21% |
+| Parameters | 1757 | 1757 | 100% |
 
 ## Halstead metrics
 
 | Distinct operators | Distinct operands | Total operators | Total operands | Vocabulary | Length | Volume | Difficulty | Effort | Estimated defects |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 53 | 2959 | 39928 | 30862 | 3012 | 70790 | 818085.06 | 276.39 | 226111910.33 | 272.7 |
+| 53 | 2984 | 40177 | 31044 | 3037 | 71221 | 823915.24 | 275.69 | 227147135.79 | 274.64 |
 
 ## Files
 
@@ -60,6 +60,7 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`src/minipixels/graphics/canvas.ml`](File-src-minipixels-graphics-canvas-ml-370061960.md) | 882 | 65 | 268 / 4.12 / 24 | 331 / 50 | 62 (7.03%) | 67525.72 | 0 |
 | [`src/minipixels/graphics/font.ml`](File-src-minipixels-graphics-font-ml-906525775.md) | 88 | 5 | 58 / 11.6 / 43 | 59 / 42 | 0 (0%) | 5226.68 | 23.75 |
 | [`src/minipixels/graphics/gpu.ml`](File-src-minipixels-graphics-gpu-ml-159526452.md) | 186 | 24 | 60 / 2.5 / 8 | 39 / 9 | 0 (0%) | 13639.37 | 13.47 |
+| [`src/minipixels/graphics/scene3d.ml`](File-src-minipixels-graphics-scene3d-ml-1530096291.md) | 27 | 10 | 10 / 1 / 1 | 0 / 0 | 0 (0%) | 2586 | 43.54 |
 | [`src/minipixels/graphics/sprite.ml`](File-src-minipixels-graphics-sprite-ml-1992064667.md) | 155 | 13 | 46 / 3.54 / 12 | 36 / 11 | 0 (0%) | 8489.74 | 18.52 |
 | [`src/minipixels/input/input.ml`](File-src-minipixels-input-input-ml-1476207415.md) | 297 | 28 | 70 / 2.5 / 11 | 45 / 10 | 0 (0%) | 14469.65 | 7.51 |
 | [`src/minipixels/math/types.ml`](File-src-minipixels-math-types-ml-311947336.md) | 243 | 48 | 79 / 1.65 / 13 | 32 / 12 | 0 (0%) | 12409.75 | 8.67 |
@@ -421,6 +422,16 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`minipixels.graphics.gpu.supported`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-supported-function-supported-returns-bool-src-minipixels-graphics-gpu-ml-2140388001) | `src/minipixels/graphics/gpu.ml:64` | 3 | 1 | 1 | 0 | 0 | 31.7 | 78.95 |
 | [`minipixels.graphics.gpu.texture`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-texture-function-texture-image-src-minipixels-graphics-gpu-ml-1711808915) | `src/minipixels/graphics/gpu.ml:79` | 22 | 17 | 7 | 9 | 3 | 764.32 | 49.59 |
 | [`minipixels.graphics.gpu.uploadBytes`](File-src-minipixels-graphics-gpu-ml-159526452.md#function-function-minipixels-graphics-gpu-uploadbytes-function-uploadbytes-returns-int-src-minipixels-graphics-gpu-ml-348491374) | `src/minipixels/graphics/gpu.ml:306` | 4 | 3 | 2 | 1 | 1 | 76.15 | 73.42 |
+| [`minipixels.graphics.scene3d.begin`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-begin-function-begin-camerax-cameray-zoom-centerx-centery-returns-bool-src-minipixels-graphics-scene3d-ml-70495686) | `src/minipixels/graphics/scene3d.ml:35` | 3 | 1 | 1 | 0 | 0 | 130.8 | 74.64 |
+| [`minipixels.graphics.scene3d.beginProjected`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-beginprojected-function-beginprojected-x-y-width-height-halfextent-returns-bool-src-minipixels-graphics-scene3d-ml-1381206914) | `src/minipixels/graphics/scene3d.ml:48` | 3 | 1 | 1 | 0 | 0 | 130.8 | 74.64 |
+| [`minipixels.graphics.scene3d.box`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-box-function-box-x-y-z-sx-sy-sz-color-returns-bool-src-minipixels-graphics-scene3d-ml-567024415) | `src/minipixels/graphics/scene3d.ml:63` | 1 | 1 | 1 | 0 | 0 | 169.92 | 84.25 |
+| [`minipixels.graphics.scene3d.draw`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-draw-function-draw-handle-returns-bool-src-minipixels-graphics-scene3d-ml-1643208343) | `src/minipixels/graphics/scene3d.ml:70` | 1 | 1 | 1 | 0 | 0 | 57.36 | 87.55 |
+| [`minipixels.graphics.scene3d.drawAt`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-drawat-function-drawat-handle-x-y-z-yaw-0-sx-1-sy-1-sz-1-returns-bool-src-minipixels-graphics-scene3d-ml-111743870) | `src/minipixels/graphics/scene3d.ml:81` | 3 | 1 | 1 | 0 | 0 | 231.89 | 72.9 |
+| [`minipixels.graphics.scene3d.finish`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-finish-function-finish-src-minipixels-graphics-scene3d-ml-805697962) | `src/minipixels/graphics/scene3d.ml:39` | 1 | 1 | 1 | 0 | 0 | 23.26 | 90.3 |
+| [`minipixels.graphics.scene3d.meshBegin`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-meshbegin-function-meshbegin-returns-bool-src-minipixels-graphics-scene3d-ml-1195999557) | `src/minipixels/graphics/scene3d.ml:53` | 1 | 1 | 1 | 0 | 0 | 48.43 | 88.07 |
+| [`minipixels.graphics.scene3d.meshEnd`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-meshend-function-meshend-returns-int-src-minipixels-graphics-scene3d-ml-2092566256) | `src/minipixels/graphics/scene3d.ml:66` | 1 | 1 | 1 | 0 | 0 | 38.04 | 88.8 |
+| [`minipixels.graphics.scene3d.metric`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-metric-function-metric-field-src-minipixels-graphics-scene3d-ml-753839984) | `src/minipixels/graphics/scene3d.ml:89` | 1 | 1 | 1 | 0 | 0 | 36 | 88.97 |
+| [`minipixels.graphics.scene3d.release`](File-src-minipixels-graphics-scene3d-ml-1530096291.md#function-function-minipixels-graphics-scene3d-release-function-release-handle-src-minipixels-graphics-scene3d-ml-426897158) | `src/minipixels/graphics/scene3d.ml:86` | 1 | 1 | 1 | 0 | 0 | 30.88 | 89.43 |
 | [`minipixels.graphics.sprite.cacheFrames`](File-src-minipixels-graphics-sprite-ml-1992064667.md#function-function-minipixels-graphics-sprite-cacheframes-function-cacheframes-sheet-src-minipixels-graphics-sprite-ml-1688415125) | `src/minipixels/graphics/sprite.ml:250` | 7 | 5 | 3 | 2 | 1 | 166.91 | 65.6 |
 | [`minipixels.graphics.sprite.Image.getPixel`](Type-minipixels-graphics-sprite-image-712579706.md#method-method-minipixels-graphics-sprite-image-getpixel-function-getpixel-x-y-src-minipixels-graphics-sprite-ml-1990116619) | `src/minipixels/graphics/sprite.ml:29` | 3 | 1 | 1 | 0 | 0 | 93.77 | 75.65 |
 | [`minipixels.graphics.sprite.imageGetPixel`](File-src-minipixels-graphics-sprite-ml-1992064667.md#function-function-minipixels-graphics-sprite-imagegetpixel-function-imagegetpixel-img-x-y-src-minipixels-graphics-sprite-ml-595135794) | `src/minipixels/graphics/sprite.ml:172` | 12 | 14 | 12 | 11 | 1 | 856.24 | 54.31 |
