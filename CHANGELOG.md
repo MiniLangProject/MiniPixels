@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.21.0 - 2026-11-10
+
+- Prepare image and procedural assets as compact MRI1 RGBA8888 payloads during Python/native builds, eliminating runtime PNG filter reconstruction and color conversion while preserving generated game APIs.
+- Decode MPX LZ4 blocks with the pinned native LZ4 reference implementation directly from bounded source ranges into exact-sized output buffers; signatures and AES-GCM authentication still precede decompression.
+- Add pixel-fidelity, malformed-image, native LZ4 boundary/corruption, and protected prepared-image regression tests. Rebuild the executable, asset pack and native runtime together.
+- Include the LZ4 license with native runtime builds and Steam depot exports.
+
 ## 0.20.1 - 2026-11-09
 
 - Updated the compiler baseline to MiniLangCompilerPy 1.3.3 and pinned both CI targets to its release commit.

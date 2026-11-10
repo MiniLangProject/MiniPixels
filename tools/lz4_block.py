@@ -1,6 +1,6 @@
 """Dependency-free encoder for independent, standard LZ4 blocks.
 
-The MiniLang runtime decodes these blocks with ``std.compress.lz4.decode``.
+The MiniPixels native runtime decodes these blocks with LZ4_decompress_safe.
 MPX stores the exact logical size in its own eight-byte payload envelope.
 """
 

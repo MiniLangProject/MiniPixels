@@ -22,6 +22,12 @@ DR_MP3_SHA256 = "997b7ee18de6e6b81e2a83f1ea9fc62aef25c62b28d48db95635f49e65de0a2
 STB_COMMIT = "2c980bb59875b0d32144a71867fbdebb2f77cd20"
 STB_IMAGE_URL = f"https://raw.githubusercontent.com/nothings/stb/{STB_COMMIT}/stb_image.h"
 STB_IMAGE_SHA256 = "594c2fe35d49488b4382dbfaec8f98366defca819d916ac95becf3e75f4200b3"
+LZ4_COMMIT = "ebb370ca83af193212df4dcbadcc5d87bc0de2f0"  # v1.10.0
+LZ4_FILES = {
+    "lz4.c": "9396f7de527bc8435de9c7569fb7998e56545a84b4f3c2d808c0235c01774539",
+    "lz4.h": "26b82efc53d1570f3b54eef02e9c4764c1ad374ff03cac04e2ced5ea4d4c552f",
+    "LICENSE": "8b58c446121a109ccf32edc094bba3010a3d85e4ee3702950db55e4d3e87736c",
+}
 
 
 def _sha256(path: Path) -> str:
@@ -56,7 +62,11 @@ def _ensure_headers(vendor_dir: Path) -> list[Path]:
     stb_dir = vendor_dir / "stb" / STB_COMMIT
     dr_mp3 = _ensure_download(dr_mp3_dir / "dr_mp3.h", DR_MP3_URL, DR_MP3_SHA256, "dr_mp3")
     stb_image = _ensure_download(stb_dir / "stb_image.h", STB_IMAGE_URL, STB_IMAGE_SHA256, "stb_image")
-    return [dr_mp3, stb_image]
+    lz4_dir = vendor_dir / "lz4" / LZ4_COMMIT
+    lz4_files = [_ensure_download(lz4_dir / name,
+        f"https://raw.githubusercontent.com/lz4/lz4/{LZ4_COMMIT}/lib/{name}", checksum, "LZ4 " + name)
+        for name, checksum in LZ4_FILES.items()]
+    return [dr_mp3, stb_image, *lz4_files]
 
 
 def _newest_mtime(paths: list[Path]) -> float:
@@ -142,12 +152,15 @@ def ensure_audio_runtime(target: str, output_dir: Path | None = None) -> Path:
     build_dir.mkdir(parents=True, exist_ok=True)
     headers = _ensure_headers(vendor_dir)
     runtime = _build_windows(build_dir, headers) if target == "windows-x64" else _build_linux(build_dir, headers)
+    license_source = vendor_dir / "lz4" / LZ4_COMMIT / "LICENSE"
+    shutil.copy2(license_source, runtime.parent / "minipixels-lz4-LICENSE.txt")
     if output_dir is None:
         return runtime
     destination = Path(output_dir).resolve() / runtime.name
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination != runtime.resolve():
         shutil.copy2(runtime, destination)
+        shutil.copy2(license_source, destination.parent / "minipixels-lz4-LICENSE.txt")
     return destination
 
 

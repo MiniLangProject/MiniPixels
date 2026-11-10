@@ -39,7 +39,7 @@ class SteamToolsTests(unittest.TestCase):
             root = Path(temp)
             build = root / "build"
             build.mkdir()
-            names = ["game.exe", "assets.mpx", "minipixels_audio.dll", "minipixels_steam.dll", "steam_api64.dll", "minilang_video.dll", "minipixels_gpu.dll"]
+            names = ["game.exe", "assets.mpx", "minipixels_audio.dll", "minipixels_steam.dll", "steam_api64.dll", "minilang_video.dll", "minipixels_gpu.dll", "minipixels-lz4-LICENSE.txt"]
             for name in names + ["steam_appid.txt", "secret.pem", "main.ml", "junk.dll"]:
                 (build / name).write_bytes(b"test")
             (build / "steam-build.json").write_text(json.dumps({"stub": False, "target": "windows-x64"}))

@@ -155,7 +155,7 @@ jump or landing. The forest layer's roots are anchored eight pixels behind the
 world ground, keeping the trees visible as the camera moves vertically. Regression
 tests cover landing/walk-off stability, bounded movement, and timestep-independent damping.
 
-Level data lives in `examples/jump-and-run/assets/levels/levels.json` and is compiled into `generated.levels` during the build. Image/audio/file assets are written to `build/assets.mpx`; generated MiniLang image factories decode packed PNG payloads, and audio helpers load memory-backed clips. The Python build can transcode source WAVs to MP3 automatically. The native MiniLang CLI can generate the asset/level modules and unprotected packs too; use the Python driver for protected packs and the full build/run pipeline.
+Level data lives in `examples/jump-and-run/assets/levels/levels.json` and is compiled into `generated.levels` during the build. Image/audio/file assets are written to `build/assets.mpx`; generated MiniLang image factories load build-prepared MRI1 pixels, and audio helpers load memory-backed clips. The Python build can transcode source WAVs to MP3 automatically. The native MiniLang CLI can generate the asset/level modules and unprotected packs too; use the Python driver for protected packs and the full build/run pipeline.
 
 Current graphics were generated with the built-in image-generation tool and then
 cropped, scaled, and assembled into the existing frame layouts. The previous

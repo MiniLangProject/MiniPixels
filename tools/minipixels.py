@@ -39,6 +39,8 @@ PACK_CODEC_STREAM = 4
 PACK_COMPRESSED_MAGIC = b"MPC1"
 PACK_RLE_MAGIC = b"MPR1"
 PACK_LZ4_MAGIC = b"MPL1"
+PACK_IMAGE_MAGIC = b"MRI1"
+MAX_IMAGE_PIXELS = 67108864
 
 
 def asset_protection(data: dict) -> dict | None:
@@ -421,74 +423,27 @@ def color_rgba(color: list[int]) -> tuple[int, int, int, int]:
 
 
 def read_png_rgba(path: Path) -> tuple[int, int, bytes]:
-    data = path.read_bytes()
-    if not data.startswith(b"\x89PNG\r\n\x1a\n"):
-        die(f"{path}: not a PNG file")
-    pos = 8
-    width = height = color_type = bit_depth = None
-    compression = filter_method = interlace = None
-    compressed = bytearray()
-    while pos + 8 <= len(data):
-        length = struct.unpack(">I", data[pos : pos + 4])[0]
-        ctype = data[pos + 4 : pos + 8]
-        payload = data[pos + 8 : pos + 8 + length]
-        pos += 12 + length
-        if ctype == b"IHDR":
-            width, height, bit_depth, color_type, compression, filter_method, interlace = struct.unpack(">IIBBBBB", payload[:13])
-        elif ctype == b"IDAT":
-            compressed.extend(payload)
-        elif ctype == b"IEND":
-            break
-    if (
-        width is None
-        or height is None
-        or bit_depth != 8
-        or color_type not in (2, 6)
-        or compression != 0
-        or filter_method != 0
-        or interlace != 0
-    ):
-        die(f"{path}: only 8-bit RGB/RGBA PNG assets are supported by this processor")
-    channels = 4 if color_type == 6 else 3
-    raw = zlib.decompress(bytes(compressed))
-    stride = width * channels
-    rows: list[bytearray] = []
-    p = 0
-    for _ in range(height):
-        filt = raw[p]
-        p += 1
-        row = bytearray(raw[p : p + stride])
-        p += stride
-        prev = rows[-1] if rows else bytearray(stride)
-        for i in range(stride):
-            left = row[i - channels] if i >= channels else 0
-            up = prev[i]
-            up_left = prev[i - channels] if i >= channels else 0
-            if filt == 1:
-                row[i] = (row[i] + left) & 255
-            elif filt == 2:
-                row[i] = (row[i] + up) & 255
-            elif filt == 3:
-                row[i] = (row[i] + ((left + up) // 2)) & 255
-            elif filt == 4:
-                pa = abs(up - up_left)
-                pb = abs(left - up_left)
-                pc = abs(left + up - (2 * up_left))
-                pr = left if pa <= pb and pa <= pc else (up if pb <= pc else up_left)
-                row[i] = (row[i] + pr) & 255
-            elif filt != 0:
-                die(f"{path}: unsupported PNG filter {filt}")
-        rows.append(row)
-    out = bytearray(width * height * 4)
-    for y, row in enumerate(rows):
-        for x in range(width):
-            si = x * channels
-            di = (y * width + x) * 4
-            out[di] = row[si]
-            out[di + 1] = row[si + 1]
-            out[di + 2] = row[si + 2]
-            out[di + 3] = row[si + 3] if channels == 4 else 255
-    return width, height, bytes(out)
+    from PIL import Image
+
+    try:
+        with Image.open(path) as image:
+            if image.format != "PNG":
+                die(f"{path}: not a PNG file")
+            width, height = image.size
+            if width <= 0 or height <= 0 or width * height > MAX_IMAGE_PIXELS:
+                die(f"{path}: image dimensions exceed the decode limit")
+            # Do not silently repair corrupt PNGs when converting to MRI1.
+            image.verify()
+        with Image.open(path) as image:
+            return width, height, image.convert("RGBA").tobytes()
+    except (OSError, ValueError, SyntaxError, Image.DecompressionBombError) as exc:
+        die(f"{path}: invalid PNG: {exc}")
+
+
+def prepared_image(width: int, height: int, rgba: bytes) -> bytes:
+    if width <= 0 or height <= 0 or width * height > MAX_IMAGE_PIXELS or len(rgba) != width * height * 4:
+        die("invalid prepared image dimensions or pixels")
+    return PACK_IMAGE_MAGIC + struct.pack("<II", width, height) + rgba
 
 
 def adler32(data: bytes) -> int:
@@ -664,19 +619,19 @@ def asset_pack_payload(asset: dict, root: Path, default_compression: str = "auto
     transform = "raw"
     if kind == "procedural":
         width, height, rgba = procedural_pixels(asset)
-        payload = write_png_rgba_compressed(width, height, rgba)
+        payload = prepared_image(width, height, rgba)
         type_code = 1
-        transform = "png-deflate"
+        transform = "rgba-prepared"
     elif kind == "image":
         raw_path = asset.get("path")
         if not raw_path:
             return None
         path = root / raw_path
-        read_png_rgba(path)
-        payload = path.read_bytes()
-        source_size = len(payload)
+        width, height, rgba = read_png_rgba(path)
+        payload = prepared_image(width, height, rgba)
+        source_size = path.stat().st_size
         type_code = 1
-        transform = "png-source"
+        transform = "rgba-prepared"
     elif kind == "audio":
         raw_path = asset.get("path")
         if not raw_path:
@@ -736,12 +691,20 @@ def asset_pack_payload(asset: dict, root: Path, default_compression: str = "auto
     logical_size = len(payload)
     codec = PACK_CODEC_NONE
     stored = payload
-    if kind in ("file", "text", "data"):
+    if kind in ("image", "procedural", "file", "text", "data"):
         profile = str(asset.get("compression", default_compression)).lower()
         effective_profile = profile
         if kind == "file" and profile == "auto" and path.suffix.lower() in (".sprites", ".rgba") and logical_size >= 65536:
             effective_profile = "fast"
-        codec, stored = compress_pack_payload(payload, effective_profile)
+        if kind in ("image", "procedural") and profile in ("auto", "small"):
+            # PNG filtering/color conversion is paid at build time. Prefer the
+            # native Deflate path over portable RLE for compact prepared pixels.
+            candidate = PACK_COMPRESSED_MAGIC + struct.pack("<I", logical_size) + zlib.compress(payload, level=9)
+            saving = 1 if profile == "small" else max(8, logical_size // 100)
+            if len(candidate) + saving <= logical_size:
+                codec, stored = PACK_CODEC_DEFLATE, candidate
+        else:
+            codec, stored = compress_pack_payload(payload, effective_profile)
         if codec == PACK_CODEC_DEFLATE:
             transform += "+deflate" if profile == "auto" else "+deflate-" + profile
         elif codec == PACK_CODEC_RLE:

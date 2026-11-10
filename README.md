@@ -3,9 +3,9 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
-Current version: `0.20.1`
+Current version: `0.21.0`
 
-See the [0.20.1 release notes](RELEASE_NOTES_0.20.1.md) for MiniLang Compiler 1.3.3 compatibility and CI fixes. Protected games must still rebuild their executable, pack, and native runtime together when upgrading from versions before 0.18.0.
+See the [0.21.0 release notes](RELEASE_NOTES_0.21.0.md) for faster asset loading with prepared images and native LZ4. Rebuild the game executable, asset pack, and native runtime together when upgrading.
 
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. The current source targets MiniLang Compiler 1.3.3 and builds native Windows x64 PE and Linux x64 ELF executables.
 
@@ -40,7 +40,7 @@ diagnostics as failures.
 ## Requirements
 
 - Windows x64 or Linux x64 with glibc, X11 (`libX11.so.6`) and ALSA (`libasound.so.2`); streamed audio/video on Linux also needs GStreamer (base/good plugins plus libav for MP3/H.264 decoding). On Ubuntu: `sudo apt-get install libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-libav`. Building the native MPX runtime additionally requires OpenSSL development headers (`libssl-dev`).
-- MiniLangCompilerPy **1.3.3** in a sibling checkout. CI pins commit `25f168e02d9e0ef7c33d7ac37c3ec83779308d02` so compiler updates are validated deliberately. Lazy MPX I/O uses `std.io.file`, fast MPX assets use `std.compress.lz4`, protected builds use `std.crypto.ecdsa_p256`, and streamed media uses `std.audio`/`std.video`.
+- MiniLangCompilerPy **1.3.3** in a sibling checkout. CI pins commit `25f168e02d9e0ef7c33d7ac37c3ec83779308d02` so compiler updates are validated deliberately. Lazy MPX I/O uses `std.io.file`, fast MPX assets use the native LZ4 decoder, protected builds use `std.crypto.ecdsa_p256`, and streamed media uses `std.audio`/`std.video`.
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
 - The Python packages in `requirements.txt` for protected builds and WAV-to-MP3 asset transcoding
 - Visual Studio C++ Build Tools on Windows, or GCC on Linux, for the small native audio/asset/presentation bridge
@@ -58,7 +58,7 @@ Install the build dependencies once before packing protected assets or WAV audio
 python -m pip install -r requirements.txt
 ```
 
-The normal `build` and `run` commands also build and copy the target-specific native runtime automatically. It provides MP3 and zlib/Deflate decoding, a private MPX range source for streamed media on both targets, and accelerated XImage color conversion/scaling on Linux. Projects that declare streamed audio or video also receive the matching MiniLang media bridge automatically. On its first build, the helper downloads checksum-verified `dr_mp3` and `stb_image` single-header sources at pinned revisions and caches them under `build/native-audio`.
+The normal `build` and `run` commands also build and copy the target-specific native runtime automatically. It provides MP3, LZ4, and zlib/Deflate decoding, a private MPX range source for streamed media on both targets, and accelerated XImage color conversion/scaling on Linux. Projects that declare streamed audio or video also receive the matching MiniLang media bridge automatically. On its first build, the helper downloads checksum-verified `dr_mp3`, `stb_image`, and LZ4 1.10.0 sources at pinned revisions and caches them under `build/native-audio`. Keep the automatically copied `minipixels-lz4-LICENSE.txt` alongside distributed games; Steam depot exports include it.
 
 ## Quickstart
 
@@ -406,7 +406,7 @@ Current `kind` values:
 
 | Kind | Asset type | Payload |
 | --- | --- | --- |
-| `1` | `image` or `procedural` | non-interlaced PNG bytes |
+| `1` | `image` or `procedural` | Build-prepared `MRI1` RGBA8888 pixels after container decompression |
 | `2` | `audio` | MP3 bytes, or WAV when transcoding is disabled/not smaller |
 | `3` | `file` | Original bytes after optional container compression |
 | `4` | `text` | Deterministic `MPT1` UTF-8 key/value catalog |
@@ -428,9 +428,11 @@ The default private key is `.minipixels/asset-signing-key.pem` and is added to t
 
 When upgrading to MPX3 version 6, rebuild the protected pack, game executable, and native runtime together with the normal `build` command. Existing signing keys can be retained. The added signed ciphertext digests detect modifications even if the embedded AES key is recovered; old protected pack versions are rejected.
 
-The runtime decodes stored, fixed, and dynamic Deflate streams, PNG filters 0 through 4, grayscale, RGB, indexed, grayscale-alpha, and RGBA data. Current decoding is non-interlaced. Deflate now runs in the target-native runtime directly into the final output buffer; a checked MiniLang implementation remains as the format-validation fallback. The Python packer validates and preserves compatible source PNG bytes, while generated images use actual Deflate rather than uncompressed PNG blocks. File, text, and JSON data entries select Deflate or RLE only when the complete encoded payload is meaningfully smaller. Identical encoded payloads share one stored block and one decoded runtime buffer transparently.
+The runtime decodes stored, fixed, and dynamic Deflate streams, PNG filters 0 through 4, grayscale, RGB, indexed, grayscale-alpha, and RGBA data. Current decoding is non-interlaced. Deflate now runs in the target-native runtime directly into the final output buffer; a checked MiniLang implementation remains as the format-validation fallback. The Python packer verifies source PNGs and converts image/procedural assets to `MRI1`: four magic bytes, little-endian 32-bit width and height, then exactly width × height × 4 RGBA bytes. PNG filters and color conversion run at build time. Default `auto` and `small` images use native-decoded Deflate when worthwhile; `fast` uses native LZ4 and `none` stores prepared bytes directly. The native MiniLang generator prepares the same image format and uses LZ4 for compressed images. Ordinary PNG payloads and direct PNG hot-loading remain supported. File, text, and JSON data entries select Deflate or RLE only when the complete encoded payload is meaningfully smaller. Identical encoded payloads share one stored block and one decoded runtime buffer transparently.
 
 PCM WAV assets are converted to MP3 during Python builds when the result is smaller. Mono defaults to 96 kbit/s, stereo to 128 kbit/s, and LAME quality 2. Set `mp3Bitrate` (32–320), `mp3Quality` (0–9), or `"transcode": false` on an audio asset to override this behavior. Existing MP3 sources remain byte-for-byte unchanged.
+
+See [asset loading performance](docs/asset-loading-performance.md) for measured gains, format details, and benchmark reproduction.
 
 Runtime APIs:
 
@@ -446,7 +448,7 @@ stats = mp.assetPackStats(pack)
 mp.preloadAssetPackSlots(pack, [slot], 16777216)
 ```
 
-Generated helpers use numeric slots automatically, cache decoded sprites, short audio clips, text catalogs, localization services and JSON text, and release PNG/text/data source bytes after successful decoding. `gen.preload()` warms non-streaming assets through bounded contiguous reads before constructing them; `gen.preloadGroup("level-1")` does the same for non-streaming entries tagged with that group. Audio streams and video are deliberately excluded so preloading never copies an entire movie or music track into memory. `assetPackStats()` additionally reports physical `storedBytesRead`, logical `decodedBytes`, and `bulkReads`.
+Generated helpers use numeric slots automatically, cache decoded sprites, short audio clips, text catalogs, localization services and JSON text, and release prepared-image/PNG/text/data source bytes after successful decoding. `gen.preload()` warms non-streaming assets through bounded contiguous reads before constructing them; `gen.preloadGroup("level-1")` does the same for non-streaming entries tagged with that group. Audio streams and video are deliberately excluded so preloading never copies an entire movie or music track into memory. `assetPackStats()` additionally reports physical `storedBytesRead`, logical `decodedBytes`, and `bulkReads`.
 
 Preloads coalesce only adjacent requested blocks, never gaps containing skipped media. `batchBytes` limits each file read even when a single asset is larger; `bulkReads` counts these read operations. It is not a total RAM limit: cached assets still occupy their full decoded size, and compressed/encrypted entries need decoding buffers. A single raw entry is read directly into its final cache buffer.
 
@@ -465,7 +467,7 @@ Loading and container compression are configured without changing game code:
 }
 ```
 
-`lazy` remains the memory-efficient default. `resident` bulk-loads and decompresses every non-streaming entry on first open, useful when the game repeatedly touches most assets and has the RAM budget. Streamed media always stays file-backed. `compression` accepts `auto`, `fast`, `small`, and `none`, globally or per asset. `fast` now stores compressible file assets as LZ4 blocks. The default `auto` uses LZ4 for `.sprites`/`.rgba` files of at least 64 KiB and keeps other file/text/data assets compact with Deflate/RLE. `none` avoids even LZ4 decoding when minimum latency matters more than installed size. An explicit asset-level choice takes precedence.
+`lazy` remains the memory-efficient default. `resident` bulk-loads and decompresses every non-streaming entry on first open, useful when the game repeatedly touches most assets and has the RAM budget. Streamed media always stays file-backed. `compression` accepts `auto`, `fast`, `small`, and `none`, globally or per asset. `fast` stores compressible image/file/text/data assets as LZ4 blocks. The bounded reference decoder writes directly into the final output buffer without copying the compressed subrange. The default `auto` uses LZ4 for `.sprites`/`.rgba` files of at least 64 KiB and keeps other file/text/data assets compact with Deflate/RLE. `none` avoids even LZ4 decoding when minimum latency matters more than installed size. An explicit asset-level choice takes precedence. After upgrading, rebuild the game executable, MPX and native runtime together; image preparation is automatic and existing generated image/sprite/sheet APIs stay unchanged.
 
 `asset-report.json` records `sourceBytes`, `logicalBytes`, `storedBytes`, the selected `codec`/`transform`, and whether an entry was deduplicated. Its totals count shared payload blocks only once.
 
@@ -555,6 +557,7 @@ The generated helpers start a loopback-only HTTP range source on a random port a
 - `minipixels.assets.pack`: MiniPixels `.mpx` asset container reader
 - `minipixels.assets.text`: UTF-8 catalogs, locale fallback, and placeholder formatting
 - `minipixels.assets.png`: PNG decoder/encoder and screenshot support
+- `minipixels.assets.packed_image`: validated MRI1 prepared-image encoding and loading
 - `minipixels.media.media`: file-backed MPX range streaming into `std.audio` and `std.video`
 - `minipixels.platform.windows`: Win32 window, input, DIB renderer
 - `minipixels.platform.linux`: X11 window, input, timing, and XImage renderer

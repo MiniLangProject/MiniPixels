@@ -8,6 +8,7 @@ import minipixels.tools.fsutil as fsu
 import minipixels.tools.json as json
 import minipixels.tools.manifest as manifest
 import minipixels.assets.png as png
+import minipixels.assets.packed_image as packedImage
 import std.array as arr
 import std.bytes as by
 import std.compress.lz4 as lz4
@@ -333,11 +334,16 @@ end function
 function assetPayload(asset, projectRoot)
   typ = stringField(asset, "type", "image")
   if typ == "procedural" then
-    return png.encodeRgba(assetWidth(asset), assetHeight(asset), renderProceduralPixels(asset))
+    return packedImage.encode(assetWidth(asset), assetHeight(asset), renderProceduralPixels(asset))
   end if
   path = stringField(asset, "path", "")
   if path == "" then return error(9201, "asset '" + stringField(asset, "id", "asset") + "' requires a path") end if
   if typ == "text" then return textCatalogPayload(join(projectRoot, path)) end if
+  if typ == "image" then
+    image = try(png.load(join(projectRoot, path)))
+    if typeof(image) == "error" then return image end if
+    return packedImage.encode(image.width, image.height, image.pixels)
+  end if
   return fs.readAllBytes(join(projectRoot, path))
 end function
 
@@ -452,6 +458,8 @@ function writeAssetPack(root, projectRoot, path, r)
       profile = stringField(asset, "compression", defaultCompression)
       typ = stringField(asset, "type", "image")
       if typ == "audio" or typ == "video" then profile = "none" end if
+      // Prepared images use the native LZ4 decoder instead of portable RLE.
+      if (typ == "image" or typ == "procedural") and profile != "none" then profile = "fast" end if
       packed = try(compactPayload(logicalPayload, profile))
       if typeof(packed) == "error" then
         addError(r, packed.message)

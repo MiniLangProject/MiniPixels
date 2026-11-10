@@ -156,7 +156,7 @@ function createGame(cfg)
 end function
 
 /// Performs the version operation for the minipixels module.
-function version() return "0.20.1" end function
+function version() return "0.21.0" end function
 /// Updates renderer maintained by the minipixels module.
 /// @param cfg Configuration used by the operation.
 /// @param renderer renderer value consumed by this operation.
@@ -491,11 +491,11 @@ function loadTextCatalogFromPackSlot(assetPack, slot, locale) return textAssets.
 /// Creates a locale service with language-region fallback and a default locale.
 /// @param defaultLocale Locale used when a requested catalog or key is absent.
 function localization(defaultLocale) return textAssets.create(defaultLocale) end function
-/// Loads png from pack for the minipixels module.
+/// Loads a prepared MRI1 image or PNG payload from a named pack entry.
 /// @param assetPack assetPack value consumed by this operation.
 /// @param name Name of the affected item.
 function loadPngFromPack(assetPack, name) return pack.loadPng(assetPack, name) end function
-/// Loads a PNG from a pre-resolved asset slot without a string lookup.
+/// Loads a prepared MRI1 image or PNG from a slot without a string lookup.
 /// @param assetPack Open asset pack.
 /// @param slot Pre-resolved entry slot.
 function loadPngFromPackSlot(assetPack, slot) return pack.loadPngAt(assetPack, slot) end function

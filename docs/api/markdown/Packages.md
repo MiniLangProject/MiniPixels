@@ -6,6 +6,7 @@
 - [minipixels.animation.animation](Package-minipixels-animation-animation-417161807.md)
 - [minipixels.assets.assets](Package-minipixels-assets-assets-1798617957.md)
 - [minipixels.assets.pack](Package-minipixels-assets-pack-54195661.md)
+- [minipixels.assets.packed_image](Package-minipixels-assets-packed-image-782195334.md)
 - [minipixels.assets.png](Package-minipixels-assets-png-1408634139.md)
 - [minipixels.assets.text](Package-minipixels-assets-text-1852764955.md)
 - [minipixels.audio.audio](Package-minipixels-audio-audio-2063109159.md)

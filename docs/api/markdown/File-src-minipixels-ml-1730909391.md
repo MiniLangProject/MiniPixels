@@ -861,7 +861,7 @@ Loads a common non-interlaced PNG file directly from disk.
 function loadPngFromPack(assetPack, name)
 ```
 
-Loads png from pack for the minipixels module.
+Loads a prepared MRI1 image or PNG payload from a named pack entry.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -878,7 +878,7 @@ Loads png from pack for the minipixels module.
 function loadPngFromPackSlot(assetPack, slot)
 ```
 
-Loads a PNG from a pre-resolved asset slot without a string lookup.
+Loads a prepared MRI1 image or PNG from a slot without a string lookup.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |

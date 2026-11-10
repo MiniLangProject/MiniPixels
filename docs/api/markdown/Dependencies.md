@@ -8,9 +8,9 @@ These MiniLang source files are reachable through imports but are outside the co
 | ---: | --- | --- |
 | 2 | `std.array` | `../MiniLangCompilerPy/std/array.ml` |
 | 1 | `std.audio` | `../MiniLangCompilerPy/std/audio.ml` |
-| 6 | `std.bytes` | `../MiniLangCompilerPy/std/bytes.ml` |
+| 7 | `std.bytes` | `../MiniLangCompilerPy/std/bytes.ml` |
 | 1 | `std.checksum.crc32` | `../MiniLangCompilerPy/std/checksum/crc32.ml` |
-| 2 | `std.compress.lz4` | `../MiniLangCompilerPy/std/compress/lz4.ml` |
+| 1 | `std.compress.lz4` | `../MiniLangCompilerPy/std/compress/lz4.ml` |
 | 1 | `std.crypto` | `../MiniLangCompilerPy/std/crypto.ml` |
 | 0 | `std.crypto._cng` | `../MiniLangCompilerPy/std/crypto/_cng.ml` |
 | 1 | `std.crypto.aes_gcm` | `../MiniLangCompilerPy/std/crypto/aes_gcm.ml` |

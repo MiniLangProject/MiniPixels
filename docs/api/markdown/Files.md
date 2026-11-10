@@ -7,7 +7,8 @@
 | [src/minipixels.ml](File-src-minipixels-ml-1730909391.md) | `minipixels` | yes | 159 |
 | [src/minipixels/animation/animation.ml](File-src-minipixels-animation-animation-ml-2065983051.md) | `minipixels.animation.animation` | yes | 28 |
 | [src/minipixels/assets/assets.ml](File-src-minipixels-assets-assets-ml-652120143.md) | `minipixels.assets.assets` | yes | 24 |
-| [src/minipixels/assets/pack.ml](File-src-minipixels-assets-pack-ml-1157891367.md) | `minipixels.assets.pack` | yes | 93 |
+| [src/minipixels/assets/pack.ml](File-src-minipixels-assets-pack-ml-1157891367.md) | `minipixels.assets.pack` | yes | 94 |
+| [src/minipixels/assets/packed_image.ml](File-src-minipixels-assets-packed-image-ml-714259438.md) | `minipixels.assets.packed_image` | yes | 4 |
 | [src/minipixels/assets/png.ml](File-src-minipixels-assets-png-ml-1155821131.md) | `minipixels.assets.png` | yes | 48 |
 | [src/minipixels/assets/text.ml](File-src-minipixels-assets-text-ml-1300721413.md) | `minipixels.assets.text` | yes | 21 |
 | [src/minipixels/audio/audio.ml](File-src-minipixels-audio-audio-ml-660527635.md) | `minipixels.audio.audio` | yes | 170 |

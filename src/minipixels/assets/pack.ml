@@ -10,11 +10,19 @@ import std.crypto as crypto
 import std.crypto.aes_gcm as aes
 import std.crypto.ecdsa_p256 as ecdsa
 import std.ds.hashmap as hm
-import std.compress.lz4 as lz4
 import std.process as process
 import std.fs as fs
 import std.path as paths
 import minipixels.assets.png as png
+import minipixels.assets.packed_image as packedImage
+
+#if TARGET_OS == "windows"
+/// @internal
+extern function mpAssetDecodeLz4(destination as bytes, destinationSize as u64, source as bytes, sourceBufferSize as u64, sourceOffset as u64, sourceSize as u64) from "minipixels_audio.dll" returns i32
+#else
+/// @internal
+extern function mpAssetDecodeLz4(destination as bytes, destinationSize as u64, source as bytes, sourceBufferSize as u64, sourceOffset as u64, sourceSize as u64) from "$ORIGIN/libminipixels_audio.so" returns i32
+#endif
 
 /// Defines the pack err constant used by the minipixels assets pack module.
 const PACK_ERR = 9302
@@ -191,8 +199,8 @@ function _decodePayloadRange(codec, payload, offset, storedSize, expectedSize)
     return decoded
   end if
   if codec == CODEC_LZ4 then
-    decoded = try(lz4.decode(slice(payload, offset + 8, storedSize - 8), logicalSize))
-    if typeof(decoded) == "error" then return packError("asset decompression failed") end if
+    decoded = bytes(logicalSize, 0)
+    if mpAssetDecodeLz4(decoded, logicalSize, payload, len(payload), offset + 8, storedSize - 8) == 0 then return packError("asset decompression failed") end if
     return decoded
   end if
   decoded = bytes(logicalSize, 0)
@@ -942,7 +950,7 @@ function streamInfo(pack, name)
   return streamInfoAt(pack, index)
 end function
 
-/// Loads png for the minipixels assets pack module.
+/// Loads and caches prepared MRI1 pixels or a PNG from a pre-resolved slot.
 /// @param pack pack value consumed by this operation.
 /// @param index Pre-resolved entry slot.
 function loadPngAt(pack, index)
@@ -954,7 +962,7 @@ function loadPngAt(pack, index)
   pack.imageMisses = pack.imageMisses + 1
   payload = getBytesAt(pack, index)
   if typeof(payload) == "error" then return payload end if
-  image = png.decode(payload, pack.names[index])
+  image = packedImage.decode(payload, pack.names[index])
   if typeof(image) != "error" then
     pack.imageCache[index] = image
     pack.imageLoaded[index] = true
@@ -963,7 +971,7 @@ function loadPngAt(pack, index)
   return image
 end function
 
-/// Loads and caches a named PNG image.
+/// Loads and caches a named prepared MRI1 image or PNG payload.
 /// @param pack Asset pack to read.
 /// @param name Stable asset name.
 function loadPng(pack, name)

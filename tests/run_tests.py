@@ -30,6 +30,7 @@ TESTS = [
     "canvas_tests.ml",
     "systems_tests.ml",
     "asset_pack_tests.ml",
+    "packed_image_tests.ml",
     "asset_preload_tests.ml",
     "headless_game_tests.ml",
     "jump_and_run_tests.ml",
@@ -93,6 +94,15 @@ def run_test_executable(exe: Path, target: str, args: list[str] | None = None, c
 def test_media_range_runtime(runtime: Path, target: str) -> None:
     """Run native regressions in an isolated, time-bounded process on either target."""
     script = ROOT / "tests" / "media_range_tests.py"
+    command = [sys.executable, str(script), str(runtime)]
+    if target == "linux-x64" and os.name == "nt":
+        command = ["wsl.exe", "-d", os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"),
+                   "--", "python3", wsl_path(script), wsl_path(runtime)]
+    subprocess.run(command, check=True, timeout=45)
+
+
+def test_native_asset_runtime(runtime: Path, target: str) -> None:
+    script = ROOT / "tests" / "native_asset_tests.py"
     command = [sys.executable, str(script), str(runtime)]
     if target == "linux-x64" and os.name == "nt":
         command = ["wsl.exe", "-d", os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"),
@@ -265,6 +275,7 @@ def create_protected_asset_fixture() -> Path:
     (assets / "terrain.bin").write_bytes(b"terrain-chunk-0123456789" * 512)
     (assets / "music.mp3").write_bytes(STEREO_MP3_FIXTURE)
     (assets / "intro.mp4").write_bytes(TINY_MP4_FIXTURE)
+    (assets / "image.png").write_bytes(filtered_rgba_png(64, 32))
     (assets / "balance.json").write_text(json.dumps({"player": {"speed": 120}, "enemies": {"slime": {"health": 3}}, "waves": [2, 4, 8]}), encoding="utf-8")
     key_dir = project / ".minipixels"
     mod.generate_signing_key(key_dir / "asset-signing-key.pem", key_dir / "asset-signing-public.pem")
@@ -278,6 +289,8 @@ def create_protected_asset_fixture() -> Path:
         "assets": [
             {"id": "de", "type": "text", "locale": "de", "path": "assets/de.json"},
             {"id": "en", "type": "text", "locale": "en", "path": "assets/en.json"},
+            {"id": "image_deflate", "type": "image", "path": "assets/image.png"},
+            {"id": "image_fast", "type": "image", "path": "assets/image.png", "compression": "fast"},
             {"id": "world", "type": "data", "path": "assets/world.json"},
             {"id": "terrain", "type": "file", "path": "assets/terrain.bin", "compression": "fast"},
             {"id": "music", "type": "audio", "path": "assets/music.mp3", "stream": True},
@@ -332,6 +345,7 @@ def create_protected_asset_fixture() -> Path:
 def run_python_tests() -> None:
     subprocess.run([sys.executable, str(ROOT / "tests/steam_tools_tests.py")], check=True)
     subprocess.run([sys.executable, str(ROOT / "tests/asset_security_tests.py")], check=True)
+    subprocess.run([sys.executable, str(ROOT / "tests/prepared_image_tools_tests.py")], check=True)
     from example_art_tests import test_example_art
     test_example_art()
     spec = importlib.util.spec_from_file_location("minipixels_cli", ROOT / "tools" / "minipixels.py")
@@ -602,7 +616,8 @@ def run_python_tests() -> None:
         )
         procedural_data = procedural_pack.read_bytes()
         assert b"generated" in procedural_data, procedural_data
-        assert procedural_data.count(b"\x89PNG\r\n\x1a\n") == 1, procedural_data
+        prepared = mod.asset_pack_payload({"type": "procedural", "kind": "checker", "width": 4, "height": 2, "compression": "none"}, tmp_path)
+        assert prepared["data"].startswith(b"MRI1") and len(prepared["data"]) == 12 + 4 * 2 * 4
         level_path = tmp_path / "levels.json"
         level_path.write_text(json.dumps(levels), encoding="utf-8")
         out_dir = tmp_path / "generated"
@@ -808,13 +823,22 @@ def run_protected_asset_smoke(compiler: Path, target: str, project: Path) -> Non
                 "  terrain = mp.loadBytesFromPack(pack, \"terrain\")",
                 "  a.assertEq(len(terrain), 12288, \"protected LZ4 file expands\")",
                 "  a.assertEq(terrain[0], 116, \"protected LZ4 file content\")",
+                "  image = gen.make_image_deflate().image",
+                "  fastImage = gen.make_image_fast().image",
+                "  a.assertEq(image.width, 64, \"protected prepared image width\")",
+                "  a.assertEq(image.getPixel(63, 31), fastImage.getPixel(63, 31), \"protected image codecs agree\")",
+                "  a.assertEq(image.getPixel(0, 0), mp.rgba(0, 0, 0, 255), \"protected prepared first pixel\")",
+                "  a.assertEq(image.getPixel(63, 31), mp.rgba(53, 19, 4, 105), \"protected prepared last pixel\")",
                 "  mp.releasePackedAssetBytesSlot(pack, mp.assetSlotFromPack(pack, \"terrain\"))",
                 "  stats = mp.assetPackStats(pack)",
                 "  a.assertTrue(stats.lazyFile, \"MPX3 payloads remain file-backed\")",
-                "  a.assertEq(stats.payloadMisses, 4, \"each decoded payload read once\")",
+                "  a.assertEq(stats.payloadMisses, 6, \"each decoded payload read once\")",
                 "  a.assertEq(stats.cachedPayloadBytes, 0, \"decoded payload bytes released\")",
                 "  a.assertEq(stats.bulkReads, 2, \"resident MPX3 splits at skipped media\")",
-                "  expectedRead = pack.storedSizes[0] + pack.storedSizes[1] + pack.storedSizes[4] + pack.storedSizes[5]",
+                "  expectedRead = 0",
+                "  for i = 0 to pack.count - 1",
+                "    if pack.kinds[i] != 2 and pack.kinds[i] != 6 then expectedRead = expectedRead + pack.storedSizes[i] end if",
+                "  end for",
                 "  a.assertEq(stats.storedBytesRead, expectedRead, \"resident MPX3 does not read skipped media\")",
                 "  a.assertTrue(gen.preload(), \"preload reuses generated caches\")",
                 "  a.assertEq(balance.PLAYER_SPEED, 120, \"compiled scalar constant\")",
@@ -930,6 +954,7 @@ def main(argv: list[str] | None = None) -> int:
     from steam_runtime_tests import run as run_steam_runtime_tests
     run_steam_runtime_tests(compiler, target)
     test_media_range_runtime(runtime, target)
+    test_native_asset_runtime(runtime, target)
     if target == "linux-x64":
         from alsa_mixer_tests import run as run_alsa_tests
         run_alsa_tests(compiler)

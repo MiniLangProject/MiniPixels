@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // MiniPixels native audio, asset-decoding, and pixel-conversion bridge.
-// Third-party single-header dependencies are fetched at pinned revisions by
+// Third-party dependencies are fetched at pinned revisions by
 // tools/build_audio_runtime.py and remain available under their own licenses.
 
 #include <stdint.h>
@@ -20,6 +20,9 @@
 #define STBI_NO_HDR
 #define STBI_NO_FAILURE_STRINGS
 #include "stb_image.h"
+
+/* Pinned BSD-2-Clause LZ4 reference decoder; compiled into this bridge. */
+#include "lz4.c"
 
 #if defined(_WIN32)
 #define MP_API __declspec(dllexport)
@@ -89,6 +92,20 @@ MP_API void mpAudioMp3Close(void* handle)
     if (value == NULL) return;
     drmp3_uninit(&value->decoder);
     free(value);
+}
+
+MP_API int32_t mpAssetDecodeLz4(
+    void* destination, uint64_t destination_size,
+    const void* source, uint64_t source_buffer_size,
+    uint64_t source_offset, uint64_t source_size)
+{
+    int result;
+    if (destination == NULL || source == NULL || destination_size > INT32_MAX ||
+        source_size > INT32_MAX || source_buffer_size > SIZE_MAX ||
+        source_offset > source_buffer_size || source_size > source_buffer_size - source_offset) return 0;
+    result = LZ4_decompress_safe((const char*)source + (size_t)source_offset,
+        (char*)destination, (int)source_size, (int)destination_size);
+    return result >= 0 && (uint64_t)result == destination_size;
 }
 
 MP_API int32_t mpAssetInflateZlib(
