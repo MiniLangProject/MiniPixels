@@ -3,7 +3,7 @@ name = "MiniPixels"
 description = "API and implementation reference for the MiniLang pixel-oriented 2D game engine, including rendering, assets, input, audio, scenes, animation, collision, and world helpers."
 entry = "src/minipixels.ml"
 source_roots = ["src"]
-include = ["src"]
+include = ["src", "../MiniLangCompilerML"]
 exclude = ["build", "dist", "docs/api", "examples", "tests", "benchmarks"]
 target = "windows-x64"
 
