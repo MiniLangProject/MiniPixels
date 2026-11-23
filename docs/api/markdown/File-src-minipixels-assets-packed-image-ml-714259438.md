@@ -12,7 +12,7 @@ Reachable from entry: **yes**
 
 - `minipixels/assets/png.ml` as `png` → [src/minipixels/assets/png.ml](File-src-minipixels-assets-png-ml-1155821131.md)
 - `minipixels/graphics/sprite.ml` as `sp` → [src/minipixels/graphics/sprite.ml](File-src-minipixels-graphics-sprite-ml-1992064667.md)
-- `std/bytes.ml` as `by` → `../../MiniLangCompilerML/std/bytes.ml` — external dependency
+- `std/bytes.ml` as `by` → `../MiniLangCompilerML/std/bytes.ml` — external dependency
 
 ## Declarations
 
