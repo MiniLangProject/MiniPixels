@@ -4,12 +4,17 @@
 
 package minipixels.media.media
 
+#option MINIPIXELS_PURE: bool = false
+
 import minipixels.assets.pack as packs
+#if not MINIPIXELS_PURE
 import std.audio as nativeAudio
 import std.video as nativeVideo
+#endif
 
 const MEDIA_ERR = 9310
 
+#if not MINIPIXELS_PURE
 #if TARGET_OS == "windows"
 /// Opens a native loopback source for one MPX media range.
 /// @internal
@@ -59,6 +64,7 @@ extern function _streamOpen(path as cstr, offset as u64, storedSize as u64, logi
 /// @param handle Native source handle.
 extern function _streamClose(handle as ptr) from "$ORIGIN/libminipixels_audio.so" symbol "mpMediaStreamClose" returns void
 #endif
+#endif
 
 /// Creates a media-module error.
 /// @internal
@@ -79,8 +85,12 @@ struct PackedMediaSource
     handle = this.handle
     this.handle = 0
     this.closed = true
+#if MINIPIXELS_PURE
+    return _error("MPX media streaming is unsupported in MINIPIXELS_PURE")
+#else
     _streamClose(handle)
     return true
+#endif
   end function
 end struct
 
@@ -197,6 +207,9 @@ end struct
 /// @param mime HTTP content type advertised to the media backend.
 /// @param suffix Filename suffix used for decoder selection.
 function _openSource(info, mime, suffix)
+#if MINIPIXELS_PURE
+  return _error("MPX media streaming is unsupported in MINIPIXELS_PURE")
+#else
   if typeof(info) != "struct" then return _error("invalid packed media source") end if
   if typeof(mime) != "string" or len(mime) == 0 then mime = "application/octet-stream" end if
   if typeof(suffix) != "string" or len(suffix) == 0 then suffix = ".bin" end if
@@ -224,6 +237,7 @@ function _openSource(info, mime, suffix)
     return _error("native MPX media stream returned no URL")
   end if
   return PackedMediaSource(handle, url, false)
+#endif
 end function
 
 /// Opens streamed audio by pre-resolved MPX slot.
@@ -233,6 +247,9 @@ end function
 /// @param suffix Filename suffix used for decoder selection.
 /// @param options Optional `std.audio.PlayerOptions`.
 function openAudioAt(pack, slot, mime = "audio/mpeg", suffix = ".mp3", options = void)
+#if MINIPIXELS_PURE
+  return _error("MPX audio streaming is unsupported in MINIPIXELS_PURE; use PCM WAV clips")
+#else
   info = packs.streamInfoAt(pack, slot)
   if typeof(info) == "error" then return info end if
   source = _openSource(info, mime, suffix)
@@ -244,6 +261,7 @@ function openAudioAt(pack, slot, mime = "audio/mpeg", suffix = ".mp3", options =
   player = try(nativeAudio.Player.open(source.url, localOptions))
   if typeof(player) == "error" then source.close(); return player end if
   return PackedAudio(source, player, false)
+#endif
 end function
 
 /// Opens streamed audio by stable MPX asset name.
@@ -265,6 +283,9 @@ end function
 /// @param suffix Filename suffix used for decoder selection.
 /// @param options Optional `std.video.PlayerOptions`.
 function openVideoAt(pack, slot, mime = "video/mp4", suffix = ".mp4", options = void)
+#if MINIPIXELS_PURE
+  return _error("MPX video streaming is unsupported in MINIPIXELS_PURE")
+#else
   info = packs.streamInfoAt(pack, slot)
   if typeof(info) == "error" then return info end if
   source = _openSource(info, mime, suffix)
@@ -276,6 +297,7 @@ function openVideoAt(pack, slot, mime = "video/mp4", suffix = ".mp4", options = 
   player = try(nativeVideo.Player.open(source.url, localOptions))
   if typeof(player) == "error" then source.close(); return player end if
   return PackedVideo(source, player, false)
+#endif
 end function
 
 /// Opens streamed video by stable MPX asset name.

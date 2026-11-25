@@ -4,11 +4,14 @@
 
 package minipixels.audio.audio
 
+#option MINIPIXELS_PURE: bool = false
+
 import std.bytes as by
 import std.fs as fs
 import minipixels.math.types as mt
 
 #if TARGET_OS == "windows"
+#if not MINIPIXELS_PURE
 /// Opens an in-memory MP3 decoder retained by the native audio bridge.
 /// @param data Complete MP3 bytes retained for the lifetime of the decoder.
 /// @param size Byte length of the MP3 source.
@@ -40,6 +43,7 @@ extern function mpAudioMp3Seek(handle as ptr, frame as u64) from "minipixels_aud
 /// Releases an MP3 decoder handle.
 /// @param handle Open native MP3 decoder.
 extern function mpAudioMp3Close(handle as ptr) from "minipixels_audio.dll" returns void
+#endif
 /// Invokes the legacy PlaySoundW file entry point.
 /// @param path UTF-16 WAV file path.
 /// @param module Optional resource module handle.
@@ -88,6 +92,7 @@ extern function waveOutReset(handle as ptr) from "winmm.dll" returns u32
 /// @returns Multimedia-system result code.
 extern function waveOutClose(handle as ptr) from "winmm.dll" returns u32
 #else
+#if not MINIPIXELS_PURE
 /// Opens an in-memory MP3 decoder retained by the native audio bridge.
 extern function mpAudioMp3Open(data as bytes, size as u64) from "$ORIGIN/libminipixels_audio.so" returns ptr
 extern function mpAudioMp3Channels(handle as ptr) from "$ORIGIN/libminipixels_audio.so" returns i32
@@ -96,6 +101,7 @@ extern function mpAudioMp3FrameCount(handle as ptr) from "$ORIGIN/libminipixels_
 extern function mpAudioMp3Read(handle as ptr, output as bytes, frames as u64) from "$ORIGIN/libminipixels_audio.so" returns u64
 extern function mpAudioMp3Seek(handle as ptr, frame as u64) from "$ORIGIN/libminipixels_audio.so" returns i32
 extern function mpAudioMp3Close(handle as ptr) from "$ORIGIN/libminipixels_audio.so" returns void
+#endif
 /// Opens an ALSA PCM stream.
 extern function snd_pcm_open(handle as bytes, name as cstr, stream as int, mode as int) from "libasound.so.2" returns i32
 /// Configures a simple interleaved PCM stream.
@@ -112,6 +118,18 @@ extern function snd_pcm_drop(handle as ptr) from "libasound.so.2" returns i32
 extern function snd_pcm_prepare(handle as ptr) from "libasound.so.2" returns i32
 /// Closes an ALSA PCM stream.
 extern function snd_pcm_close(handle as ptr) from "libasound.so.2" returns i32
+#endif
+
+#if MINIPIXELS_PURE
+// MP3 is an optional native codec. Preserve explicit failure at every decoder
+// entry point while PCM WAV parsing and the MiniLang mixer remain available.
+function mpAudioMp3Open(data, size) return error(9311, "MP3 decoding is unsupported in MINIPIXELS_PURE; use PCM WAV") end function
+function mpAudioMp3Channels(handle) return error(9311, "MP3 decoding is unsupported in MINIPIXELS_PURE") end function
+function mpAudioMp3SampleRate(handle) return error(9311, "MP3 decoding is unsupported in MINIPIXELS_PURE") end function
+function mpAudioMp3FrameCount(handle) return error(9311, "MP3 decoding is unsupported in MINIPIXELS_PURE") end function
+function mpAudioMp3Read(handle, output, frames) return error(9311, "MP3 decoding is unsupported in MINIPIXELS_PURE") end function
+function mpAudioMp3Seek(handle, frame) return error(9311, "MP3 decoding is unsupported in MINIPIXELS_PURE") end function
+function mpAudioMp3Close(handle) return error(9311, "MP3 decoding is unsupported in MINIPIXELS_PURE") end function
 #endif
 
 /// Legacy synchronous playback flag.
@@ -514,7 +532,11 @@ end function
 
 /// Returns whether the advanced mixer can decode MP3 clips.
 function supportsMp3()
+#if MINIPIXELS_PURE
+  return false
+#else
   return true
+#endif
 end function
 
 /// Returns whether independent left/right source channels are preserved.

@@ -2,6 +2,11 @@
 //! Optional Steam client integration. All calls and callbacks run on the game thread.
 package minipixels.steam
 
+#option MINIPIXELS_PURE: bool = false
+#if MINIPIXELS_PURE and defined(MINIPIXELS_STEAM)
+#error "MINIPIXELS_PURE does not support the Steam native bridge"
+#endif
+
 import std.bytes as by
 import std.fs as fs
 import std.process as process

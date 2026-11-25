@@ -4,17 +4,21 @@
 
 package minipixels.assets.png
 
+#option MINIPIXELS_PURE: bool = false
+
 import std.bytes as by
 import std.checksum.crc32 as crc
 import std.fs as fs
 import minipixels.graphics.sprite as sp
 
+#if not MINIPIXELS_PURE
 #if TARGET_OS == "windows"
 /// @internal
 extern function mpAssetInflateZlib(destination as bytes, destinationSize as u64, source as bytes, sourceOffset as u64, sourceSize as u64) from "minipixels_audio.dll" returns i32
 #else
 /// @internal
 extern function mpAssetInflateZlib(destination as bytes, destinationSize as u64, source as bytes, sourceOffset as u64, sourceSize as u64) from "$ORIGIN/libminipixels_audio.so" returns i32
+#endif
 #endif
 
 /// PNG decoding error code.
@@ -389,8 +393,10 @@ end function
 function inflateZlibRange(data, offset, size, expectedSize)
   if not hasRange(data, offset, size) or size < 6 then return pngError("png zlib stream too small") end if
   if typeof(expectedSize) != "int" or expectedSize < 0 then return pngError("png inflated size invalid") end if
+#if not MINIPIXELS_PURE
   output = bytes(expectedSize, 0)
   if mpAssetInflateZlib(output, expectedSize, data, offset, size) != 0 then return output end if
+#endif
   stream = slice(data, offset, size)
   return _inflateZlibPortable(stream, expectedSize)
 end function

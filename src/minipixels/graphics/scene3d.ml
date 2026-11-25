@@ -3,7 +3,9 @@
 //! begin/finish share the GPU canvas; draw ordinary 2D UI only after finish.
 package minipixels.graphics.scene3d
 
-#if TARGET_OS == "windows"
+#option MINIPIXELS_PURE: bool = false
+
+#if TARGET_OS == "windows" and not MINIPIXELS_PURE
 /// @internal
 extern function mp3dBegin(cameraX as double,cameraY as double,zoom as double,centerX as double,centerY as double) from "minipixels_gpu.dll" returns int
 /// @internal

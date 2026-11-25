@@ -4,6 +4,8 @@
 
 package minipixels.assets.pack
 
+#option MINIPIXELS_PURE: bool = false
+
 import std.io.file as fileio
 import std.bytes as by
 import std.crypto as crypto
@@ -16,12 +18,14 @@ import std.path as paths
 import minipixels.assets.png as png
 import minipixels.assets.packed_image as packedImage
 
+#if not MINIPIXELS_PURE
 #if TARGET_OS == "windows"
 /// @internal
 extern function mpAssetDecodeLz4(destination as bytes, destinationSize as u64, source as bytes, sourceBufferSize as u64, sourceOffset as u64, sourceSize as u64) from "minipixels_audio.dll" returns i32
 #else
 /// @internal
 extern function mpAssetDecodeLz4(destination as bytes, destinationSize as u64, source as bytes, sourceBufferSize as u64, sourceOffset as u64, sourceSize as u64) from "$ORIGIN/libminipixels_audio.so" returns i32
+#endif
 #endif
 
 /// Defines the pack err constant used by the minipixels assets pack module.
@@ -199,9 +203,13 @@ function _decodePayloadRange(codec, payload, offset, storedSize, expectedSize)
     return decoded
   end if
   if codec == CODEC_LZ4 then
+#if MINIPIXELS_PURE
+    return packError("LZ4 assets are unsupported in MINIPIXELS_PURE; use none, RLE or Deflate compression")
+#else
     decoded = bytes(logicalSize, 0)
     if mpAssetDecodeLz4(decoded, logicalSize, payload, len(payload), offset + 8, storedSize - 8) == 0 then return packError("asset decompression failed") end if
     return decoded
+#endif
   end if
   decoded = bytes(logicalSize, 0)
   source = offset + 8

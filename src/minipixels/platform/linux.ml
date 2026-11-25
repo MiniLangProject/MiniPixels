@@ -9,13 +9,6 @@ import minipixels.math.types as mt
 import minipixels.input.input as inp
 
 /// @internal
-extern function mpPixelsRgbaToBgra(destination as bytes, destinationOffset as u64, source as bytes, sourceOffset as u64, pixelCount as int) from "$ORIGIN/libminipixels_audio.so" returns void
-/// @internal
-extern function mpPixelsScaleIntegerBgra(destination as bytes, destinationWidth as int, destinationHeight as int, source as bytes, sourceWidth as int, sourceHeight as int, viewportX as int, viewportY as int, factor as int) from "$ORIGIN/libminipixels_audio.so" returns i32
-/// @internal
-extern function mpPixelsScaleNearestBgra(destination as bytes, destinationWidth as int, destinationHeight as int, source as bytes, sourceWidth as int, sourceHeight as int, viewportX as int, viewportY as int, viewportWidth as int, viewportHeight as int) from "$ORIGIN/libminipixels_audio.so" returns i32
-
-/// @internal
 extern function XOpenDisplay(name as ptr) from "libX11.so.6" returns ptr
 /// @internal
 extern function XDefaultScreen(display as ptr) from "libX11.so.6" returns int
@@ -484,25 +477,136 @@ function ensureImage(w)
 end function
 
 /// @internal
+/// Converts one validated RGBA row to XImage BGR0, optionally repeating pixels.
+/// Typed MiniLang assembly keeps this hot path inside the native executable.
+function copyBgraRow(destination as bytes, source as bytes, di as int, si as int, count as int, factor as int) returns bool
+  if count < 1 or factor < 1 or di < 0 or si < 0 then return false end if
+  if di > len(destination) or si > len(source) then return false end if
+  if count > ((len(source) - si) div 4) then return false end if
+  if factor > ((len(destination) - di) div 4) then return false end if
+  if count > ((len(destination) - di) div (factor * 4)) then return false end if
+  asm unsafe x64(inout destination as bytes, in source as bytes, in di as int, in si as int, in count as int, in factor as int, scratch dst as int, scratch src as int, scratch remaining as int, scratch repeats as int, scratch pixel as int, scratch red as int, scratch blue as int)
+    mov dst, di
+    mov src, si
+    mov remaining, count
+    label pixelLoop
+    mov pixel, dword [source.data + src]
+    mov red, pixel
+    and red, 255
+    shl red, 16
+    mov blue, pixel
+    shr blue, 16
+    and blue, 255
+    and pixel, 65280
+    or pixel, red
+    or pixel, blue
+    mov repeats, factor
+    label repeatLoop
+    mov dword [destination.data + dst], pixel
+    add dst, 4
+    sub repeats, 1
+    cmp repeats, 0
+    jnz repeatLoop
+    add src, 4
+    sub remaining, 1
+    cmp remaining, 0
+    jnz pixelLoop
+  end asm
+  return true
+end function
+
+/// @internal
 function convertNativeRegion(w, canvas, x0, y0, x1, y1)
+  if x0 >= x1 or y0 >= y1 then return end if
   for y = y0 to y1 - 1
     source = (y * canvas.width + x0) * 4
     destination = (y * w.clientWidth + x0) * 4
-    mpPixelsRgbaToBgra(w.presentPixels, destination, canvas.pixels, source, x1 - x0)
+    copyBgraRow(w.presentPixels, canvas.pixels, destination, source, x1 - x0, 1)
   end for
 end function
 
 /// @internal
 function scaleInteger(w, canvas, vx, vy, factor)
+  if w.clientWidth < 1 or w.clientHeight < 1 then return false end if
+  if canvas.width < 1 or canvas.height < 1 or factor < 1 or vx < 0 or vy < 0 then return false end if
+  if canvas.width > (len(canvas.pixels) div 4) or w.clientWidth > (len(w.presentPixels) div 4) then return false end if
+  if canvas.height > (len(canvas.pixels) div (canvas.width * 4)) or w.clientHeight > (len(w.presentPixels) div (w.clientWidth * 4)) then return false end if
+  if vx > w.clientWidth or vy > w.clientHeight then return false end if
+  if canvas.width > ((w.clientWidth - vx) div factor) or canvas.height > ((w.clientHeight - vy) div factor) then return false end if
   if vx != 0 or vy != 0 or canvas.width * factor != w.clientWidth or canvas.height * factor != w.clientHeight then
     fillBytes(w.presentPixels, 0, len(w.presentPixels), 0)
   end if
-  mpPixelsScaleIntegerBgra(w.presentPixels, w.clientWidth, w.clientHeight, canvas.pixels, canvas.width, canvas.height, vx, vy, factor)
+  rowBytes = canvas.width * factor * 4
+  stride = w.clientWidth * 4
+  for sy = 0 to canvas.height - 1
+    firstRow = ((vy + sy * factor) * w.clientWidth + vx) * 4
+    copyBgraRow(w.presentPixels, canvas.pixels, firstRow, sy * canvas.width * 4, canvas.width, factor)
+    duplicate = 1
+    while duplicate < factor
+      copyBytes(w.presentPixels, firstRow + duplicate * stride, w.presentPixels, firstRow, rowBytes)
+      duplicate = duplicate + 1
+    end while
+  end for
+  return true
 end function
 
 /// @internal
 function scaleGeneric(w, canvas, vx, vy, vw, vh)
-  mpPixelsScaleNearestBgra(w.presentPixels, w.clientWidth, w.clientHeight, canvas.pixels, canvas.width, canvas.height, vx, vy, vw, vh)
+  if w.clientWidth < 1 or w.clientHeight < 1 or canvas.width < 1 or canvas.height < 1 or vw < 1 or vh < 1 then return false end if
+  if canvas.width > (len(canvas.pixels) div 4) or w.clientWidth > (len(w.presentPixels) div 4) then return false end if
+  if canvas.height > (len(canvas.pixels) div (canvas.width * 4)) or w.clientHeight > (len(w.presentPixels) div (w.clientWidth * 4)) then return false end if
+  fillBytes(w.presentPixels, 0, len(w.presentPixels), 0)
+  x0 = vx
+  y0 = vy
+  x1 = vx + vw
+  y1 = vy + vh
+  if x0 < 0 then x0 = 0 end if
+  if y0 < 0 then y0 = 0 end if
+  if x1 > w.clientWidth then x1 = w.clientWidth end if
+  if y1 > w.clientHeight then y1 = w.clientHeight end if
+  if x0 >= x1 or y0 >= y1 then return true end if
+  // Build horizontal source offsets once, then reuse them for every row.
+  // This preserves the original floor mapping even for a clipped viewport.
+  count as int = x1 - x0
+  offsets as bytes = bytes(count * 4, 0)
+  for x = 0 to count - 1
+    sourceOffset = (((x0 + x - vx) * canvas.width) div vw) * 4
+    offsets[x * 4] = sourceOffset & 255
+    offsets[x * 4 + 1] = (sourceOffset >> 8) & 255
+    offsets[x * 4 + 2] = (sourceOffset >> 16) & 255
+    offsets[x * 4 + 3] = (sourceOffset >> 24) & 255
+  end for
+  destination as bytes = w.presentPixels
+  source as bytes = canvas.pixels
+  for y = y0 to y1 - 1
+    di as int = (y * w.clientWidth + x0) * 4
+    si as int = (((y - vy) * canvas.height) div vh) * canvas.width * 4
+    asm unsafe x64(inout destination as bytes, in source as bytes, in offsets as bytes, in di as int, in si as int, in count as int, scratch dst as int, scratch index as int, scratch remaining as int, scratch src as int, scratch pixel as int, scratch red as int, scratch blue as int)
+      mov dst, di
+      mov index, 0
+      mov remaining, count
+      label pixelLoop
+      mov src, dword [offsets.data + index]
+      add src, si
+      mov pixel, dword [source.data + src]
+      mov red, pixel
+      and red, 255
+      shl red, 16
+      mov blue, pixel
+      shr blue, 16
+      and blue, 255
+      and pixel, 65280
+      or pixel, red
+      or pixel, blue
+      mov dword [destination.data + dst], pixel
+      add dst, 4
+      add index, 4
+      sub remaining, 1
+      cmp remaining, 0
+      jnz pixelLoop
+    end asm
+  end for
+  return true
 end function
 
 /// Scales and presents an RGBA canvas through an X11 XImage.

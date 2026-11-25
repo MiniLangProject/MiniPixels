@@ -5,7 +5,9 @@
 
 package minipixels.graphics.gpu
 
-#if TARGET_OS == "windows"
+#option MINIPIXELS_PURE: bool = false
+
+#if TARGET_OS == "windows" and not MINIPIXELS_PURE
 import minipixels.math.types as mt
 import minipixels.graphics.sprite as sp
 import minipixels.platform.windows as win
@@ -338,7 +340,11 @@ end function
 
 /// GPU scene canvases are currently unavailable on non-Windows targets.
 function create(window, width, height, vsync)
+#if MINIPIXELS_PURE
+  return error(9311, "GPU scene canvases are unsupported in MINIPIXELS_PURE; use a CPU canvas")
+#else
   return void
+#endif
 end function
 
 /// Returns false because no GPU scene frame can start on this target.
