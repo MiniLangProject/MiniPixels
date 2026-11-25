@@ -29,6 +29,7 @@ TESTS = [
     "steam_tests.ml",
     "canvas_tests.ml",
     "systems_tests.ml",
+    "visualmap_tests.ml",
     "asset_pack_tests.ml",
     "packed_image_tests.ml",
     "asset_preload_tests.ml",
