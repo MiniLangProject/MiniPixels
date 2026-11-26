@@ -48,7 +48,7 @@ diagnostics as failures.
 ## Requirements
 
 - Windows x64 or Linux x64 with glibc, X11 (`libX11.so.6`) and ALSA (`libasound.so.2`); streamed audio/video on Linux also needs GStreamer (base/good plugins plus libav for MP3/H.264 decoding). On Ubuntu: `sudo apt-get install libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-libav`. Building the native MPX runtime additionally requires OpenSSL development headers (`libssl-dev`).
-- MiniLangCompilerPy **1.3.3** in a sibling checkout. CI pins commit `25f168e02d9e0ef7c33d7ac37c3ec83779308d02` so compiler updates are validated deliberately. Lazy MPX I/O uses `std.io.file`, fast MPX assets use the native LZ4 decoder, protected builds use `std.crypto.ecdsa_p256`, and streamed media uses `std.audio`/`std.video`.
+- MiniLangCompilerPy **1.3.3** in a sibling checkout. For reproducible local validation, use compiler commit `25f168e02d9e0ef7c33d7ac37c3ec83779308d02` and validate compiler updates deliberately. Lazy MPX I/O uses `std.io.file`, fast MPX assets use the native LZ4 decoder, protected builds use `std.crypto.ecdsa_p256`, and streamed media uses `std.audio`/`std.video`.
 - Python 3.11 or newer for the MiniPixels CLI and compiler project cache
 - The Python packages in `requirements.txt` for protected builds and WAV-to-MP3 asset transcoding
 - Visual Studio C++ Build Tools on Windows, or GCC on Linux, for the small native audio/asset/presentation bridge
@@ -432,7 +432,7 @@ python tools\minipixels.py security init path\to\minipixels.json
 python tools\minipixels.py security status path\to\minipixels.json
 ```
 
-The default private key is `.minipixels/asset-signing-key.pem` and is added to the project's `.gitignore`. CI can provide `MINIPIXELS_ASSET_SIGNING_KEY` or `MINIPIXELS_ASSET_SIGNING_KEY_FILE` instead. This deliberately raises the effort needed for casual extraction and gives strong modification detection; it cannot make a client-side decryption key impossible to recover from a determined attacker.
+The default private key is `.minipixels/asset-signing-key.pem` and is added to the project's `.gitignore`. Local builds can provide `MINIPIXELS_ASSET_SIGNING_KEY` or `MINIPIXELS_ASSET_SIGNING_KEY_FILE` instead. This deliberately raises the effort needed for casual extraction and gives strong modification detection; it cannot make a client-side decryption key impossible to recover from a determined attacker.
 
 When upgrading to MPX3 version 6, rebuild the protected pack, game executable, and native runtime together with the normal `build` command. Existing signing keys can be retained. The added signed ciphertext digests detect modifications even if the embedded AES key is recovered; old protected pack versions are rejected.
 
@@ -600,8 +600,8 @@ Implemented:
 - Camera, scrolling, parallax bands
 - Tilemap culling, cached frames, growable layers, and swept collision
 - Headless, framehash, PNG, WAV/MP3/stereo, lifecycle, and `std.test` regression tests
-- Windows and Ubuntu GitHub Actions CI for tests and example builds
-- SDK ZIP packaging with SHA256 checksum and release upload on `v*` tags
+- Local Windows and Linux tests and example builds
+- Local SDK ZIP packaging with SHA256 checksum; upload tested bundles to releases manually
 - Version file, changelog, and first-game guide
 
 Not yet implemented:
