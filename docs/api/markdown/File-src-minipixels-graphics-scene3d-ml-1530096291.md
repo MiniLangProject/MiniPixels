@@ -111,10 +111,10 @@ Reuses a mesh with a world transform; yaw rotates around upward Z.
 | `x` | `dynamic` | — | World tile X translation. |
 | `y` | `dynamic` | — | World tile Y translation. |
 | `z` | `dynamic` | — | Upward elevation. |
-| `yaw` | `dynamic` | `0` | Rotation in degrees around world Z. |
-| `sx` | `dynamic` | `1` | Positive world X scale. |
-| `sy` | `dynamic` | `1` | Positive world Y scale. |
-| `sz` | `dynamic` | `1` | Positive world Z scale. |
+| `yaw` | `dynamic` | <code>0</code> | Rotation in degrees around world Z. |
+| `sx` | `dynamic` | <code>1</code> | Positive world X scale. |
+| `sy` | `dynamic` | <code>1</code> | Positive world Y scale. |
+| `sz` | `dynamic` | <code>1</code> | Positive world Z scale. |
 
 
 **Returns:** True when the transformed mesh is drawn.

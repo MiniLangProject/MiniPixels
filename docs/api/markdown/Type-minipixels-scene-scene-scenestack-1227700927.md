@@ -40,7 +40,7 @@ Replaces the active scene.
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
 | `name` | `dynamic` | — | Registered scene name. |
-| `game` | `dynamic` | `void` | Game passed to lifecycle callbacks. |
+| `game` | `dynamic` | <code>void</code> | Game passed to lifecycle callbacks. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/scene/scene.ml#L64)
@@ -116,7 +116,7 @@ Removes the current scene and resumes the scene below it.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `game` | `dynamic` | `void` | Game passed to lifecycle callbacks. |
+| `game` | `dynamic` | <code>void</code> | Game passed to lifecycle callbacks. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/scene/scene.ml#L77)
@@ -133,7 +133,7 @@ Pushes a scene above the current scene.
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
 | `name` | `dynamic` | — | Registered scene name. |
-| `game` | `dynamic` | `void` | Game passed to lifecycle callbacks. |
+| `game` | `dynamic` | <code>void</code> | Game passed to lifecycle callbacks. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/scene/scene.ml#L71)

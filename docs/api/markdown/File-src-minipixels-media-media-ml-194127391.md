@@ -121,9 +121,9 @@ Opens streamed audio by stable MPX asset name.
 | --- | --- | --- | --- |
 | `pack` | `dynamic` | — | Open asset pack. |
 | `name` | `dynamic` | — | Stable audio asset name. |
-| `mime` | `dynamic` | `"audio/mpeg"` | HTTP content type advertised to the audio backend. |
-| `suffix` | `dynamic` | `".mp3"` | Filename suffix used for decoder selection. |
-| `options` | `dynamic` | `void` | Optional `std.audio.PlayerOptions`. |
+| `mime` | `dynamic` | <code>&#34;audio&#47;mpeg&#34;</code> | HTTP content type advertised to the audio backend. |
+| `suffix` | `dynamic` | <code>&#34;&#46;mp3&#34;</code> | Filename suffix used for decoder selection. |
+| `options` | `dynamic` | <code>void</code> | Optional `std.audio.PlayerOptions`. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L255)
@@ -141,9 +141,9 @@ Opens streamed audio by pre-resolved MPX slot.
 | --- | --- | --- | --- |
 | `pack` | `dynamic` | — | Open asset pack. |
 | `slot` | `dynamic` | — | Pre-resolved audio entry slot. |
-| `mime` | `dynamic` | `"audio/mpeg"` | HTTP content type advertised to the audio backend. |
-| `suffix` | `dynamic` | `".mp3"` | Filename suffix used for decoder selection. |
-| `options` | `dynamic` | `void` | Optional `std.audio.PlayerOptions`. |
+| `mime` | `dynamic` | <code>&#34;audio&#47;mpeg&#34;</code> | HTTP content type advertised to the audio backend. |
+| `suffix` | `dynamic` | <code>&#34;&#46;mp3&#34;</code> | Filename suffix used for decoder selection. |
+| `options` | `dynamic` | <code>void</code> | Optional `std.audio.PlayerOptions`. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L235)
@@ -161,9 +161,9 @@ Opens streamed video by stable MPX asset name.
 | --- | --- | --- | --- |
 | `pack` | `dynamic` | — | Open asset pack. |
 | `name` | `dynamic` | — | Stable video asset name. |
-| `mime` | `dynamic` | `"video/mp4"` | HTTP content type advertised to the video backend. |
-| `suffix` | `dynamic` | `".mp4"` | Filename suffix used for decoder selection. |
-| `options` | `dynamic` | `void` | Optional `std.video.PlayerOptions`. |
+| `mime` | `dynamic` | <code>&#34;video&#47;mp4&#34;</code> | HTTP content type advertised to the video backend. |
+| `suffix` | `dynamic` | <code>&#34;&#46;mp4&#34;</code> | Filename suffix used for decoder selection. |
+| `options` | `dynamic` | <code>void</code> | Optional `std.video.PlayerOptions`. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L287)
@@ -181,9 +181,9 @@ Opens streamed video by pre-resolved MPX slot.
 | --- | --- | --- | --- |
 | `pack` | `dynamic` | — | Open asset pack. |
 | `slot` | `dynamic` | — | Pre-resolved video entry slot. |
-| `mime` | `dynamic` | `"video/mp4"` | HTTP content type advertised to the video backend. |
-| `suffix` | `dynamic` | `".mp4"` | Filename suffix used for decoder selection. |
-| `options` | `dynamic` | `void` | Optional `std.video.PlayerOptions`. |
+| `mime` | `dynamic` | <code>&#34;video&#47;mp4&#34;</code> | HTTP content type advertised to the video backend. |
+| `suffix` | `dynamic` | <code>&#34;&#46;mp4&#34;</code> | Filename suffix used for decoder selection. |
+| `options` | `dynamic` | <code>void</code> | Optional `std.video.PlayerOptions`. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/media/media.ml#L267)

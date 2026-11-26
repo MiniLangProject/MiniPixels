@@ -1537,14 +1537,14 @@ Creates a scene with optional lifecycle callbacks.
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
 | `name` | `dynamic` | — | Stable scene name. |
-| `state` | `dynamic` | `void` | User-owned scene state. |
-| `onEnter` | `dynamic` | `void` | Callback invoked as onEnter(game, scene). |
-| `onExit` | `dynamic` | `void` | Callback invoked as onExit(game, scene). |
-| `update` | `dynamic` | `void` | Callback invoked as update(game, scene, dt). |
-| `render` | `dynamic` | `void` | Callback invoked as render(game, scene, canvas). |
-| `onPause` | `dynamic` | `void` | Callback invoked when another scene is pushed. |
-| `onResume` | `dynamic` | `void` | Callback invoked after the scene above is popped. |
-| `renderBelow` | `dynamic` | `false` | Whether scenes underneath remain visible. |
+| `state` | `dynamic` | <code>void</code> | User-owned scene state. |
+| `onEnter` | `dynamic` | <code>void</code> | Callback invoked as onEnter(game, scene). |
+| `onExit` | `dynamic` | <code>void</code> | Callback invoked as onExit(game, scene). |
+| `update` | `dynamic` | <code>void</code> | Callback invoked as update(game, scene, dt). |
+| `render` | `dynamic` | <code>void</code> | Callback invoked as render(game, scene, canvas). |
+| `onPause` | `dynamic` | <code>void</code> | Callback invoked when another scene is pushed. |
+| `onResume` | `dynamic` | <code>void</code> | Callback invoked after the scene above is popped. |
+| `renderBelow` | `dynamic` | <code>false</code> | Whether scenes underneath remain visible. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels.ml#L588)

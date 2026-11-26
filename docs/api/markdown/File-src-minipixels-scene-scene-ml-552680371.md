@@ -45,7 +45,7 @@ Replaces the active scene with a registered scene.
 | --- | --- | --- | --- |
 | `s` | `dynamic` | — | Scene stack to mutate. |
 | `name` | `dynamic` | — | Registered scene name. |
-| `game` | `dynamic` | `void` | Game passed to lifecycle callbacks. |
+| `game` | `dynamic` | <code>void</code> | Game passed to lifecycle callbacks. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/scene/scene.ml#L256)
@@ -62,7 +62,7 @@ Removes all active scenes from top to bottom.
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
 | `s` | `dynamic` | — | Scene stack to mutate. |
-| `game` | `dynamic` | `void` | Game passed to lifecycle callbacks. |
+| `game` | `dynamic` | <code>void</code> | Game passed to lifecycle callbacks. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/scene/scene.ml#L279)
@@ -211,7 +211,7 @@ Removes the active scene and resumes the scene below it.
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
 | `s` | `dynamic` | — | Scene stack to mutate. |
-| `game` | `dynamic` | `void` | Game passed to lifecycle callbacks. |
+| `game` | `dynamic` | <code>void</code> | Game passed to lifecycle callbacks. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/scene/scene.ml#L235)
@@ -229,7 +229,7 @@ Pushes a registered scene above the active scene.
 | --- | --- | --- | --- |
 | `s` | `dynamic` | — | Scene stack to mutate. |
 | `name` | `dynamic` | — | Registered scene name. |
-| `game` | `dynamic` | `void` | Game passed to lifecycle callbacks. |
+| `game` | `dynamic` | <code>void</code> | Game passed to lifecycle callbacks. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/scene/scene.ml#L212)
@@ -299,14 +299,14 @@ Creates a scene from optional lifecycle callbacks.
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
 | `name` | `dynamic` | — | Stable scene name. |
-| `state` | `dynamic` | `void` | User-owned scene state. |
-| `onEnter` | `dynamic` | `void` | Callback invoked when the scene becomes active. |
-| `onExit` | `dynamic` | `void` | Callback invoked when the scene leaves the stack. |
-| `update` | `dynamic` | `void` | Callback invoked for fixed simulation updates. |
-| `render` | `dynamic` | `void` | Callback invoked for rendering. |
-| `onPause` | `dynamic` | `void` | Callback invoked when another scene is pushed above this one. |
-| `onResume` | `dynamic` | `void` | Callback invoked after the scene above is popped. |
-| `renderBelow` | `dynamic` | `false` | Whether scenes underneath remain visible. |
+| `state` | `dynamic` | <code>void</code> | User-owned scene state. |
+| `onEnter` | `dynamic` | <code>void</code> | Callback invoked when the scene becomes active. |
+| `onExit` | `dynamic` | <code>void</code> | Callback invoked when the scene leaves the stack. |
+| `update` | `dynamic` | <code>void</code> | Callback invoked for fixed simulation updates. |
+| `render` | `dynamic` | <code>void</code> | Callback invoked for rendering. |
+| `onPause` | `dynamic` | <code>void</code> | Callback invoked when another scene is pushed above this one. |
+| `onResume` | `dynamic` | <code>void</code> | Callback invoked after the scene above is popped. |
+| `renderBelow` | `dynamic` | <code>false</code> | Whether scenes underneath remain visible. |
 
 
 [View source](https://github.com/MiniLangProject/MiniPixels/blob/main/src/minipixels/scene/scene.ml#L102)
