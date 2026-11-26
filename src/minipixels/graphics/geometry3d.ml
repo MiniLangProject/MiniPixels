@@ -2,10 +2,12 @@
 //! Portable CPU 3D geometry for a MiniPixels Canvas. Flat shaded triangles use
 //! a 16-bit depth buffer and perspective-correct inverse-depth interpolation.
 //! Geometry crossing the near plane is rejected, not clipped; choose a camera
-//! that keeps the complete scene in front of it. No textures or transparency.
+//! that keeps the complete scene in front of it. RGBA textures support
+//! perspective-correct UVs and alpha cutout, but not translucent blending.
 package minipixels.graphics.geometry3d
 
 import minipixels.graphics.canvas as cv
+import minipixels.graphics.sprite as g3image
 import minipixels.math.types as mt
 import std.math as math
 
@@ -48,6 +50,32 @@ struct Triangle
   cx as float
   cy as float
   cz as float
+  color as int
+end struct
+
+struct UV
+  u
+  v
+end struct
+
+struct Texture
+  width as int
+  height as int
+  pixels as bytes
+  opaque as bool
+  tint as int
+  alphaCutoff as int
+  bilinear as bool
+end struct
+
+struct TexturedTriangle
+  a
+  b
+  c
+  uvA
+  uvB
+  uvC
+  material
   color as int
 end struct
 
@@ -101,7 +129,7 @@ function copySurface(destination, source)
   if destination.width != source.width or destination.height != source.height then return false end if
   copyBytes(destination.canvas.pixels,0,source.canvas.pixels,0,len(source.canvas.pixels))
   copyBytes(destination.depth,0,source.depth,0,len(source.depth))
-  destination.canvas.imageView.opaque = true
+  destination.canvas.imageView.opaque = source.canvas.imageView.opaque
   destination.canvas.dirty = true
   destination.canvas.dirtyX0 = 0
   destination.canvas.dirtyY0 = 0
@@ -163,6 +191,96 @@ end function
 function quad(m,a,b,c,d,color,lit=true)
   triangle(m,a.x,a.y,a.z,b.x,b.y,b.z,c.x,c.y,c.z,color,lit)
   triangle(m,a.x,a.y,a.z,c.x,c.y,c.z,d.x,d.y,d.z,color,lit)
+end function
+
+/// Creates a clamped RGBA texture material sharing a MiniPixels Image buffer.
+/// Alpha is a coverage cutout; surviving pixels are opaque. Tint affects RGB.
+/// Keep the source image immutable; recreate the material after pixel changes.
+function texture(image,tint=0xffffffff,alphaCutoff=128,bilinear=true)
+  if not (image is g3image.Image) then return error(8301,"geometry3d texture requires an Image") end if
+  if image.width <= 0 or image.height <= 0 or len(image.pixels) != image.width*image.height*4 then return error(8302,"geometry3d texture dimensions are invalid") end if
+  if alphaCutoff < 1 then alphaCutoff = 1 end if
+  if alphaCutoff > 255 then alphaCutoff = 255 end if
+  return Texture(image.width,image.height,image.pixels,image.opaque,tint,alphaCutoff,bilinear)
+end function
+
+/// Appends a textured triangle with independent normalized UV coordinates.
+function texturedTriangle(m,a,b,c,uvA,uvB,uvC,material,lit=false)
+  if not (material is Texture) then return false end if
+  if m.count >= m.capacity then
+    next = array(m.capacity*2)
+    copyArray(next,0,m.triangles,0,m.count)
+    m.triangles = next
+    m.capacity = m.capacity*2
+  end if
+  color = material.tint
+  if lit then
+    ux = b.x-a.x; uy = b.y-a.y; uz = b.z-a.z
+    vx = c.x-a.x; vy = c.y-a.y; vz = c.z-a.z
+    nx = uy*vz-uz*vy; ny = uz*vx-ux*vz; nz = ux*vy-uy*vx
+    magnitude = math.sqrt(nx*nx+ny*ny+nz*nz)
+    light = 0.0
+    if magnitude > 0.000000001 then light = math.max(0.0,(nx*(-0.34)+ny*(-0.42)+nz*0.84)/magnitude) end if
+    color = colorScale(color,0.38+0.62*light)
+  end if
+  m.triangles[m.count] = TexturedTriangle(Point(a.x,a.y,a.z),Point(b.x,b.y,b.z),Point(c.x,c.y,c.z),UV(uvA.u,uvA.v),UV(uvB.u,uvB.v),UV(uvC.u,uvC.v),material,color)
+  m.count = m.count+1
+  return true
+end function
+
+/// Maps an image onto a quad. Default vertex order is bottom-left,
+/// bottom-right, top-right, top-left; image V=0 is its top edge.
+/// Custom UV arrays also allow atlas cells and diamond-shaped source regions.
+function texturedQuad(m,a,b,c,d,material,uvs=void,lit=false)
+  if typeof(uvs) == "void" then uvs = [UV(0.0,1.0),UV(1.0,1.0),UV(1.0,0.0),UV(0.0,0.0)] end if
+  if typeof(uvs) != "array" or len(uvs) != 4 then return false end if
+  if not texturedTriangle(m,a,b,c,uvs[0],uvs[1],uvs[2],material,lit) then return false end if
+  return texturedTriangle(m,a,c,d,uvs[0],uvs[2],uvs[3],material,lit)
+end function
+
+/// Samples a clamped texture. Bilinear RGBA filtering uses premultiplied color
+/// internally so transparent white/black borders do not create colored halos.
+function sampleTexture(material,u,v)
+  u = math.clamp(u,0.0,1.0)
+  v = math.clamp(v,0.0,1.0)
+  var fx as float = toFloat(u*(material.width-1))
+  var fy as float = toFloat(v*(material.height-1))
+  pixels = material.pixels
+  if not material.bilinear then
+    x = math.floorInt(toNumber(fx+0.5))
+    y = math.floorInt(toNumber(fy+0.5))
+    index = (y*material.width+x)*4
+    return (pixels[index]<<24)|(pixels[index+1]<<16)|(pixels[index+2]<<8)|pixels[index+3]
+  end if
+  var x0 as int = math.floorInt(toNumber(fx))
+  var y0 as int = math.floorInt(toNumber(fy))
+  x1 = math.min(x0+1,material.width-1)
+  y1 = math.min(y0+1,material.height-1)
+  var dx as float = toFloat(fx-x0)
+  var dy as float = toFloat(fy-y0)
+  var w0 as float = toFloat((1.0-dx)*(1.0-dy))
+  var w1 as float = toFloat(dx*(1.0-dy))
+  var w2 as float = toFloat((1.0-dx)*dy)
+  var w3 as float = toFloat(dx*dy)
+  i0 = (y0*material.width+x0)*4
+  i1 = (y0*material.width+x1)*4
+  i2 = (y1*material.width+x0)*4
+  i3 = (y1*material.width+x1)*4
+  alpha = 255
+  var divisor as float = 1.0
+  if not material.opaque then
+    w0 = toFloat(w0*pixels[i0+3])
+    w1 = toFloat(w1*pixels[i1+3])
+    w2 = toFloat(w2*pixels[i2+3])
+    w3 = toFloat(w3*pixels[i3+3])
+    divisor = toFloat(w0+w1+w2+w3)
+    if divisor <= 0.000001 then return 0 end if
+    alpha = math.floorInt(toNumber(divisor+0.5))
+  end if
+  red = math.floorInt(toNumber((pixels[i0]*w0+pixels[i1]*w1+pixels[i2]*w2+pixels[i3]*w3)/divisor+0.5))
+  green = math.floorInt(toNumber((pixels[i0+1]*w0+pixels[i1+1]*w1+pixels[i2+1]*w2+pixels[i3+1]*w3)/divisor+0.5))
+  blue = math.floorInt(toNumber((pixels[i0+2]*w0+pixels[i1+2]*w1+pixels[i2+2]*w2+pixels[i3+2]*w3)/divisor+0.5))
+  return (red<<24)|(green<<16)|(blue<<8)|alpha
 end function
 
 /// Appends an axis-aligned closed box; x/y are its center and z its base.
@@ -330,6 +448,134 @@ function rasterTriangle(s,a,b,c,color,perspective)
   s.triangles = s.triangles+1
 end function
 
+/// Draws a textured span. Transparent texels never modify color or depth.
+function rasterTextureSpan(s,y as int,x0 as int,x1 as int,depth0 as float,depthStep as float,u0 as float,uStep as float,v0 as float,vStep as float,material,color as int,perspective as bool)
+  var depth as float = depth0
+  var currentU as float = u0
+  var currentV as float = v0
+  var depthIndex as int = (y*s.width+x0)*2
+  var pixelIndex as int = (y*s.width+x0)*4
+  output = s.canvas.pixels
+  depthBuffer = s.depth
+  tintRed = (color>>24)&255
+  tintGreen = (color>>16)&255
+  tintBlue = (color>>8)&255
+  tinted = color != 0xffffffff
+  for x = x0 to x1
+    var actualDepth as float = toFloat(depth)
+    var u as float = toFloat(currentU)
+    var v as float = toFloat(currentV)
+    if perspective then
+      actualDepth = toFloat(1.0/depth)
+      u = toFloat(currentU*actualDepth)
+      v = toFloat(currentV*actualDepth)
+    end if
+    encoded = math.floorInt(toNumber(actualDepth*4096.0))
+    prior = depthBuffer[depthIndex]|(depthBuffer[depthIndex+1]<<8)
+    if encoded >= 0 and encoded < 65535 and encoded <= prior then
+      sampled = sampleTexture(material,u,v)
+      alpha = sampled&255
+      if alpha >= material.alphaCutoff then
+        red = (sampled>>24)&255
+        green = (sampled>>16)&255
+        blue = (sampled>>8)&255
+        if tinted then
+          value = red*tintRed; red = (value+1+(value>>8))>>8
+          value = green*tintGreen; green = (value+1+(value>>8))>>8
+          value = blue*tintBlue; blue = (value+1+(value>>8))>>8
+        end if
+        output[pixelIndex] = red
+        output[pixelIndex+1] = green
+        output[pixelIndex+2] = blue
+        output[pixelIndex+3] = 255
+        depthBuffer[depthIndex] = encoded&255
+        depthBuffer[depthIndex+1] = (encoded>>8)&255
+      end if
+    end if
+    depth = toFloat(depth+depthStep)
+    currentU = toFloat(currentU+uStep)
+    currentV = toFloat(currentV+vStep)
+    depthIndex = depthIndex+2
+    pixelIndex = pixelIndex+4
+  end for
+end function
+
+/// Rasterizes a UV triangle with inverse-depth attributes in perspective mode.
+function rasterTexturedTriangle(s,a,b,c,uvA,uvB,uvC,material,color,perspective)
+  if not a.visible or not b.visible or not c.visible then return end if
+  if b.y < a.y then swap=a; a=b; b=swap; uvSwap=uvA; uvA=uvB; uvB=uvSwap end if
+  if c.y < a.y then swap=a; a=c; c=swap; uvSwap=uvA; uvA=uvC; uvC=uvSwap end if
+  if c.y < b.y then swap=b; b=c; c=swap; uvSwap=uvB; uvB=uvC; uvC=uvSwap end if
+  var totalHeight as float = toFloat(c.y-a.y)
+  if totalHeight < 0.000001 then return end if
+  first = math.max(0,math.ceilInt(toNumber(a.y-0.5)))
+  last = math.min(s.height-1,math.floorInt(toNumber(c.y-0.5)))
+  if first > last then return end if
+  var da as float = toFloat(a.depth)
+  var db as float = toFloat(b.depth)
+  var dc as float = toFloat(c.depth)
+  var ua as float = toFloat(uvA.u)
+  var ub as float = toFloat(uvB.u)
+  var uc as float = toFloat(uvC.u)
+  var va as float = toFloat(uvA.v)
+  var vb as float = toFloat(uvB.v)
+  var vc as float = toFloat(uvC.v)
+  if perspective then
+    da=toFloat(1.0/da); db=toFloat(1.0/db); dc=toFloat(1.0/dc)
+    ua=toFloat(ua*da); ub=toFloat(ub*db); uc=toFloat(uc*dc)
+    va=toFloat(va*da); vb=toFloat(vb*db); vc=toFloat(vc*dc)
+  end if
+  minimumX = s.width
+  maximumX = -1
+  for y = first to last
+    sampleY = y+0.5
+    longT = (sampleY-a.y)/totalHeight
+    var lx as float = toFloat(a.x+(c.x-a.x)*longT)
+    var ld as float = toFloat(da+(dc-da)*longT)
+    var lu as float = toFloat(ua+(uc-ua)*longT)
+    var lv as float = toFloat(va+(vc-va)*longT)
+    var rx as float = 0.0
+    var rd as float = 0.0
+    var ru as float = 0.0
+    var rv as float = 0.0
+    if sampleY < b.y and b.y-a.y > 0.000001 then
+      shortT = (sampleY-a.y)/(b.y-a.y)
+      rx=toFloat(a.x+(b.x-a.x)*shortT); rd=toFloat(da+(db-da)*shortT)
+      ru=toFloat(ua+(ub-ua)*shortT); rv=toFloat(va+(vb-va)*shortT)
+    else
+      if c.y-b.y < 0.000001 then continue end if
+      shortT = (sampleY-b.y)/(c.y-b.y)
+      rx=toFloat(b.x+(c.x-b.x)*shortT); rd=toFloat(db+(dc-db)*shortT)
+      ru=toFloat(ub+(uc-ub)*shortT); rv=toFloat(vb+(vc-vb)*shortT)
+    end if
+    if lx > rx then
+      swapX=lx; lx=rx; rx=swapX
+      swapD=ld; ld=rd; rd=swapD
+      swapU=lu; lu=ru; ru=swapU
+      swapV=lv; lv=rv; rv=swapV
+    end if
+    var width as float = toFloat(rx-lx)
+    if width > 0.000001 then
+      start = math.max(0,math.ceilInt(toNumber(lx-0.5)))
+      finish = math.min(s.width-1,math.floorInt(toNumber(rx-0.5)))
+      if start <= finish then
+        var dd as float = toFloat((rd-ld)/width)
+        var du as float = toFloat((ru-lu)/width)
+        var dv as float = toFloat((rv-lv)/width)
+        offset = start+0.5-lx
+        rasterTextureSpan(s,y,start,finish,toFloat(ld+offset*dd),dd,toFloat(lu+offset*du),du,toFloat(lv+offset*dv),dv,material,color,perspective)
+        if start < minimumX then minimumX = start end if
+        if finish > maximumX then maximumX = finish end if
+      end if
+    end if
+  end for
+  if maximumX >= minimumX then
+    cv.markDirty(s.canvas,minimumX,first,maximumX-minimumX+1,last-first+1)
+    s.canvas.drawCalls = s.canvas.drawCalls+1
+  end if
+  s.triangles = s.triangles+1
+end function
+
 /// Draws a resident mesh with translation, rotation around Z and axis scales.
 function drawAt(s,m,c,tx=0.0,ty=0.0,tz=0.0,angle=0.0,sx=1.0,sy=1.0,sz=1.0)
   if m.count <= 0 then return end if
@@ -337,9 +583,16 @@ function drawAt(s,m,c,tx=0.0,ty=0.0,tz=0.0,angle=0.0,sx=1.0,sy=1.0,sz=1.0)
   sa = math.sin(angle)
   for i = 0 to m.count-1
     t = m.triangles[i]
-    a = project(c,tx+t.ax*sx*ca-t.ay*sy*sa,ty+t.ax*sx*sa+t.ay*sy*ca,tz+t.az*sz)
-    b = project(c,tx+t.bx*sx*ca-t.by*sy*sa,ty+t.bx*sx*sa+t.by*sy*ca,tz+t.bz*sz)
-    d = project(c,tx+t.cx*sx*ca-t.cy*sy*sa,ty+t.cx*sx*sa+t.cy*sy*ca,tz+t.cz*sz)
-    rasterTriangle(s,a,b,d,t.color,c.perspective)
+    if t is TexturedTriangle then
+      a = project(c,tx+t.a.x*sx*ca-t.a.y*sy*sa,ty+t.a.x*sx*sa+t.a.y*sy*ca,tz+t.a.z*sz)
+      b = project(c,tx+t.b.x*sx*ca-t.b.y*sy*sa,ty+t.b.x*sx*sa+t.b.y*sy*ca,tz+t.b.z*sz)
+      d = project(c,tx+t.c.x*sx*ca-t.c.y*sy*sa,ty+t.c.x*sx*sa+t.c.y*sy*ca,tz+t.c.z*sz)
+      rasterTexturedTriangle(s,a,b,d,t.uvA,t.uvB,t.uvC,t.material,t.color,c.perspective)
+    else
+      a = project(c,tx+t.ax*sx*ca-t.ay*sy*sa,ty+t.ax*sx*sa+t.ay*sy*ca,tz+t.az*sz)
+      b = project(c,tx+t.bx*sx*ca-t.by*sy*sa,ty+t.bx*sx*sa+t.by*sy*ca,tz+t.bz*sz)
+      d = project(c,tx+t.cx*sx*ca-t.cy*sy*sa,ty+t.cx*sx*sa+t.cy*sy*ca,tz+t.cz*sz)
+      rasterTriangle(s,a,b,d,t.color,c.perspective)
+    end if
   end for
 end function

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add perspective-correct UV interpolation, clamped nearest/bilinear RGBA
+  textures, premultiplied edge filtering, and alpha-cutout depth coverage to
+  the portable geometry renderer. Preserve Canvas opacity in scene caches.
+- Test perspective texture coordinates, filtered colors, transparent borders,
+  cutout occlusion, and transparent-cache compositing without a display server.
 - Add portable Canvas 3D geometry with perspective and orthographic projection,
   flat-shaded triangle meshes, 16-bit depth testing, and static color/depth caches.
 - Add headless projection, occlusion, cache, empty-mesh, and integral-depth tests.

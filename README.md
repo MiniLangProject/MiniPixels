@@ -19,7 +19,8 @@ fixed-camera layer, without a general model importer or automatic 3D shadows.
 
 Portable CPU 3D is available through `minipixels.graphics.geometry3d`: arbitrary
 flat-shaded triangles, perspective/orthographic cameras, primitive mesh builders,
-16-bit per-pixel depth, and reusable color/depth caches on an ordinary Canvas.
+16-bit per-pixel depth, perspective-correct textured triangles with bilinear
+filtering and alpha cutouts, and reusable color/depth caches on an ordinary Canvas.
 It also works in headless Linux captures. See the [portable geometry guide](docs/geometry3d.md)
 for API examples, limits, and the required compiler fix for default arguments.
 

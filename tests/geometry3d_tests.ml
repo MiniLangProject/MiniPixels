@@ -1,6 +1,7 @@
 import std.test as test
 import minipixels.graphics.canvas as cv
 import minipixels.graphics.geometry3d as geometry
+import minipixels.graphics.sprite as textureImages
 
 function depthOrder()
   canvas = cv.create(64,64)
@@ -76,8 +77,102 @@ function main(args)
   depthOrder()
   projectionModes()
   cachedDepthSurvives()
+  filteredTextureColors()
+  perspectiveTextureCoordinates()
+  transparentTextureDoesNotOcclude()
+  transparentCachePreservesCutout()
   print "GEOMETRY3D [OK]"
   return 0
+end function
+
+function imageFromColors(width,height,colors)
+  pixels = bytes(width*height*4,0)
+  for i = 0 to len(colors)-1
+    color = colors[i]
+    pixels[i*4] = (color>>24)&255
+    pixels[i*4+1] = (color>>16)&255
+    pixels[i*4+2] = (color>>8)&255
+    pixels[i*4+3] = color&255
+  end for
+  return textureImages.newImage(width,height,pixels,"texture-test")
+end function
+
+function filteredTextureColors()
+  checker = imageFromColors(2,2,[0xff0000ff,0x00ff00ff,0x0000ffff,0xffffffff])
+  material = geometry.texture(checker,0xffffffff,128,true)
+  test.assertEqual(geometry.sampleTexture(material,0.5,0.5),0x808080ff,"bilinear center averages all four opaque texels")
+  test.assertEqual(geometry.sampleTexture(material,-0.5,-0.5),0xff0000ff,"UVs clamp to image bounds")
+  edge = imageFromColors(2,1,[0xffffff00,0xff0000ff])
+  cutout = geometry.texture(edge,0xffffffff,128,true)
+  test.assertEqual(geometry.sampleTexture(cutout,0.5,0.0),0xff000080,"transparent white does not bleed a white halo into red")
+end function
+
+function perspectiveTextureCoordinates()
+  colors = imageFromColors(4,1,[0xff0000ff,0x00ff00ff,0x0000ffff,0xffffffff])
+  material = geometry.texture(colors,0xffffffff,128,false)
+  target = geometry.surface(cv.create(34,34))
+  a = geometry.Projected(2.5,2.5,1.0,true)
+  b = geometry.Projected(30.5,2.5,4.0,true)
+  c = geometry.Projected(2.5,30.5,1.0,true)
+  geometry.clear(target,0x101010ff)
+  geometry.rasterTexturedTriangle(target,a,b,c,geometry.UV(0.0,0.0),geometry.UV(1.0,0.0),geometry.UV(0.0,1.0),material,0xffffffff,true)
+  test.assertEqual(target.canvas.getPixel(17,4),0x00ff00ff,"perspective u about0.224 samples green instead of affine blue")
+  geometry.clear(target,0x101010ff)
+  geometry.rasterTexturedTriangle(target,a,b,c,geometry.UV(0.0,0.0),geometry.UV(1.0,0.0),geometry.UV(0.0,1.0),material,0xffffffff,false)
+  test.assertEqual(target.canvas.getPixel(17,4),0x0000ffff,"orthographic interpolation keeps affine u about0.536")
+end function
+
+function transparentTextureDoesNotOcclude()
+  camera = geometry.camera(16.0,16.0,20.0,0.0,0.0,0.0,0.0,0.0,3.0,false)
+  camera.sinPitch = 1.0
+  camera.cosPitch = 0.0
+  target = geometry.surface(cv.create(32,32))
+  geometry.clear(target,0x881111ff)
+  mask = imageFromColors(2,1,[0xffffff00,0x00ff00ff])
+  material = geometry.texture(mask,0xffffffff,128,false)
+  front = geometry.mesh()
+  geometry.texturedQuad(front,geometry.Point(-0.6,-0.6,1.0),geometry.Point(0.6,-0.6,1.0),geometry.Point(0.6,0.6,1.0),geometry.Point(-0.6,0.6,1.0),material)
+  geometry.drawAt(target,front,camera)
+  index = (16*32+8)*2
+  test.assertEqual(target.depth[index]|(target.depth[index+1]<<8),65535,"transparent texel leaves depth untouched")
+  behind = geometry.mesh()
+  geometry.quad(behind,geometry.Point(-0.7,-0.7,0.0),geometry.Point(0.7,-0.7,0.0),geometry.Point(0.7,0.7,0.0),geometry.Point(-0.7,0.7,0.0),0x2040e0ff,false)
+  geometry.drawAt(target,behind,camera)
+  test.assertEqual(target.canvas.getPixel(8,16),0x2040e0ff,"later background remains visible through cutout")
+  test.assertEqual(target.canvas.getPixel(23,16),0x00ff00ff,"opaque foreground still occludes background")
+end function
+
+function transparentCachePreservesCutout()
+  camera = geometry.camera(16.0,16.0,20.0,0.0,0.0,0.0,0.0,0.0,3.0,false)
+  camera.sinPitch = 1.0
+  camera.cosPitch = 0.0
+  cached = geometry.surface(cv.create(32,32))
+  live = geometry.surface(cv.create(32,32))
+  geometry.clear(cached,0x00000000)
+  geometry.clear(live,0x111111ff)
+  mask = imageFromColors(2,1,[0xffffff00,0x00ff00ff])
+  material = geometry.texture(mask,0xffffffff,128,false)
+  front = geometry.mesh()
+  geometry.texturedQuad(front,geometry.Point(-0.6,-0.6,1.0),geometry.Point(0.6,-0.6,1.0),geometry.Point(0.6,0.6,1.0),geometry.Point(-0.6,0.6,1.0),material)
+  geometry.drawAt(cached,front,camera)
+  test.assertTrue(geometry.copySurface(live,cached))
+  test.assertFalse(live.canvas.imageView.opaque,"a transparent cache must retain its alpha metadata")
+  composite = cv.create(32,32)
+  composite.clear(0x2040e0ff)
+  cv.drawCanvas(composite,live.canvas,0,0)
+  test.assertEqual(composite.getPixel(8,16),0x2040e0ff,"cached cutout keeps the compositing background visible")
+  test.assertEqual(composite.getPixel(23,16),0x00ff00ff,"cached opaque texel still composites over the background")
+  holeIndex = (16*32+8)*2
+  opaqueIndex = (16*32+23)*2
+  test.assertEqual(live.depth[holeIndex]|(live.depth[holeIndex+1]<<8),65535,"cached cutout leaves clear depth")
+  test.assertEqual(live.depth[opaqueIndex]|(live.depth[opaqueIndex+1]<<8),8192,"cached opaque texel retains its exact depth")
+  behind = geometry.mesh()
+  geometry.quad(behind,geometry.Point(-0.7,-0.7,0.0),geometry.Point(0.7,-0.7,0.0),geometry.Point(0.7,0.7,0.0),geometry.Point(-0.7,0.7,0.0),0xd02020ff,false)
+  geometry.drawAt(live,behind,camera)
+  test.assertEqual(live.canvas.getPixel(8,16),0xd02020ff,"later geometry can fill a copied cutout")
+  test.assertEqual(live.canvas.getPixel(23,16),0x00ff00ff,"copied opaque depth continues to occlude later geometry")
+  test.assertEqual(cached.canvas.getPixel(8,16),0x00000000,"live drawing must not mutate cached color")
+  test.assertEqual(cached.depth[holeIndex]|(cached.depth[holeIndex+1]<<8),65535,"live drawing must not mutate cached depth")
 end function
 
 function exactFloatDepth()
