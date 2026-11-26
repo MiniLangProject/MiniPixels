@@ -94,6 +94,94 @@ MP_API void mpAudioMp3Close(void* handle)
     free(value);
 }
 
+/* Bounded, allocation-free PCM accumulation. The language owns every source,
+ * destination and decoder; this kernel never retains managed pointers. Samples
+ * use the existing nearest-source-frame rule and ordered double additions. */
+static double mpAudioPcmSample(const uint8_t* sample, int32_t bits)
+{
+    uint32_t raw;
+    if (bits == 8) return ((int32_t)sample[0] - 128) * 256.0;
+    raw = (uint32_t)sample[0] | ((uint32_t)sample[1] << 8);
+    if (bits == 16) return raw >= 32768 ? (double)raw - 65536.0 : (double)raw;
+    raw |= (uint32_t)sample[2] << 16;
+    if (bits == 24) return (raw >= 8388608 ? (double)raw - 16777216.0 : (double)raw) / 256.0;
+    raw |= (uint32_t)sample[3] << 24;
+    return (raw >= UINT32_C(2147483648) ? (double)raw - 4294967296.0 : (double)raw) / 65536.0;
+}
+
+MP_API void mpAudioMixClear(void* destination, uint64_t bytes)
+{
+    if (destination != NULL && bytes <= SIZE_MAX) memset(destination, 0, (size_t)bytes);
+}
+
+MP_API double mpAudioMixPcm(
+    void* destination, uint64_t mix_bytes, uint64_t output_frame,
+    const void* source, uint64_t source_bytes, uint64_t source_start, uint64_t source_frames,
+    int32_t channels, int32_t bits, int32_t block_align,
+    double cursor, double step, double left_gain, double right_gain, void* result)
+{
+    uint64_t count = 0;
+    uint64_t mix_frames = mix_bytes / 16;
+    uint64_t frame;
+    int32_t sample_bytes = bits / 8;
+    int silent = left_gain == 0.0 && right_gain == 0.0;
+    double* mix = (double*)destination;
+    const uint8_t* pcm = (const uint8_t*)source;
+    if (result == NULL) return cursor;
+    memcpy(result, &count, sizeof(count));
+    if (destination == NULL || output_frame >= mix_frames || mix_bytes > SIZE_MAX || mix_bytes % 16 != 0 ||
+        !(cursor >= 0.0 && cursor < 18446744073709551616.0) || !(step > 0.0 && step < 18446744073709551616.0) ||
+        source_frames > UINT64_MAX - source_start) return cursor;
+    if (!silent && (source == NULL || channels < 1 || channels > 2 ||
+        (bits != 8 && bits != 16 && bits != 24 && bits != 32) || block_align < channels * sample_bytes ||
+        source_bytes > SIZE_MAX || source_frames > source_bytes / (uint32_t)block_align)) return cursor;
+    while (output_frame + count < mix_frames && cursor >= (double)source_start &&
+           cursor < (double)(source_start + source_frames)) {
+        /* Double rounding at large absolute offsets must not turn the lower
+         * bound into an unsigned underflow or round past the last source frame. */
+        frame = (uint64_t)cursor;
+        if (frame < source_start || frame - source_start >= source_frames) break;
+        frame -= source_start;
+        if (!silent) {
+            const uint8_t* sample = pcm + (size_t)frame * (uint32_t)block_align;
+            double left = mpAudioPcmSample(sample, bits);
+            double right = channels == 1 ? left : mpAudioPcmSample(sample + sample_bytes, bits);
+            mix[(output_frame + count) * 2] += (left * left_gain) / 100.0;
+            mix[(output_frame + count) * 2 + 1] += (right * right_gain) / 100.0;
+        }
+        cursor += step;
+        ++count;
+    }
+    memcpy(result, &count, sizeof(count));
+    return cursor;
+}
+
+MP_API int32_t mpAudioMixFinish(
+    const void* source, uint64_t source_bytes, void* destination, uint64_t destination_bytes, uint64_t frames)
+{
+    uint64_t sample;
+    const double* mix = (const double*)source;
+    uint8_t* pcm = (uint8_t*)destination;
+    if (source == NULL || destination == NULL || source_bytes > SIZE_MAX || destination_bytes > SIZE_MAX ||
+        frames > source_bytes / 16 || frames > destination_bytes / 4) return 0;
+    for (sample = 0; sample < frames * 2; ++sample) {
+        double value = mix[sample];
+        int32_t integer;
+        uint16_t packed;
+        if (value != value) integer = 0;
+        else if (value <= -32768.0) integer = -32768;
+        else if (value >= 32767.0) integer = 32767;
+        else {
+            integer = (int32_t)value;
+            if ((double)integer > value) --integer; /* floor, including negatives */
+        }
+        packed = (uint16_t)integer;
+        pcm[sample * 2] = (uint8_t)packed;
+        pcm[sample * 2 + 1] = (uint8_t)(packed >> 8);
+    }
+    return 1;
+}
+
 MP_API int32_t mpAssetDecodeLz4(
     void* destination, uint64_t destination_size,
     const void* source, uint64_t source_buffer_size,

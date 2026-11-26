@@ -71,6 +71,8 @@ struct GameConfig
   designHeight
   /// Optional Steam settings, generated from minipixels.json for Steam builds.
   steam
+  /// Fixed-update debt policy: discard (legacy) or retain.
+  catchUpPolicy
 end struct
 
 /// Represents the game data used by the minipixels module.
@@ -127,7 +129,7 @@ function createConfig(title, width, height, scale)
   if width <= 0 then width = 320 end if
   if height <= 0 then height = 180 end if
   if scale <= 0 then scale = 4 end if
-  return GameConfig(title, width, height, scale, 60, 0.25, 5, false, 120, "auto", "stretch", false, 60, true, "fixed", 1.0, 33554432, width, height, steam.defaults())
+  return GameConfig(title, width, height, scale, 60, 0.25, 5, false, 120, "auto", "stretch", false, 60, true, "fixed", 1.0, 33554432, width, height, steam.defaults(), "discard")
 end function
 
 /// Creates game for the minipixels module.
@@ -156,7 +158,7 @@ function createGame(cfg)
 end function
 
 /// Performs the version operation for the minipixels module.
-function version() return "0.22.0" end function
+function version() return "0.22.1" end function
 /// Updates renderer maintained by the minipixels module.
 /// @param cfg Configuration used by the operation.
 /// @param renderer renderer value consumed by this operation.
@@ -342,6 +344,20 @@ end function
 function setPauseWhenUnfocused(cfg, enabled)
   if cfg is GameConfig then cfg.pauseWhenUnfocused = enabled == true end if
   return cfg
+end function
+/// Selects whether capped fixed-update work is retained for later frames.
+/// @param cfg Configuration to update.
+/// @param policy "retain" preserves simulation time; "discard" is the legacy policy.
+function setCatchUpPolicy(cfg, policy)
+  if cfg is GameConfig and (policy == "retain" or policy == "discard") then cfg.catchUpPolicy = policy end if
+  return cfg
+end function
+/// Clears queued simulation work when an application enters its own pause/menu.
+/// The cleared debt is recorded separately in time.pausedBacklogSeconds.
+/// @param game Game whose fixed-update debt should be cleared.
+function clearCatchUpDebt(game)
+  if game is Game then tm.pauseFixedUpdates(game.time) end if
+  return game
 end function
 /// Performs the activeRenderer operation for the minipixels module.
 /// @param game game value consumed by this operation.
@@ -847,12 +863,10 @@ function run(cfg, initialize, update, render, shutdown)
   lastTime = win.seconds()
   nextFrameTime = lastTime
   nextTitleTime = lastTime
-  accumulator = 0.0
   while game.running and win.running() and typeof(failure) != "error"
     now = win.seconds()
     dt = now - lastTime
     lastTime = now
-    if dt > cfg.maxFrameSeconds then dt = cfg.maxFrameSeconds end if
 
     win.pollEvents(w)
     syncRenderResolution(game)
@@ -862,31 +876,31 @@ function run(cfg, initialize, update, render, shutdown)
       inp.suppress(game.input)
       if game.steam.config.pauseOnOverlay then
         dt = 0
-        accumulator = 0
+        tm.pauseFixedUpdates(game.time)
       end if
     end if
     if game.input.escape then game.running = false end if
-    if cfg.pauseWhenUnfocused and win.hasFocus(w) == false then dt = 0 end if
+    if cfg.pauseWhenUnfocused and win.hasFocus(w) == false then
+      dt = 0
+      tm.pauseFixedUpdates(game.time)
+    end if
 
-    tm.beginFrame(game.time, dt)
+    tm.beginFixedFrame(game.time, dt, cfg.maxFrameSeconds, cfg.catchUpPolicy)
     if now >= nextTitleTime then
       win.setTitle(w, cfg.title + " FPS " + mt.floorInt(game.time.fps) + " " + win.rendererName(w))
       nextTitleTime = now + 0.25
     end if
-    accumulator = accumulator + dt
     updates = 0
-    while accumulator >= game.time.fixedDelta and updates < cfg.maxCatchUpUpdates
+    while game.time.backlogSeconds >= game.time.fixedDelta and updates < cfg.maxCatchUpUpdates
       game.input.beginUpdate()
       failure = try(callUpdate(update, game, game.time.fixedDelta))
       if typeof(failure) != "error" then failure = try(scn.updateCurrent(game.scenes, game, game.time.fixedDelta)) end if
       game.input.endUpdate()
       if typeof(failure) == "error" then break end if
-      tm.countUpdate(game.time)
-      accumulator = accumulator - game.time.fixedDelta
+      tm.consumeFixedUpdate(game.time)
       updates = updates + 1
     end while
-    if updates >= cfg.maxCatchUpUpdates and accumulator >= game.time.fixedDelta then accumulator = 0 end if
-    tm.finishFrame(game.time, accumulator / game.time.fixedDelta)
+    tm.finishFixedFrame(game.time, updates, cfg.maxCatchUpUpdates, cfg.catchUpPolicy)
     aud.update(game.audio)
 
     cv.resetStats(game.canvas)

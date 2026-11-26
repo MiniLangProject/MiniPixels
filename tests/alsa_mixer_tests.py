@@ -6,12 +6,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tools'))
-from build_audio_runtime import _wsl_path
+from build_audio_runtime import _wsl_path, ensure_audio_runtime
 
 
 def run(compiler):
     output = ROOT / 'build/tests/alsa-isolated'
     output.mkdir(parents=True, exist_ok=True)
+    ensure_audio_runtime("linux-x64", output)
     native = _wsl_path if os.name == 'nt' else str
     prefix = ['wsl.exe', '-d', os.environ.get('MINIPIXELS_WSL_DISTRO', 'Ubuntu'), '--'] if os.name == 'nt' else []
     subprocess.run(prefix + ['gcc', '-shared', '-fPIC', native(ROOT / 'tests/fixtures/alsa_mock.c'), '-o', native(output / 'libasound.so.2')], check=True)

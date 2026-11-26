@@ -861,11 +861,26 @@ function blendTransparentSpriteRow(destination as bytes, source as bytes, di as 
       else
         da = destination[di + 3]
         inv = 255 - a
-        outA = a + mt.floorInt((da * inv) / 255)
-        destination[di] = mt.floorInt(((source[si] * a) + mt.floorInt((destination[di] * da * inv) / 255)) / outA)
-        destination[di + 1] = mt.floorInt(((source[si + 1] * a) + mt.floorInt((destination[di + 1] * da * inv) / 255)) / outA)
-        destination[di + 2] = mt.floorInt(((source[si + 2] * a) + mt.floorInt((destination[di + 2] * da * inv) / 255)) / outA)
-        destination[di + 3] = outA
+        if da == 255 then
+          // A transparent render target can still contain opaque HUD panels.
+          // Integer division by 255 is exact for the bounded channel sum.
+          red = source[si] * a + destination[di] * inv
+          green = source[si + 1] * a + destination[di + 1] * inv
+          blue = source[si + 2] * a + destination[di + 2] * inv
+          destination[di] = (red + 1 + (red >> 8)) >> 8
+          destination[di + 1] = (green + 1 + (green >> 8)) >> 8
+          destination[di + 2] = (blue + 1 + (blue >> 8)) >> 8
+        else
+          // Keep full alpha precision until division. Rounding coverage first
+          // can produce RGB above 255 for low-alpha source/destination pairs.
+          sourceWeight = a * 255
+          destinationWeight = da * inv
+          coverage = sourceWeight + destinationWeight
+          destination[di] = (source[si] * sourceWeight + destination[di] * destinationWeight) div coverage
+          destination[di + 1] = (source[si + 1] * sourceWeight + destination[di + 1] * destinationWeight) div coverage
+          destination[di + 2] = (source[si + 2] * sourceWeight + destination[di + 2] * destinationWeight) div coverage
+          destination[di + 3] = coverage div 255
+        end if
       end if
     end if
     di = di + 4

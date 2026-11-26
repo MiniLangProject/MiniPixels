@@ -40,6 +40,13 @@ extern function mpAudioMp3Seek(handle as ptr, frame as u64) from "minipixels_aud
 /// Releases an MP3 decoder handle.
 /// @param handle Open native MP3 decoder.
 extern function mpAudioMp3Close(handle as ptr) from "minipixels_audio.dll" returns void
+/// Clears reusable double-precision PCM accumulation storage.
+extern function mpAudioMixClear(destination as bytes, size as u64) from "minipixels_audio.dll" returns void
+/// Accumulates a bounded PCM segment and returns its advanced source cursor.
+/// Result is an eight-byte output containing the number of destination frames.
+extern function mpAudioMixPcm(destination as bytes, mixBytes as u64, outputFrame as u64, source as bytes, sourceBytes as u64, sourceStart as u64, sourceFrames as u64, channels as i32, bits as i32, blockAlign as i32, cursor as double, step as double, leftGain as double, rightGain as double, result as bytes) from "minipixels_audio.dll" returns double
+/// Floors, clips and writes a complete stereo signed-16 output buffer.
+extern function mpAudioMixFinish(source as bytes, sourceBytes as u64, destination as bytes, destinationBytes as u64, frames as u64) from "minipixels_audio.dll" returns i32
 /// Invokes the legacy PlaySoundW file entry point.
 /// @param path UTF-16 WAV file path.
 /// @param module Optional resource module handle.
@@ -96,6 +103,13 @@ extern function mpAudioMp3FrameCount(handle as ptr) from "$ORIGIN/libminipixels_
 extern function mpAudioMp3Read(handle as ptr, output as bytes, frames as u64) from "$ORIGIN/libminipixels_audio.so" returns u64
 extern function mpAudioMp3Seek(handle as ptr, frame as u64) from "$ORIGIN/libminipixels_audio.so" returns i32
 extern function mpAudioMp3Close(handle as ptr) from "$ORIGIN/libminipixels_audio.so" returns void
+/// Clears reusable double-precision PCM accumulation storage.
+extern function mpAudioMixClear(destination as bytes, size as u64) from "$ORIGIN/libminipixels_audio.so" returns void
+/// Accumulates a bounded PCM segment and returns its advanced source cursor.
+/// Result is an eight-byte output containing the number of destination frames.
+extern function mpAudioMixPcm(destination as bytes, mixBytes as u64, outputFrame as u64, source as bytes, sourceBytes as u64, sourceStart as u64, sourceFrames as u64, channels as i32, bits as i32, blockAlign as i32, cursor as double, step as double, leftGain as double, rightGain as double, result as bytes) from "$ORIGIN/libminipixels_audio.so" returns double
+/// Floors, clips and writes a complete stereo signed-16 output buffer.
+extern function mpAudioMixFinish(source as bytes, sourceBytes as u64, destination as bytes, destinationBytes as u64, frames as u64) from "$ORIGIN/libminipixels_audio.so" returns i32
 /// Opens an ALSA PCM stream.
 extern function snd_pcm_open(handle as bytes, name as cstr, stream as int, mode as int) from "libasound.so.2" returns i32
 /// Configures a simple interleaved PCM stream.
@@ -317,9 +331,9 @@ struct AudioMixer
   bufferFrames
   /// Number of queued buffers.
   bufferCount
-  /// Reusable left-channel mixing accumulator.
+  /// Legacy left-channel scratch array, retained for source compatibility.
   mixLeft
-  /// Reusable right-channel mixing accumulator.
+  /// Legacy right-channel scratch array, retained for source compatibility.
   mixRight
   /// Whether the native PCM backend is open.
   ready
@@ -329,6 +343,10 @@ struct AudioMixer
   pendingFrames
   /// First unwritten frame in the retained ALSA buffer.
   pendingOffset
+  /// Reusable interleaved float64 accumulator, owned by the managed mixer.
+  nativeMix
+  /// Reusable native result storage; never retained by the native bridge.
+  mixResult
 
   /// Sets master volume for subsequently mixed samples.
   /// @param value Percentage from 0 through 100.
@@ -473,7 +491,7 @@ function mixer(maxChannels)
   return AudioMixer(
     create(), channels, maxChannels, 0, void, channel(-1), MIXER_SAMPLE_RATE,
     0, bytes(8, 0), bytes(18, 0), array(MIXER_BUFFER_COUNT), array(MIXER_BUFFER_COUNT),
-    frames, MIXER_BUFFER_COUNT, array(frames, 0), array(frames, 0), false, 0, 0, 0
+    frames, MIXER_BUFFER_COUNT, array(frames, 0), array(frames, 0), false, 0, 0, 0, bytes(frames * 16, 0), bytes(8, 0)
   )
 end function
 
@@ -865,6 +883,12 @@ end function
 /// @param sourceFrame Absolute source frame needed by the mixer.
 function refillVoiceStream(voice, sourceFrame)
   source = voice.clip
+  // Silent voices advance without decoding. Seek once when they become audible.
+  if voice.streamFrames < 0 then
+    if mpAudioMp3Seek(voice.decoder, sourceFrame) == 0 then voice.playing = false return voice end if
+    voice.streamStart = sourceFrame
+    voice.streamFrames = 0
+  end if
   while voice.playing and (voice.streamFrames <= 0 or sourceFrame < voice.streamStart or sourceFrame >= voice.streamStart + voice.streamFrames)
     if voice.streamFrames > 0 then voice.streamStart = voice.streamStart + voice.streamFrames end if
     voice.streamFrames = mpAudioMp3Read(voice.decoder, voice.streamData, MP3_STREAM_FRAMES)
@@ -896,19 +920,29 @@ function streamSampleAt(voice, sourceFrame, side)
   return sample
 end function
 
-/// Accumulates one voice into reusable stereo mix arrays and returns its new state.
-/// @param value Destination mixer.
+/// Accumulates one voice in bounded native batches, retaining language-owned state.
+/// Sample decoding, gain multiplication and cursor steps keep their original order.
+/// Silent voices still reach clip endings and loop boundaries without reading PCM.
+/// @param value Destination mixer with reusable native accumulation storage.
 /// @param voice Voice to advance.
 /// @param busVolume Bus volume percentage.
 function mixVoice(value, voice, busVolume)
   if voice.playing == false or voice.clip is not AudioClip then return voice end if
   source = voice.clip
-  gain = effectiveClipVolume(value.audio, busVolume, (voice.volume * source.volume) / 100)
+  if source.frameCount <= 0 or source.sampleRate <= 0 or value.sampleRate <= 0 then
+    voice.playing = false
+    return closeVoiceDecoder(voice)
+  end if
+  // Normalize the public percentages before multiplication. Normalizing their
+  // fractional product would incorrectly replace e.g. 33% * 20% with 100%.
+  gain = (effectiveVolume(value.audio, busVolume) * normalizeVolume(voice.volume) * normalizeVolume(source.volume)) / 10000
   pan = normalizePan(voice.pan)
   leftGain = gain
   rightGain = gain
   if pan < 0 then rightGain = (rightGain * (100 + pan)) / 100 end if
   if pan > 0 then leftGain = (leftGain * (100 - pan)) / 100 end if
+  silent = leftGain == 0 and rightGain == 0
+  step = source.sampleRate / value.sampleRate
   frame = 0
   while frame < value.bufferFrames and voice.playing
     sourceFrame = mt.floorInt(voice.cursor)
@@ -916,44 +950,47 @@ function mixVoice(value, voice, busVolume)
       if source.looping then
         voice.cursor = voice.cursor % source.frameCount
         sourceFrame = mt.floorInt(voice.cursor)
-        if voice.decoder != 0 then
-          mpAudioMp3Seek(voice.decoder, sourceFrame)
-          voice.streamStart = sourceFrame
-          voice.streamFrames = 0
-        end if
+        if voice.decoder != 0 then voice.streamFrames = -1 end if
       else
         voice.playing = false
         break
       end if
     end if
-    left = 0
-    right = 0
-    if voice.decoder != 0 then
+    data = source.sampleData
+    start = 0
+    count = source.frameCount
+    bits = source.bitsPerSample
+    if silent then
+      // The native kernel skips all sample reads for zero gain. A small retained
+      // buffer supplies a valid ABI pointer even for a streaming MP3 source.
+      data = value.mixResult
+      if voice.decoder != 0 then voice.streamFrames = -1 end if
+    else if voice.decoder != 0 then
       voice = refillVoiceStream(voice, sourceFrame)
       if not voice.playing then break end if
-      left = streamSampleAt(voice, sourceFrame, 0)
-      right = streamSampleAt(voice, sourceFrame, 1)
-    else
-      left = sampleAt(source, sourceFrame, 0)
-      right = sampleAt(source, sourceFrame, 1)
+      data = voice.streamData
+      start = voice.streamStart
+      count = voice.streamFrames
+      if count > source.frameCount - start then count = source.frameCount - start end if
+      bits = 16
     end if
-    value.mixLeft[frame] = value.mixLeft[frame] + ((left * leftGain) / 100)
-    value.mixRight[frame] = value.mixRight[frame] + ((right * rightGain) / 100)
-    voice.cursor = voice.cursor + (source.sampleRate / value.sampleRate)
-    frame = frame + 1
+    voice.cursor = mpAudioMixPcm(value.nativeMix, len(value.nativeMix), frame, data, len(data), start, count, source.channels, bits, source.blockAlign, voice.cursor, step, leftGain, rightGain, value.mixResult)
+    mixed = getU32(value.mixResult, 0)
+    if mixed <= 0 then voice.playing = false break end if
+    frame = frame + mixed
   end while
   if not voice.playing then voice = closeVoiceDecoder(voice) end if
   return voice
 end function
 
 /// Mixes active voices into one interleaved stereo 16-bit output buffer.
+/// Native storage grows only when the configured buffer size changes.
 /// @param value Source mixer.
 /// @param output Destination interleaved PCM buffer.
 function mixBuffer(value, output)
-  for frame = 0 to value.bufferFrames - 1
-    value.mixLeft[frame] = 0
-    value.mixRight[frame] = 0
-  end for
+  required = value.bufferFrames * 16
+  if len(value.nativeMix) != required then value.nativeMix = bytes(required, 0) end if
+  mpAudioMixClear(value.nativeMix, len(value.nativeMix))
   for index = 0 to value.channelCount - 1
     voice = value.channels[index]
     if voice.playing then value.channels[index] = mixVoice(value, voice, value.audio.sfxVolume) end if
@@ -962,17 +999,7 @@ function mixBuffer(value, output)
     value.musicChannel = mixVoice(value, value.musicChannel, value.audio.musicVolume)
     if value.musicChannel.playing == false then value.music = void end if
   end if
-  for frame = 0 to value.bufferFrames - 1
-    left = mt.clamp(mt.floorInt(value.mixLeft[frame]), -32768, 32767)
-    right = mt.clamp(mt.floorInt(value.mixRight[frame]), -32768, 32767)
-    offset = frame * 4
-    if left < 0 then left = left + 65536 end if
-    if right < 0 then right = right + 65536 end if
-    output[offset] = left & 255
-    output[offset + 1] = (left >> 8) & 255
-    output[offset + 2] = right & 255
-    output[offset + 3] = (right >> 8) & 255
-  end for
+  mpAudioMixFinish(value.nativeMix, len(value.nativeMix), output, len(output), value.bufferFrames)
   return output
 end function
 

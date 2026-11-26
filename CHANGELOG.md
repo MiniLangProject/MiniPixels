@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.22.1 - 2026-11-26
+
+- Batch PCM sample accumulation and final conversion in the existing native audio bridge, using reusable managed buffers and no per-sample managed allocations.
+- Advance silent voice timelines without PCM reads or MP3 decoding; seek streaming sources when they become audible and retain loop/end behavior.
+- Correct fractional channel/clip volume products that previously reverted to full volume.
+- Blend opaque pixels inside transparent render targets with exact integer arithmetic; retain full alpha coverage in partial-alpha blending to prevent RGB overflow.
+- Add explicit retain/discard fixed-update debt policy and observable backlog/discard/pause counters. Legacy discard remains the default.
+- Rebuild the native audio bridge alongside applications to provide the new bounded PCM entry points.
+
 ## 0.22.0 - 2026-11-10
 
 - Integrate the optional Windows/OpenGL `minipixels.graphics.scene3d` layer from the local renderer experiment.
