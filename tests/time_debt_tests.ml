@@ -61,9 +61,30 @@ function explicitDiscardAndPause()
   test.assertTrue(game.time.updateNumber <= 1, "resume cannot replay pre-pause updates")
 end function
 
+function runningWorldReplacement()
+  game = mp.createGame(mp.createConfig("Replacement", 1, 1, 1))
+  tm.beginFixedFrame(game.time, 0.4, 0.25, "retain")
+  oldDebt = game.time.backlogSeconds
+  running = game.running
+  mp.resetSimulationClock(game)
+  test.assertEqual(game.running, running, "reset does not require a running-state transition")
+  test.assertEqual(game.time.backlogSeconds, 0, "old world debt is cleared")
+  test.assertApproxEqual(game.time.pausedBacklogSeconds, oldDebt, 0.0000001, "old world debt is accounted separately")
+  count = frame(game.time, 2.6, 32, "retain")
+  test.assertEqual(count, 0, "synchronous loading time does not update the new world")
+  test.assertEqual(game.time.backlogSeconds, 0, "loading time cannot replay later")
+  test.assertApproxEqual(game.time.pausedElapsedSeconds, 2.6, 0.0000001, "loading wall interval is an intentional pause")
+  test.assertEqual(game.time.droppedSeconds, 0, "loading time is not overload discard")
+  test.assertApproxEqual(game.time.elapsed, 3.0, 0.0000001, "wall elapsed includes the measured load")
+  count = frame(game.time, game.time.fixedDelta, 32, "retain")
+  test.assertEqual(count, 1, "the next ordinary frame resumes fixed updates")
+  test.assertApproxEqual(game.time.pausedElapsedSeconds, 2.6, 0.0000001, "only one sampled interval is skipped")
+end function
+
 function main(args)
   suite = test.Suite.new("Fixed-update debt")
   suite.add("retained wall time and recovery", retainedTime)
   suite.add("explicit discard and pause", explicitDiscardAndPause)
+  suite.add("running world replacement", runningWorldReplacement)
   return test.run([suite], args)
 end function

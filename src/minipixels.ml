@@ -359,6 +359,14 @@ function clearCatchUpDebt(game)
   if game is Game then tm.pauseFixedUpdates(game.time) end if
   return game
 end function
+/// Resets simulation timing after replacing a world synchronously.
+/// Old debt is cleared; the next wall sample is recorded as intentional pause
+/// in time.pausedElapsedSeconds, without changing wall elapsed/FPS reporting.
+/// @param game Game whose next fixed-update interval should be skipped.
+function resetSimulationClock(game)
+  if game is Game then tm.resetSimulationClock(game.time) end if
+  return game
+end function
 /// Performs the activeRenderer operation for the minipixels module.
 /// @param game game value consumed by this operation.
 function activeRenderer(game)

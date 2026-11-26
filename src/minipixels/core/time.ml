@@ -34,15 +34,19 @@ struct TimeState
   droppedSeconds
   /// Number of rendered frames whose fixed-update budget was exhausted.
   catchUpLimitedFrames
-  /// Queued simulation time intentionally cleared by focus/overlay pauses.
+  /// Queued simulation time intentionally cleared by engine/application pauses.
   pausedBacklogSeconds
+  /// Wall intervals intentionally skipped after a synchronous world replacement.
+  pausedElapsedSeconds
+  /// Whether the next wall sample is a deliberate simulation-clock reset.
+  resetPending
 end struct
 
 /// Creates create for the minipixels core time module.
 /// @param updatesPerSecond updatesPerSecond value consumed by this operation.
 function create(updatesPerSecond)
   if updatesPerSecond <= 0 then updatesPerSecond = 60 end if
-  return TimeState(0, 1.0 / updatesPerSecond, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+  return TimeState(0, 1.0 / updatesPerSecond, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false)
 end function
 
 /// Performs the beginFrame operation for the minipixels core time module.
@@ -85,6 +89,12 @@ end function
 function beginFixedFrame(t, delta, maxFrameSeconds, policy)
   if delta < 0 then delta = 0 end if
   beginFrame(t, delta)
+  if t.resetPending then
+    t.resetPending = false
+    t.pausedElapsedSeconds = t.pausedElapsedSeconds + delta
+    t.delta = 0
+    return
+  end if
   accepted = delta
   if maxFrameSeconds > 0 and t.delta > maxFrameSeconds then
     t.delta = maxFrameSeconds
@@ -117,4 +127,11 @@ end function
 function pauseFixedUpdates(t)
   t.pausedBacklogSeconds = t.pausedBacklogSeconds + t.backlogSeconds
   t.backlogSeconds = 0
+end function
+
+/// Clears old simulation debt and skips the next sampled loading interval.
+/// Wall elapsed time and rate reporting still include that interval.
+function resetSimulationClock(t)
+  pauseFixedUpdates(t)
+  t.resetPending = true
 end function

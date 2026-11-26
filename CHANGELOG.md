@@ -7,6 +7,7 @@
 - Correct fractional channel/clip volume products that previously reverted to full volume.
 - Blend opaque pixels inside transparent render targets with exact integer arithmetic; retain full alpha coverage in partial-alpha blending to prevent RGB overflow.
 - Add explicit retain/discard fixed-update debt policy and observable backlog/discard/pause counters. Legacy discard remains the default.
+- Add `resetSimulationClock(game)` for synchronous world replacement: clear old debt and separately account the next loading interval without replaying it in the new world.
 - Rebuild the native audio bridge alongside applications to provide the new bounded PCM entry points.
 
 ## 0.22.0 - 2026-11-10

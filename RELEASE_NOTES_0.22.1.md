@@ -35,7 +35,12 @@ presentation delta, while retained simulation time includes the full frame.
 The default `"discard"` policy preserves the existing clamp/discard behavior.
 Render interpolation remains between zero and one under either policy.
 Applications with their own pause or menu should call `clearCatchUpDebt(game)`
-on entering that state, so pre-pause debt cannot replay after resuming.
+on entering that state, so pre-pause debt cannot replay after resuming. After a
+synchronous load or world replacement, call `resetSimulationClock(game)` instead:
+it also skips the next measured wall interval, which includes the loading work.
+`time.pausedElapsedSeconds` accounts that deliberate skip; elapsed wall time and
+FPS reporting still include the measured interval. Normal updates resume on the
+following interval even if the application never changed its running flag.
 
 Inspect `game.time.backlogSeconds`, `droppedSeconds`, `catchUpLimitedFrames` and
 `pausedBacklogSeconds`. Discard counters include frame-clamp and update-budget
