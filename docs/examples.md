@@ -172,7 +172,7 @@ python tools/capture_examples.py --update-docs
 For Linux, pass `--target linux-x64` to both commands. Capture runs 60 deterministic
 headless engine frames per scene, validates all five examples and all three Jump
 and Run levels, and writes a contact sheet to `build/example-previews/overview.png`.
-The same capture smoke checks run on Windows and Linux in CI. Individual executables
+Run the same capture smoke checks locally on Windows and Linux. Individual executables
 also accept `--screenshot output.png`; Jump and Run additionally accepts
 `--screenshot output.png play 0` (level indices 0, 1, or 2).
 

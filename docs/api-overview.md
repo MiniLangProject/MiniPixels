@@ -319,7 +319,7 @@ MiniPixels exposes the entry through a loopback-only, tokenized HTTP range sourc
 python tools\package_sdk.py
 ```
 
-This writes `dist/MiniPixels-<version>-sdk.zip` and a `.sha256` file. GitHub Actions uploads the SDK bundle as a workflow artifact and publishes it as a release asset when a `v*` tag is pushed.
+This writes `dist/MiniPixels-<version>-sdk.zip` and a `.sha256` file locally. Run the tests and example builds locally, then upload the verified SDK bundle and checksum to the matching GitHub release manually. Pushing a tag does not build or publish artifacts.
 
 ## Tilemaps
 

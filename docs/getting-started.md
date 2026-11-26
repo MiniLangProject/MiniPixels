@@ -37,7 +37,7 @@ python tools\minipixels.py build examples\moving-sprite\minipixels.json --compil
 python tests\run_tests.py --target linux-x64
 ```
 
-Cross-target tests execute Linux binaries and the native media regressions inside WSL. Install Python 3 and `cryptography` there (Ubuntu: `sudo apt-get install python3-cryptography`), plus the GStreamer and OpenSSL packages listed in the README. Native Linux CI installs these runtime/build dependencies before running the same suite.
+Cross-target tests execute Linux binaries and the native media regressions inside WSL. Install Python 3 and `cryptography` there (Ubuntu: `sudo apt-get install python3-cryptography`), plus the GStreamer and OpenSSL packages listed in the README. For native Linux tests, install these runtime/build dependencies locally before running the same suite.
 
 There is also a native MiniLang CLI for the pieces that have already moved out of Python:
 
@@ -102,7 +102,7 @@ The ALSA refill drains available capacity with a bounded number of writes per up
 
 ## Implemented now
 
-Canvas, render targets, rotated sprites, deterministic PNG screenshots, cached signed/encrypted `.mpx` asset packs, localized text, generated constants/data, general non-interlaced PNG loading, native asset/Tiled generation, sprite sheets, scene stacks, animation, camera, tilemaps, parallax, swept collision, bitmap text, buffered configurable input, a real multi-voice PCM mixer, headless/visual regression tests, Win32 GDI/OpenGL and Linux X11/XImage presentation, an experimental batched Windows GPU scene canvas, CLI, cross-platform CI, SDK packaging, and examples are present.
+Canvas, render targets, rotated sprites, deterministic PNG screenshots, cached signed/encrypted `.mpx` asset packs, localized text, generated constants/data, general non-interlaced PNG loading, native asset/Tiled generation, sprite sheets, scene stacks, animation, camera, tilemaps, parallax, swept collision, bitmap text, buffered configurable input, a real multi-voice PCM mixer, headless/visual regression tests, Win32 GDI/OpenGL and Linux X11/XImage presentation, an experimental batched Windows GPU scene canvas, CLI, local cross-platform tests, SDK packaging, and examples are present.
 
 ## Not yet in the engine
 
