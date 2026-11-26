@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Add portable Canvas 3D geometry with perspective and orthographic projection,
+  flat-shaded triangle meshes, 16-bit depth testing, and static color/depth caches.
+- Add headless projection, occlusion, cache, empty-mesh, and integral-depth tests.
+  Document the limited CPU renderer and the required compiler default-argument fix.
+
 ## 0.22.1 - 2026-11-26
 
 - Batch PCM sample accumulation and final conversion in the existing native audio bridge, using reusable managed buffers and no per-sample managed allocations.

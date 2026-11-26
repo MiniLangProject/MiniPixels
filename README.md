@@ -17,6 +17,12 @@ the 3D module returns unsupported results there. See the [3D guide](docs/scene3d
 for lifecycle, integration contracts and limitations. This is an experimental
 fixed-camera layer, without a general model importer or automatic 3D shadows.
 
+Portable CPU 3D is available through `minipixels.graphics.geometry3d`: arbitrary
+flat-shaded triangles, perspective/orthographic cameras, primitive mesh builders,
+16-bit per-pixel depth, and reusable color/depth caches on an ordinary Canvas.
+It also works in headless Linux captures. See the [portable geometry guide](docs/geometry3d.md)
+for API examples, limits, and the required compiler fix for default arguments.
+
 MiniPixels is a pixel-oriented 2D game engine prototype for MiniLang. The current source targets MiniLang Compiler 1.3.12 and builds native Windows x64 PE and Linux x64 ELF executables.
 
 MiniPixels focuses on a small but working 2D engine slice: native Win32 and X11 windows, fixed/native/scaled framebuffers, OpenGL/WGL, GDI and XImage presentation, an optional batched Windows GPU scene canvas, configurable keyboard/mouse actions, sprites and rotated render targets, signed and optionally encrypted asset packs, localized text and generated game data, scene stacks, swept tile collision, bitmap text, multi-voice WAV/MP3 audio through waveOut or ALSA, streamed MPX audio/video, headless tests, and example projects.
