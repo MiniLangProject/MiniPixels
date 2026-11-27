@@ -68,6 +68,17 @@ struct Texture
   bilinear as bool
 end struct
 
+/// Repeating UVs for physical materials; the legacy Texture remains clamped.
+struct RepeatingTexture
+  width as int
+  height as int
+  pixels as bytes
+  opaque as bool
+  tint as int
+  alphaCutoff as int
+  bilinear as bool
+end struct
+
 struct TexturedTriangle
   a
   b
@@ -83,6 +94,8 @@ struct Mesh
   triangles
   count as int
   capacity as int
+  albedo
+  lighting
 end struct
 
 struct Surface
@@ -96,6 +109,375 @@ end struct
 /// Creates a camera looking towards increasing Y with upward world Z.
 function camera(centerX, centerY, scale, targetX=0.0, targetY=0.6, targetZ=0.0, pitch=0.94, yaw=0.0, distance=2.6, perspective=true)
   return Camera(toFloat(centerX),toFloat(centerY),toFloat(scale),toFloat(targetX),toFloat(targetY),toFloat(targetZ),toFloat(math.sin(pitch)),toFloat(math.cos(pitch)),toFloat(math.sin(yaw)),toFloat(math.cos(yaw)),toFloat(distance),perspective,0.05)
+end function
+
+/// A finite point source. Intensity falls smoothly to zero at range.
+struct PointLight
+  x
+  y
+  z
+  color
+  intensity
+  range
+end struct
+
+/// World-space illumination shared by meshes. Direction points toward the key.
+struct Lighting
+  x
+  y
+  z
+  ambient
+  color
+  intensity
+  points
+  shadow
+  shadowCamera
+  shadowBias
+end struct
+
+/// Creates a normalized directional source and a colored ambient contribution.
+function lighting(x=-0.32,y=-0.43,z=0.84,ambient=0x454952ff,color=0xffefd9ff,intensity=0.86)
+  length = math.sqrt(x*x+y*y+z*z)
+  if length < 0.0000001 then x = 0.0; y = 0.0; z = 1.0; length = 1.0 end if
+  return Lighting(x/length,y/length,z/length,ambient,color,math.max(0.0,intensity),[],void,void,0.0025)
+end function
+
+/// Adds a colored lamp; range and intensity are clamped to nonnegative values.
+function addPointLight(lights,x,y,z,color,intensity=1.0,range=0.25)
+  lights.points = lights.points + [PointLight(x,y,z,color,math.max(0.0,intensity),math.max(0.00001,range))]
+end function
+
+/// Computes Lambert diffuse and a view-dependent Blinn specular highlight.
+/// Albedo is retained separately from the legacy baked triangle color.
+function illuminate(color,nx,ny,nz,x,y,z,c,lights,specular=0.0,shininess=48)
+  normalLength = math.sqrt(nx*nx+ny*ny+nz*nz)
+  if normalLength < 0.0000001 then return color end if
+  nx=nx/normalLength; ny=ny/normalLength; nz=nz/normalLength
+  red = ((lights.ambient>>24)&255)/255.0
+  green = ((lights.ambient>>16)&255)/255.0
+  blue = ((lights.ambient>>8)&255)/255.0
+  key = math.max(0.0,nx*lights.x+ny*lights.y+nz*lights.z)*lights.intensity
+  visibility=1.0
+  if typeof(lights.shadow) != "void" then visibility=shadowVisibility(lights.shadow,lights.shadowCamera,x,y,z,lights.shadowBias) end if
+  key=key*visibility
+  red=red+key*((lights.color>>24)&255)/255.0
+  green=green+key*((lights.color>>16)&255)/255.0
+  blue=blue+key*((lights.color>>8)&255)/255.0
+  vx=c.targetX-c.sinYaw*c.cosPitch*c.distance-x
+  vy=c.targetY-c.cosYaw*c.cosPitch*c.distance-y
+  vz=c.targetZ+c.sinPitch*c.distance-z
+  viewLength=math.sqrt(vx*vx+vy*vy+vz*vz)
+  if viewLength < 0.0000001 then viewLength=1.0 end if
+  vx=vx/viewLength; vy=vy/viewLength; vz=vz/viewLength
+  shineRed=0.0; shineGreen=0.0; shineBlue=0.0
+  if specular > 0.0 and key > 0.0 then
+    hx=lights.x+vx; hy=lights.y+vy; hz=lights.z+vz
+    halfLength=math.sqrt(hx*hx+hy*hy+hz*hz)
+    if halfLength > 0.0000001 then
+      shine=math.powi(math.max(0.0,(nx*hx+ny*hy+nz*hz)/halfLength),shininess)*specular*lights.intensity*visibility
+      shineRed=shine*((lights.color>>24)&255)
+      shineGreen=shine*((lights.color>>16)&255)
+      shineBlue=shine*((lights.color>>8)&255)
+    end if
+  end if
+  if len(lights.points) > 0 then
+  for i=0 to len(lights.points)-1
+    lamp=lights.points[i]
+    lx=lamp.x-x; ly=lamp.y-y; lz=lamp.z-z
+    distanceSquared=lx*lx+ly*ly+lz*lz
+    if distanceSquared < lamp.range*lamp.range and distanceSquared > 0.000000001 then
+      distance=math.sqrt(distanceSquared)
+      lx=lx/distance; ly=ly/distance; lz=lz/distance
+      attenuation=1.0-distance/lamp.range
+      attenuation=attenuation*attenuation*lamp.intensity
+      diffuse=math.max(0.0,nx*lx+ny*ly+nz*lz)*attenuation
+      red=red+diffuse*((lamp.color>>24)&255)/255.0
+      green=green+diffuse*((lamp.color>>16)&255)/255.0
+      blue=blue+diffuse*((lamp.color>>8)&255)/255.0
+      if specular > 0.0 and diffuse > 0.0 then
+        hx=lx+vx; hy=ly+vy; hz=lz+vz
+        halfLength=math.sqrt(hx*hx+hy*hy+hz*hz)
+        if halfLength > 0.0000001 then
+          shine=math.powi(math.max(0.0,(nx*hx+ny*hy+nz*hz)/halfLength),shininess)*specular*attenuation
+          shineRed=shineRed+shine*((lamp.color>>24)&255)
+          shineGreen=shineGreen+shine*((lamp.color>>16)&255)
+          shineBlue=shineBlue+shine*((lamp.color>>8)&255)
+        end if
+      end if
+    end if
+  end for
+  end if
+  r=math.clamp(math.floorInt(((color>>24)&255)*red+shineRed),0,255)
+  g=math.clamp(math.floorInt(((color>>16)&255)*green+shineGreen),0,255)
+  b=math.clamp(math.floorInt(((color>>8)&255)*blue+shineBlue),0,255)
+  return (r<<24)|(g<<16)|(b<<8)|(color&255)
+end function
+
+/// Draws actual world-space illumination after object rotation and scaling.
+/// Unlit triangles remain emissive. Flat shading is evaluated per face.
+function drawLitAt(s,m,c,lights,tx=0.0,ty=0.0,tz=0.0,angle=0.0,sx=1.0,sy=1.0,sz=1.0,specular=0.0,shininess=48,cullBackfaces=true)
+  if m.count <= 0 then return end if
+  ca=math.cos(angle); sa=math.sin(angle)
+  for i=0 to m.count-1
+    t=m.triangles[i]
+    a=void; b=void; d=void
+    if t is TexturedTriangle then
+      a=Point(tx+t.a.x*sx*ca-t.a.y*sy*sa,ty+t.a.x*sx*sa+t.a.y*sy*ca,tz+t.a.z*sz)
+      b=Point(tx+t.b.x*sx*ca-t.b.y*sy*sa,ty+t.b.x*sx*sa+t.b.y*sy*ca,tz+t.b.z*sz)
+      d=Point(tx+t.c.x*sx*ca-t.c.y*sy*sa,ty+t.c.x*sx*sa+t.c.y*sy*ca,tz+t.c.z*sz)
+    else
+      a=Point(tx+t.ax*sx*ca-t.ay*sy*sa,ty+t.ax*sx*sa+t.ay*sy*ca,tz+t.az*sz)
+      b=Point(tx+t.bx*sx*ca-t.by*sy*sa,ty+t.bx*sx*sa+t.by*sy*ca,tz+t.bz*sz)
+      d=Point(tx+t.cx*sx*ca-t.cy*sy*sa,ty+t.cx*sx*sa+t.cy*sy*ca,tz+t.cz*sz)
+    end if
+    color=m.albedo[i]
+    ux=b.x-a.x; uy=b.y-a.y; uz=b.z-a.z
+    vx=d.x-a.x; vy=d.y-a.y; vz=d.z-a.z
+    nx=uy*vz-uz*vy; ny=uz*vx-ux*vz; nz=ux*vy-uy*vx
+    centerX=(a.x+b.x+d.x)/3.0; centerY=(a.y+b.y+d.y)/3.0; centerZ=(a.z+b.z+d.z)/3.0
+    viewX=c.targetX-c.sinYaw*c.cosPitch*c.distance-centerX
+    viewY=c.targetY-c.cosYaw*c.cosPitch*c.distance-centerY
+    viewZ=c.targetZ+c.sinPitch*c.distance-centerZ
+    if cullBackfaces and m.lighting[i] and nx*viewX+ny*viewY+nz*viewZ <= 0.0 then continue end if
+    if m.lighting[i] then
+      color=illuminate(color,nx,ny,nz,centerX,centerY,centerZ,c,lights,specular,shininess)
+    end if
+    aa=project(c,a.x,a.y,a.z); bb=project(c,b.x,b.y,b.z); dd=project(c,d.x,d.y,d.z)
+    if t is TexturedTriangle then
+      rasterTexturedTriangle(s,aa,bb,dd,t.uvA,t.uvB,t.uvC,t.material,color,c.perspective)
+    else
+      rasterTriangle(s,aa,bb,dd,color,c.perspective)
+    end if
+  end for
+end function
+
+/// Bakes a fixed pose's world lighting into an immutable mesh in world space.
+/// Use drawAt for subsequent frames; rebake after changing view or lights.
+function bakeLitMesh(m,c,lights,tx=0.0,ty=0.0,tz=0.0,angle=0.0,sx=1.0,sy=1.0,sz=1.0,specular=0.0,shininess=48)
+  result=mesh(m.count)
+  if m.count <= 0 then return result end if
+  ca=math.cos(angle); sa=math.sin(angle)
+  for i=0 to m.count-1
+    t=m.triangles[i]
+    a=void; b=void; d=void
+    if t is TexturedTriangle then
+      a=Point(tx+t.a.x*sx*ca-t.a.y*sy*sa,ty+t.a.x*sx*sa+t.a.y*sy*ca,tz+t.a.z*sz)
+      b=Point(tx+t.b.x*sx*ca-t.b.y*sy*sa,ty+t.b.x*sx*sa+t.b.y*sy*ca,tz+t.b.z*sz)
+      d=Point(tx+t.c.x*sx*ca-t.c.y*sy*sa,ty+t.c.x*sx*sa+t.c.y*sy*ca,tz+t.c.z*sz)
+    else
+      a=Point(tx+t.ax*sx*ca-t.ay*sy*sa,ty+t.ax*sx*sa+t.ay*sy*ca,tz+t.az*sz)
+      b=Point(tx+t.bx*sx*ca-t.by*sy*sa,ty+t.bx*sx*sa+t.by*sy*ca,tz+t.bz*sz)
+      d=Point(tx+t.cx*sx*ca-t.cy*sy*sa,ty+t.cx*sx*sa+t.cy*sy*ca,tz+t.cz*sz)
+    end if
+    color=m.albedo[i]
+    if m.lighting[i] then
+      ux=b.x-a.x; uy=b.y-a.y; uz=b.z-a.z; vx=d.x-a.x; vy=d.y-a.y; vz=d.z-a.z
+      nx=uy*vz-uz*vy; ny=uz*vx-ux*vz; nz=ux*vy-uy*vx
+      centerX=(a.x+b.x+d.x)/3.0; centerY=(a.y+b.y+d.y)/3.0; centerZ=(a.z+b.z+d.z)/3.0
+      viewX=c.targetX-c.sinYaw*c.cosPitch*c.distance-centerX
+      viewY=c.targetY-c.cosYaw*c.cosPitch*c.distance-centerY
+      viewZ=c.targetZ+c.sinPitch*c.distance-centerZ
+      if nx*viewX+ny*viewY+nz*viewZ <= 0.0 then continue end if
+      color=illuminate(color,nx,ny,nz,centerX,centerY,centerZ,c,lights,specular,shininess)
+    end if
+    if t is TexturedTriangle then
+      texturedTriangle(result,a,b,d,t.uvA,t.uvB,t.uvC,t.material,false)
+      result.triangles[result.count-1].color=color
+      result.albedo[result.count-1]=color
+    else
+      triangle(result,a.x,a.y,a.z,b.x,b.y,b.z,d.x,d.y,d.z,color,false)
+    end if
+  end for
+  return result
+end function
+
+/// Renders opaque mesh geometry from a light camera into a real depth map.
+/// Transparent texture cutouts should use drawAt instead when they cast shadows.
+function drawDepthAt(s,m,c,tx=0.0,ty=0.0,tz=0.0,angle=0.0,sx=1.0,sy=1.0,sz=1.0)
+  if m.count <= 0 then return end if
+  ca=math.cos(angle); sa=math.sin(angle)
+  for i=0 to m.count-1
+    t=m.triangles[i]
+    a=void; b=void; d=void
+    if t is TexturedTriangle then
+      a=project(c,tx+t.a.x*sx*ca-t.a.y*sy*sa,ty+t.a.x*sx*sa+t.a.y*sy*ca,tz+t.a.z*sz)
+      b=project(c,tx+t.b.x*sx*ca-t.b.y*sy*sa,ty+t.b.x*sx*sa+t.b.y*sy*ca,tz+t.b.z*sz)
+      d=project(c,tx+t.c.x*sx*ca-t.c.y*sy*sa,ty+t.c.x*sx*sa+t.c.y*sy*ca,tz+t.c.z*sz)
+    else
+      a=project(c,tx+t.ax*sx*ca-t.ay*sy*sa,ty+t.ax*sx*sa+t.ay*sy*ca,tz+t.az*sz)
+      b=project(c,tx+t.bx*sx*ca-t.by*sy*sa,ty+t.bx*sx*sa+t.by*sy*ca,tz+t.bz*sz)
+      d=project(c,tx+t.cx*sx*ca-t.cy*sy*sa,ty+t.cx*sx*sa+t.cy*sy*ca,tz+t.cz*sz)
+    end if
+    rasterTriangle(s,a,b,d,0xffffffff,c.perspective)
+  end for
+end function
+
+/// Samples a light's actual occluder depth, with four-tap soft edge filtering.
+function shadowVisibility(shadow,lightCamera,x,y,z,bias=0.002) returns float
+  var dx as float=toFloat(x-lightCamera.targetX)
+  var dy as float=toFloat(y-lightCamera.targetY)
+  var dz as float=toFloat(z-lightCamera.targetZ)
+  var rx as float=toFloat(dx*lightCamera.cosYaw-dy*lightCamera.sinYaw)
+  var ry as float=toFloat(dx*lightCamera.sinYaw+dy*lightCamera.cosYaw)
+  var depth as float=toFloat(lightCamera.distance+ry*lightCamera.cosPitch-dz*lightCamera.sinPitch)
+  if depth <= lightCamera.nearPlane or depth >= 15.99 then return 1.0 end if
+  var factor as float=lightCamera.scale
+  if lightCamera.perspective then factor=toFloat(factor*lightCamera.distance/depth) end if
+  var x0 as int=math.floorInt(toNumber(lightCamera.centerX+rx*factor))
+  var y0 as int=math.floorInt(toNumber(lightCamera.centerY-(ry*lightCamera.sinPitch+dz*lightCamera.cosPitch)*factor))
+  var width as int=shadow.width
+  if x0 < 0 or y0 < 0 or x0+1 >= width or y0+1 >= shadow.height then return 1.0 end if
+  var expected as float=toFloat((depth-bias)*4096.0)
+  var index as int=(y0*width+x0)*2
+  var row as int=width*2
+  var buffer as bytes=shadow.depth
+  var visible as int=0
+  if expected <= (buffer[index]|(buffer[index+1]<<8)) then visible=visible+1 end if
+  if expected <= (buffer[index+2]|(buffer[index+3]<<8)) then visible=visible+1 end if
+  index=index+row
+  if expected <= (buffer[index]|(buffer[index+1]<<8)) then visible=visible+1 end if
+  if expected <= (buffer[index+2]|(buffer[index+3]<<8)) then visible=visible+1 end if
+  return toFloat(visible*0.25)
+end function
+
+/// Applies depth-map occlusion to the completed static receiver surface.
+/// Reconstructs each visible world point from camera depth; receivers can be
+/// vertical, sloping or elevated. Color and depth caches retain the result.
+function applyShadowMap(s,c,shadow,lightCamera,strength=0.54,bias=0.002)
+  var amount as float=toFloat(math.clamp(strength,0.0,1.0))
+  var width as int=s.width
+  var height as int=s.height
+  var depths as bytes=s.depth
+  var output as bytes=s.canvas.pixels
+  var scale as float=c.scale
+  var distance as float=c.distance
+  var centerX as float=c.centerX; var centerY as float=c.centerY
+  var targetX as float=c.targetX; var targetY as float=c.targetY; var targetZ as float=c.targetZ
+  var sinPitch as float=c.sinPitch; var cosPitch as float=c.cosPitch
+  var sinYaw as float=c.sinYaw; var cosYaw as float=c.cosYaw
+  var perspective as bool=c.perspective
+  var index as int=0; var pixel as int=0
+  for y=0 to height-1
+    for x=0 to width-1
+      var encoded as int=depths[index]|(depths[index+1]<<8)
+      if encoded < 65535 then
+        var depth as float=toFloat(encoded/4096.0)
+        var factor as float=scale
+        if perspective then factor=toFloat(factor*distance/depth) end if
+        var rx as float=toFloat((x+0.5-centerX)/factor)
+        var vertical as float=toFloat((centerY-y-0.5)/factor)
+        var delta as float=toFloat(depth-distance)
+        var ry as float=toFloat(vertical*sinPitch+delta*cosPitch)
+        var wz as float=toFloat(targetZ+vertical*cosPitch-delta*sinPitch)
+        var wx as float=toFloat(targetX+rx*cosYaw+ry*sinYaw)
+        var wy as float=toFloat(targetY-rx*sinYaw+ry*cosYaw)
+        var visibility as float=shadowVisibility(shadow,lightCamera,wx,wy,wz,bias)
+        if visibility < 1.0 then
+          var shade as float=toFloat(1.0-amount*(1.0-visibility))
+          output[pixel]=math.floorInt(toNumber(output[pixel]*shade))
+          output[pixel+1]=math.floorInt(toNumber(output[pixel+1]*shade))
+          output[pixel+2]=math.floorInt(toNumber(output[pixel+2]*shade))
+        end if
+      end if
+      index=index+2; pixel=pixel+4
+    end for
+  end for
+  cv.markDirty(s.canvas,0,0,width,height)
+end function
+
+/// Begins a non-accumulating dynamic shadow layer on a cached receiver image.
+function shadowMask(s)
+  return bytes(s.width*s.height,0)
+end function
+
+function _shadowSpan(s,mask as bytes,y as int,x0 as int,x1 as int,depth0 as float,depthStep as float,strength as float,perspective as bool)
+  var depth as float=depth0
+  var fade as float=toFloat(1.0-strength)
+  var index as int=y*s.width+x0
+  var di as int=index*2
+  var pixel as int=index*4
+  var buffer as bytes=s.depth
+  var output as bytes=s.canvas.pixels
+  for x=x0 to x1
+    var actual as float=depth
+    if perspective then actual=toFloat(1.0/depth) end if
+    var encoded as int=math.floorInt(toNumber(actual*4096.0))
+    var prior as int=buffer[di]|(buffer[di+1]<<8)
+    if encoded >= 0 and encoded <= prior+1 and prior < 65535 and mask[index] == 0 then
+      mask[index]=1
+      output[pixel]=math.floorInt(toNumber(output[pixel]*fade))
+      output[pixel+1]=math.floorInt(toNumber(output[pixel+1]*fade))
+      output[pixel+2]=math.floorInt(toNumber(output[pixel+2]*fade))
+    end if
+    depth=toFloat(depth+depthStep)
+    index=index+1; di=di+2; pixel=pixel+4
+  end for
+end function
+
+function _shadowTriangle(s,mask,a,b,c,strength,perspective)
+  if not a.visible or not b.visible or not c.visible then return end if
+  if b.y < a.y then swap=a; a=b; b=swap end if
+  if c.y < a.y then swap=a; a=c; c=swap end if
+  if c.y < b.y then swap=b; b=c; c=swap end if
+  totalHeight=c.y-a.y
+  if totalHeight < 0.000001 then return end if
+  first=math.max(0,math.ceilInt(a.y-0.5)); last=math.min(s.height-1,math.floorInt(c.y-0.5))
+  if first > last then return end if
+  da=a.depth; db=b.depth; dc=c.depth
+  if perspective then da=1.0/da; db=1.0/db; dc=1.0/dc end if
+  for y=first to last
+    sampleY=y+0.5; longT=(sampleY-a.y)/totalHeight
+    lx=a.x+(c.x-a.x)*longT; ld=da+(dc-da)*longT
+    rx=0.0; rd=0.0
+    if sampleY < b.y and b.y-a.y > 0.000001 then
+      shortT=(sampleY-a.y)/(b.y-a.y)
+      rx=a.x+(b.x-a.x)*shortT; rd=da+(db-da)*shortT
+    else
+      if c.y-b.y < 0.000001 then continue end if
+      shortT=(sampleY-b.y)/(c.y-b.y)
+      rx=b.x+(c.x-b.x)*shortT; rd=db+(dc-db)*shortT
+    end if
+    if lx > rx then swap=lx; lx=rx; rx=swap; swap=ld; ld=rd; rd=swap end if
+    width=rx-lx
+    if width > 0.000001 then
+      start=math.max(0,math.ceilInt(lx-0.5)); finish=math.min(s.width-1,math.floorInt(rx-0.5))
+      if start <= finish then
+        step=(rd-ld)/width
+        _shadowSpan(s,mask,y,start,finish,toFloat(ld+(start+0.5-lx)*step),toFloat(step),toFloat(strength),perspective)
+      end if
+    end if
+  end for
+end function
+
+/// Projects the actual moving mesh silhouette along the directional light.
+/// The receiver is one horizontal support plane; the live depth test prevents
+/// the projection painting across objects in front of that plane.
+function drawPlanarShadowAt(s,m,c,lights,mask,receiverZ,tx=0.0,ty=0.0,tz=0.0,angle=0.0,sx=1.0,sy=1.0,sz=1.0,strength=0.42)
+  if m.count <= 0 or lights.z <= 0.00001 then return end if
+  ca=math.cos(angle); sa=math.sin(angle)
+  for i=0 to m.count-1
+    t=m.triangles[i]
+    ax=0.0; ay=0.0; az=0.0; bx=0.0; by=0.0; bz=0.0; cx=0.0; cy=0.0; cz=0.0
+    if t is TexturedTriangle then
+      ax=t.a.x; ay=t.a.y; az=t.a.z; bx=t.b.x; by=t.b.y; bz=t.b.z; cx=t.c.x; cy=t.c.y; cz=t.c.z
+    else
+      ax=t.ax; ay=t.ay; az=t.az; bx=t.bx; by=t.by; bz=t.bz; cx=t.cx; cy=t.cy; cz=t.cz
+    end if
+    wx=ax*sx*ca-ay*sy*sa+tx; wy=ax*sx*sa+ay*sy*ca+ty; ax=wx; ay=wy; az=az*sz+tz
+    wx=bx*sx*ca-by*sy*sa+tx; wy=bx*sx*sa+by*sy*ca+ty; bx=wx; by=wy; bz=bz*sz+tz
+    wx=cx*sx*ca-cy*sy*sa+tx; wy=cx*sx*sa+cy*sy*ca+ty; cx=wx; cy=wy; cz=cz*sz+tz
+    ux=bx-ax; uy=by-ay; uz=bz-az; vx=cx-ax; vy=cy-ay; vz=cz-az
+    facing=(uy*vz-uz*vy)*lights.x+(uz*vx-ux*vz)*lights.y+(ux*vy-uy*vx)*lights.z
+    // Closed caster silhouettes are fully covered by their source-facing skin.
+    if facing <= 0.0 then continue end if
+    da=math.max(0.0,az-receiverZ)/lights.z
+    db=math.max(0.0,bz-receiverZ)/lights.z
+    dc=math.max(0.0,cz-receiverZ)/lights.z
+    a=project(c,ax-lights.x*da,ay-lights.y*da,receiverZ)
+    b=project(c,bx-lights.x*db,by-lights.y*db,receiverZ)
+    d=project(c,cx-lights.x*dc,cy-lights.y*dc,receiverZ)
+    _shadowTriangle(s,mask,a,b,d,strength,c.perspective)
+  end for
 end function
 
 /// Projects one world position into pixel coordinates and camera depth.
@@ -142,7 +524,7 @@ end function
 /// Allocates a growable triangle mesh.
 function mesh(capacity=256)
   if capacity < 1 then capacity = 1 end if
-  return Mesh(array(capacity),0,capacity)
+  return Mesh(array(capacity),0,capacity,array(capacity),array(capacity))
 end function
 
 /// Scales RGB while retaining opaque output.
@@ -165,8 +547,12 @@ function triangle(m, ax,ay,az,bx,by,bz,cx,cy,cz,color,lit=true)
     next = array(m.capacity*2)
     copyArray(next,0,m.triangles,0,m.count)
     m.triangles = next
+    nextAlbedo = array(m.capacity*2); copyArray(nextAlbedo,0,m.albedo,0,m.count); m.albedo = nextAlbedo
+    nextLighting = array(m.capacity*2); copyArray(nextLighting,0,m.lighting,0,m.count); m.lighting = nextLighting
     m.capacity = m.capacity*2
   end if
+  m.albedo[m.count] = color
+  m.lighting[m.count] = lit
   if lit then
     ux = bx-ax
     uy = by-ay
@@ -204,16 +590,26 @@ function texture(image,tint=0xffffffff,alphaCutoff=128,bilinear=true)
   return Texture(image.width,image.height,image.pixels,image.opaque,tint,alphaCutoff,bilinear)
 end function
 
+/// Creates a tiled texture for UVs expressed in world-sized repeats.
+function repeatingTexture(image,tint=0xffffffff,alphaCutoff=128,bilinear=true)
+  base=texture(image,tint,alphaCutoff,bilinear)
+  return RepeatingTexture(base.width,base.height,base.pixels,base.opaque,base.tint,base.alphaCutoff,base.bilinear)
+end function
+
 /// Appends a textured triangle with independent normalized UV coordinates.
 function texturedTriangle(m,a,b,c,uvA,uvB,uvC,material,lit=false)
-  if not (material is Texture) then return false end if
+  if not (material is Texture) and not (material is RepeatingTexture) then return false end if
   if m.count >= m.capacity then
     next = array(m.capacity*2)
     copyArray(next,0,m.triangles,0,m.count)
     m.triangles = next
+    nextAlbedo = array(m.capacity*2); copyArray(nextAlbedo,0,m.albedo,0,m.count); m.albedo = nextAlbedo
+    nextLighting = array(m.capacity*2); copyArray(nextLighting,0,m.lighting,0,m.count); m.lighting = nextLighting
     m.capacity = m.capacity*2
   end if
   color = material.tint
+  m.albedo[m.count] = color
+  m.lighting[m.count] = lit
   if lit then
     ux = b.x-a.x; uy = b.y-a.y; uz = b.z-a.z
     vx = c.x-a.x; vy = c.y-a.y; vz = c.z-a.z
@@ -241,8 +637,12 @@ end function
 /// Samples a clamped texture. Bilinear RGBA filtering uses premultiplied color
 /// internally so transparent white/black borders do not create colored halos.
 function sampleTexture(material,u,v)
-  u = math.clamp(u,0.0,1.0)
-  v = math.clamp(v,0.0,1.0)
+  if material is RepeatingTexture then
+    u=u-math.floor(u); v=v-math.floor(v)
+  else
+    u = math.clamp(u,0.0,1.0)
+    v = math.clamp(v,0.0,1.0)
+  end if
   var fx as float = toFloat(u*(material.width-1))
   var fy as float = toFloat(v*(material.height-1))
   pixels = material.pixels

@@ -105,13 +105,66 @@ six bytes per pixel per surface, excluding textures, meshes and runtime
 overhead. The caller owns cache invalidation and Canvas resizing. Immutable
 textured scenery can be cached without repeating texture sampling each frame.
 
+## World-space lighting and physical materials
+
+`lighting(x,y,z,ambient,color,intensity)` creates a directional key pointing
+toward its source, with RGB ambient light. `addPointLight` adds a finite colored
+point source with a smooth squared falloff to its range. `drawLitAt` evaluates
+Lambert diffuse and optional view-dependent Blinn specular terms after the
+mesh's actual translation, rotation and nonuniform scale. The key and point
+directions therefore remain in world space as an object turns. Lit faces are
+backface-culled by default; the final `cullBackfaces=false` argument retains
+two-sided drawing when needed.
+
+Mesh construction retains the original albedo and lit/unlit flags alongside
+the legacy baked colors. `drawAt` remains compatible with existing scenes;
+`drawLitAt` does not mutate those cached colors. Set `specular` and `shininess`
+for polished surfaces. Flat shading is evaluated at each face's centroid; this
+is direct lighting, not a physically based material pipeline or indirect/global
+illumination. `repeatingTexture` wraps positive and negative UV coordinates
+for material grain expressed in physical world units; ordinary `texture`
+continues to clamp UVs for artwork and atlases.
+
+`bakeLitMesh` evaluates a fixed pose once and returns its already lit geometry
+in world space. Draw that result with `drawAt` without applying the original
+transform again. It retains depth and texture behavior, and must be regenerated
+after changing the lighting, view or pose. This avoids shading stationary
+mechanisms repeatedly while still depth-testing them against the scene.
+
+## Occluder depth maps and moving contact shadows
+
+Render real opaque caster geometry using `drawDepthAt(shadow,mesh,lightCamera)`
+into an ordinary `Surface`. An orthographic light camera represents a
+directional light. `applyShadowMap(receiver,viewCamera,shadow,lightCamera)`
+reconstructs every visible receiver pixel's world position from its depth,
+compares it against the caster map, and applies four-tap edge filtering.
+Receivers can be vertical, sloping or elevated. Cache the resulting static
+color and depth, so static shadow mapping does not repeat every frame.
+
+For moving lit meshes, assign `lights.shadow`, `lights.shadowCamera` and
+optionally `lights.shadowBias` to the same map. Their directional diffuse and
+specular terms then respect the static occluders at each face. Point sources do
+not automatically acquire their own shadow maps. Opaque `drawDepthAt` ignores
+texture cutouts; use `drawAt` for alpha-cutout casters when their holes matter.
+
+`shadowMask(surface)` starts a non-accumulating dynamic shadow layer.
+`drawPlanarShadowAt` projects a **closed mesh's actual source-facing silhouette**
+along the directional source onto a chosen horizontal support plane. The
+receiver's depth prevents the decal from painting across foreground geometry,
+and one shared mask prevents overlapping triangles or casters from multiplying
+darkness. These moving contact shadows assume a planar receiver; they do not
+replace general dynamic shadow maps or shadow volumes.
+
 ## Limits and focused tests
 
 Triangles crossing the near plane are rejected, not clipped. There is no
 texture mipmapping, anisotropic filtering, automatic mesh importer, GPU
-triangle submission, general translucent-surface sorting, dynamic world-space
-lighting, or shadow mapping. Author cameras inside the supported depth range.
-Sphere gloss is an authored highlight, not an environment reflection.
+triangle submission, general translucent-surface sorting, per-pixel normal
+mapping, indirect illumination or environment reflections. Author cameras
+inside the supported depth range. The legacy `sphere(...,gloss=true)` highlight
+is authored; use a neutral sphere with `drawLitAt` for actual light-dependent
+specular response. Shadow depth shares the 16-bit depth quantization; choose
+camera bounds, resolution and bias for the scene's physical scale.
 Flat-color alpha follows Canvas blending and still writes depth; it is useful
 for deliberately ordered planar decals, not a general transparent 3D material.
 
@@ -121,6 +174,10 @@ static depth caches, a genuinely perspective-interpolated texture lookup,
 bilinear colors and transparent-border halos, and alpha cutouts preserving
 depth holes. The transparent-cache regression also checks opacity metadata,
 Canvas compositing, subsequent geometry through holes, and cache immutability.
+The lighting regressions additionally cover directional changes, finite colored
+point lights, immutable albedo, moving real occluders and reconstructed shadow
+receivers, non-accumulating planar shadows, world-UV repetition, and exact
+framebuffer/depth parity between live and cached fixed-pose lighting.
 
 Compile with the MiniLang Python compiler using
 `--target linux-x64 -I src -I <compiler-root>`, then run the resulting

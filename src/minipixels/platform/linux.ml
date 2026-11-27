@@ -63,6 +63,8 @@ extern function XPutImage(display as ptr, drawable as u64, gc as ptr, image as p
 extern function XFree(value as ptr) from "libX11.so.6" returns int
 /// @internal
 extern function XkbSetDetectableAutoRepeat(display as ptr, detectable as bool, supported as bytes) from "libX11.so.6" returns bool
+/// Sends EWMH fullscreen requests to the desktop window manager.
+extern function XSendEvent(display as ptr, window as u64, propagate as bool, eventMask as i64, event as bytes) from "libX11.so.6" returns int
 
 const KEY_PRESS = 2
 const KEY_RELEASE = 3
@@ -121,6 +123,8 @@ struct Window
   alive
   wmDelete
   needsPresent
+  /// Requested EWMH fullscreen state; the window manager owns native geometry.
+  fullscreen
 end struct
 
 /// @internal
@@ -143,6 +147,13 @@ end function
 /// @internal
 function putU64(buffer, offset, value)
   for index = 0 to 7
+    buffer[offset + index] = (value >> (index * 8)) & 255
+  end for
+end function
+
+/// @internal
+function putU32(buffer, offset, value)
+  for index = 0 to 3
     buffer[offset + index] = (value >> (index * 8)) & 255
   end for
 end function
@@ -199,7 +210,7 @@ function open(title, width, height, scale, renderer, scaleMode, smoothing)
     display, id, gc, XDefaultVisual(display, screen), XDefaultDepth(display, screen),
     0, void, width, height, clientWidth, clientHeight, scale, title, "x11", fallback,
     normalizeScaleMode(scaleMode), smoothing, bytes(192, 0), array(256, false),
-    0, 0, false, 0, true, true, wmDelete, true
+    0, 0, false, 0, true, true, wmDelete, true, false
   )
 end function
 
@@ -279,9 +290,13 @@ function keysymToVirtualKey(sym)
   if sym == 0xFF57 then return 0x23 end if
   if sym == 0xFF63 then return 0x2D end if
   if sym == 0xFFFF then return 0x2E end if
-  if sym == 0xFFE1 or sym == 0xFFE2 then return 0x10 end if
-  if sym == 0xFFE3 or sym == 0xFFE4 then return 0x11 end if
-  if sym == 0xFFE9 or sym == 0xFFEA then return 0x12 end if
+  if sym == 0xFFE1 then return 0xA0 end if
+  if sym == 0xFFE2 then return 0xA1 end if
+  if sym == 0xFFE3 then return 0xA2 end if
+  if sym == 0xFFE4 then return 0xA3 end if
+  if sym == 0xFFE9 then return 0xA4 end if
+  if sym == 0xFFEA or sym == 0xFE03 then return 0xA5 end if
+  if sym >= 0xFFB0 and sym <= 0xFFB9 then return 0x60 + (sym - 0xFFB0) end if
   if sym >= 0xFFBE and sym <= 0xFFC9 then return 0x70 + (sym - 0xFFBE) end if
   return -1
 end function
@@ -289,6 +304,49 @@ end function
 /// @internal
 function setKeyState(w, virtualKey, down)
   if virtualKey >= 0 and virtualKey < len(w.keyStates) then w.keyStates[virtualKey] = down end if
+  // Preserve generic modifier bindings when either physical side remains held.
+  if virtualKey >= 0xA0 and virtualKey <= 0xA5 then
+    w.keyStates[0x10] = w.keyStates[0xA0] or w.keyStates[0xA1]
+    w.keyStates[0x11] = w.keyStates[0xA2] or w.keyStates[0xA3]
+    w.keyStates[0x12] = w.keyStates[0xA4] or w.keyStates[0xA5]
+  end if
+end function
+
+/// Reads a physical key only while this window owns input focus.
+function keyDownForWindow(w, key)
+  if w is not Window or not w.focused or not w.alive then return false end if
+  if key < 0 or key >= len(w.keyStates) then return false end if
+  return w.keyStates[key]
+end function
+
+/// Returns the latest fullscreen state requested from the window manager.
+function isFullscreen(w)
+  return w is Window and w.fullscreen
+end function
+
+/// Requests borderless fullscreen using the standard EWMH client message.
+function setFullscreen(w, enabled)
+  if w is not Window or w.display == 0 or not w.alive or typeof(enabled) != "bool" then return false end if
+  if w.fullscreen == enabled then return true end if
+  message = bytes(192, 0)
+  stateAtom = XInternAtom(w.display, "_NET_WM_STATE", false)
+  fullscreenAtom = XInternAtom(w.display, "_NET_WM_STATE_FULLSCREEN", false)
+  putU32(message, 0, CLIENT_MESSAGE)
+  putU64(message, 24, w.display)
+  putU64(message, 32, w.id)
+  putU64(message, 40, stateAtom)
+  putU32(message, 48, 32)
+  action = 0
+  if enabled then action = 1 end if
+  putU64(message, 56, action)
+  putU64(message, 64, fullscreenAtom)
+  putU64(message, 80, 1)
+  root = XRootWindow(w.display, XDefaultScreen(w.display))
+  if XSendEvent(w.display, root, false, 0x180000, message) == 0 then return false end if
+  XFlush(w.display)
+  w.fullscreen = enabled
+  w.needsPresent = true
+  return true
 end function
 
 /// @internal

@@ -347,6 +347,8 @@ struct AudioMixer
   nativeMix
   /// Reusable native result storage; never retained by the native bridge.
   mixResult
+  /// Dedicated additional music voices, independent of sound-effect stealing.
+  musicLayers
 
   /// Sets master volume for subsequently mixed samples.
   /// @param value Percentage from 0 through 100.
@@ -385,6 +387,20 @@ struct AudioMixer
   /// @param clip WAV or MP3 clip.
   function playMusic(clip)
     return minipixels.audio.audio.mixerPlayMusic(this, clip)
+  end function
+  /// Queues an additional music voice without opening an output device.
+  /// @param id Layer index from 0 through 7.
+  /// @param clip Prepared or lazy audio clip.
+  /// @param volume Voice volume percentage.
+  /// @param pan Stereo pan percentage.
+  /// @param cursor Initial source-frame cursor for phase alignment.
+  function queueMusicLayer(id, clip, volume, pan, cursor)
+    return minipixels.audio.audio.queueMusicLayer(this, id, clip, volume, pan, cursor)
+  end function
+  /// Stops and releases one additional music layer.
+  /// @param id Layer index from 0 through 7.
+  function stopMusicLayer(id)
+    return minipixels.audio.audio.stopMusicLayer(this, id)
   end function
   /// Refills completed output buffers.
   function update()
@@ -487,11 +503,15 @@ function mixer(maxChannels)
   for index = 0 to maxChannels - 1
     channels[index] = channel(index)
   end for
+  layers = array(8)
+  for index = 0 to len(layers) - 1
+    layers[index] = channel(-2 - index)
+  end for
   frames = MIXER_BUFFER_FRAMES
   return AudioMixer(
     create(), channels, maxChannels, 0, void, channel(-1), MIXER_SAMPLE_RATE,
     0, bytes(8, 0), bytes(18, 0), array(MIXER_BUFFER_COUNT), array(MIXER_BUFFER_COUNT),
-    frames, MIXER_BUFFER_COUNT, array(frames, 0), array(frames, 0), false, 0, 0, 0, bytes(frames * 16, 0), bytes(8, 0)
+    frames, MIXER_BUFFER_COUNT, array(frames, 0), array(frames, 0), false, 0, 0, 0, bytes(frames * 16, 0), bytes(8, 0), layers
   )
 end function
 
@@ -999,8 +1019,57 @@ function mixBuffer(value, output)
     value.musicChannel = mixVoice(value, value.musicChannel, value.audio.musicVolume)
     if value.musicChannel.playing == false then value.music = void end if
   end if
+  for index = 0 to len(value.musicLayers) - 1
+    voice = value.musicLayers[index]
+    if voice.playing then value.musicLayers[index] = mixVoice(value, voice, value.audio.musicVolume) end if
+  end for
   mpAudioMixFinish(value.nativeMix, len(value.nativeMix), output, len(output), value.bufferFrames)
   return output
+end function
+
+/// Queues an additional music-bus voice without opening a playback device.
+/// This software operation works for both offline mixing and an already-open
+/// live mixer. Call ensureBackend once after queueing a complete live ensemble.
+/// Muted/zero-volume layers still advance; sound effects cannot steal them.
+/// @param value Destination mixer.
+/// @param id Layer index from 0 through 7.
+/// @param source Prepared or lazy audio clip; looping is retained.
+/// @param volume Voice volume percentage.
+/// @param pan Stereo pan percentage.
+/// @param cursor Initial source-frame cursor, normalized to the clip length.
+function queueMusicLayer(value, id, source, volume = 100, pan = 0, cursor = 0.0)
+  if value is not AudioMixer then return false end if
+  if typeof(id) != "int" or id < 0 or id >= len(value.musicLayers) then return false end if
+  if source is not AudioClip then return false end if
+  if typeof(cursor) != "int" and typeof(cursor) != "float" then return false end if
+  if cursor < 0 or cursor > 9007199254740991 or cursor != cursor then return false end if
+  if not prepareClip(source) or source.frameCount <= 0 then return false end if
+  voice = closeVoiceDecoder(value.musicLayers[id])
+  voice.clip = source
+  voice.playing = true
+  voice.volume = normalizeVolume(volume)
+  voice.pan = normalizePan(pan)
+  voice.cursor = cursor % source.frameCount
+  voice = openVoiceDecoder(voice)
+  // An MP3 layer may start at a nonzero ensemble cursor. Request its own seek
+  // before the first audible decode rather than reusing another voice state.
+  if voice.decoder != 0 and voice.cursor > 0 then voice.streamFrames = -1 end if
+  value.musicLayers[id] = voice
+  return voice.playing
+end function
+
+/// Stops and releases one dedicated music layer without affecting other buses.
+/// @param value Mixer whose layer is stopped.
+/// @param id Layer index from 0 through 7.
+function stopMusicLayer(value, id)
+  if value is not AudioMixer then return false end if
+  if typeof(id) != "int" or id < 0 or id >= len(value.musicLayers) then return false end if
+  voice = closeVoiceDecoder(value.musicLayers[id])
+  voice.playing = false
+  voice.clip = void
+  voice.cursor = 0.0
+  value.musicLayers[id] = voice
+  return true
 end function
 
 /// Initializes and fills the native PCM format structure.
@@ -1216,6 +1285,9 @@ function mixerStopAll(value)
   value.musicChannel.clip = void
   value.musicChannel.cursor = 0.0
   value.music = void
+  for index = 0 to len(value.musicLayers) - 1
+    stopMusicLayer(value, index)
+  end for
   if value.ready then
 #if TARGET_OS == "windows"
     waveOutReset(value.handle)
@@ -1264,6 +1336,9 @@ function closeMixer(value)
     value.channels[index] = closeVoiceDecoder(value.channels[index])
   end for
   value.musicChannel = closeVoiceDecoder(value.musicChannel)
+  for index = 0 to len(value.musicLayers) - 1
+    stopMusicLayer(value, index)
+  end for
   if value.handle == 0 then
     value.ready = false
     return true

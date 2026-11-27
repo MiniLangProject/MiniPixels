@@ -179,6 +179,27 @@ extern function GetAsyncKeyState(key as int) from "user32.dll" returns i32
 /// Invokes the native GetForegroundWindow entry point used by the minipixels platform windows module.
 /// @returns Native ptr result produced by the call.
 extern function GetForegroundWindow() from "user32.dll" returns ptr
+
+/// Returns the style of a native window.
+extern function GetWindowLongPtrW(hwnd as ptr, index as int) from "user32.dll" returns i64
+/// Changes a window style without changing the desktop display mode.
+extern function SetWindowLongPtrW(hwnd as ptr, index as int, value as i64) from "user32.dll" returns i64
+/// Saves normal/maximized placement for reversible fullscreen.
+extern function GetWindowPlacement(hwnd as ptr, placement as bytes) from "user32.dll" returns bool
+/// Restores normal/maximized placement after fullscreen.
+extern function SetWindowPlacement(hwnd as ptr, placement as bytes) from "user32.dll" returns bool
+/// Selects the monitor containing the window, including secondary monitors.
+extern function MonitorFromWindow(hwnd as ptr, flags as u32) from "user32.dll" returns ptr
+/// Reads monitor bounds in desktop coordinates.
+extern function GetMonitorInfoW(monitor as ptr, info as bytes) from "user32.dll" returns bool
+/// Moves/resizes a window and refreshes its non-client frame.
+extern function SetWindowPos(hwnd as ptr, after as ptr, x as int, y as int, width as int, height as int, flags as u32) from "user32.dll" returns bool
+/// Resets native error state before an API with an ambiguous zero result.
+extern function SetLastError(code as u32) from "kernel32.dll" returns void
+/// Returns the current native error code.
+extern function GetLastError() from "kernel32.dll" returns u32
+/// Aligns the GDI halftone brush when scaling a high-resolution framebuffer.
+extern function SetBrushOrgEx(dc as ptr, x as int, y as int, previous as ptr) from "gdi32.dll" returns bool
 /// Invokes the native GetClientRect entry point used by the minipixels platform windows module.
 /// @param hwnd hwnd value consumed by this operation.
 /// @param rect rect value consumed by this operation.
@@ -400,6 +421,11 @@ struct Window
   viewportHeight
   /// Stores a reusable Win32 POINT buffer for pointer polling.
   point
+  /// Whether this window is in borderless monitor fullscreen.
+  fullscreen
+  /// Original style and placement, preserved across fullscreen toggles.
+  windowedStyle
+  windowedPlacement
 end struct
 
 /// Performs the putU32 operation for the minipixels platform windows module.
@@ -590,7 +616,7 @@ function open(title, width, height, scale, renderer, scaleMode, smoothing)
   UpdateWindow(hwnd)
   SetForegroundWindow(hwnd)
   mode = normalizeRenderer(renderer)
-  w = Window(hwnd, width, height, scale, sw, sh, createBitmapInfo(width, height), bytes(48, 0), bytes(16, 0), title, className, "gdi", 0, 0, 0, width, height, bytes(4, 0), false, normalizeScaleMode(scaleMode), smoothing, "", bytes(16, 0), 0, 0, width, height, bytes(8, 0))
+  w = Window(hwnd, width, height, scale, sw, sh, createBitmapInfo(width, height), bytes(48, 0), bytes(16, 0), title, className, "gdi", 0, 0, 0, width, height, bytes(4, 0), false, normalizeScaleMode(scaleMode), smoothing, "", bytes(16, 0), 0, 0, width, height, bytes(8, 0), false, 0, bytes(44, 0))
   if mode == "auto" or mode == "opengl" then
     if initOpenGL(w) then
       w.renderer = "opengl"
@@ -674,6 +700,58 @@ end function
 /// @param vk vk value consumed by this operation.
 function keyDown(vk)
   return GetAsyncKeyState(vk) < 0
+end function
+
+/// Reads one physical virtual key only while the window owns focus.
+/// Left/right modifiers use their distinct VK_L*/VK_R* codes.
+function keyDownForWindow(w, key)
+  if key < 0 or key > 255 or not hasFocus(w) then return false end if
+  return keyDown(key)
+end function
+
+/// Returns the active borderless fullscreen state.
+function isFullscreen(w)
+  return w is Window and w.fullscreen
+end function
+
+/// Toggle borderless fullscreen on the current monitor and restore placement.
+/// Logical input coordinates and framebuffer resolution remain independent.
+function setFullscreen(w, enabled)
+  global windowNeedsPresent
+  if w is not Window or w.hwnd == 0 or typeof(enabled) != "bool" then return false end if
+  if w.fullscreen == enabled then return true end if
+  if enabled then
+    info = bytes(40, 0)
+    putU32(info, 0, 40)
+    monitor = MonitorFromWindow(w.hwnd, 2)
+    if monitor == 0 or not GetMonitorInfoW(monitor, info) then return false end if
+    placement = bytes(44, 0)
+    putU32(placement, 0, 44)
+    if not GetWindowPlacement(w.hwnd, placement) then return false end if
+    style = GetWindowLongPtrW(w.hwnd, -16)
+    SetLastError(0)
+    previous = SetWindowLongPtrW(w.hwnd, -16, style & (0xFFFFFFFF ^ WS_OVERLAPPEDWINDOW))
+    if previous == 0 and GetLastError() != 0 then return false end if
+    left = getI32(info, 4)
+    top = getI32(info, 8)
+    if not SetWindowPos(w.hwnd, 0, left, top, getI32(info, 12) - left, getI32(info, 16) - top, 0x0020 | 0x0004) then
+      SetWindowLongPtrW(w.hwnd, -16, style)
+      SetWindowPlacement(w.hwnd, placement)
+      return false
+    end if
+    w.windowedStyle = style
+    w.windowedPlacement = placement
+  else
+    SetLastError(0)
+    previous = SetWindowLongPtrW(w.hwnd, -16, w.windowedStyle)
+    if previous == 0 and GetLastError() != 0 then return false end if
+    if not SetWindowPlacement(w.hwnd, w.windowedPlacement) then return false end if
+    if not SetWindowPos(w.hwnd, 0, 0, 0, 0, 0, 0x0020 | 0x0001 | 0x0002 | 0x0004) then return false end if
+  end if
+  w.fullscreen = enabled
+  windowNeedsPresent = true
+  refreshClientSize(w)
+  return true
 end function
 
 /// Returns whether focus is available.
@@ -1026,7 +1104,17 @@ function presentGDI(w, canvas)
   clientW = w.scaledWidth
   clientH = w.scaledHeight
   updateViewportForSize(w, clientW, clientH)
-  SetStretchBltMode(dc, 3)
+  // The physical framebuffer can exceed the logical input/UI coordinate space.
+  // GDI must use the physical stride, including after a quality setting change.
+  if getI32(w.bmi, 4) != canvas.width or getI32(w.bmi, 8) != -canvas.height then
+    w.bmi = createBitmapInfo(canvas.width, canvas.height)
+  end if
+  if w.smoothing then
+    SetStretchBltMode(dc, 4)
+    SetBrushOrgEx(dc, 0, 0, 0)
+  else
+    SetStretchBltMode(dc, 3)
+  end if
   // Avoid an extra full-window GDI operation (and a visible black interframe).
   // On resize/expose the letterbox must still be repainted.
   if windowNeedsPresent and (viewportX(w) != 0 or viewportY(w) != 0 or viewportW(w) != clientW or viewportH(w) != clientH) then

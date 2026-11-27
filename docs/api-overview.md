@@ -1,5 +1,11 @@
 # API Overview
 
+Physical left/right modifier keys, reversible desktop fullscreen and additional
+synchronized music-bus voices are described in
+[Desktop input and music layers](desktop-input-and-music-layers.md). The portable
+CPU mesh renderer's direct lighting and geometry-derived shadows are documented
+in [Canvas 3D geometry](geometry3d.md).
+
 ## Steam
 
 `import minipixels.steam as steam` provides optional Steamworks integration.
