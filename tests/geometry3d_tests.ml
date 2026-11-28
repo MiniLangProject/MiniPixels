@@ -72,6 +72,9 @@ function emptyMeshIsNoOp()
 end function
 
 function main(args)
+  opaqueDepthPatchMatchesDirectGeometry()
+  depthPatchCutoutsRemainOpen()
+  depthPatchBoundsAndOwnership()
   worldSpaceLightingRespondsToSources()
   geometryShadowMapMovesWithOccluder()
   movingMeshShadowsDoNotAccumulate()
@@ -88,6 +91,111 @@ function main(args)
   transparentCachePreservesCutout()
   print "GEOMETRY3D [OK]"
   return 0
+end function
+
+function opaqueDepthPatchMatchesDirectGeometry()
+  camera=geometry.camera(32.0,32.0,45.0,0.0,0.0,0.0,1.0,0.2,3.0,true)
+  lights=geometry.lighting()
+  source=geometry.mesh(); back=geometry.mesh(); front=geometry.mesh()
+  geometry.box(source,0.0,0.0,0.0,0.45,0.35,0.22,0xb7a080ff)
+  geometry.box(back,0.0,0.0,-0.15,1.2,1.2,0.04,0xc03020ff)
+  geometry.box(front,0.03,0.0,0.33,0.14,0.30,0.16,0x2080e0ff)
+  pose=geometry.bakeLitMesh(source,camera,lights,0.03,0.04,0.02,0.2,1.0,1.0,1.0,0.30,48)
+  scratch=geometry.surface(cv.create(64,64))
+  geometry.clear(scratch,0x00000000)
+  geometry.drawAt(scratch,pose,camera)
+  patch=geometry.captureDepthPatch(scratch,8,8,48,48)
+  test.assertTrue(patch is geometry.DepthPatch)
+  expected=geometry.surface(cv.create(64,64)); actual=geometry.surface(cv.create(64,64))
+  for order=0 to 1
+    geometry.clear(expected,0x161d20ff); geometry.clear(actual,0x161d20ff)
+    if order == 0 then
+      geometry.drawAt(expected,back,camera); geometry.drawAt(actual,back,camera)
+    else
+      geometry.drawAt(expected,front,camera); geometry.drawAt(actual,front,camera)
+    end if
+    geometry.drawAt(expected,pose,camera)
+    test.assertTrue(geometry.drawDepthPatch(actual,patch))
+    if order == 0 then
+      geometry.drawAt(expected,front,camera); geometry.drawAt(actual,front,camera)
+    else
+      geometry.drawAt(expected,back,camera); geometry.drawAt(actual,back,camera)
+    end if
+    test.assertEqual(actual.canvas.pixels,expected.canvas.pixels,"native-size cached pose retains exact lit pixels with front/back geometry in either order")
+    test.assertEqual(actual.depth,expected.depth,"patch uses the original quantized depth, without reprojection")
+  end for
+  test.assertEqual(patch.frameWidth,64)
+  test.assertEqual(patch.frameHeight,64)
+end function
+
+function depthPatchCutoutsRemainOpen()
+  camera=geometry.camera(16.0,16.0,20.0,0.0,0.0,0.0,0.0,0.0,3.0,false)
+  camera.sinPitch=1.0; camera.cosPitch=0.0
+  isolated=geometry.surface(cv.create(32,32))
+  direct=geometry.surface(cv.create(32,32)); cached=geometry.surface(cv.create(32,32))
+  mask=imageFromColors(2,1,[0xffffff00,0x00ff00ff])
+  material=geometry.texture(mask,0xffffffff,128,false)
+  model=geometry.mesh(); behind=geometry.mesh()
+  geometry.texturedQuad(model,geometry.Point(-0.6,-0.6,1.0),geometry.Point(0.6,-0.6,1.0),geometry.Point(0.6,0.6,1.0),geometry.Point(-0.6,0.6,1.0),material)
+  geometry.quad(behind,geometry.Point(-0.7,-0.7,0.0),geometry.Point(0.7,-0.7,0.0),geometry.Point(0.7,0.7,0.0),geometry.Point(-0.7,0.7,0.0),0xd02020ff,false)
+  geometry.clear(isolated,0x00000000); geometry.drawAt(isolated,model,camera)
+  patch=geometry.captureDepthPatch(isolated,4,4,24,24)
+  geometry.clear(cached,0x00000000); cv.resetDirty(cached.canvas)
+  test.assertTrue(geometry.drawDepthPatch(cached,patch))
+  test.assertTrue(cached.canvas.dirty,"visible cached pixels mark the canvas dirty")
+  test.assertFalse(cached.canvas.imageView.opaque,"a patch cannot declare its untouched transparent destination opaque")
+  test.assertEqual(cached.canvas.getPixel(8,16),0x00000000,"stored clear-depth pixels never copy the cache background")
+  hole=(16*32+8)*2
+  test.assertEqual(cached.depth[hole]|(cached.depth[hole+1]<<8),65535,"cutout holes keep unoccupied depth")
+  geometry.clear(direct,0x00000000)
+  geometry.drawAt(direct,model,camera)
+  geometry.drawAt(direct,behind,camera); geometry.drawAt(cached,behind,camera)
+  test.assertEqual(cached.canvas.pixels,direct.canvas.pixels,"later opaque geometry fills the same cutout pixels")
+  test.assertEqual(cached.depth,direct.depth,"cutout cache preserves exact depth on both sides of the coverage boundary")
+end function
+
+function depthPatchBoundsAndOwnership()
+  source=geometry.surface(cv.create(8,6))
+  geometry.clear(source,0x00000000)
+  geometry.rasterSpan(source,2,0,7,1.5,0.0,0xaabbccff,false)
+  patch=geometry.captureDepthPatch(source,-3,-4,7,7)
+  test.assertEqual(patch.x,0); test.assertEqual(patch.y,0)
+  test.assertEqual(patch.width,4); test.assertEqual(patch.height,3)
+  test.assertEqual(len(patch.pixels),48); test.assertEqual(len(patch.depth),24)
+  oldPixels=slice(patch.pixels,0,len(patch.pixels))
+  oldDepth=slice(patch.depth,0,len(patch.depth))
+  geometry.clear(source,0x203040ff)
+  test.assertEqual(patch.pixels,oldPixels,"capture owns a copy of source color")
+  test.assertEqual(patch.depth,oldDepth,"capture owns a copy of source depth")
+  // MiniLang boxed integers carry 61 signed bits (three runtime tag bits).
+  huge=geometry.captureDepthPatch(source,-10,-10,1152921504606846975,1152921504606846975)
+  test.assertEqual(huge.width,8); test.assertEqual(huge.height,6)
+  empty=geometry.captureDepthPatch(source,1152921504606846975,0,1152921504606846975,2)
+  test.assertEqual(len(empty.pixels),0); test.assertEqual(len(empty.depth),0)
+  destination=geometry.surface(cv.create(8,6))
+  geometry.clear(destination,0x123456ff); cv.resetDirty(destination.canvas)
+  test.assertTrue(geometry.drawDepthPatch(destination,empty))
+  test.assertFalse(destination.canvas.dirty,"a valid empty patch is a clean no-op")
+  test.assertTrue(geometry.drawDepthPatch(destination,patch))
+  test.assertEqual(destination.canvas.getPixel(0,2),0xaabbccff)
+  test.assertEqual(destination.canvas.getPixel(4,2),0x123456ff,"clipped extent cannot write past its own rectangle")
+  test.assertEqual(destination.canvas.dirtyX0,0); test.assertEqual(destination.canvas.dirtyY0,0)
+  test.assertEqual(destination.canvas.dirtyX1,4); test.assertEqual(destination.canvas.dirtyY1,3)
+  destination.depth=bytes(8*6*2,0); cv.resetDirty(destination.canvas)
+  before=slice(destination.canvas.pixels,0,len(destination.canvas.pixels))
+  test.assertTrue(geometry.drawDepthPatch(destination,patch))
+  test.assertEqual(destination.canvas.pixels,before,"closer destination pixels occlude the whole patch")
+  test.assertFalse(destination.canvas.dirty,"a fully occluded patch does not dirty the canvas")
+  resized=geometry.surface(cv.create(9,6))
+  test.assertFalse(geometry.drawDepthPatch(resized,patch),"stale native-resolution caches are rejected after resize")
+  test.assertFalse(geometry.drawDepthPatch(destination,void))
+  test.assertEqual(typeof(try(geometry.captureDepthPatch(source,0.5,0,2,2))),"error")
+  test.assertEqual(typeof(try(geometry.captureDepthPatch(source,0,0,-1,2))),"error")
+  test.assertEqual(typeof(try(geometry.captureDepthPatch(void,0,0,2,2))),"error")
+  source.canvas.pixels[3]=128; source.depth[0]=0; source.depth[1]=24
+  test.assertEqual(typeof(try(geometry.captureDepthPatch(source,0,0,2,2))),"error","flattening translucent color into opaque depth is explicitly rejected")
+  patch.depth=bytes(1,0)
+  test.assertFalse(geometry.drawDepthPatch(destination,patch),"malformed storage cannot cause an out-of-bounds blit")
 end function
 
 function fixedPoseLightingCacheMatchesLive()

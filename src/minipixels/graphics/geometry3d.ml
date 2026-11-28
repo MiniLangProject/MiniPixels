@@ -106,6 +106,19 @@ struct Surface
   triangles as int
 end struct
 
+/// Owned, native-resolution opaque color/depth pixels from one fixed camera.
+/// Retain unchanged until the view, lighting, pose or framebuffer size changes.
+struct DepthPatch
+  x as int
+  y as int
+  width as int
+  height as int
+  frameWidth as int
+  frameHeight as int
+  pixels as bytes
+  depth as bytes
+end struct
+
 /// Creates a camera looking towards increasing Y with upward world Z.
 function camera(centerX, centerY, scale, targetX=0.0, targetY=0.6, targetZ=0.0, pitch=0.94, yaw=0.0, distance=2.6, perspective=true)
   return Camera(toFloat(centerX),toFloat(centerY),toFloat(scale),toFloat(targetX),toFloat(targetY),toFloat(targetZ),toFloat(math.sin(pitch)),toFloat(math.cos(pitch)),toFloat(math.sin(yaw)),toFloat(math.cos(yaw)),toFloat(distance),perspective,0.05)
@@ -518,6 +531,101 @@ function copySurface(destination, source)
   destination.canvas.dirtyX1 = destination.width
   destination.canvas.dirtyY1 = destination.height
   destination.triangles = 0
+  return true
+end function
+
+function _depthPatchSurfaceValid(s)
+  if s is not Surface then return false end if
+  if s.canvas is not cv.Canvas then return false end if
+  if s.width < 1 or s.height < 1 then return false end if
+  if s.canvas.width != s.width or s.canvas.height != s.height then return false end if
+  // Bound multiplication by storage that already exists, even for malformed
+  // externally constructed surfaces with huge dimensions.
+  if s.width > len(s.canvas.pixels)/4 then return false end if
+  if s.height != len(s.canvas.pixels)/(s.width*4) then return false end if
+  return len(s.depth) == s.width*s.height*2
+end function
+
+/// Captures an integer rectangle, clipped to the source's actual pixel bounds.
+/// Render the isolated opaque/cutout pose on a full-size cleared Surface using
+/// the original camera first: cropping/reprojecting a camera can change pixels.
+/// Empty/outside rectangles yield a valid empty patch. Invalid input or a
+/// visible nonopaque pixel returns an error; alpha blending is not supported.
+function captureDepthPatch(s,x,y,width,height)
+  if not _depthPatchSurfaceValid(s) then return error(8310,"Invalid depth-patch source surface") end if
+  if typeof(x) != "int" or typeof(y) != "int" or typeof(width) != "int" or typeof(height) != "int" then return error(8311,"Depth-patch rectangle must contain integers") end if
+  if width < 0 or height < 0 then return error(8312,"Depth-patch dimensions cannot be negative") end if
+  left=math.clamp(x,0,s.width); top=math.clamp(y,0,s.height)
+  if width == 0 or height == 0 or x >= s.width or y >= s.height or x <= -width or y <= -height then
+    return DepthPatch(left,top,0,0,s.width,s.height,bytes(0,0),bytes(0,0))
+  end if
+  // Avoid x+width overflow for huge requests. The clipped extent is bounded
+  // before allocating; negative offsets can only reduce the requested size.
+  if x < 0 then width=width+x end if
+  if y < 0 then height=height+y end if
+  width=math.min(width,s.width-left); height=math.min(height,s.height-top)
+  pixels=bytes(width*height*4,0)
+  depths=bytes(width*height*2,255)
+  for row=0 to height-1
+    copyBytes(pixels,row*width*4,s.canvas.pixels,((top+row)*s.width+left)*4,width*4)
+    copyBytes(depths,row*width*2,s.depth,((top+row)*s.width+left)*2,width*2)
+  end for
+  var colorIndex as int=3
+  var depthIndex as int=0
+  var count as int=width*height
+  for index=0 to count-1
+    if (depths[depthIndex]|(depths[depthIndex+1]<<8)) != 65535 and pixels[colorIndex] != 255 then return error(8313,"Depth patches require opaque geometry or alpha cutouts") end if
+    colorIndex=colorIndex+4; depthIndex=depthIndex+2
+  end for
+  return DepthPatch(left,top,width,height,s.width,s.height,pixels,depths)
+end function
+
+/// Depth-tests an immutable opaque patch at its original native pixel origin.
+/// Returns false for invalid data or stale framebuffer dimensions. A valid
+/// empty/fully occluded patch returns true without changing pixels or dirtiness.
+function drawDepthPatch(destination,patch)
+  if not _depthPatchSurfaceValid(destination) or patch is not DepthPatch then return false end if
+  if patch.frameWidth != destination.width or patch.frameHeight != destination.height then return false end if
+  if patch.x < 0 or patch.y < 0 or patch.width < 0 or patch.height < 0 then return false end if
+  if patch.x > destination.width or patch.y > destination.height then return false end if
+  if patch.width > destination.width-patch.x or patch.height > destination.height-patch.y then return false end if
+  if len(patch.pixels) != patch.width*patch.height*4 or len(patch.depth) != patch.width*patch.height*2 then return false end if
+  if patch.width == 0 or patch.height == 0 then return true end if
+  var sourcePixels as bytes=patch.pixels
+  var sourceDepth as bytes=patch.depth
+  var outputPixels as bytes=destination.canvas.pixels
+  var outputDepth as bytes=destination.depth
+  var sourceColorIndex as int=0
+  var sourceDepthIndex as int=0
+  var width as int=patch.width
+  var height as int=patch.height
+  var stride as int=destination.width
+  var originX as int=patch.x
+  var originY as int=patch.y
+  var wrote as bool=false
+  for row=0 to height-1
+    var outputColorIndex as int=((originY+row)*stride+originX)*4
+    var outputDepthIndex as int=((originY+row)*stride+originX)*2
+    for column=0 to width-1
+      var encoded as int=sourceDepth[sourceDepthIndex]|(sourceDepth[sourceDepthIndex+1]<<8)
+      var prior as int=outputDepth[outputDepthIndex]|(outputDepth[outputDepthIndex+1]<<8)
+      if encoded < 65535 and encoded <= prior then
+        outputPixels[outputColorIndex]=sourcePixels[sourceColorIndex]
+        outputPixels[outputColorIndex+1]=sourcePixels[sourceColorIndex+1]
+        outputPixels[outputColorIndex+2]=sourcePixels[sourceColorIndex+2]
+        outputPixels[outputColorIndex+3]=255
+        outputDepth[outputDepthIndex]=sourceDepth[sourceDepthIndex]
+        outputDepth[outputDepthIndex+1]=sourceDepth[sourceDepthIndex+1]
+        wrote=true
+      end if
+      sourceColorIndex=sourceColorIndex+4; sourceDepthIndex=sourceDepthIndex+2
+      outputColorIndex=outputColorIndex+4; outputDepthIndex=outputDepthIndex+2
+    end for
+  end for
+  if wrote then
+    cv.markDirty(destination.canvas,originX,originY,width,height)
+    destination.canvas.drawCalls=destination.canvas.drawCalls+1
+  end if
   return true
 end function
 

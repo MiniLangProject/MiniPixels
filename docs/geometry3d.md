@@ -105,6 +105,56 @@ six bytes per pixel per surface, excluding textures, meshes and runtime
 overhead. The caller owns cache invalidation and Canvas resizing. Immutable
 textured scenery can be cached without repeating texture sampling each frame.
 
+### Small native-resolution pose patches
+
+`captureDepthPatch(surface,x,y,width,height)` copies a clipped integer rectangle
+into an owned `DepthPatch`. Its `pixels` and `depth` buffers use six bytes per
+pixel; `x/y` retain the original screen origin and `frameWidth/frameHeight`
+retain the full source viewport. Rasterize an isolated fixed pose onto a
+**full-resolution** cleared surface with the original camera, then capture its
+small covered region. Reuse that scratch surface for other poses. Moving or
+cropping the camera to rasterize directly into a small target can introduce
+different floating-point rounding and is not this cache's contract.
+
+```minilang
+scratch = geometry.surface(canvas.create(640,480))
+geometry.clear(scratch,0x00000000)
+canvas.resetDirty(scratch.canvas)
+geometry.drawAt(scratch,preparedPose,camera)
+patch = geometry.captureDepthPatch(scratch,
+  scratch.canvas.dirtyX0,scratch.canvas.dirtyY0,
+  scratch.canvas.dirtyX1-scratch.canvas.dirtyX0,
+  scratch.canvas.dirtyY1-scratch.canvas.dirtyY0)
+
+// After the scene's ordinary color/depth restore:
+geometry.drawDepthPatch(surface,patch)
+```
+
+`drawDepthPatch` tests each stored depth against the destination using the same
+`<=` tie rule as direct rasterization. Clear depth (`65535`) never writes color
+or depth, so alpha-cutout holes preserve both earlier scenery and later geometry.
+No rescaling, interpolation or reprojection occurs. Nearer moving geometry can
+be submitted before or after the patch. Visible writes mark the bounded Canvas
+region dirty; empty and fully occluded patches are clean no-ops. Existing Canvas
+opacity metadata stays conservative, including untouched transparent pixels.
+
+This API is for opaque geometry and alpha cutouts. The caller must not flatten
+blended translucent layers or planar shadow overlays into an opaque pose patch.
+Visible source pixels whose alpha is not 255 are rejected. Color already blended
+over an opaque background cannot be identified retrospectively; capture an
+isolated pose on a transparent cleared surface. Capture errors 8310–8313 identify
+invalid surfaces, noninteger/negative rectangles and nonopaque visible pixels.
+Empty or entirely out-of-bounds rectangles produce valid empty patches instead.
+Huge requested extents are clipped before allocation, without computing an
+overflow-prone `x+width` or `y+height`.
+
+Patches own their buffers independently of the scratch surface. Treat them as
+immutable and rebuild after any pose, lighting, camera or resolution change.
+Drawing returns false for invalid storage, invalid extents or a different
+destination viewport; valid draws, including no-ops, return true. This catches
+stale resized caches rather than stretching them. A patch adds no triangles to
+the surface's rasterization statistics because it reuses already rasterized data.
+
 ## World-space lighting and physical materials
 
 `lighting(x,y,z,ambient,color,intensity)` creates a directional key pointing
@@ -178,6 +228,11 @@ The lighting regressions additionally cover directional changes, finite colored
 point lights, immutable albedo, moving real occluders and reconstructed shadow
 receivers, non-accumulating planar shadows, world-UV repetition, and exact
 framebuffer/depth parity between live and cached fixed-pose lighting.
+Pose-patch regressions additionally compare exact color and depth with direct
+geometry through both front/back submission orders, preserve textured cutout
+holes, verify owned storage after the scratch source changes, and exercise
+clipping, huge/invalid bounds, opacity rejection, stale viewport rejection,
+dirty tracking and fully occluded no-ops.
 
 Compile with the MiniLang Python compiler using
 `--target linux-x64 -I src -I <compiler-root>`, then run the resulting
