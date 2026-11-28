@@ -47,6 +47,17 @@ extern function mpAudioMixClear(destination as bytes, size as u64) from "minipix
 extern function mpAudioMixPcm(destination as bytes, mixBytes as u64, outputFrame as u64, source as bytes, sourceBytes as u64, sourceStart as u64, sourceFrames as u64, channels as i32, bits as i32, blockAlign as i32, cursor as double, step as double, leftGain as double, rightGain as double, result as bytes) from "minipixels_audio.dll" returns double
 /// Floors, clips and writes a complete stereo signed-16 output buffer.
 extern function mpAudioMixFinish(source as bytes, sourceBytes as u64, destination as bytes, destinationBytes as u64, frames as u64) from "minipixels_audio.dll" returns i32
+/// Optional smooth peak limiter; ordinary levels remain bit-identical.
+extern function mpAudioMixFinishLimited(source as bytes, sourceBytes as u64, destination as bytes, destinationBytes as u64, frames as u64) from "minipixels_audio.dll" returns i32
+/// Independent PCM output owns copied samples; worker threads never touch managed data.
+extern function mpAudioOutputCreate(rate as u32, voices as u32) from "minipixels_audio.dll" returns ptr
+extern function mpAudioOutputAddClip(handle as ptr, data as bytes, size as u64, frames as u64, rate as u32, channels as u32, bits as u32, align as u32) from "minipixels_audio.dll" returns u32
+extern function mpAudioOutputSync(handle as ptr, commands as bytes, commandBytes as u64, states as bytes, stateBytes as u64) from "minipixels_audio.dll" returns i32
+extern function mpAudioOutputStart(handle as ptr, mode as u32) from "minipixels_audio.dll" returns i32
+extern function mpAudioOutputStats(handle as ptr, output as bytes, size as u64) from "minipixels_audio.dll" returns i32
+extern function mpAudioOutputRender(handle as ptr, output as bytes, size as u64, frames as u32) from "minipixels_audio.dll" returns i32
+extern function mpAudioOutputClose(handle as ptr) from "minipixels_audio.dll" returns void
+
 /// Invokes the legacy PlaySoundW file entry point.
 /// @param path UTF-16 WAV file path.
 /// @param module Optional resource module handle.
@@ -110,6 +121,17 @@ extern function mpAudioMixClear(destination as bytes, size as u64) from "$ORIGIN
 extern function mpAudioMixPcm(destination as bytes, mixBytes as u64, outputFrame as u64, source as bytes, sourceBytes as u64, sourceStart as u64, sourceFrames as u64, channels as i32, bits as i32, blockAlign as i32, cursor as double, step as double, leftGain as double, rightGain as double, result as bytes) from "$ORIGIN/libminipixels_audio.so" returns double
 /// Floors, clips and writes a complete stereo signed-16 output buffer.
 extern function mpAudioMixFinish(source as bytes, sourceBytes as u64, destination as bytes, destinationBytes as u64, frames as u64) from "$ORIGIN/libminipixels_audio.so" returns i32
+/// Optional smooth peak limiter; ordinary levels remain bit-identical.
+extern function mpAudioMixFinishLimited(source as bytes, sourceBytes as u64, destination as bytes, destinationBytes as u64, frames as u64) from "$ORIGIN/libminipixels_audio.so" returns i32
+/// Independent PCM output owns copied samples; worker threads never touch managed data.
+extern function mpAudioOutputCreate(rate as u32, voices as u32) from "$ORIGIN/libminipixels_audio.so" returns ptr
+extern function mpAudioOutputAddClip(handle as ptr, data as bytes, size as u64, frames as u64, rate as u32, channels as u32, bits as u32, align as u32) from "$ORIGIN/libminipixels_audio.so" returns u32
+extern function mpAudioOutputSync(handle as ptr, commands as bytes, commandBytes as u64, states as bytes, stateBytes as u64) from "$ORIGIN/libminipixels_audio.so" returns i32
+extern function mpAudioOutputStart(handle as ptr, mode as u32) from "$ORIGIN/libminipixels_audio.so" returns i32
+extern function mpAudioOutputStats(handle as ptr, output as bytes, size as u64) from "$ORIGIN/libminipixels_audio.so" returns i32
+extern function mpAudioOutputRender(handle as ptr, output as bytes, size as u64, frames as u32) from "$ORIGIN/libminipixels_audio.so" returns i32
+extern function mpAudioOutputClose(handle as ptr) from "$ORIGIN/libminipixels_audio.so" returns void
+
 /// Opens an ALSA PCM stream.
 extern function snd_pcm_open(handle as bytes, name as cstr, stream as int, mode as int) from "libasound.so.2" returns i32
 /// Configures a simple interleaved PCM stream.
@@ -299,6 +321,8 @@ struct AudioChannel
   streamStart
   /// Number of valid source frames in the streaming buffer.
   streamFrames
+  /// Explicit start identity; equal clips can be retriggered on a reused channel.
+  generation
 end struct
 
 /// Represents a software PCM mixer backed by WinMM waveOut or ALSA.
@@ -349,6 +373,16 @@ struct AudioMixer
   mixResult
   /// Dedicated additional music voices, independent of sound-effect stealing.
   musicLayers
+  /// Opt-in independently serviced PCM backend (Windows; software mixing unchanged).
+  independentOutput
+  nativeOutput
+  nativeClips
+  nativeClipCount
+  nativeCommands
+  nativeStates
+  nativeStats
+  /// Optional smooth peak limiting for dense effect mixtures; off by default.
+  softLimit
 
   /// Sets master volume for subsequently mixed samples.
   /// @param value Percentage from 0 through 100.
@@ -492,7 +526,7 @@ end function
 /// Creates an inactive mixer channel.
 /// @param id Stable channel identifier.
 function channel(id)
-  return AudioChannel(id, void, false, 100, 0, 0.0, 0, void, 0, 0)
+  return AudioChannel(id, void, false, 100, 0, 0.0, 0, void, 0, 0, 0)
 end function
 
 /// Creates a lazily opened multi-voice PCM mixer.
@@ -511,7 +545,7 @@ function mixer(maxChannels)
   return AudioMixer(
     create(), channels, maxChannels, 0, void, channel(-1), MIXER_SAMPLE_RATE,
     0, bytes(8, 0), bytes(18, 0), array(MIXER_BUFFER_COUNT), array(MIXER_BUFFER_COUNT),
-    frames, MIXER_BUFFER_COUNT, array(frames, 0), array(frames, 0), false, 0, 0, 0, bytes(frames * 16, 0), bytes(8, 0), layers
+    frames, MIXER_BUFFER_COUNT, array(frames, 0), array(frames, 0), false, 0, 0, 0, bytes(frames * 16, 0), bytes(8, 0), layers, false, 0, array(128), 0, bytes((maxChannels + 9) * 40, 0), bytes((maxChannels + 9) * 16, 0), bytes(24, 0), false
   )
 end function
 
@@ -1023,7 +1057,11 @@ function mixBuffer(value, output)
     voice = value.musicLayers[index]
     if voice.playing then value.musicLayers[index] = mixVoice(value, voice, value.audio.musicVolume) end if
   end for
-  mpAudioMixFinish(value.nativeMix, len(value.nativeMix), output, len(output), value.bufferFrames)
+  if value.softLimit then
+    mpAudioMixFinishLimited(value.nativeMix, len(value.nativeMix), output, len(output), value.bufferFrames)
+  else
+    mpAudioMixFinish(value.nativeMix, len(value.nativeMix), output, len(output), value.bufferFrames)
+  end if
   return output
 end function
 
@@ -1050,6 +1088,7 @@ function queueMusicLayer(value, id, source, volume = 100, pan = 0, cursor = 0.0)
   voice.volume = normalizeVolume(volume)
   voice.pan = normalizePan(pan)
   voice.cursor = cursor % source.frameCount
+  voice.generation = voice.generation + 1
   voice = openVoiceDecoder(voice)
   // An MP3 layer may start at a nonzero ensemble cursor. Request its own seek
   // before the first audible decode rather than reusing another voice state.
@@ -1085,10 +1124,138 @@ function prepareMixerFormat(value)
   by.writeU16LE(format, 16, 0)
 end function
 
+/// Opts a still-closed PCM mixer into independently serviced Windows output.
+/// WAV PCM clips are copied once into native ownership. Streaming MP3 clients
+/// retain the default software/backend path; this choice is explicit.
+function enableIndependentOutput(value)
+  if value is not AudioMixer or value.ready or value.channelCount > 247 then return false end if
+#if TARGET_OS == "windows"
+  value.independentOutput = true
+  return true
+#else
+  return false
+#endif
+end function
+
+function independentVoice(value, index)
+  if index < value.channelCount then return value.channels[index] end if
+  if index == value.channelCount then return value.musicChannel end if
+  return value.musicLayers[index - value.channelCount - 1]
+end function
+
+function setIndependentVoice(value, index, voice)
+  if index < value.channelCount then
+    value.channels[index] = voice
+  else if index == value.channelCount then
+    value.musicChannel = voice
+  else
+    value.musicLayers[index - value.channelCount - 1] = voice
+  end if
+end function
+
+/// The registry retains managed source objects for stable identity, while the
+/// worker exclusively reads its own copy. Uploads never hold its rendering lock.
+function independentClip(value, source)
+  if source is not AudioClip or not prepareClip(source) then return 0 end if
+  if typeof(source.sampleData) != "bytes" then return 0 end if
+  pointer = nativeBytesPtr(source.sampleData)
+  index = 0
+  while index < value.nativeClipCount
+    clip = value.nativeClips[index]
+    if nativeBytesPtr(clip.sampleData) == pointer then return index + 1 end if
+    index = index + 1
+  end while
+  if value.nativeClipCount >= len(value.nativeClips) then return 0 end if
+  id = mpAudioOutputAddClip(value.nativeOutput, source.sampleData, len(source.sampleData), source.frameCount, source.sampleRate, source.channels, source.bitsPerSample, source.blockAlign)
+  if id != value.nativeClipCount + 1 then return 0 end if
+  value.nativeClips[value.nativeClipCount] = source
+  value.nativeClipCount = value.nativeClipCount + 1
+  return id
+end function
+
+/// Publishes a whole voice ensemble atomically, retaining native timing and
+/// generation-based starts through delayed host frames and repeated snapshots.
+function syncIndependentOutput(value)
+  if value.nativeOutput == 0 then return false end if
+  limited = 0
+  if value.softLimit then limited = 1 end if
+  putU32(value.nativeCommands, 32, limited)
+  for index = 0 to value.channelCount + 8
+    voice = independentVoice(value, index)
+    offset = index * 40
+    id = 0
+    if voice.playing then
+      id = independentClip(value, voice.clip)
+      if id == 0 then value.lastError = -2 return false end if
+    end if
+    bus = value.audio.musicVolume
+    if index < value.channelCount then bus = value.audio.sfxVolume end if
+    gain = 0.0
+    if id > 0 then gain = effectiveVolume(value.audio, bus) * normalizeVolume(voice.volume) * normalizeVolume(voice.clip.volume) / 1000000.0 end if
+    pan = normalizePan(voice.pan)
+    left = gain
+    right = gain
+    if pan < 0 then right = right * (100 + pan) / 100 end if
+    if pan > 0 then left = left * (100 - pan) / 100 end if
+    putU32(value.nativeCommands, offset, id)
+    putU32(value.nativeCommands, offset + 4, voice.generation)
+    playing = 0
+    looping = 0
+    if voice.playing then playing = 1 end if
+    if voice.clip is AudioClip and voice.clip.looping then looping = 1 end if
+    putU32(value.nativeCommands, offset + 8, playing)
+    putU32(value.nativeCommands, offset + 12, looping)
+    putU64(value.nativeCommands, offset + 16, mt.floorInt(voice.cursor))
+    putU32(value.nativeCommands, offset + 24, mt.floorInt(left * 1000000.0 + 0.5))
+    putU32(value.nativeCommands, offset + 28, mt.floorInt(right * 1000000.0 + 0.5))
+  end for
+  if mpAudioOutputSync(value.nativeOutput, value.nativeCommands, len(value.nativeCommands), value.nativeStates, len(value.nativeStates)) == 0 then
+    value.lastError = -3
+    return false
+  end if
+  for index = 0 to value.channelCount + 8
+    voice = independentVoice(value, index)
+    if voice.playing then
+      voice.cursor = getU64(value.nativeStates, index * 16)
+      voice.playing = getU32(value.nativeStates, index * 16 + 8) != 0
+      setIndependentVoice(value, index, voice)
+    end if
+  end for
+  if mpAudioOutputStats(value.nativeOutput, value.nativeStats, len(value.nativeStats)) == 0 then return false end if
+  value.lastError = getU32(value.nativeStats, 12)
+  return value.lastError == 0
+end function
+
 /// Opens the platform PCM device and prepares retained output buffers.
 /// @param value Mixer to open.
 function ensureBackend(value)
-  if value.ready then return true end if
+  if value.ready then
+    if value.independentOutput then return syncIndependentOutput(value) end if
+    return true
+  end if
+  if value.independentOutput then
+    value.nativeOutput = mpAudioOutputCreate(value.sampleRate, value.channelCount + 9)
+    if value.nativeOutput == 0 then value.lastError = -1 return false end if
+    if not syncIndependentOutput(value) then
+      mpAudioOutputClose(value.nativeOutput)
+      value.nativeOutput = 0
+      value.nativeClipCount = 0
+      value.nativeClips = array(128)
+      return false
+    end if
+    if mpAudioOutputStart(value.nativeOutput, 1) == 0 then
+      mpAudioOutputStats(value.nativeOutput, value.nativeStats, len(value.nativeStats))
+      value.lastError = getU32(value.nativeStats, 12)
+      if value.lastError == 0 then value.lastError = -4 end if
+      mpAudioOutputClose(value.nativeOutput)
+      value.nativeOutput = 0
+      value.nativeClipCount = 0
+      value.nativeClips = array(128)
+      return false
+    end if
+    value.ready = true
+    return true
+  end if
 #if TARGET_OS == "windows"
   prepareMixerFormat(value)
   result = waveOutOpen(value.handleStorage, WAVE_MAPPER, value.format, 0, 0, 0)
@@ -1153,6 +1320,7 @@ function mixerPlaySfx(value, source)
   voice.volume = 100
   voice.pan = 0
   voice.cursor = 0.0
+  voice.generation = voice.generation + 1
   voice = openVoiceDecoder(voice)
   if not voice.playing then
     value.channels[index] = voice
@@ -1183,6 +1351,7 @@ function mixerPlayMusic(value, source)
   voice.volume = 100
   voice.pan = 0
   voice.cursor = 0.0
+  voice.generation = voice.generation + 1
   voice = openVoiceDecoder(voice)
   if not voice.playing then
     value.musicChannel = voice
@@ -1205,6 +1374,7 @@ end function
 /// @param value Mixer to update.
 function updateMixer(value)
   if value is not AudioMixer or value.ready == false then return false end if
+  if value.independentOutput then return syncIndependentOutput(value) end if
 #if TARGET_OS == "windows"
   wrote = false
   for index = 0 to value.bufferCount - 1
@@ -1265,6 +1435,7 @@ end function
 /// Applies a volume or mute change to subsequently mixed buffers.
 /// @param value Mixer to refresh.
 function refreshMixer(value)
+  if value is AudioMixer and value.ready and value.independentOutput then return syncIndependentOutput(value) end if
   return value is AudioMixer
 end function
 
@@ -1289,6 +1460,7 @@ function mixerStopAll(value)
     stopMusicLayer(value, index)
   end for
   if value.ready then
+    if value.independentOutput then return syncIndependentOutput(value) end if
 #if TARGET_OS == "windows"
     waveOutReset(value.handle)
     updateMixer(value)
@@ -1309,6 +1481,7 @@ function stopChannel(value, id)
   voice.playing = false
   voice.clip = void
   value.channels[id] = voice
+  if value.ready and value.independentOutput then return syncIndependentOutput(value) end if
   return true
 end function
 
@@ -1330,12 +1503,21 @@ end function
 /// @param value Mixer to close.
 function closeMixer(value)
   if value is not AudioMixer then return true end if
+  if value.nativeOutput != 0 then
+    mpAudioOutputClose(value.nativeOutput)
+    value.nativeOutput = 0
+    value.nativeClipCount = 0
+    value.nativeClips = array(128)
+  end if
   value.pendingFrames = 0
   value.pendingOffset = 0
   for index = 0 to value.channelCount - 1
     value.channels[index] = closeVoiceDecoder(value.channels[index])
+    value.channels[index].playing = false
   end for
   value.musicChannel = closeVoiceDecoder(value.musicChannel)
+  value.musicChannel.playing = false
+  value.music = void
   for index = 0 to len(value.musicLayers) - 1
     stopMusicLayer(value, index)
   end for

@@ -7,3 +7,13 @@
 `media_stream.c` supplies the loopback HTTP range transport for MPX audio/video. Protected MPX3 version-6 sources use `mpMediaStreamOpenV6`, whose additional `signed_hashes` pointer/size arguments contain the ciphertext SHA-256 table from the ECDSA-verified index. The bridge copies that table and checks each requested 256 KiB chunk against its trusted digest before GCM decryption. Supplying hashes read from the untrusted payload would defeat the integrity boundary. Unprotected sources pass an empty table. Rebuild the runtime and game together when upgrading; the old open symbol is deliberately not exported.
 
 The bridge uses Windows CNG or Linux OpenSSL for cryptography, plus native sockets/threads for the transport. Linux builds link against libcrypto and pthread; the final `.so` belongs beside the executable and is loaded through `$ORIGIN`.
+
+`audio_output.c` adds an opt-in independently serviced Windows PCM mixer. It
+copies PCM into bounded native ownership, consumes atomic voice snapshots and
+uses WinMM event notifications on its own thread, so long application render
+frames cannot stop buffer replenishment. It never invokes the language runtime
+or reads managed memory from the worker. All music stems retain their sample
+phase through mute; gain/start/stop ramps avoid abrupt sample steps. The Windows
+bridge also links to the system `winmm` library. Linux exposes the same portable
+renderer and a headless timing-test worker; the ordinary live ALSA path is
+unchanged. See [the output design and verification](../../docs/audio-output.md).

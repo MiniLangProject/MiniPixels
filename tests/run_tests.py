@@ -32,6 +32,7 @@ TESTS = [
     "geometry3d_tests.ml",
     "audio_mixer_tests.ml",
     "audio_layers_tests.ml",
+    "audio_output_tests.ml",
     "platform_display_tests.ml",
     "systems_tests.ml",
     "asset_pack_tests.ml",
@@ -961,10 +962,11 @@ def main(argv: list[str] | None = None) -> int:
     run_steam_runtime_tests(compiler, target)
     test_media_range_runtime(runtime, target)
     test_native_asset_runtime(runtime, target)
-    command = [sys.executable, str(ROOT / "tests/native_mixer_tests.py"), str(runtime)]
-    if target == "linux-x64" and os.name == "nt":
-        command = ["wsl.exe", "-d", os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"), "--", "python3", wsl_path(ROOT / "tests/native_mixer_tests.py"), wsl_path(runtime)]
-    subprocess.run(command, check=True, timeout=45)
+    for native_test in ("native_mixer_tests.py", "native_output_tests.py"):
+        command = [sys.executable, str(ROOT / "tests" / native_test), str(runtime)]
+        if target == "linux-x64" and os.name == "nt":
+            command = ["wsl.exe", "-d", os.environ.get("MINIPIXELS_WSL_DISTRO", "Ubuntu"), "--", "python3", wsl_path(ROOT / "tests" / native_test), wsl_path(runtime)]
+        subprocess.run(command, check=True, timeout=45)
     if target == "linux-x64":
         from alsa_mixer_tests import run as run_alsa_tests
         run_alsa_tests(compiler)

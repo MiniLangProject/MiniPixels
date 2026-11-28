@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "audio_limiter.h"
 
 #define DR_MP3_IMPLEMENTATION
 #define DR_MP3_NO_STDIO
@@ -156,8 +157,8 @@ MP_API double mpAudioMixPcm(
     return cursor;
 }
 
-MP_API int32_t mpAudioMixFinish(
-    const void* source, uint64_t source_bytes, void* destination, uint64_t destination_bytes, uint64_t frames)
+static int32_t mpAudioFinish(
+    const void* source, uint64_t source_bytes, void* destination, uint64_t destination_bytes, uint64_t frames, int limited)
 {
     uint64_t sample;
     const double* mix = (const double*)source;
@@ -168,6 +169,7 @@ MP_API int32_t mpAudioMixFinish(
         double value = mix[sample];
         int32_t integer;
         uint16_t packed;
+        if (limited) value = mp_audio_soft_limit(value);
         if (value != value) integer = 0;
         else if (value <= -32768.0) integer = -32768;
         else if (value >= 32767.0) integer = 32767;
@@ -180,6 +182,18 @@ MP_API int32_t mpAudioMixFinish(
         pcm[sample * 2 + 1] = (uint8_t)(packed >> 8);
     }
     return 1;
+}
+
+MP_API int32_t mpAudioMixFinish(
+    const void* source, uint64_t source_bytes, void* destination, uint64_t destination_bytes, uint64_t frames)
+{
+    return mpAudioFinish(source, source_bytes, destination, destination_bytes, frames, 0);
+}
+
+MP_API int32_t mpAudioMixFinishLimited(
+    const void* source, uint64_t source_bytes, void* destination, uint64_t destination_bytes, uint64_t frames)
+{
+    return mpAudioFinish(source, source_bytes, destination, destination_bytes, frames, 1);
 }
 
 MP_API int32_t mpAssetDecodeLz4(
